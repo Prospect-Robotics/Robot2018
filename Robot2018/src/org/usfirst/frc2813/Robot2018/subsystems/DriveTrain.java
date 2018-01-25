@@ -44,8 +44,8 @@ public class DriveTrain extends Subsystem {
     //private final SpeedController speedController3 = RobotMap.driveTrainSpeedController3;
     //private final SpeedController speedController4 = RobotMap.driveTrainSpeedController4;
     private final DifferentialDrive robotDrive = RobotMap.driveTrainRobotDrive;
-    private final Encoder quadratureEncoder1 = RobotMap.driveTrainQuadratureEncoder1;
-    private final Encoder quadratureEncoder2 = RobotMap.driveTrainQuadratureEncoder2;
+    public final Encoder quadratureEncoder1 = RobotMap.driveTrainQuadratureEncoder1;
+    public final Encoder quadratureEncoder2 = RobotMap.driveTrainQuadratureEncoder2;
     //private final Encoder quadratureEncoder3 = RobotMap.driveTrainQuadratureEncoder3;
     //private final Encoder quadratureEncoder4 = RobotMap.driveTrainQuadratureEncoder4;
     private final Solenoid solenoid1 = RobotMap.driveTrainSolenoid1;
@@ -76,6 +76,10 @@ public class DriveTrain extends Subsystem {
     	double z = joystick1.getX()+joystick1.getTwist();
     	double x = joystick1.getY();
     	robotDrive.arcadeDrive((x > 0 ? x*x : -x*x), z*z*z, false);
+    }
+    public void arcadeDrive(double x, double y, double rotate) {
+    	double z= x+rotate;
+    	robotDrive.arcadeDrive((y>0 ? y*y : -y*y), z*z*z, false);
     }
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
