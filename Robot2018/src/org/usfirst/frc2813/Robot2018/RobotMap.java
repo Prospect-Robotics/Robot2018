@@ -109,6 +109,7 @@ public class RobotMap {
         intakeSpeedController1 = new WPI_VictorSPX(5);
         LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController1);
         intakeSpeedController1.setInverted(false);
+        intakeSpeedController2 = new WPI_VictorSPX(6); 
         
         elevatorQuadratureEncoder1 = new Encoder(14,15,true, EncodingType.k4X);
         elevatorQuadratureEncoder1.setDistancePerPulse(1.0);
