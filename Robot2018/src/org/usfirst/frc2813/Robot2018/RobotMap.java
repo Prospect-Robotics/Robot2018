@@ -46,6 +46,7 @@ public class RobotMap {
     public static Solenoid driveTrainSolenoid1;
     public static SpeedController elevatorSpeedController1;
     public static SpeedController intakeSpeedController1;
+    public static SpeedController intakeSpeedController2;
     public static Encoder elevatorQuadratureEncoder1;
     public static DigitalInput elevatorDigitalInput1;
     public static Relay relay0;
