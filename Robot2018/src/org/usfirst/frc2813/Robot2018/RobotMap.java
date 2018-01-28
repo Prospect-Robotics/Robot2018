@@ -86,7 +86,7 @@ public class RobotMap {
         //driveTrainRobotDrive.setSensitivity(0.5);
         driveTrainRobotDrive.setMaxOutput(1.0);
 
-        driveTrainQuadratureEncoder1 = new Encoder(10, 11, true, EncodingType.k4X);//port 0 2*0+10=10, port 1 2*0+11=11
+        driveTrainQuadratureEncoder1 = new Encoder(10, 11, true, EncodingType.k4X);//port 0 2*0+10=10, port 0 2*0+11=11
         LiveWindow.addSensor("DriveTrain", "Quadrature Encoder 1", driveTrainQuadratureEncoder1);
         driveTrainQuadratureEncoder1.setDistancePerPulse(0.00390625);//1/Encoder ticks per revolution, which = 256
         driveTrainQuadratureEncoder1.setSamplesToAverage(1);
