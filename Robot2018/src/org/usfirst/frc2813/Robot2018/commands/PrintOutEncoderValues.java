@@ -38,8 +38,8 @@ public class PrintOutEncoderValues extends TimedCommand {
     protected void execute() {
     	if((System.currentTimeMillis() - last) >= 100) {
 	    	System.out.println(
-	    			"ENCODER" + myEncoder1.get() + " [" + myEncoder1.getRaw() + "] " +myEncoder1.getDistance()+" "+ myEncoder1.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE +" ["+myEncoder1.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n" +
-	    			myEncoder2.get() + " [" + myEncoder2.getRaw() + "]" +myEncoder2.getDistance()+" "+ myEncoder2.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE+" ["+myEncoder2.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n"
+	    			"ENCODERSTARBOARD " + myEncoder1.get() + " [" + myEncoder1.getRaw() + "] " +myEncoder1.getDistance()+" "+ myEncoder1.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE +" ["+myEncoder1.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n" +
+	    			"ENCODERPORT " + myEncoder2.get() + " [" + myEncoder2.getRaw() + "]" +myEncoder2.getDistance()+" "+ myEncoder2.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE+" ["+myEncoder2.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n"
 	    			);
 	    	this.last = System.currentTimeMillis();
     	}

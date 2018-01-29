@@ -11,6 +11,7 @@
 
 package org.usfirst.frc2813.Robot2018;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -28,6 +29,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.*;
  * the project.
  */
 public class Robot extends TimedRobot {
+	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
 
     Command autonomousCommand;
     SendableChooser<Command> chooser = new SendableChooser<>();
