@@ -25,7 +25,7 @@ public class ToggleCompressor extends InstantCommand {
     		compressor.start();
     		if(compressor.getPressureSwitchValue())
     			System.out.println("[ToggleCompressor] The compressor has been enabled but will not start until tank pressure drops below 90PSI.");
-    		else if(compressor.closed)
+    		//else if(compressor.closed)
     	}
     }
 
