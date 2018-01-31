@@ -99,4 +99,8 @@ public class DriveTrain extends Subsystem {
 		robotDrive.tankDrive(-joystick1.getY() * Math.abs(joystick1.getY()),
 				-joystick2.getY() * Math.abs(joystick2.getY()));
 	}
+
+	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
+		robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if omitted, the argument defaults to true)
+	}
 }
