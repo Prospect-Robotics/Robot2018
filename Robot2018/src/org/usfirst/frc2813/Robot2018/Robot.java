@@ -105,13 +105,33 @@ public class Robot extends TimedRobot {
     			autonomousCommand = new AutoLLRL();
     		}
     		else if (gameData == "LRR") {
-    			autonomousCommand = new AutoLLRL();
+    			autonomousCommand = new AutoLLRR();
     		}
     	}
     	else if ((int) selectAuto.getSelected() == CENTER) {
-    		if (gameData ==)
-    	}*/
-        //autonomousCommand = (Command) selectAuto.getSelected();
+    		if (gameData == "LLL" || gameData== "LLR" || gameData == "LRL" || gameData == "LRR") {
+    			autonomousCommand = new AutoCL();
+    		}
+    		else if (gameData == "RRR" || gameData=="RRL"|| gameData == "RLR" || gameData == "RLL") {
+    			autonomousCommand = new AutoCR();
+    		}
+    	}
+    	else if ((int) selectAuto.getSelected() == RIGHT) {
+    		if (gameData == "RRR") {
+    			autonomousCommand = new AutoRRRR();
+    		}
+    		else if (gameData == "RRL") {
+    			autonomousCommand = new AutoRRRL();
+    		}
+    		else if (gameData == "RLR") {
+    			autonomousCommand = new AutoRRLR();
+    		}
+    		else if (gameData == "RLL") {
+    			autonomousCommand = new AutoRRLL();
+    		}
+    	}
+        autonomousCommand = (Command) selectAuto.getSelected();*/
+    	autonomousCommand = new AutonomousCommand();
         // schedule the autonomous command (example)
         if (autonomousCommand != null) autonomousCommand.start();
     }

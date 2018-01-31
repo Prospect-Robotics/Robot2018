@@ -24,21 +24,26 @@ public class AutoDrive extends Command {
 	private double accelStopDistance;
 	private double accelStartValue;
 	private double accelStopValue;
-    public AutoDrive(double forwardSpeed, double distance) {
+	private double minSpeed;
+    public AutoDrive(double forwardSpeed, double minSpeed, double distance) {
     	requires(Robot.driveTrain);
     	m_forwardSpeed = forwardSpeed;
     	m_distance = distance;
     	maxSpeed = Math.abs(forwardSpeed);
+    	minSpeed = Math.abs(minSpeed);
     	encoder1 = Robot.driveTrain.quadratureEncoder1;
     	encoder2 = Robot.driveTrain.quadratureEncoder2;
+    	lerpStart = m_distance/4;
+    	lerpEnd=.2;
+    	lerpStop = .02;
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	encoder1.reset();
-    	encoder2.reset();
+    	//encoder1.reset();
+    	//encoder2.reset();
     	distanceLeft=m_distance;
     }
     private double distanceTraveled() {
@@ -70,18 +75,62 @@ public class AutoDrive extends Command {
     	distanceLeft=m_distance - distanceTraveled();
     	double potentialThrottle=Math.min(calcThrottleSteadyState(), calcThrottleAccelerate(distanceLeft));
     	double newThrottle=Math.min(potentialThrottle,calcThrottleDecelerate(distanceLeft));
-    	if (newThrottle != Math.abs(m_forwardSpeed)) {
+    	System.out.println("EXECUTE"+newThrottle);
+    	/*if (newThrottle != Math.abs(m_forwardSpeed)) {
     		m_forwardSpeed=-1*newThrottle;
     	}
+    	System.out.println("EXECUTE"+newThrottle);
+    	double newThrottle1=newThrottle;
+    	if (Robot.gyro.getAngle() > 0 && distanceLeft<10) {
+    		newThrottle1=newThrottle+.1;
+    	}
+    	else if (Robot.gyro.getAngle() < 0 && distanceLeft<10) {
+    		newThrottle1=newThrottle-.1;
+    	}*/
+    	//Robot.driveTrain.tankAutoDrive(newThrottle1,newThrottle);
+    	if (distanceLeft<=.25*m_distance) {
+    		newThrottle=minSpeed;
+    	}
+    	Robot.driveTrain.tankAutoDrive(newThrottle,newThrottle);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return distanceTraveled() >=m_distance;
+        return distanceTraveled() >=m_distance-36;
     }
 
     // Called once after isFinished returns true
     protected void end() {
+    	System.out.println("END");
+    	if (Robot.gyro.getAngle()>0) {
+    		System.out.println("GETANGLE>0");
+    		while(true) {
+    			System.out.println(Robot.gyro.getAngle());
+    			if (Robot.gyro.getAngle()<=0) {
+    				System.out.println("GETANGLE>=0BREAK");
+    				break;
+    			}
+    			Robot.driveTrain.speedController2.set(.15);
+    			//Robot.driveTrain.speedController1.set(.15);
+    		}
+    		Robot.driveTrain.speedController2.set(0);
+    		Robot.driveTrain.speedController1.set(0);
+    	}
+    	else if (Robot.gyro.getAngle()<0) {
+    		System.out.println("GETANGLE<0");
+    		while(true) {
+    			System.out.println(Robot.gyro.getAngle());
+    			if (Robot.gyro.getAngle()>=0) {
+    				System.out.println(Robot.gyro.getAngle());
+    				System.out.println("GETANGLE>=0BREAK");
+    				break;
+    			}
+    			Robot.driveTrain.speedController1.set(-.15);
+    			//Robot.driveTrain.speedController2.set(-.15);
+    		}
+    		Robot.driveTrain.speedController1.set(0);
+    		Robot.driveTrain.speedController2.set(0);
+    	}
     }
 
     // Called when another command which requires one or more of the same
