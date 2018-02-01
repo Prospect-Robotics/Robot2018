@@ -94,25 +94,25 @@ public class Robot extends TimedRobot {
 
     //@Override
     public void autonomousInit() {
-    	/*if ((int) selectAuto.getSelected() == LEFT) {
+    	if ((int) selectAuto.getSelected() == LEFT) {//If the robot is positioned on the left, check the Game Data
     		if (gameData == "LLL") {
-    			autonomousCommand = new AutoLLLL();
-    		}
-    		else if (gameData == "LLR") {
-    			autonomousCommand = new AutoLLLR();
+    			//autonomousCommand = new AutoLLLL();
     		}
     		else if (gameData == "LRL") {
-    			autonomousCommand = new AutoLLRL();
+    			autonomousCommand = new AutoLRLR();
     		}
-    		else if (gameData == "LRR") {
-    			autonomousCommand = new AutoLLRR();
+    		else if (gameData == "RLR") {
+    			autonomousCommand = new AutoLRLR();
+    		}
+    		else if (gameData == "RRR") {
+    			autonomousCommand = new AutoLRRR();
     		}
     	}
     	else if ((int) selectAuto.getSelected() == CENTER) {
-    		if (gameData == "LLL" || gameData== "LLR" || gameData == "LRL" || gameData == "LRR") {
+    		if (gameData == "LLL" || gameData== "LRL") {
     			autonomousCommand = new AutoCL();
     		}
-    		else if (gameData == "RRR" || gameData=="RRL"|| gameData == "RLR" || gameData == "RLL") {
+    		else if (gameData == "RRR" || gameData=="RLR") {
     			autonomousCommand = new AutoCR();
     		}
     	}
@@ -121,17 +121,17 @@ public class Robot extends TimedRobot {
     			autonomousCommand = new AutoRRRR();
     		}
     		else if (gameData == "RRL") {
-    			autonomousCommand = new AutoRRRL();
-    		}
-    		else if (gameData == "RLR") {
     			autonomousCommand = new AutoRRLR();
     		}
+    		else if (gameData == "RLR") {
+    			autonomousCommand = new AutoRLRL();
+    		}
     		else if (gameData == "RLL") {
-    			autonomousCommand = new AutoRRLL();
+    			autonomousCommand = new AutoRLLL();
     		}
     	}
-        autonomousCommand = (Command) selectAuto.getSelected();*/
-    	autonomousCommand = new AutonomousCommand();
+        //autonomousCommand = (Command) selectAuto.getSelected();
+    	//autonomousCommand = new AutonomousCommand();
         // schedule the autonomous command (example)
         if (autonomousCommand != null) autonomousCommand.start();
     }

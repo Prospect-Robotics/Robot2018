@@ -82,6 +82,12 @@ public class DriveTrain extends Subsystem {
 	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
 		double z = joystick1.getX() + joystick1.getTwist();
 		double x = joystick1.getY();
+		if (Math.abs(joystick1.getY()) > .7 && gearShift.get() == false) {
+			new ShiftGears();
+		}
+		else if (Math.abs(joystick1.getY()) <= .7 && gearShift.get()==true) {
+			new ShiftGears();
+		}
 		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX()*Math.abs(joystick1.getX()), false);
 	}
 
@@ -99,8 +105,14 @@ public class DriveTrain extends Subsystem {
 		robotDrive.tankDrive(-joystick1.getY() * Math.abs(joystick1.getY()),
 				-joystick2.getY() * Math.abs(joystick2.getY()));
 	}
+<<<<<<< HEAD
 
 	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
 		robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if omitted, the argument defaults to true)
+=======
+	
+	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
+		 robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if omitted, the argument defaults to true)
+>>>>>>> branch 'Grady' of https://github.com/Prospect-Robotics/Robot2018
 	}
 }
