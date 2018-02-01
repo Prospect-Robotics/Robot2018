@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
     	if ((int) selectAuto.getSelected() == LEFT) {//If the robot is positioned on the left, check the Game Data
     		if (gameData == "LLL") {
-    			autonomousCommand = new AutoLLLL();
+    			//autonomousCommand = new AutoLLLL();
     		}
     		else if (gameData == "LRL") {
     			autonomousCommand = new AutoLRLR();

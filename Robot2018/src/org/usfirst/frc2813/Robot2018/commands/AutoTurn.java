@@ -8,20 +8,22 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class AutoTurn extends Command {
-	private final double degrees, rotateSpeed;
-	private double throttle;
+	private final double degrees, leftSpeed, rightSpeed;
+	private double throttleLeft, throttleRight;
 	private double finalOrientation;
 	private static final double LERP_START=60;
 	private static final double LERP_STOP=40;
 	private static final double LERP_END=0.2;
 	private static final double MIN_DEG=0.01;
-    public AutoTurn(double rotateSpeed, double degrees) {
+    public AutoTurn(double leftSpeed, double rightSpeed, double degrees) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.driveTrain);
     	this.degrees=degrees;
-    	this.rotateSpeed=rotateSpeed;
-    	throttle = rotateSpeed;
+    	this.leftSpeed=leftSpeed;
+    	this.rightSpeed=rightSpeed;
+    	throttleLeft=leftSpeed;
+    	throttleRight=rightSpeed;
     }
 
     // Called just before this Command runs the first time
@@ -32,7 +34,7 @@ public class AutoTurn extends Command {
     private double degreesRotated() {
     	return (Robot.gyro.getAngle());
     }
-    private double calcThrottle(double deg) {//set throttle given degrees from target
+    private double calcThrottle(double deg, double throttle) {//set throttle given degrees from target
     	if (deg<MIN_DEG) {//if at correct location, stop
     		return 0;
     	}
@@ -47,8 +49,9 @@ public class AutoTurn extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	double deg=degrees-degreesRotated();
-    	double newThrottle=calcThrottle(deg);
-    	Robot.driveTrain.tankAutoDrive(0, 0);
+    	double newThrottleLeft=calcThrottle(deg, throttleLeft);
+    	double newThrottleRight = calcThrottle(deg, throttleRight);
+    	Robot.driveTrain.tankAutoDrive(newThrottleLeft, newThrottleRight);
     }
 
     // Make this return true when this Command no longer needs to run execute()

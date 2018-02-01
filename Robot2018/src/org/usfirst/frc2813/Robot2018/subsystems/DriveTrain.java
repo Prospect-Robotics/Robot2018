@@ -82,6 +82,12 @@ public class DriveTrain extends Subsystem {
 	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
 		double z = joystick1.getX() + joystick1.getTwist();
 		double x = joystick1.getY();
+		if (Math.abs(joystick1.getY()) > .7 && gearShift.get() == false) {
+			new ShiftGears();
+		}
+		else if (Math.abs(joystick1.getY()) <= .7 && gearShift.get()==true) {
+			new ShiftGears();
+		}
 		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX()*Math.abs(joystick1.getX()), false);
 	}
 

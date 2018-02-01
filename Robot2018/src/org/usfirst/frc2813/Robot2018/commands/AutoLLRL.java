@@ -13,7 +13,7 @@ public class AutoLLRL extends CommandGroup {
     	addSequential(new ResetEncoders());
     	addSequential(new ResetGyro());
     	addSequential(new AutoDrive(-1,-0.25,120));
-    	addSequential(new AutoTurn(.75,90));
+    	addSequential(new AutoTurn(.75,90, 0));
     	addSequential(new AutoDrive(-1,-0.25,12));
     	addSequential(new MoveArm(false));
     	addParallel(new SpinIntake(false));
