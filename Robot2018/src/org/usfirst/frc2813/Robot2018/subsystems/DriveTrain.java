@@ -84,19 +84,17 @@ public class DriveTrain extends Subsystem {
 		double x = joystick1.getY();
 		if (Math.abs(joystick1.getY()) > .7 && gearShift.get() == false) {
 			new ShiftGears();
-		}
-		else if (Math.abs(joystick1.getY()) <= .7 && gearShift.get()==true) {
+		} else if (Math.abs(joystick1.getY()) <= .7 && gearShift.get() == true) {
 			new ShiftGears();
 		}
-		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX()*Math.abs(joystick1.getX()), false);
+		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX() * Math.abs(joystick1.getX()), false);
 	}
 
-
 	public void tankAutoDrive(double speedLeft, double speedRight) {
-		//double z = x + rotate;
+		// double z = x + rotate;
 		Robot.driveTrain.speedController1.set(-speedLeft);
 		Robot.driveTrain.speedController2.set(speedRight);
-		//robotDrive.arcadeDrive(-y, rotate, false);// TODO check math
+		// robotDrive.arcadeDrive(-y, rotate, false);// TODO check math
 	}
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
@@ -105,14 +103,29 @@ public class DriveTrain extends Subsystem {
 		robotDrive.tankDrive(-joystick1.getY() * Math.abs(joystick1.getY()),
 				-joystick2.getY() * Math.abs(joystick2.getY()));
 	}
-<<<<<<< HEAD
 
 	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
-		robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if omitted, the argument defaults to true)
-=======
-	
-	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
-		 robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if omitted, the argument defaults to true)
->>>>>>> branch 'Grady' of https://github.com/Prospect-Robotics/Robot2018
+		robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if
+																// omitted, the argument defaults to true)\
+	}
+
+	/**
+	 * Return the distance the robot has traveled in feet since the last call to
+	 * {@link #reset Robot.driveTrain.reset()}, or robot program start, whichever
+	 * was later. If the robot drove backwards, the value returned will be negative.
+	 * If the robot spins in place, the value will not change.
+	 * 
+	 * @return the average of the left and right encoder values
+	 */
+	public double getDistance() {
+		return quadratureEncoder1.getDistance() + quadratureEncoder2.getDistance() / 2;
+	}
+
+	/**
+	 * Reset both encoders, restoring the value returned by getDistance() to zero.
+	 */
+	public void reset() {
+		quadratureEncoder1.reset();
+		quadratureEncoder2.reset();
 	}
 }

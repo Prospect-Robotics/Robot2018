@@ -8,28 +8,25 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class AutoTurn extends Command {
-	private final double degrees, leftSpeed, rightSpeed;
-	private double throttleLeft, throttleRight;
-	private double finalOrientation;
+	private final double degrees, rate;
+	private double startingOrientation;
 	private static final double LERP_START=60;
 	private static final double LERP_STOP=40;
 	private static final double LERP_END=0.2;
 	private static final double MIN_DEG=0.01;
-    public AutoTurn(double leftSpeed, double rightSpeed, double degrees) {
+    public AutoTurn(double rate, double degrees) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.driveTrain);
     	this.degrees=degrees;
-    	this.leftSpeed=leftSpeed;
-    	this.rightSpeed=rightSpeed;
-    	throttleLeft=leftSpeed;
-    	throttleRight=rightSpeed;
+    	this.rate   =rate;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.gyro.reset();
-    	finalOrientation = Robot.gyro.getAngle() + degrees;
+    	//Robot.gyro.reset();
+    	startingOrientation = Robot.gyro.getAngle();
+    	//finalOrientation = Robot.gyro.getAngle() + degrees;
     }
     private double degreesRotated() {
     	return (Robot.gyro.getAngle());
@@ -48,15 +45,16 @@ public class AutoTurn extends Command {
     }
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double deg=degrees-degreesRotated();
-    	double newThrottleLeft=calcThrottle(deg, throttleLeft);
-    	double newThrottleRight = calcThrottle(deg, throttleRight);
-    	Robot.driveTrain.tankAutoDrive(newThrottleLeft, newThrottleRight);
+    	//double deg=degrees-degreesRotated();
+    	//double newThrottleLeft=calcThrottle(deg, throttleLeft);
+    	//double newThrottleRight = calcThrottle(deg, throttleRight);
+    	
+    	Robot.driveTrain.arcadeDrive(0, calcThrottle(degreesRotated(), rate));
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return (degrees > 0 ? Robot.gyro.getAngle() >= finalOrientation : Robot.gyro.getAngle() <= finalOrientation);
+        return (degrees > 0 ? Robot.gyro.getAngle() >= startingOrientation + degrees : Robot.gyro.getAngle() <= startingOrientation - degrees);
     }
 
     // Called once after isFinished returns true
