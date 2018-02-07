@@ -139,8 +139,9 @@ public class Robot extends TimedRobot {
     		}
     	}*/
         //autonomousCommand = (Command) selectAuto.getSelected();
+    	System.out.println("Autonomous Init");
     	autonomousCommand = new AutonomousCommand();
-        // schedule the autonomous command (example)
+        // schedule the autonomous  (example)
         if (autonomousCommand != null) autonomousCommand.start();
     }
 

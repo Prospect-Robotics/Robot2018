@@ -10,7 +10,6 @@
 	<classpathentry kind="lib" path="C:/Users/Sean/wpilib/user/java/lib/CTRE_Phoenix.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Sean/wpilib/user/java/lib/CTRE_Phoenix-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Sean/wpilib/user/java/lib/CTRE_Phoenix-sources.jar"/>
-	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-javadoc.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar"/>
 	<classpathentry kind="output" path="bin"/>
