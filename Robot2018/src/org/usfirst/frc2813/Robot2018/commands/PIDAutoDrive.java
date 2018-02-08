@@ -18,7 +18,7 @@ public class PIDAutoDrive extends Command {
 	private final double distance;
 	private double stopAt;
 	
-    public PIDAutoDrive(double forwardSpeed, double distance) {
+    public PIDAutoDrive(double forwardSpeed, double distance) {	// What are the units of distance?
         requires(Robot.driveTrain);
         controller.setInputRange(0, 360);
         controller.setContinuous();
@@ -31,9 +31,13 @@ public class PIDAutoDrive extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	stopAt = ((Robot.driveTrain.quadratureEncoder1.getDistance()+Robot.driveTrain.quadratureEncoder2.getDistance())/2) + distance;
+    	// Encoder 2 spins the opposite direction of Encoder 1.  Encoder 1 has a postive sense, Encoder 2 will therefore have a negative sense.
+    	// In order to add the two values correctly, you should add Encoder 1 to the negative of Encoder 2, or "Encoder 1 - Encoder 2"
+    	// This will, counter intuitively, add the two values, NOT take the difference between the two values
+    	stopAt = ((Robot.driveTrain.quadratureEncoder1.getDistance() + (-1 * Robot.driveTrain.quadratureEncoder2.getDistance()))/2) + distance;
     	controller.enable();
-    	System.out.println("Started");
+    	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
+    	
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -43,7 +47,17 @@ public class PIDAutoDrive extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        double distanceRemaining = stopAt - ((Math.abs(Robot.driveTrain.quadratureEncoder1.getDistance())+Math.abs(Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
+    	/*
+    	 * isFinished() for PIDAutoDrive
+    	 * Want to stop when we have reached the desired Encoder position
+    	 * The encoder position "stopAt" is recoreded 
+    	 */
+    	//  stopAt is an encoder position; it is signed 
+    	// Encoder 2 spins the opposite direction of Encoder 1.  Encoder 1 has a postive sense, Encoder 2 will therefore have a negative sense.
+    	// In order to add the two values correctly, you should add Encoder 1 to the negative of Encoder 2, or "Encoder 1 - Encoder 2"
+    	// This will, counter intuitively, add the two values, NOT take the difference between the two values
+    	//        double distanceRemaining = stopAt - ((Math.abs(Robot.driveTrain.quadratureEncoder1.getDistance())+Math.abs(Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
+        double distanceRemaining = stopAt - ((Robot.driveTrain.quadratureEncoder1.getDistance() + (-1 * Robot.driveTrain.quadratureEncoder2.getDistance())) /2);
         if(distance < 0)
         	distanceRemaining *= -1;
         System.out.println("Distance remaining: "+distanceRemaining);
