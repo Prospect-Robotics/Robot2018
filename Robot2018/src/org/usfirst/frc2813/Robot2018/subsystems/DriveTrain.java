@@ -121,7 +121,7 @@ public class DriveTrain extends Subsystem {
 		return quadratureEncoder1.getDistance() + quadratureEncoder2.getDistance() / 2;
 	}
 
-	/**
+	/**getDistance
 	 * Reset both encoders, restoring the value returned by getDistance() to zero.
 	 */
 	public void reset() {

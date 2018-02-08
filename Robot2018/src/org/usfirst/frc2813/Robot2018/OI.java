@@ -108,8 +108,7 @@ public class OI {
         spinIntakeOut.whileHeld(new SpinIntake(false));
         spinIntakeIn = new JoystickButton(buttonPanel, 1);
         spinIntakeIn.whileHeld(new SpinIntake(true));
-        armUpToLimitSwitch = new JoystickButton(buttonPanel, 9);
-        armUpToLimitSwitch.whenPressed(new ArmLimitSwitch(true));
+        new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
         new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
         armMoveUp = new JoystickButton(buttonPanel, 11);
         armMoveUp.whileHeld(new MoveArm(true));

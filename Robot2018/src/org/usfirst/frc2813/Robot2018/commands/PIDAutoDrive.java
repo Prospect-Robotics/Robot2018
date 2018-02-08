@@ -31,7 +31,7 @@ public class PIDAutoDrive extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	stopAt = Robot.driveTrain.getDistance() + distance;
+    	stopAt = ((Robot.driveTrain.quadratureEncoder1.getDistance()+Robot.driveTrain.quadratureEncoder2.getDistance())/2) + distance;
     	controller.enable();
     	System.out.println("Started");
     }
@@ -43,7 +43,7 @@ public class PIDAutoDrive extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        double distanceRemaining = stopAt - Robot.driveTrain.getDistance();
+        double distanceRemaining = stopAt - ((Math.abs(Robot.driveTrain.quadratureEncoder1.getDistance())+Math.abs(Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
         if(distance < 0)
         	distanceRemaining *= -1;
         System.out.println("Distance remaining: "+distanceRemaining);

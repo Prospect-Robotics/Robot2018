@@ -39,8 +39,10 @@ public class PrintOutEncoderValues extends TimedCommand {
     	if((System.currentTimeMillis() - last) >= 100) {
 	    	System.out.println(
 	    			"ENCODERSTARBOARD " + myEncoder1.get() + " [" + myEncoder1.getRaw() + "] " +myEncoder1.getDistance()+" "+ myEncoder1.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE +" ["+myEncoder1.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n" +
-	    			"ENCODERPORT " + myEncoder2.get() + " [" + myEncoder2.getRaw() + "]" +myEncoder2.getDistance()+" "+ myEncoder2.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE+" ["+myEncoder2.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n"
+	    			"ENCODERPORT " + myEncoder2.get() + " [" + myEncoder2.getRaw() + "]" +myEncoder2.getDistance()+" "+ myEncoder2.getDistance()*RobotMap.WHEEL_CIRCUMFERENCE+" ["+myEncoder2.getDistancePerPulse()+"] "+myEncoder1.getDirection()+" ["+myEncoder1.getStopped()+"]\n"+
+	    			"DRIVETRAIN" + Robot.driveTrain.getDistance() +"\n"
 	    			);
+	    	
 	    	this.last = System.currentTimeMillis();
     	}
     }

@@ -782,12 +782,14 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 						while (true) {
 							m_thisMutex.lock();
 							try {
-								if (m_thread == null)
+								if (m_thread == null || Thread.interrupted())
 									return;
 							} finally {
 								m_thisMutex.unlock();
 							}
+							System.out.println("Not interrupted yet.  Continuing.");
 							calculate();
+							System.out.println("Calculations complete.");
 						}
 					}
 				});
@@ -805,31 +807,34 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 	@Override
 	public void disable() {
 		// Ensures m_enabled check and pidWrite() call occur atomically
+
+		Thread t;
+		m_thisMutex.lock();
+		try {
+			t = m_thread;
+			m_thread = null;
+		} finally {
+			m_thisMutex.unlock();
+		}
+		if (t != null) {
+			System.out.println("Interrupting m_thread");
+			t.interrupt();
+			System.out.println("Joining m_thread");
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			/*
+			 * When there is a problem with DifferentialDrive, it gets stuck here. The
+			 * println "m_thread has stopped" is never executed when this happens
+			 */
+		}
+		System.out.println("m_thread has stopped");
 		m_pidWriteMutex.lock();
 		try {
-			Thread t;
-			m_thisMutex.lock();
-			try {
-				t = m_thread;
-				m_thread = null;
-			} finally {
-				m_thisMutex.unlock();
-			}
-			if (t != null) {
-				System.out.println("Joining m_thread");
-				t.join();
-				/*
-				 * When there is a problem with DifferentialDrive,
-				 * it gets stuck here. The println "m_thread has stopped"
-				 * is never executed when this happens
-				 */
-			}
-			System.out.println("m_thread has stopped");
-
 			m_pidOutput.pidWrite(0);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
 			m_pidWriteMutex.unlock();
 		}
