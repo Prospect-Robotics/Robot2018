@@ -787,9 +787,9 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 							} finally {
 								m_thisMutex.unlock();
 							}
-							System.out.println("Not interrupted yet.  Continuing.");
+							//System.out.println("Not interrupted yet.  Continuing.");
 							calculate();
-							System.out.println("Calculations complete.");
+							//System.out.println("Calculations complete.");
 						}
 					}
 				});
@@ -817,9 +817,9 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 			m_thisMutex.unlock();
 		}
 		if (t != null) {
-			System.out.println("Interrupting m_thread");
+			//System.out.println("Interrupting m_thread");
 			t.interrupt();
-			System.out.println("Joining m_thread");
+			//System.out.println("Joining m_thread");
 			try {
 				t.join();
 			} catch (InterruptedException e) {
@@ -831,7 +831,7 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 			 * println "m_thread has stopped" is never executed when this happens
 			 */
 		}
-		System.out.println("m_thread has stopped");
+		//System.out.println("m_thread has stopped");
 		m_pidWriteMutex.lock();
 		try {
 			m_pidOutput.pidWrite(0);

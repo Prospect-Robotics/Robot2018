@@ -118,7 +118,8 @@ public class DriveTrain extends Subsystem {
 	 * @return the average of the left and right encoder values
 	 */
 	public double getDistance() {
-		return quadratureEncoder1.getDistance() + quadratureEncoder2.getDistance() / 2;
+		//return quadratureEncoder1.getDistance() + quadratureEncoder2.getDistance() / 2;
+		return ((Robot.driveTrain.quadratureEncoder1.getDistance() + (-1 * Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
 	}
 
 	/**getDistance

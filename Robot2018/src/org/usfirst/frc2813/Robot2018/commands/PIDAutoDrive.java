@@ -28,13 +28,19 @@ public class PIDAutoDrive extends Command {
         this.forwardSpeed=forwardSpeed;
         this.distance = distance;
     }
+    
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	// Encoder 2 spins the opposite direction of Encoder 1.  Encoder 1 has a postive sense, Encoder 2 will therefore have a negative sense.
     	// In order to add the two values correctly, you should add Encoder 1 to the negative of Encoder 2, or "Encoder 1 - Encoder 2"
     	// This will, counter intuitively, add the two values, NOT take the difference between the two values
-    	stopAt = ((Robot.driveTrain.quadratureEncoder1.getDistance() + (-1 * Robot.driveTrain.quadratureEncoder2.getDistance()))/2) + distance;
+    	/*
+    	 * A note on Encoders and the sign of distance:
+    	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
+    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
+    	 */
+    	stopAt = Robot.driveTrain.getDistance() + distance;
     	controller.enable();
     	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
     	
@@ -60,7 +66,7 @@ public class PIDAutoDrive extends Command {
         double distanceRemaining = stopAt - ((Robot.driveTrain.quadratureEncoder1.getDistance() + (-1 * Robot.driveTrain.quadratureEncoder2.getDistance())) /2);
         if(distance < 0)
         	distanceRemaining *= -1;
-        System.out.println("Distance remaining: "+distanceRemaining);
+        System.out.println("Distance remaining: "+distanceRemaining+",  stopAt:"+stopAt+", Encoder1:"+ Robot.driveTrain.quadratureEncoder1.getDistance());
         return distanceRemaining <= 0;
     }
 
@@ -80,7 +86,7 @@ public class PIDAutoDrive extends Command {
     	 * don't accept input.
     	 */
 //    	if(!watchdog.isAlive()) return;
-    	System.out.println("Output updated to: "+output);//+", Time since last run: "+controller.getTimeDelta());
+    	//System.out.println("Output updated to: "+output);//+", Time since last run: "+controller.getTimeDelta());
     	Robot.driveTrain.arcadeDrive(forwardSpeed, -output);
     }
 }

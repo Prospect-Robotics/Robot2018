@@ -23,10 +23,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class AutonomousCommand extends CommandGroup {
 
 	private static final SendableChooser<Integer> positionSelector = new SendableChooser<Integer>();
-	public static final int FORWARD_x_PERCENT_POWER = -1;
-	public static final int BACKWARD_x_PERCENT_POWER = 1;
-	public static final int ONE_INCH = 1;
-	public static final int ONE_FOOT = 12 * ONE_INCH;
+	public static final int FORWARD_SPEED_x_percent_power = -1;
+	public static final int BACKWARD_SPEED_x_percent_power = 1;
+	public static final int FORWARD_DISTANCE = 1;
+	public static final int BACKWARD_DISTANCE = -1;
+	public static final double ONE_INCH = 1 / RobotMap.INCHES_PER_PULSE;
+	public static final double ONE_FOOT = 12 * ONE_INCH;
 	
 	static {
 		positionSelector.addDefault("LEFT", 0);
@@ -43,8 +45,14 @@ public class AutonomousCommand extends CommandGroup {
 		addSequential(new ResetEncoders());
 		addSequential(new ResetGyro());
 
-		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
-		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 1 * ONE_FOOT));	// drive forward some distance
+    	/*
+    	 * A note on Encoders and the sign of distance:
+    	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
+    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
+    	 */
+		
+		addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.2, FORWARD_DISTANCE * 2 * ONE_FOOT));				// drive at % of max speed some distance
+		addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 0.2, BACKWARD_DISTANCE * 2 * ONE_FOOT));	// drive at % of max speed some distance
 		//  This code makes the robot drive backwards, but it doesn't stop...  FLAG  - fix this!
 //		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive back the same distance - are we where we started?
 		// addSequential(new
