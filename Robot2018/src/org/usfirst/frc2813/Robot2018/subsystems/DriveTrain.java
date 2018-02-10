@@ -51,6 +51,7 @@ public class DriveTrain extends Subsystem {
 	// private final Encoder quadratureEncoder3 =
 	// RobotMap.driveTrainQuadratureEncoder4;
 	public final Solenoid gearShift = RobotMap.driveTrainSolenoid1;
+	public boolean encoder1Functional, encoder2Functional; // set by POST.
 
 	// private final Encoder quadratureEncoder4 =
 	// RobotMap.driveTrainQuadrature
@@ -118,8 +119,20 @@ public class DriveTrain extends Subsystem {
 	 * @return the average of the left and right encoder values
 	 */
 	public double getDistance() {
-		//return quadratureEncoder1.getDistance() + quadratureEncoder2.getDistance() / 2;
-		return ((Robot.driveTrain.quadratureEncoder1.getDistance() + (-1 * Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
+		/*
+    	 * A note on Encoders and the sign of distance:
+    	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
+    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
+    	 */
+		
+		if(encoder1Functional && encoder2Functional)
+			return (quadratureEncoder1.getDistance() + (-1 * quadratureEncoder2.getDistance()))/2;
+		else if(encoder1Functional)
+			return quadratureEncoder1.getDistance();
+		else if(encoder2Functional)
+			return -quadratureEncoder2.getDistance();
+		else
+			throw new Error("Both encoders are nonfunctional!");
 	}
 
 	/**getDistance

@@ -27,7 +27,8 @@ public class AutonomousCommand extends CommandGroup {
 	public static final int BACKWARD_SPEED_x_percent_power = 1;
 	public static final int FORWARD_DISTANCE = 1;
 	public static final int BACKWARD_DISTANCE = -1;
-	public static final double ONE_INCH = 1 / RobotMap.INCHES_PER_PULSE;
+	public static final double ONE_INCH = 1;			//  The Encoder code in WPI Lib translates the distance to inches based on the
+														//  
 	public static final double ONE_FOOT = 12 * ONE_INCH;
 	
 	static {
@@ -51,15 +52,15 @@ public class AutonomousCommand extends CommandGroup {
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
     	 */
 		
-		addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.2, FORWARD_DISTANCE * 2 * ONE_FOOT));				// drive at % of max speed some distance
-		addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 0.2, BACKWARD_DISTANCE * 2 * ONE_FOOT));	// drive at % of max speed some distance
+		addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.75, FORWARD_DISTANCE * 10 * ONE_FOOT));				// drive at % of max speed some distance
+		addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 0.75, BACKWARD_DISTANCE * 10 * ONE_FOOT));	// drive at % of max speed some distance
 		//  This code makes the robot drive backwards, but it doesn't stop...  FLAG  - fix this!
 //		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive back the same distance - are we where we started?
 		// addSequential(new
 		// PrintOutEncoderValues(60,Robot.driveTrain.quadratureEncoder1,Robot.driveTrain.quadratureEncoder2));
 		// addSequential(new AutoTurn(0.1,180));
 		/*
-		 * From here down is for choosing Auto program There are 10 possibilites
+		 * From here down is for choosing Auto program There are 10 possibilities
 		 */
 
 		final String gameData = DriverStation.getInstance().getGameSpecificMessage();

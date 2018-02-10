@@ -99,10 +99,9 @@ public class Robot extends TimedRobot {
     //@Override
     public void autonomousInit() {
     	System.out.println("Autonomous Init");
-    	POST.beginPOST();
     	autonomousCommand = new AutonomousCommand();
-        // schedule the autonomous  (example)
-        if (autonomousCommand != null) autonomousCommand.start();
+        // schedule the autonomous to be run after POST completes  (example)
+        new POST(autonomousCommand).start();
     }
 
     /**
@@ -120,7 +119,7 @@ public class Robot extends TimedRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) autonomousCommand.cancel();
-        POST.beginPOST();
+        new POST().start(); // will do nothing of POST already ran.
     }
 
     /**

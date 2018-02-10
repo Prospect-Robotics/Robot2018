@@ -3,7 +3,6 @@ package org.usfirst.frc2813.Robot2018.commands.post;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder.BooleanConsumer;
 
 /**
@@ -16,15 +15,13 @@ public class TestEncoder extends Command {
 	private final BooleanConsumer callback;
 	private int startingPosition;
 
-    public TestEncoder(SpeedController motor, Encoder encoder, BooleanConsumer callback, Subsystem s) {
+    public TestEncoder(SpeedController motor, Encoder encoder, BooleanConsumer callback) {
         this.motor=motor;
         this.encoder=encoder;
         this.callback=callback;
         setTimeout(0.1);
         // this happens during POST.  Please don't interrupt it!
         setInterruptible(false);
-        if(s != null)
-        	requires(s);
     }
 
     // Called just before this Command runs the first time
