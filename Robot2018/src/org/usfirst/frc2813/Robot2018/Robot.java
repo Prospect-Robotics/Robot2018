@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc2813.Robot2018.commands.*;
+import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.*;
 
 /**
@@ -98,6 +99,7 @@ public class Robot extends TimedRobot {
     //@Override
     public void autonomousInit() {
     	System.out.println("Autonomous Init");
+    	POST.beginPOST();
     	autonomousCommand = new AutonomousCommand();
         // schedule the autonomous  (example)
         if (autonomousCommand != null) autonomousCommand.start();
@@ -118,6 +120,7 @@ public class Robot extends TimedRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) autonomousCommand.cancel();
+        POST.beginPOST();
     }
 
     /**

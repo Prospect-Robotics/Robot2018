@@ -55,7 +55,7 @@ public class RobotMap {
 	private static final double WHEEL_DIAMETER = 4;
 	public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 	//public static final double REVOLUTIONS_PER_INCH = 1.0 / WHEEL_CIRCUMFERENCE;
-	public static final double PULSES_PER_REVOLUTION = 256; // it should be 256 but the robot only % as far as it should with 256
+	public static final double PULSES_PER_REVOLUTION = 256*3; // 768 because the encoder spins 3 times as fast as the output shaft; it should be 256 but the robot only % as far as it should with 256
 	//public static final double PULSES_PER_INCH = PULSES_PER_REVOLUTION * REVOLUTIONS_PER_INCH;goes ~80
 	public static final double INCHES_PER_PULSE = WHEEL_CIRCUMFERENCE / PULSES_PER_REVOLUTION; // inches per revolution times revolutions per pulse (1/pulses per revolution) equals inches per pulse.
 
