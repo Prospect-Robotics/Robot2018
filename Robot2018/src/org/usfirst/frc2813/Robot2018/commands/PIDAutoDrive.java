@@ -26,6 +26,8 @@ public class PIDAutoDrive extends Command {
    //     watchdog.setSafetyEnabled(true);
    //     watchdog.setExpiration(0.1);
         this.forwardSpeed=forwardSpeed;
+        if(forwardSpeed < 0)
+        	distance *= -1;
         this.distance = distance;
     }
 
@@ -69,6 +71,8 @@ public class PIDAutoDrive extends Command {
     	System.out.println("Stopping...");
     	controller.disable();
     	controller.reset();
+    	// drive the other way for one tick to dampen the robot's momentum
+    	//Robot.driveTrain.arcadeDrive(-forwardSpeed, 0);
     }
     
     private void usePIDOutput(double output) {

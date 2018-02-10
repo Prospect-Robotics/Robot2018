@@ -99,11 +99,13 @@ public class OI {
         toggleRelay0 = new JoystickButton(buttonPanel, 7);
         toggleRelay0.whenPressed(new ShiftGears());
         spin4MotorsBackwardsElevator = new JoystickButton(buttonPanel, 5);
-        spin4MotorsBackwardsElevator.whileHeld(new MoveElevator(false));
+        spin4MotorsBackwardsElevator.whileHeld(new MoveElevator(false,false));
+        spin4MotorsBackwardsElevator.whenReleased(new MoveElevator(false,true));
         spin4MotorsElevator = new JoystickButton(buttonPanel, 4);
-        spin4MotorsElevator.whileHeld(new MoveElevator(true));
+        spin4MotorsElevator.whileHeld(new MoveElevator(true,false));
+        spin4MotorsElevator.whenReleased(new MoveElevator(true,true));
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
-        bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
+        //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
         spinIntakeOut.whileHeld(new SpinIntake(false));
         spinIntakeIn = new JoystickButton(buttonPanel, 1);
@@ -134,8 +136,8 @@ public class OI {
         SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
         SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
         SmartDashboard.putData("BottomElevator", new BottomElevator());
-        SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
-        SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
+        //SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
+        //SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
         
         driveStyleChooser = new SendableChooser<>();
         driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);

@@ -44,9 +44,22 @@ public class AutonomousCommand extends CommandGroup {
 		addSequential(new ResetGyro());
 
 		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
-		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 1 * ONE_FOOT));	// drive forward some distance
-		//  This code makes the robot drive backwards, but it doesn't stop...  FLAG  - fix this!
-//		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive back the same distance - are we where we started?
+//		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 1 * ONE_FOOT));	// drive forward some distance
+		
+		 // drive back the same distance - we are now approximately where we started.
+		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));
+		
+		
+		
+		// drive forward and back a couple more times:
+		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
+		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
+		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
+		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
+		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
+		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive forward some distance
+		// drive forward a minuscule distance to ensure the robot ends up where it started, and negate its backward momentum.
+		addSequential(new PIDAutoDrive(FORWARD_x_PERCENT_POWER * 0.1, 0.01));
 		// addSequential(new
 		// PrintOutEncoderValues(60,Robot.driveTrain.quadratureEncoder1,Robot.driveTrain.quadratureEncoder2));
 		// addSequential(new AutoTurn(0.1,180));

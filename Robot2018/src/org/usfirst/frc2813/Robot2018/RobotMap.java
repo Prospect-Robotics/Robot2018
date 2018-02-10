@@ -44,7 +44,10 @@ public class RobotMap {
 	public static Encoder driveTrainQuadratureEncoder11;
 	public static Encoder driveTrainQuadratureEncoder22;
 	public static Solenoid driveTrainSolenoid1;
-	public static SpeedController elevatorSpeedController1;
+	public static WPI_VictorSPX elevatorSpeedController1;
+	public static WPI_VictorSPX elevatorSpeedController2;
+	public static VictorSPX elevatorSpeedController11;
+	public static VictorSPX elevatorSpeedController22;
 	public static SpeedController intakeSpeedController1;
 	public static SpeedController intakeSpeedController2;
 	public static Encoder elevatorQuadratureEncoder1;
@@ -121,9 +124,20 @@ public class RobotMap {
 		driveTrainSolenoid1 = new Solenoid(0, 0);
 		LiveWindow.addActuator("DriveTrain", "Solenoid 1", driveTrainSolenoid1);
 
-		elevatorSpeedController1 = new WPI_VictorSPX(4);
+		elevatorSpeedController1 = new WPI_VictorSPX(3);
 		LiveWindow.addActuator("Elevator", "Speed Controller 1", (WPI_VictorSPX) elevatorSpeedController1);
 		elevatorSpeedController1.setInverted(false);
+		elevatorSpeedController2 = new WPI_VictorSPX(9);
+		LiveWindow.addActuator("Elevator", "Speed Controller 2", (WPI_VictorSPX) elevatorSpeedController2);
+		elevatorSpeedController2.setInverted(true);
+		
+		elevatorSpeedController11 = new VictorSPX(4);
+		elevatorSpeedController11.set(ControlMode.Follower, elevatorSpeedController1.getDeviceID());
+		elevatorSpeedController11.setInverted(elevatorSpeedController1.getInverted());
+		elevatorSpeedController22 = new VictorSPX(10);
+		elevatorSpeedController22.set(ControlMode.Follower, elevatorSpeedController2.getDeviceID());
+		elevatorSpeedController22.setInverted(elevatorSpeedController2.getInverted());
+		
 		intakeSpeedController1 = new WPI_VictorSPX(5);
 		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController1);
 		intakeSpeedController1.setInverted(false);
