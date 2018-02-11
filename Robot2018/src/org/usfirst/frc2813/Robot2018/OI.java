@@ -112,8 +112,8 @@ public class OI {
         spinIntakeIn = new JoystickButton(buttonPanel, 1);
         spinIntakeIn.whileHeld(new SpinIntake(true, false));
         spinIntakeIn.whenReleased(new SpinIntake(true, true));
-        new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
-        new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
+        //new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
+        //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
         armMoveUp = new JoystickButton(buttonPanel, 11);
         armMoveUp.whileHeld(new MoveArm(true, false));
         armMoveUp.whenReleased(new MoveArm(true, true));
@@ -137,8 +137,8 @@ public class OI {
         SmartDashboard.putData("ToggleRelay0", new ShiftGears());
         //SmartDashboard.putData("ToggleRelay1", new ToggleRelay1());
         //SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
-        SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
-        SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
+        //SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
+        //SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
         SmartDashboard.putData("BottomElevator", new BottomElevator());
         //SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
         //SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
