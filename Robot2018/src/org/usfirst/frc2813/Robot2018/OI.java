@@ -107,15 +107,19 @@ public class OI {
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
         //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
-        spinIntakeOut.whileHeld(new SpinIntake(false));
+        spinIntakeOut.whileHeld(new SpinIntake(false, false));
+        spinIntakeOut.whenReleased(new SpinIntake(false, true));
         spinIntakeIn = new JoystickButton(buttonPanel, 1);
-        spinIntakeIn.whileHeld(new SpinIntake(true));
+        spinIntakeIn.whileHeld(new SpinIntake(true, false));
+        spinIntakeIn.whenReleased(new SpinIntake(true, true));
         new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
         new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
         armMoveUp = new JoystickButton(buttonPanel, 11);
-        armMoveUp.whileHeld(new MoveArm(true));
+        armMoveUp.whileHeld(new MoveArm(true, false));
+        armMoveUp.whenReleased(new MoveArm(true, true));
         armMoveDown = new JoystickButton(buttonPanel, 12);
-        armMoveDown.whileHeld(new MoveArm(false));
+        armMoveDown.whileHeld(new MoveArm(false, false));
+        armMoveDown.whenReleased(new MoveArm(false, true));
         joystick1 = new Joystick(1);
         joystick2 = new Joystick(2);
         

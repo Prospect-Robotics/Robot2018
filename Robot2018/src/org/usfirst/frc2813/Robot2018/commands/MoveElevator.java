@@ -59,12 +59,12 @@ public class MoveElevator extends Command {
     //@Override
     protected void execute() {
     	if(direction == true && stop == false) {
-    		speedController1.set(.4);//TODO not sure if 1 or -1 is up
-    		speedController2.set(-.4);
+    		speedController1.set(.5);//TODO not sure if 1 or -1 is up
+    		speedController2.set(-.5);
     	}
     	else if (direction == false && stop == false) {
-    		speedController1.set(-.4);//TODO not sure if -1 or 1 is down
-    		speedController2.set(.4);
+    		speedController1.set(-.5);//TODO not sure if -1 or 1 is down
+    		speedController2.set(.5);
     	}
     	else if (stop == true) {
     		speedController1.set(0);

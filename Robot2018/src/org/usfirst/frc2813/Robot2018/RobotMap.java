@@ -48,8 +48,8 @@ public class RobotMap {
 	public static WPI_VictorSPX elevatorSpeedController2;
 	public static VictorSPX elevatorSpeedController11;
 	public static VictorSPX elevatorSpeedController22;
-	public static SpeedController intakeSpeedController1;
-	public static SpeedController intakeSpeedController2;
+	public static WPI_VictorSPX intakeSpeedController1;
+	public static VictorSPX intakeSpeedController2;
 	public static Encoder elevatorQuadratureEncoder1;
 	public static DigitalInput elevatorDigitalInput1;
 	public static SpeedController armSpeedController1;
@@ -141,8 +141,9 @@ public class RobotMap {
 		intakeSpeedController1 = new WPI_VictorSPX(5);
 		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController1);
 		intakeSpeedController1.setInverted(false);
-		intakeSpeedController2 = new WPI_VictorSPX(6);
-		intakeSpeedController2.setInverted(false);
+		intakeSpeedController2 = new VictorSPX(6);
+		intakeSpeedController2.set(ControlMode.Follower, intakeSpeedController1.getDeviceID());
+		intakeSpeedController2.setInverted(true);
 
 		elevatorQuadratureEncoder1 = new Encoder(14, 15, true, EncodingType.k4X);
 		elevatorQuadratureEncoder1.setDistancePerPulse(1.0);
