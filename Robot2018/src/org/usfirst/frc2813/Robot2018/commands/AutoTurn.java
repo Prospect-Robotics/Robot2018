@@ -32,7 +32,14 @@ public class AutoTurn extends Command {
     	return (Robot.gyro.getAngle());
     }
     private double calcThrottle(double deg, double throttle) {//set throttle given degrees from target
-    	if (deg<MIN_DEG) {//if at correct location, stop
+    	//return -.3;
+    	if (degrees < 0) {
+    		return rate;
+    	}
+    	else {
+    		return -rate;
+    	}
+    	/*if (deg<MIN_DEG) {//if at correct location, stop
     		return 0;
     	}
     	if (deg<=LERP_STOP) {//if through lerp period, min speed
@@ -42,7 +49,7 @@ public class AutoTurn extends Command {
     		return throttle;
     	}
     	return (deg-LERP_STOP)*(throttle-LERP_END)/(LERP_START-LERP_STOP)+LERP_END;//deceleration/linear interpolation code
-    }
+  */  }
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	//double deg=degrees-degreesRotated();
@@ -54,7 +61,15 @@ public class AutoTurn extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return (degrees > 0 ? Robot.gyro.getAngle() >= startingOrientation + degrees : Robot.gyro.getAngle() <= startingOrientation - degrees);
+    	System.out.println("ISFINISHED");
+    	System.out.printf("degrees %.3f ;gyro %.3f ;startingOrientation %.3f\n", degrees, Robot.gyro.getAngle(), startingOrientation);
+        //return (degrees > 0 ? Robot.gyro.getAngle() >= startingOrientation + degrees : Robot.gyro.getAngle() <= startingOrientation - degrees);
+        
+        boolean positiveIsFinished = Robot.gyro.getAngle() >= startingOrientation + degrees;
+        
+        boolean negativeIsFinished = Robot.gyro.getAngle() <= startingOrientation + degrees;
+        
+        return degrees > 0 ? positiveIsFinished : negativeIsFinished;
     }
 
     // Called once after isFinished returns true
