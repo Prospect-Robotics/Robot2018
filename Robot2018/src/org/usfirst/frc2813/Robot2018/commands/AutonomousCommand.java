@@ -52,8 +52,8 @@ public class AutonomousCommand extends CommandGroup {
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
     	 */
 		
-		addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.75, FORWARD_DISTANCE * 10 * ONE_FOOT));				// drive at % of max speed some distance
-		addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 0.75, BACKWARD_DISTANCE * 10 * ONE_FOOT));	// drive at % of max speed some distance
+		//addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.75, FORWARD_DISTANCE * 10 * ONE_FOOT));				// drive at % of max speed some distance
+		//addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 0.75, BACKWARD_DISTANCE * 10 * ONE_FOOT));	// drive at % of max speed some distance
 		//  This code makes the robot drive backwards, but it doesn't stop...  FLAG  - fix this!
 //		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive back the same distance - are we where we started?
 		// addSequential(new
@@ -128,40 +128,41 @@ public class AutonomousCommand extends CommandGroup {
 			}
 			break;
 		case 1://POSITION CENTER
-			switch (gameData.charAt(1)) {
+			switch (gameData.charAt(0)) {
 			case 'L':
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 4));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(-0.25, 45));//inaccurte angle
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(0.25, 45));
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.7, FORWARD_DISTANCE * 44));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
+				addSequential(new AutoTurn(0.25, -55));//inaccurate angle
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.7, FORWARD_DISTANCE * 48));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
+				//addSequential(new AutoTurn(0.25, 45));
 				//do the block thing
-				addSequential(new AutoTurn(0.25, 90));
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(-0.25, 90));
+				//addSequential(new AutoTurn(0.25, 90));
+				//addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
+				//addSequential(new AutoTurn(0.25, -90));
 				//grab
 				break;
 			case 'R':
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 4));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
 				addSequential(new AutoTurn(0.25, 45));//inaccurte angle
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(-0.25, 45));
+				addSequential(new AutoTurn(0.25, -45));
 				//do the block thing
-				addSequential(new AutoTurn(-0.25, 90));
+				addSequential(new AutoTurn(0.25, -90));
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
 				addSequential(new AutoTurn(0.25, 90));
 				//grab
 				break;
 			}
+			break;
 		case 2://POSITION RIGHT
 			switch(gameData) {
 			case "LLL":
 			case "RLR":
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 324));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(-0.25, 90));//plz dont neglect autoturn
+				addSequential(new AutoTurn(0.25, -90));//plz dont neglect autoturn
 				//raise elevator
 				//angrily throw cube
 				//lower eleavtor
-				addSequential(new AutoTurn(-0.25, 90));
+				addSequential(new AutoTurn(0.25, -90));
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 128));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
 				/*addSequential(new AutoTurn(0.25, 90));
 				//move to first cube dist

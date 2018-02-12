@@ -1,36 +1,47 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
 import org.usfirst.frc2813.RandomPIDController2;
-import org.usfirst.frc2813.WatchdogPIDInterface;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.RobotMap;
 
+import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
 public class PIDAutoDrive extends Command {
+	
+	
+	private final PIDSource m_source = new PIDSource() {
+
+		@Override
+		public void setPIDSourceType(PIDSourceType pidSource) {
+		}
+
+		@Override
+		public PIDSourceType getPIDSourceType() {
+			return PIDSourceType.kDisplacement;
+		}
+
+		@Override
+		public double pidGet() {
+			return Robot.gyro.getAngle() - startAngle;
+		}
+	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
-	private final RandomPIDController2 controller = new RandomPIDController2(.1, 0.00, 0, Robot.gyro, this::usePIDOutput);
+	private final RandomPIDController2 controller = new RandomPIDController2(.01, 0.00, 0, m_source, this::usePIDOutput);
 	//private final PIDController controller = new PIDController(0.15, 0, 0.2);
 	//private final WatchdogPIDInterface watchdog = new WatchdogPIDInterface(controller);
 	private final double forwardSpeed;
 	private final double distance;
 	private double stopAt;
-	private double maxSpeed;
-	private double lerpStart;
-	private double lerpEnd;
-	private double lerpStop;
-	private double distanceLeft;
-	private double minDist;
-	private double accelStopDistance;
-	private double accelStopValue;
-	private double accelStartDistance;
-	private double accelStartValue;
+	private final double maxSpeed;
+	private double startPosition;
+	private double startAngle; // which may or may not be zero degrees.
 	
-	private static final double ACCELERATION = 600;//inches
-	private static final double DECELERATION = 600;//inches
+	private static final double ACCELERATION = 60;//inches
+	private static final double DECELERATION = 60;//inches
 	
     public PIDAutoDrive(double forwardSpeed, double distance) {	// What are the units of distance?
         requires(Robot.driveTrain);
@@ -41,15 +52,7 @@ public class PIDAutoDrive extends Command {
    //     watchdog.setExpiration(0.1);
         this.forwardSpeed=forwardSpeed;
         this.distance = distance;
-        maxSpeed = Math.abs(this.forwardSpeed);
-        lerpStart = this.distance /4;
-        lerpEnd=.2;
-        lerpStop=.02;
-        minDist=0.01;
-        accelStartDistance=0;
-        accelStartValue = 
-        accelStopDistance = 
-        accelStopValue = maxSpeed;
+        maxSpeed = Math.abs(forwardSpeed);
     }
     
 
@@ -63,13 +66,13 @@ public class PIDAutoDrive extends Command {
     	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
     	 */
-    	stopAt = Robot.driveTrain.getDistance() + distance;
+    	startPosition = Robot.driveTrain.getDistance();
+    	startAngle = Robot.gyro.getAngle();
     	controller.enable();
     	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
-    	distanceLeft=distance;
     }
     private double distanceTraveled() {
-    	return Robot.driveTrain.getDistance();
+    	return Robot.driveTrain.getDistance() - startPosition;
     }
     private double calcThrottleSteadyState() {
     	return maxSpeed;
@@ -79,7 +82,7 @@ public class PIDAutoDrive extends Command {
     		return 0;
     	}
     	
-    	return 1 + (inchesTraveled - (distance - DECELERATION)) * (-0.8) / DECELERATION;
+    	return 1 + (inchesTraveled - (distance - DECELERATION)) * (maxSpeed-1) / DECELERATION;
     	
     	
     }
@@ -88,7 +91,7 @@ public class PIDAutoDrive extends Command {
     	if (inchesTraveled < 0) {
     		return 0.2;
     	}
-    	return 0.2 + (inchesTraveled) * (ACCELERATION - 0.2) / (ACCELERATION);
+    	return .2 + (maxSpeed) * (ACCELERATION - inchesTraveled) / (ACCELERATION);
     }
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
@@ -107,11 +110,11 @@ public class PIDAutoDrive extends Command {
     	// In order to add the two values correctly, you should add Encoder 1 to the negative of Encoder 2, or "Encoder 1 - Encoder 2"
     	// This will, counter intuitively, add the two values, NOT take the difference between the two values
     	//        double distanceRemaining = stopAt - ((Math.abs(Robot.driveTrain.quadratureEncoder1.getDistance())+Math.abs(Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
-        double distanceRemaining = stopAt - Robot.driveTrain.getDistance();
-        if(distance < 0)
-        	distanceRemaining *= -1;
-        System.out.println("Distance remaining: "+distanceRemaining+",  stopAt:"+stopAt+", Encoder1:"+ Robot.driveTrain.quadratureEncoder1.getDistance());
-        return distanceRemaining <= 0;
+        //double distanceRemaining = stopAt - Robot.driveTrain.getDistance();
+        //if(distance < 0)
+        //	distanceRemaining *= -1;
+        //System.out.println("Distance remaining: "+distanceRemaining+",  stopAt:"+stopAt+", Encoder1:"+ Robot.driveTrain.quadratureEncoder1.getDistance());
+        return distanceTraveled() >= distance;
     }
 
     // Called once after isFinished returns true
@@ -122,10 +125,10 @@ public class PIDAutoDrive extends Command {
     }
     
     private void usePIDOutput(double output) {
-    	/*
-    	 * PID controllers write their output to zero when disabled.
+    	/*te their output to zero when disabled.
     	 * The watchdog will call disable() every 0.1 seconds when
-    	 * the command isn't running.  Every time the output is written
+    	 * the command isn't r
+    	 * PID controllers wriunning.  Every time the output is written
     	 * we cause the robot to move.  If the watchdog isn't alive,
     	 * don't accept input.
     	 */
