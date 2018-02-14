@@ -134,10 +134,10 @@ public class AutonomousCommand extends CommandGroup {
 				addSequential(new AutoCurveDrive(-0.4, -65, .7));
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 8));
 				addSequential(new AutoCurveDrive(0.4, 45, -.7));
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 16));
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 18));
 				//TODO RELEASE CUBE; might want to raise elevator...
-				addSequential(new Wait(.2));
-				addSequential(new AutoTurn(0.4,80));
+				addSequential(new Wait(1));
+				addSequential(new AutoTurn(0.4,60));
 				
 				break;
 			case 'R':
@@ -145,7 +145,9 @@ public class AutonomousCommand extends CommandGroup {
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 8));
 				addSequential(new AutoCurveDrive(-0.4, -62, .7));//WORKS; Turns LEFT
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 10));
-				//TODO RELEASE CUBE
+				//TODO RELEASE CUBE; might want to raise elevator...
+				addSequential(new Wait(1));
+				addSequential(new AutoTurn(0.4,-60));
 				
 				break;
 			}
