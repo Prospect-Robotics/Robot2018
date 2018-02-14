@@ -11,19 +11,21 @@
 
 package org.usfirst.frc2813.Robot2018;
 
+import org.usfirst.frc2813.Robot2018.commands.AutonomousCommand;
+import org.usfirst.frc2813.Robot2018.commands.post.POST;
+import org.usfirst.frc2813.Robot2018.subsystems.Arm;
+import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
+import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
+import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.usfirst.frc2813.Robot2018.commands.*;
-import org.usfirst.frc2813.Robot2018.commands.post.POST;
-import org.usfirst.frc2813.Robot2018.subsystems.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -88,7 +90,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit(){
-
+    	driveTrain.setBrakeCoast(NeutralMode.Coast);
     }
 
     @Override
@@ -119,6 +121,7 @@ public class Robot extends TimedRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) autonomousCommand.cancel();
+        driveTrain.setBrakeCoast(NeutralMode.Brake);
         new POST().start(); // will do nothing of POST already ran.
     }
 

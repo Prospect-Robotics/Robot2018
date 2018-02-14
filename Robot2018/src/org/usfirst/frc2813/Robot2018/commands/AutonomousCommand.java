@@ -128,28 +128,25 @@ public class AutonomousCommand extends CommandGroup {
 			}
 			break;
 		case 1://POSITION CENTER
+			addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 20));
 			switch (gameData.charAt(0)) {
 			case 'L':
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.7, FORWARD_DISTANCE * 44));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(0.25, -55));//inaccurate angle
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.7, FORWARD_DISTANCE * 48));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				//addSequential(new AutoTurn(0.25, 45));
-				//do the block thing
-				//addSequential(new AutoTurn(0.25, 90));
-				//addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				//addSequential(new AutoTurn(0.25, -90));
-				//grab
+				addSequential(new AutoCurveDrive(-0.4, -65, .7));
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 8));
+				addSequential(new AutoCurveDrive(0.4, 45, -.7));
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 16));
+				//TODO RELEASE CUBE; might want to raise elevator...
+				addSequential(new Wait(.2));
+				addSequential(new AutoTurn(0.4,80));
+				
 				break;
 			case 'R':
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 4));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(0.25, 45));//inaccurte angle
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(0.25, -45));
-				//do the block thing
-				addSequential(new AutoTurn(0.25, -90));
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.5, FORWARD_DISTANCE * 140));//distance is not accurate, GIVE US MEASUREMENTS GODDAMNIT
-				addSequential(new AutoTurn(0.25, 90));
-				//grab
+				addSequential(new AutoCurveDrive(0.4, 65,-.7));//WORKS; Turns RIGHT
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 8));
+				addSequential(new AutoCurveDrive(-0.4, -62, .7));//WORKS; Turns LEFT
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 10));
+				//TODO RELEASE CUBE
+				
 				break;
 			}
 			break;
