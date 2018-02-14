@@ -40,8 +40,8 @@ public class PIDAutoDrive extends Command {
 	private double startPosition;
 	private double startAngle; // which may or may not be zero degrees.
 	
-	private static final double ACCELERATION = 10;//inches
-	private static final double DECELERATION = 40;//inches
+	private static final double ACCELERATION = 0;//inches
+	private static final double DECELERATION = 30;//inches
 	
     public PIDAutoDrive(double forwardSpeed, double distance) {	// What are the units of distance?
         requires(Robot.driveTrain);
@@ -114,7 +114,8 @@ public class PIDAutoDrive extends Command {
         //if(distance < 0)
         //	distanceRemaining *= -1;
         //System.out.println("Distance remaining: "+distanceRemaining+",  stopAt:"+stopAt+", Encoder1:"+ Robot.driveTrain.quadratureEncoder1.getDistance());
-        return distanceTraveled() >= distance;
+        if (distanceTraveled() >= distance) System.out.println("ISFINISHED");
+    	return Math.abs(distanceTraveled()) >= Math.abs(distance);
     }
 
     // Called once after isFinished returns true

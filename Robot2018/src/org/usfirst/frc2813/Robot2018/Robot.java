@@ -100,6 +100,7 @@ public class Robot extends TimedRobot {
 
     //@Override
     public void autonomousInit() {
+    	driveTrain.setBrakeCoast(NeutralMode.Brake);
     	System.out.println("Autonomous Init");
     	autonomousCommand = new AutonomousCommand();
         // schedule the autonomous to be run after POST completes  (example)

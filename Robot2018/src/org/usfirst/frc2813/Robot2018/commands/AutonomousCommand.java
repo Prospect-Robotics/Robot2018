@@ -26,7 +26,7 @@ public class AutonomousCommand extends CommandGroup {
 	public static final int FORWARD_SPEED_x_percent_power = -1;
 	public static final int BACKWARD_SPEED_x_percent_power = 1;
 	public static final int FORWARD_DISTANCE = 1;
-	public static final int BACKWARD_DISTANCE = -1;
+	public static final int BACKWARD_DISTANCE = 1;
 	public static final double ONE_INCH = 1;			//  The Encoder code in WPI Lib translates the distance to inches based on the
 														//  
 	public static final double ONE_FOOT = 12 * ONE_INCH;
@@ -128,9 +128,9 @@ public class AutonomousCommand extends CommandGroup {
 			}
 			break;
 		case 1://POSITION CENTER
-			addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 20));
 			switch (gameData.charAt(0)) {
 			case 'L':
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 20));
 				addSequential(new AutoCurveDrive(-0.4, -65, .7));
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 8));
 				addSequential(new AutoCurveDrive(0.4, 45, -.7));
@@ -141,13 +141,18 @@ public class AutonomousCommand extends CommandGroup {
 				
 				break;
 			case 'R':
-				addSequential(new AutoCurveDrive(0.4, 65,-.7));//WORKS; Turns RIGHT
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 8));
-				addSequential(new AutoCurveDrive(-0.4, -62, .7));//WORKS; Turns LEFT
-				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 10));
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 20));
+				addSequential(new AutoCurveDrive(0.4, 45,-.7));//WORKS; Turns CLOCKWISE FORWARD
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 20));
+				addSequential(new AutoCurveDrive(-0.4, -50, .7));//WORKS; Turns COUNTER FORWARD
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 15));
 				//TODO RELEASE CUBE; might want to raise elevator...
-				addSequential(new Wait(1));
-				addSequential(new AutoTurn(0.4,-60));
+				addSequential(new Wait(2));
+				addSequential(new AutoCurveDrive(-0.4,90,-.6));//WORKS; Turns CLOCKWISE BACKWARD
+				//addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 1, BACKWARD_DISTANCE * 4));
+				addSequential(new AutoCurveDrive(0.4,-68,.5));//WORKS; Turns COUNTER BACKWARD
+				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 12));
+				//addSequential(new AutoTurn(0.4,-105));
 				
 				break;
 			}
