@@ -49,10 +49,9 @@ public class MoveElevator extends Command {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	quadratureEncoder1 = Robot.elevator.quadratureEncoder1;
+    	quadratureEncoder1 = Robot.elevator.encoder;
     	digitalInput1 = Robot.elevator.digitalInput1;
-    	speedController1 = Robot.elevator.speedController1;
-    	speedController2 = Robot.elevator.speedController2;
+    	speedController1 = Robot.elevator.speedController;
     }
 
     // Called repeatedly when this Command is scheduled to run

@@ -42,7 +42,7 @@ public class BottomElevator extends Command {
     //@Override
     protected void initialize() {
     	digitalInput = Robot.elevator.digitalInput1;
-    	speedController = Robot.elevator.speedController1;
+    	speedController = Robot.elevator.speedController;
     }
 
     // Called repeatedly when this Command is scheduled to run

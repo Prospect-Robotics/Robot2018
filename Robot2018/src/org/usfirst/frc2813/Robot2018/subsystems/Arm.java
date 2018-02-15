@@ -20,7 +20,7 @@ public class Arm extends Subsystem {
 	public final Encoder encoder = RobotMap.armQuadratureEncoder1;
 	public boolean encoderFunctional = true;
 	public final DigitalInput limitSwitch = RobotMap.armDigitalInput1;
-	private final DoubleSolenoid gripper = RobotMap.armSolenoid1;
+	private final DoubleSolenoid gripper = RobotMap.armSolenoid2;
 	private boolean jawsOpen;
 	/**
 	 * Double solenoids are two independent coils.
