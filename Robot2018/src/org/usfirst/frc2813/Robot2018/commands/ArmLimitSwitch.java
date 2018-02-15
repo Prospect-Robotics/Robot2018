@@ -45,9 +45,9 @@ public class ArmLimitSwitch extends Command {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	digitalInput = Robot.arm.digitalInput1;
-    	speedController = Robot.arm.speedController1;
-    	encoder = Robot.arm.encoder1;
+    	digitalInput = Robot.arm.limitSwitch;
+    	speedController = Robot.arm.speedController;
+    	encoder = Robot.arm.encoder;
     }
 
     // Called repeatedly when this Command is scheduled to run

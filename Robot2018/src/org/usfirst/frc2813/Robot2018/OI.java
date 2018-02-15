@@ -105,7 +105,7 @@ public class OI {
         spin4MotorsElevator.whileHeld(new MoveElevator(true,false));
         spin4MotorsElevator.whenReleased(new MoveElevator(true,true));
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
-        //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
+        bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
         spinIntakeOut.whileHeld(new SpinIntake(false, false));
         spinIntakeOut.whenReleased(new SpinIntake(false, true));

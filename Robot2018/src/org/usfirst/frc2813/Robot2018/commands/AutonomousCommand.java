@@ -14,6 +14,7 @@ import org.usfirst.frc2813.Robot2018.RobotMap;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.command.TimedCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -136,7 +137,7 @@ public class AutonomousCommand extends CommandGroup {
 				addSequential(new AutoCurveDrive(0.4, 45, -.7));
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 18));
 				//TODO RELEASE CUBE; might want to raise elevator...
-				addSequential(new Wait(1));
+				addSequential(new TimedCommand(1));
 				addSequential(new AutoTurn(0.4,60));
 				
 				break;
@@ -147,7 +148,7 @@ public class AutonomousCommand extends CommandGroup {
 				addSequential(new AutoCurveDrive(-0.4, -50, .7));//WORKS; Turns COUNTER FORWARD
 				addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 1, FORWARD_DISTANCE * 15));
 				//TODO RELEASE CUBE; might want to raise elevator...
-				addSequential(new Wait(2));
+				addSequential(new TimedCommand(2));
 				addSequential(new AutoCurveDrive(-0.4,90,-.6));//WORKS; Turns CLOCKWISE BACKWARD
 				//addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 1, BACKWARD_DISTANCE * 4));
 				addSequential(new AutoCurveDrive(0.4,-68,.5));//WORKS; Turns COUNTER BACKWARD

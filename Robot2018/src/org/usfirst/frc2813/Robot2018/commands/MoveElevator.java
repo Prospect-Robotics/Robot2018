@@ -77,7 +77,7 @@ public class MoveElevator extends Command {
     	if (digitalInput1.get()) {//if limit switch has been pressed, reset the encoder
     		quadratureEncoder1.reset();
     	}
-        return false;//quadratureEncoder1.getDistance()>DESIRED_ENCODER_VALUE || digitalInput1.get()==true;//If limit switch pressed OR desired encoder value is reached, STOP
+        return quadratureEncoder1.getDistance()>DESIRED_ENCODER_VALUE || digitalInput1.get()==true;//If limit switch pressed OR desired encoder value is reached, STOP
     }
 
     // Called once after isFinished returns true

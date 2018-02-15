@@ -48,9 +48,9 @@ public class MoveArm extends Command {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	quadratureEncoder1 = Robot.arm.encoder1;
-    	digitalInput1 = Robot.arm.digitalInput1;
-    	speedController1 = Robot.arm.speedController1;
+    	quadratureEncoder1 = Robot.arm.encoder;
+    	digitalInput1 = Robot.arm.limitSwitch;
+    	speedController1 = Robot.arm.speedController;
     }
 
     // Called repeatedly when this Command is scheduled to run
