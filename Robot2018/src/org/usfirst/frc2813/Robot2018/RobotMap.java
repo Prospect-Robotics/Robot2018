@@ -48,10 +48,11 @@ public class RobotMap {
 	public static DoubleSolenoid driveTrainSolenoid2;
 	public static Solenoid armSolenoid1;//for the competition bot
 	public static DoubleSolenoid armSolenoid2;//for the practice bot
-	public static WPI_VictorSPX elevatorSpeedController1;
-	public static WPI_VictorSPX elevatorSpeedController2;
-	public static VictorSPX elevatorSpeedController11;
-	public static VictorSPX elevatorSpeedController22;
+	public static WPI_VictorSPX elevatorSpeedController1;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
+															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
+	public static VictorSPX elevatorSpeedController2;		//  Controller 2 will follow controller 1; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
+	public static VictorSPX elevatorSpeedController11;		//  Controller 11 is the paired motor with controller 1; it will follow 1
+	public static VictorSPX elevatorSpeedController22;		//  Controller 22 is the paired motor with controller 2; it will follow 2
 	public static WPI_VictorSPX intakeSpeedController1;
 	public static VictorSPX intakeSpeedController2;
 	public static Encoder elevatorQuadratureEncoder1;
@@ -105,13 +106,13 @@ public class RobotMap {
 		driveTrainRobotDrive.setMaxOutput(1.0);
 
 		driveTrainQuadratureEncoder1 = new Encoder(10, 11, true, EncodingType.k4X);// port 0 2*0+10=10, port 0 2*0+11=11
-		LiveWindow.addSensor("DriveTrain", "Quadrature Encoder 1", driveTrainQuadratureEncoder1);
+		LiveWindow.addSensor("DriveTrain", "Starboard Encoder", driveTrainQuadratureEncoder1);
 		driveTrainQuadratureEncoder1.setDistancePerPulse(INCHES_PER_PULSE);
 		driveTrainQuadratureEncoder1.setSamplesToAverage(1);
 		driveTrainQuadratureEncoder1.setPIDSourceType(PIDSourceType.kRate);
 		driveTrainQuadratureEncoder2 = new Encoder(12, 13, true, EncodingType.k4X);
 		driveTrainQuadratureEncoder2.setReverseDirection(true);
-		LiveWindow.addSensor("DriveTrain", "Quadrature Encoder 2", driveTrainQuadratureEncoder2);
+		LiveWindow.addSensor("DriveTrain", "Port Encoder", driveTrainQuadratureEncoder2);
 		driveTrainQuadratureEncoder2.setDistancePerPulse(INCHES_PER_PULSE);
 		driveTrainQuadratureEncoder2.setSamplesToAverage(1);
 		driveTrainQuadratureEncoder2.setPIDSourceType(PIDSourceType.kRate);
@@ -128,19 +129,29 @@ public class RobotMap {
 		driveTrainSolenoid1 = new Solenoid(0, 0);
 		LiveWindow.addActuator("DriveTrain", "Solenoid 1", driveTrainSolenoid1);
 		
+		//  TODO:  Add better comments about port numbering
+		//  In the 2018 robot, we have motor controllers mounted on each side of the robot (Port and Starboard)
+		//  The Port motor controllers are numbered 1-6, Starboard 7-11 (one fewer controller on the Starboard side)
+		//  TODO:  verify the numbering
+		//  In general, for a task that has motors on both sides (like drive train and elevator), the starboard side number is (Port Number + 6)
+		//	e.g. Port motors are ports 1 and 2, starboard motors are ports 7 and 8 (n+6)
+		// The intake motors are an anomaly because the wire for the intake motors just goes up one side of the
+		// elevator carriage, so both controllers are on the same side of the robot (ports 5 and 6)
+		// Note:  all of the VictorSPX controllers are under CAN bus control, so we use 1-based addressing, reserving
+		// port 0 on the CAN bus for new controllers / uninitilized controllers
 		elevatorSpeedController1 = new WPI_VictorSPX(3);
 		LiveWindow.addActuator("Elevator", "Speed Controller 1", (WPI_VictorSPX) elevatorSpeedController1);
-		elevatorSpeedController1.setInverted(false);
-		elevatorSpeedController2 = new WPI_VictorSPX(9);
-		LiveWindow.addActuator("Elevator", "Speed Controller 2", (WPI_VictorSPX) elevatorSpeedController2);
-		elevatorSpeedController2.setInverted(true);
+		elevatorSpeedController1.setInverted(false);	// Motors on the Port side spin forward
+		elevatorSpeedController2 = new VictorSPX(9);
+		elevatorSpeedController2.set(ControlMode.Follower, elevatorSpeedController1.getDeviceID());
+		elevatorSpeedController2.setInverted(false);	// Motors on the Starboard side spin backward
 		
 		elevatorSpeedController11 = new VictorSPX(4);
 		elevatorSpeedController11.set(ControlMode.Follower, elevatorSpeedController1.getDeviceID());
 		elevatorSpeedController11.setInverted(elevatorSpeedController1.getInverted());
 		elevatorSpeedController22 = new VictorSPX(10);
-		elevatorSpeedController22.set(ControlMode.Follower, elevatorSpeedController2.getDeviceID());
-		elevatorSpeedController22.setInverted(elevatorSpeedController2.getInverted());
+		elevatorSpeedController22.set(ControlMode.Follower, elevatorSpeedController1.getDeviceID());
+		elevatorSpeedController22.setInverted(false);
 		
 		intakeSpeedController1 = new WPI_VictorSPX(5);
 		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController1);
@@ -149,14 +160,24 @@ public class RobotMap {
 		intakeSpeedController2.set(ControlMode.Follower, intakeSpeedController1.getDeviceID());
 		intakeSpeedController2.setInverted(true);
 
-		elevatorQuadratureEncoder1 = new Encoder(14, 15, true, EncodingType.k4X);
+		/* 
+		 *  Encoder for the Elevator SHAFT is physically connected to Encoder #3 on the Spartan Board
+		 *  Each Encoder has two DIO signals (rising / falling pulse signals)
+		 *  The Spartan board maps Encoder ports to RoboRIO ports with the formula:
+		 *  RoboRIO DIO signal A = (Spartan Board Encoder Port * 2) + 10
+		 *  RoboRIO DIO signal B = (Spartan Board Encoder Port * 2) + 11
+		 *  For port 3, the RoboRIO signals are (3*2 + 10 = 16 and 3*2 + 11 = 17.
+		 */ 
+		
+		elevatorQuadratureEncoder1 = new Encoder(16, 17, true, EncodingType.k4X);
 		elevatorQuadratureEncoder1.setDistancePerPulse(1.0);
 		elevatorQuadratureEncoder1.setPIDSourceType(PIDSourceType.kRate);
-
+		LiveWindow.addSensor("Elevator", "Quadrature Encoder", elevatorQuadratureEncoder1);
+		
 		elevatorDigitalInput1 = new DigitalInput(0);
 
 		armSpeedController1 = new WPI_VictorSPX(11);
-		armQuadratureEncoder1 = new Encoder(16, 17, true, EncodingType.k4X);
+		armQuadratureEncoder1 = new Encoder(14, 15, true, EncodingType.k4X);	// Spartan Board Encoder #2
 		armDigitalInput1 = new DigitalInput(1);
 		armSolenoid2 = new DoubleSolenoid(0,2,3);
 

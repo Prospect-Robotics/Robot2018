@@ -25,32 +25,29 @@ public class POST extends CommandGroup {
 
 		setInterruptible(false); // you really shouldn't be able to interrupt POST.
 
-		addParallel(new TestEncoder(Robot.driveTrain.speedController1, Robot.driveTrain.quadratureEncoder1,
+		addSequential(new TestEncoder(Robot.driveTrain.speedController1, Robot.driveTrain.quadratureEncoder1,
 				(boolean functional) -> {
 					Robot.driveTrain.encoder1Functional = functional;
 				}));
-		addParallel(new TestEncoder(Robot.driveTrain.speedController2, Robot.driveTrain.quadratureEncoder2,
+		addSequential(new TestEncoder(Robot.driveTrain.speedController2, Robot.driveTrain.quadratureEncoder2,
 				(boolean functional) -> {
 					Robot.driveTrain.encoder2Functional = functional;
 				}));
 		requires(Robot.driveTrain);
 
-		addParallel(new TestEncoder(Robot.arm.speedController, Robot.arm.encoder, (boolean functional) -> {
+		addSequential(new TestEncoder(Robot.arm.speedController, Robot.arm.encoder, (boolean functional) -> {
 			Robot.arm.encoderFunctional = functional;
 		}));
 		requires(Robot.arm);
 		
-		addParallel(new TestEncoder(Robot.elevator.speedController, Robot.elevator.encoder, (boolean functional) -> {
+		addSequential(new TestEncoder(Robot.elevator.speedController, Robot.elevator.encoder, (boolean functional) -> {
 			Robot.elevator.encoderFunctional = functional;
 		}));
 		requires(Robot.elevator);
 
-		// add elevator testEncoder here when they add an encoder on the elevator / we
-		// have more time
-
 		// add bottomElevator here when they add a limit switch on the elevator.
 
-		addSequential(new WaitForChildren());
+		//addSequential(new WaitForChildren());
 	}
 
 	@Override

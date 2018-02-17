@@ -17,7 +17,7 @@ public class MaintainElevatorPosition extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
     	double pos = Robot.elevator.encoder.getDistance();
-    	Robot.elevator.controller.disable(); // disable the controller to avoid strange jumpy behavior due to lack of thread safety
+    	Robot.elevator.controller.disable(); // If the source type changes, the encoder value will change suddenly, which will confuse the PID controller which will be BAD.
     	Robot.elevator.encoder.setPIDSourceType(PIDSourceType.kDisplacement);
     	Robot.elevator.controller.setSetpoint(pos);
     	Robot.elevator.controller.enable();
@@ -35,10 +35,13 @@ public class MaintainElevatorPosition extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+    	Robot.elevator.controller.disable();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	Robot.elevator.controller.disable();
     }
+    
 }

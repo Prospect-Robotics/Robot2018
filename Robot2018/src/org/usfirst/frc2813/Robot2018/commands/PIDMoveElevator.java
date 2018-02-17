@@ -20,6 +20,7 @@ public class PIDMoveElevator extends Command {
 	protected void initialize() {
 		if (Robot.elevator.encoder.getPIDSourceType() != PIDSourceType.kRate) {
 			Robot.elevator.controller.disable();
+			Robot.elevator.controller.reset();
 			Robot.elevator.encoder.setPIDSourceType(PIDSourceType.kRate);
 		}
 		Robot.elevator.controller.setSetpoint(fps);
@@ -39,5 +40,8 @@ public class PIDMoveElevator extends Command {
 	// one or more of the same subsystems is scheduled to run
 	protected void end() {
 		// Should I disable the PID controller here?
+		
+		// ... didn't think I would have to buuuut
+		// Robot.elevator.controller.disable();
 	}
 }
