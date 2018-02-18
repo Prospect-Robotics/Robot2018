@@ -25,11 +25,11 @@ public class POST extends CommandGroup {
 
 		setInterruptible(false); // you really shouldn't be able to interrupt POST.
 
-		addSequential(new TestEncoder(Robot.driveTrain.speedController1, Robot.driveTrain.quadratureEncoder1,
+		addSequential(new TestEncoder(Robot.driveTrain.speedControllerPort, Robot.driveTrain.encoderStarboard,
 				(boolean functional) -> {
 					Robot.driveTrain.encoder1Functional = functional;
 				}));
-		addSequential(new TestEncoder(Robot.driveTrain.speedController2, Robot.driveTrain.quadratureEncoder2,
+		addSequential(new TestEncoder(Robot.driveTrain.speedControllerStarboard, Robot.driveTrain.encoderPort,
 				(boolean functional) -> {
 					Robot.driveTrain.encoder2Functional = functional;
 				}));

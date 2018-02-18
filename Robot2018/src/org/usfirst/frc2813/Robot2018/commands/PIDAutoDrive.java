@@ -40,8 +40,8 @@ public class PIDAutoDrive extends Command {
 	private double startPosition;
 	private double startAngle; // which may or may not be zero degrees.
 	
-	private static final double ACCELERATION = 0;//inches
-	private static final double DECELERATION = 30;//inches
+	private static final double ACCELERATION = 60;//inches
+	private static final double DECELERATION = 60;//inches
 	
     public PIDAutoDrive(double forwardSpeed, double distance) {	// What are the units of distance?
         requires(Robot.driveTrain);
@@ -75,6 +75,12 @@ public class PIDAutoDrive extends Command {
     	controller.enable();
     	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
     }
+    
+    private double interpolate(double x1, double y1, double x2, double y2, double x) {
+        double y = y1 + (y2 - y1) / (x2 - x1) * (x - x1);
+        return y;
+    }
+    
     private double distanceTraveled() {
     	return Robot.driveTrain.getDistance() - startPosition;
     }
@@ -85,17 +91,15 @@ public class PIDAutoDrive extends Command {
     	if (inchesTraveled > distance) {
     		return 0.1;
     	}
-    	//Robot.driveTrain.setBrakeCoast(inchesTraveled < distance - DECELERATION) 
-    	return 1 + (inchesTraveled - (distance - DECELERATION)) * (maxSpeed-1) / DECELERATION;
-    	
-    	
+    	//Robot.driveTrain.setBrakeCoast(inchesTraveled < distance - DECELERATION)
+    	return interpolate(distance-DECELERATION, 1, distance, 0.2, inchesTraveled);
     }
     private double calcThrottleAccelerate(double inchesTraveled) {
     	//return inchesTraveled/ACCELERATION;
     	if (inchesTraveled < 0) {
     		return 0.2;
     	}
-    	return .2 + (maxSpeed) * (ACCELERATION - inchesTraveled) / (ACCELERATION);
+    	return interpolate(0,0.2,ACCELERATION, 1, inchesTraveled);
     }
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
@@ -142,7 +146,7 @@ public class PIDAutoDrive extends Command {
     	double rawDistance = Math.abs(distanceTraveled());
     	double steadyState=calcThrottleSteadyState();
     	double accel = calcThrottleAccelerate(rawDistance);
-    	accel = 1;
+    	//accel = 1;
     	double decel = calcThrottleDecelerate(rawDistance);
     	double potentialThrottle = Math.min(steadyState, decel);
     	double newThrottle = Math.min(potentialThrottle, accel);
@@ -156,6 +160,6 @@ public class PIDAutoDrive extends Command {
     	//System.out.printf("PID: traveled %.3f; throttle %.3f\n", distanceTraveled(), newThrottle);
     	
     	
-    	Robot.driveTrain.arcadeDrive(-.3, -output);//replace .3 with newThrottle or -newThrottle
+    	Robot.driveTrain.arcadeDrive(newThrottle, -output);//replace .3 with newThrottle or -newThrottle
     }
 }

@@ -18,8 +18,8 @@ public class ResetEncoders extends InstantCommand {
 
     // Called once when the command executes
     protected void initialize() {
-    	Robot.driveTrain.quadratureEncoder1.reset();
-    	Robot.driveTrain.quadratureEncoder2.reset();
+    	Robot.driveTrain.encoderStarboard.reset();
+    	Robot.driveTrain.encoderPort.reset();
     }
 
 }

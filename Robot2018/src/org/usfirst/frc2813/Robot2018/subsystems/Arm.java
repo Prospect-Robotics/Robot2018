@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  *
  */
 public class Arm extends Subsystem {
-	public final SpeedController speedController= RobotMap.armSpeedController1;
-	public final Encoder encoder = RobotMap.armQuadratureEncoder1;
+	public final SpeedController speedController= RobotMap.armSpeedController;
+	public final Encoder encoder = RobotMap.armQuadratureEncoder;
 	public boolean encoderFunctional = true;
-	public final DigitalInput limitSwitch = RobotMap.armDigitalInput1;
-	public final DoubleSolenoid gripper = RobotMap.armSolenoid2;
+	public final DigitalInput limitSwitch = RobotMap.armLimitSwitch;
+	public final DoubleSolenoid gripper = RobotMap.armDoubleSolenoid;
 	private boolean jawsOpen;
 	/**
 	 * Double solenoids are two independent coils.

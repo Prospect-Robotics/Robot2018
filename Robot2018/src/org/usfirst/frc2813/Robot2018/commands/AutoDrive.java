@@ -32,8 +32,8 @@ public class AutoDrive extends Command {
     	m_distance = distance;
     	maxSpeed = Math.abs(forwardSpeed);
     	minSpeed = Math.abs(minSpeed);
-    	encoder1 = Robot.driveTrain.quadratureEncoder1;
-    	encoder2 = Robot.driveTrain.quadratureEncoder2;
+    	encoder1 = Robot.driveTrain.encoderStarboard;
+    	encoder2 = Robot.driveTrain.encoderPort;
     	lerpStart = m_distance/4;
     	lerpEnd=.2;
     	lerpStop = .02;
@@ -111,11 +111,11 @@ public class AutoDrive extends Command {
     				System.out.println("GETANGLE>=0BREAK");
     				break;
     			}
-    			Robot.driveTrain.speedController2.set(.15);
+    			Robot.driveTrain.speedControllerStarboard.set(.15);
     			//Robot.driveTrain.speedController1.set(.15);
     		}
-    		Robot.driveTrain.speedController2.set(0);
-    		Robot.driveTrain.speedController1.set(0);
+    		Robot.driveTrain.speedControllerStarboard.set(0);
+    		Robot.driveTrain.speedControllerPort.set(0);
     	}
     	else if (Robot.gyro.getAngle()<0) {
     		System.out.println("GETANGLE<0");
@@ -126,11 +126,11 @@ public class AutoDrive extends Command {
     				System.out.println("GETANGLE>=0BREAK");
     				break;
     			}
-    			Robot.driveTrain.speedController1.set(-.15);
+    			Robot.driveTrain.speedControllerPort.set(-.15);
     			//Robot.driveTrain.speedController2.set(-.15);
     		}
-    		Robot.driveTrain.speedController1.set(0);
-    		Robot.driveTrain.speedController2.set(0);
+    		Robot.driveTrain.speedControllerPort.set(0);
+    		Robot.driveTrain.speedControllerStarboard.set(0);
     	}
     }
 
