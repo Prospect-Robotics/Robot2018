@@ -27,11 +27,11 @@ public class POST extends CommandGroup {
 
 		addSequential(new TestEncoder(Robot.driveTrain.speedControllerPort, Robot.driveTrain.encoderPort,
 				(boolean functional) -> {
-					Robot.driveTrain.encoder1Functional = functional;
+					Robot.driveTrain.encoderPortFunctional = functional;
 				}));
 		addSequential(new TestEncoder(Robot.driveTrain.speedControllerStarboard, Robot.driveTrain.encoderStarboard,
 				(boolean functional) -> {
-					Robot.driveTrain.encoder2Functional = functional;
+					Robot.driveTrain.encoderStarboardFunctional = functional;
 				}));
 		requires(Robot.driveTrain);
 

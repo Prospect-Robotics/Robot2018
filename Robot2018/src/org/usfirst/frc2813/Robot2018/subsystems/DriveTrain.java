@@ -57,7 +57,7 @@ public class DriveTrain extends Subsystem {
 	// private final Encoder quadratureEncoder3 =
 	// RobotMap.driveTrainQuadratureEncoder4;
 	public final Solenoid gearShift = RobotMap.driveTrainSingleSolenoid;
-	public boolean encoder1Functional, encoder2Functional; // set by POST.
+	public boolean encoderPortFunctional, encoderStarboardFunctional; // set by POST.
 
 	// private final Encoder quadratureEncoder4 =
 	// RobotMap.driveTrainQuadrature
@@ -130,6 +130,9 @@ public class DriveTrain extends Subsystem {
 	 * was later. If the robot drove backwards, the value returned will be negative.
 	 * If the robot spins in place, the value will not change.
 	 * 
+	 * DriveTrain.getDistance() also checks to ensure functionality of the encoders and throws
+	 * an error to the console if both encoders are nonfunctional
+	 * 
 	 * @return the average of the left and right encoder values
 	 */
 	public double getDistance() {
@@ -138,15 +141,20 @@ public class DriveTrain extends Subsystem {
     	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
     	 */
-		return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
-		/*(encoder1Functional && encoder2Functional)
-			return (quadratureEncoder1.getDistance() + (-1 * quadratureEncoder2.getDistance()))/2;
-		else if(encoder1Functional)
-			return quadratureEncoder1.getDistance();
-		else if(encoder2Functional)
-			return -quadratureEncoder2.getDistance();
-		else
-			throw new Error("Both encoders are nonfunctional!");*/
+		if (encoderPortFunctional && encoderStarboardFunctional)
+			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
+		else if(encoderPortFunctional) {
+			System.out.println("encoderPort NOT FUNCTIONAL");
+			return encoderStarboard.getDistance();
+		}
+		else if(encoderStarboardFunctional) {
+			System.out.println("encoderStarboard NOT FUNCTIONAL");
+			return -encoderPort.getDistance();
+		}
+		else {
+			System.out.println("Both Encoders NOT FUNCTIONAL");
+			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
+		}
 	}
 
 	/**getDistance
