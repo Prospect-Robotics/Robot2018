@@ -151,7 +151,9 @@ public class AutonomousCommand extends CommandGroup {
 				cmdIssuer.driveForward(20);
 				cmdIssuer.curveCounterForward(50, .7);
 				cmdIssuer.driveForward(15);
-				//TODO RELEASE CUBE; might want to raise elevator...
+				cmdIssuer.raiseElevator();
+				cmdIssuer.placeCube();
+				cmdIssuer.lowerElevator();
 				cmdIssuer.sleep(2);
 				cmdIssuer.curveClockBackward(90, .6);
 				cmdIssuer.curveCounterBackward(68, .5);
