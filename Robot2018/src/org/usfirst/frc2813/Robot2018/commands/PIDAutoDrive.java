@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
- *
+ * 
  */
 public class PIDAutoDrive extends Command {
 	
@@ -75,6 +75,20 @@ public class PIDAutoDrive extends Command {
     	controller.enable();
     	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
     }
+    
+    /**
+     * Interpolate: Given two points and the x value of third point, determines
+     * y value of that third point.
+     * 
+     * x is distance and y is speed when used in calcThrottle
+     * 
+     * @param x1 - x value of first point
+     * @param y1 - y value of first point
+     * @param x2 - x value of second point
+     * @param y2 - y value of second point
+     * @param x - x value of third point
+     * @return y value of third point
+     */
     
     private double interpolate(double x1, double y1, double x2, double y2, double x) {
         double y = y1 + (y2 - y1) / (x2 - x1) * (x - x1);
@@ -144,7 +158,7 @@ public class PIDAutoDrive extends Command {
 //    	if(!watchdog.isAlive()) return;
     	//System.out.println("Output updated to: "+output);//+", Time since last run: "+controller.getTimeDelta());
     	double rawDistance = Math.abs(distanceTraveled());
-    	double steadyState=calcThrottleSteadyState();
+    	double steadyState = calcThrottleSteadyState();
     	double accel = calcThrottleAccelerate(rawDistance);
     	//accel = 1;
     	double decel = calcThrottleDecelerate(rawDistance);
