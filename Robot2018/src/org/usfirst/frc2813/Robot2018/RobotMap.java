@@ -52,8 +52,8 @@ public class RobotMap {
 	public static VictorSPX elevatorSpeedControllerStarboard;		//  Controller Starboard will follow controller Port; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
 	public static VictorSPX elevatorSpeedControllerPortFollow;		//  Controller PortFollow is the paired motor with controller Port; it will follow 1
 	public static VictorSPX elevatorSpeedControllerStarboardFollow;		//  Controller StarboardFollow is the paired motor with controller Starboard; it will follow 2
-	public static WPI_VictorSPX intakeSpeedController1;
-	public static VictorSPX intakeSpeedController2;
+	public static WPI_VictorSPX intakeSpeedController;
+	public static VictorSPX intakeSpeedControllerFollow;
 	public static Encoder elevatorQuadratureEncoder1;
 	public static DigitalInput elevatorLimitSwitch;
 	public static SpeedController armSpeedController;
@@ -157,12 +157,12 @@ public class RobotMap {
 		elevatorSpeedControllerStarboardFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
 		elevatorSpeedControllerStarboardFollow.setInverted(false);
 		
-		intakeSpeedController1 = new WPI_VictorSPX(5);
-		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController1);
-		intakeSpeedController1.setInverted(false);
-		intakeSpeedController2 = new VictorSPX(6);
-		intakeSpeedController2.set(ControlMode.Follower, intakeSpeedController1.getDeviceID());
-		intakeSpeedController2.setInverted(true);
+		intakeSpeedController = new WPI_VictorSPX(5);
+		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController);
+		intakeSpeedController.setInverted(false);
+		intakeSpeedControllerFollow = new VictorSPX(6);
+		intakeSpeedControllerFollow.set(ControlMode.Follower, intakeSpeedController.getDeviceID());
+		intakeSpeedControllerFollow.setInverted(true);
 
 		/* 
 		 *  Encoder for the Elevator SHAFT is physically connected to Encoder #3 on the Spartan Board

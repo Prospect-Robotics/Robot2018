@@ -28,6 +28,7 @@ public class AutonomousCommand extends CommandGroup {
 	public static final int BACKWARD_SPEED_x_percent_power = 1;
 	public static final int FORWARD_DISTANCE = 1;
 	public static final int BACKWARD_DISTANCE = 1;
+	public static enum FieldPosition { LEFT, CENTER, RIGHT };
 	public static final double ONE_INCH = 1;			//  The Encoder code in WPI Lib translates the distance to inches based on the
 														//  
 	public static final double ONE_FOOT = 12 * ONE_INCH;
@@ -116,12 +117,15 @@ public class AutonomousCommand extends CommandGroup {
 			public void placeCube() {
 				//TODO addSequential(s) to place cube
 			}
+			public void sleep(double seconds) {
+				addSequential(new TimedCommand(seconds));
+			}
 		}
 		autoCmd cmdIssuer = new autoCmd();
 		final String gameData = DriverStation.getInstance().getGameSpecificMessage();
-		int position = positionSelector.getSelected();
+		FieldPosition position = FieldPosition.values()[positionSelector.getSelected()];
 		switch (position) {
-		case 0://POSITION LEFT
+		case LEFT:
 			switch(gameData) {
 			case "LLL":
 				
@@ -137,7 +141,7 @@ public class AutonomousCommand extends CommandGroup {
 				break;
 			}
 			break;
-		case 1://POSITION CENTER
+		case CENTER:
 			switch(gameData.charAt(0)) {
 			case 'L':
 				break;
@@ -148,8 +152,10 @@ public class AutonomousCommand extends CommandGroup {
 				cmdIssuer.driveForward(20);
 				cmdIssuer.curveCounterForward(50, .7);
 				cmdIssuer.driveForward(15);
-				//TODO RELEASE CUBE; might want to raise elevator...
-				addSequential(new TimedCommand(2));
+				cmdIssuer.raiseElevator();
+				cmdIssuer.placeCube();
+				cmdIssuer.lowerElevator();
+				cmdIssuer.sleep(2);
 				cmdIssuer.curveClockBackward(90, .6);
 				cmdIssuer.curveCounterBackward(68, .5);
 				cmdIssuer.driveForward(12);
@@ -157,7 +163,7 @@ public class AutonomousCommand extends CommandGroup {
 				
 			}
 			break;
-		case 2://POSITION RIGHT
+		case RIGHT:
 			switch(gameData) {
 			case "LLL":
 				break;
