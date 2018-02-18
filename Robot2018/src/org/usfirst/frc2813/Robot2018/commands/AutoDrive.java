@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
- *
+ * ***Replaced By PIDAutoDrive***
+ * OBSOLETE
  */
 public class AutoDrive extends Command {
 	private double m_forwardSpeed;

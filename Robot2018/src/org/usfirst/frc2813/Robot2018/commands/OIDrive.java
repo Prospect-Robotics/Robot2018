@@ -51,7 +51,8 @@ public class OIDrive extends Command {
     // Called repeatedly when this Command is scheduled to run
     //@Override
     protected void execute() {
-    	Robot.oi.driveStyleChooser.getSelected().accept(Robot.oi.joystick1, Robot.oi.joystick2);
+    	Robot.driveTrain.arcadeDrive(Robot.oi.joystick1, Robot.oi.joystick2);
+    	//Robot.oi.driveStyleChooser.getSelected().accept(Robot.oi.joystick1, Robot.oi.joystick2);
     	//Robot.driveTrain.tankDrive(Robot.oi.joystick1, Robot.oi.joystick2);
     }
 
