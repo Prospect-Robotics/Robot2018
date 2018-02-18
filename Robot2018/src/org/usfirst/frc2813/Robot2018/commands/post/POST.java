@@ -35,7 +35,7 @@ public class POST extends CommandGroup {
 				}));
 		requires(Robot.driveTrain);
 
-		addSequential(new TestEncoder(Robot.arm.speedController, Robot.arm.encoder, (boolean functional) -> {
+		/*addSequential(new TestEncoder(Robot.arm.speedController, Robot.arm.encoder, (boolean functional) -> {
 			Robot.arm.encoderFunctional = functional;
 		}));
 		requires(Robot.arm);
@@ -43,7 +43,7 @@ public class POST extends CommandGroup {
 		addSequential(new TestEncoder(Robot.elevator.speedController, Robot.elevator.encoder, (boolean functional) -> {
 			Robot.elevator.encoderFunctional = functional;
 		}));
-		requires(Robot.elevator);
+		requires(Robot.elevator);*/
 
 		// add bottomElevator here when they add a limit switch on the elevator.
 

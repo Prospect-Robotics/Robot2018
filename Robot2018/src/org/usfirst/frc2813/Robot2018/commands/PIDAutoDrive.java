@@ -30,7 +30,7 @@ public class PIDAutoDrive extends Command {
 		}
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
-	private final RandomPIDController2 controller = new RandomPIDController2(.01, 0.00, 0, m_source, this::usePIDOutput);
+	private final RandomPIDController2 controller = new RandomPIDController2(.05, 0.00, 0, m_source, this::usePIDOutput);
 	//private final PIDController controller = new PIDController(0.15, 0, 0.2);
 	//private final WatchdogPIDInterface watchdog = new WatchdogPIDInterface(controller);
 	private final double forwardSpeed;
@@ -46,8 +46,11 @@ public class PIDAutoDrive extends Command {
     public PIDAutoDrive(double forwardSpeed, double distance) {	// What are the units of distance?
         requires(Robot.driveTrain);
         controller.setInputRange(0, 360);
+        System.out.println("SetInputRange");
         controller.setContinuous();
+        System.out.println("SetContinuous");
         controller.setOutputRange(-1, 1);
+        System.out.println("SetOutputRange");
    //     watchdog.setSafetyEnabled(true);
    //     watchdog.setExpiration(0.1);
         this.forwardSpeed=forwardSpeed;
@@ -68,6 +71,7 @@ public class PIDAutoDrive extends Command {
     	 */
     	startPosition = Robot.driveTrain.getDistance();
     	startAngle = Robot.gyro.getAngle();
+    	System.out.println("PID AutoDrive");
     	controller.enable();
     	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
     }
@@ -148,10 +152,10 @@ public class PIDAutoDrive extends Command {
     	if (this.forwardSpeed <0) {
     		newThrottle *= -1;
     	}
-    	System.out.printf("PID: t %.3f; a %.3f; ss %.3f; d %.3f;\nnT %.3f; fS %.3f; dist %.3f\n", distanceTraveled(), accel, steadyState, decel, newThrottle, this.forwardSpeed, distance);
+    	System.out.printf("PID: t %.3f; a %.3f; ss %.3f; d %.3f;\nnT %.3f; fS %.3f; dist %.3f; output %.3f\n", distanceTraveled(), accel, steadyState, decel, newThrottle, this.forwardSpeed, distance,output);
     	//System.out.printf("PID: traveled %.3f; throttle %.3f\n", distanceTraveled(), newThrottle);
     	
     	
-    	Robot.driveTrain.arcadeDrive(newThrottle, -output);
+    	Robot.driveTrain.arcadeDrive(-.3, -output);//replace .3 with newThrottle or -newThrottle
     }
 }

@@ -138,7 +138,7 @@ public class DriveTrain extends Subsystem {
     	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
     	 */
-		
+		//return (quadratureEncoder1.getDistance() + (-1 * quadratureEncoder2.getDistance()))/2;
 		if(encoder1Functional && encoder2Functional)
 			return (quadratureEncoder1.getDistance() + (-1 * quadratureEncoder2.getDistance()))/2;
 		else if(encoder1Functional)

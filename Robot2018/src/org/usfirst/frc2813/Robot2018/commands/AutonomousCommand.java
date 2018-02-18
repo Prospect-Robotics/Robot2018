@@ -64,6 +64,7 @@ public class AutonomousCommand extends CommandGroup {
 				turnSpeed=speed;
 			}
 			public void driveForward(double distance) {
+				System.out.println("DRIVEFORWARD");
 				addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance));
 			}
 			public void driveBackward(double distance) {
