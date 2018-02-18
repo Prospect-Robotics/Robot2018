@@ -100,9 +100,9 @@ public class OI {
         toggleRelay0 = new JoystickButton(buttonPanel, 7);
         toggleRelay0.whenPressed(new ShiftGears());
         spin4MotorsBackwardsElevator = new JoystickButton(buttonPanel, 5);
-        spin4MotorsBackwardsElevator.whileHeld(new PIDMoveElevator(-0.5));
+        spin4MotorsBackwardsElevator.whileHeld(new PIDMoveElevator(-6));		// units of inches per second!
         spin4MotorsElevator = new JoystickButton(buttonPanel, 4);
-        spin4MotorsElevator.whileHeld(new PIDMoveElevator(0.5));
+        spin4MotorsElevator.whileHeld(new PIDMoveElevator(6));
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
         // TODO reenable this when we add a limit switch!
         //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
