@@ -25,11 +25,11 @@ public class POST extends CommandGroup {
 
 		setInterruptible(false); // you really shouldn't be able to interrupt POST.
 
-		addSequential(new TestEncoder(Robot.driveTrain.speedControllerPort, Robot.driveTrain.encoderStarboard,
+		addSequential(new TestEncoder(Robot.driveTrain.speedControllerPort, Robot.driveTrain.encoderPort,
 				(boolean functional) -> {
 					Robot.driveTrain.encoder1Functional = functional;
 				}));
-		addSequential(new TestEncoder(Robot.driveTrain.speedControllerStarboard, Robot.driveTrain.encoderPort,
+		addSequential(new TestEncoder(Robot.driveTrain.speedControllerStarboard, Robot.driveTrain.encoderStarboard,
 				(boolean functional) -> {
 					Robot.driveTrain.encoder2Functional = functional;
 				}));
@@ -72,6 +72,7 @@ public class POST extends CommandGroup {
 			afterPOST.ifPresent(Command::start);
 		else {
 			POSTinitiated = true;
+			System.out.println("Starting POST.");
 			// afterPOST will be called after POST completion.
 			super.start();
 		}

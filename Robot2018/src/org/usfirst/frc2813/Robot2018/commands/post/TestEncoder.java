@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.post;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
@@ -44,6 +45,7 @@ public class TestEncoder extends Command {
         if(isTimedOut()) {
         	if(callback != null)
         		callback.accept(false);
+        	DriverStation.reportWarning("Warning.  "+encoder.getName()+" in "+encoder.getSubsystem()+" is nonfunctional.", false);
         	return true;
         }
         return false;
