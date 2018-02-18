@@ -87,14 +87,18 @@ public class DriveTrain extends Subsystem {
 	}
 
 	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
-		double z = joystick1.getX() + joystick1.getTwist();
-		double x = joystick1.getY();
-		if (Math.abs(joystick1.getY()) > .7 && gearShift.get() == false) {
-			new ShiftGears();
-		} else if (Math.abs(joystick1.getY()) <= .7 && gearShift.get() == true) {
-			new ShiftGears();
-		}
+		// double z = joystick1.getX() + joystick1.getTwist();
+		// double x = joystick1.getY();
+		// Please note: Grady had added this some time ago and it wasn't working.  I just fixed it.  Jack may yell at us for changing it.
+		gearShift.set(Math.abs(joystick1.getY()) > .7);		//  If >70% speed, shift into high gear; if <=70% speed, shift into low gear
+		
+		/*
+		 *  The arcadeDrive call parameters are (signed) speed and (signed) turn value [-1, 1]
+		 *  Pushing the joystick forward to drive forward increases the joystick's Y parameter.  Even though the arcadeDrive calls this field "xSpeed", it comes from the Y axis of the joystick
+		 *  Pushing the joystick left and right changes the joystick's X parameter.  Even though the arcadeDrive calls this field "zRotation", it comes from the X axis of the joystick.
+		 */
 		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX() * Math.abs(joystick1.getX()), false);
+		
 	}
 
 	public void tankAutoDrive(double speedLeft, double speedRight) {
