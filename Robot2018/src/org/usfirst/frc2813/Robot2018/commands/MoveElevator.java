@@ -50,7 +50,7 @@ public class MoveElevator extends Command {
     //@Override
     protected void initialize() {
     	quadratureEncoder1 = Robot.elevator.encoder;
-    	digitalInput1 = Robot.elevator.digitalInput1;
+    	digitalInput1 = Robot.elevator.limitSwitch;
     	speedController1 = Robot.elevator.speedController;
     }
 
