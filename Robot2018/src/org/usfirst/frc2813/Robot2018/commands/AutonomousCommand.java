@@ -58,7 +58,7 @@ public class AutonomousCommand extends CommandGroup {
 				farSwitch = splitChar(gd.charAt(2));
 			}
 		}
-		class autoCmd {
+		class AutoCmd {
 			/*
 			 * autoCmd contains classes containing functions to drive and move
 			 * parts of robot during Autonomous
@@ -134,50 +134,71 @@ public class AutonomousCommand extends CommandGroup {
 				addSequential(new TimedCommand(seconds));
 			}
 		}
-		autoCmd cmdIssuer = new autoCmd();
+		AutoCmd cmdIssuer = new AutoCmd();
 		GameData gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 		FieldPosition position = FieldPosition.values()[positionSelector.getSelected()];
-		switch (position) {
-		case LEFT:
-			switch(gameData.nearSwitch) {
-			case LEFT:
-				cmdIssuer.driveForward(150);
-				//cmdIssuer.curveClockForward(30, .7);
-				break;
-			case RIGHT:
-				break;
+		if (position == gameData.scale) {
+			// we are on the same side as the scale. Leave switch for team mates
+			cmdIssuer.driveForward(150);
+			if (position == FieldPosition.LEFT) {
+				cmdIssuer.turnRight();
 			}
-			break;
-		case CENTER:
-			switch(gameData.nearSwitch) {
-			case LEFT:
-				break;
-			case RIGHT:
-				
-				cmdIssuer.driveForward(20);
-				cmdIssuer.curveClockForward(45, .7);
-				cmdIssuer.driveForward(20);
-				cmdIssuer.curveCounterForward(50, .7);
-				cmdIssuer.driveForward(15);
-				cmdIssuer.raiseElevator();
-				cmdIssuer.placeCube();
-				cmdIssuer.lowerElevator();
-				cmdIssuer.sleep(2);
-				cmdIssuer.curveClockBackward(90, .6);
-				cmdIssuer.curveCounterBackward(68, .5);
-				cmdIssuer.driveForward(12);
-				break;
-				
+			else {
+				cmdIssuer.turnLeft();
 			}
-			break;
-		case RIGHT:
-			switch(gameData.nearSwitch) {
-			case LEFT:
-				break;
-			case RIGHT:
-				break;
+			cmdIssuer.raiseElevator();
+			cmdIssuer.placeCube();
+			cmdIssuer.lowerElevator();
+		}
+		else if (position != FieldPosition.CENTER) {
+			// from far side we cross over between switch and scale and place block on scale
+			cmdIssuer.driveForward(50);
+			if (position == FieldPosition.LEFT) {
+				cmdIssuer.turnRight(45);
 			}
-			break;
+			else {
+				cmdIssuer.turnLeft(45);
+			}
+			cmdIssuer.driveForward(50); // diagonally across field
+			if (position == FieldPosition.LEFT) {
+				cmdIssuer.turnLeft(45);
+			}
+			else {
+				cmdIssuer.turnRight(45);
+			}
+			cmdIssuer.raiseElevator();
+			cmdIssuer.placeCube();
+			cmdIssuer.lowerElevator();			
+		}
+		else {
+			// We are in the center start position
+			cmdIssuer.driveForward(10); // enough to turn
+			if (gameData.nearSwitch == FieldPosition.LEFT) {
+				cmdIssuer.turnLeft(45);
+				cmdIssuer.driveForward(40); // diagonally from start to far side of near switch
+				cmdIssuer.turnRight(45);
+			}
+			else if (gameData.nearSwitch == FieldPosition.RIGHT) {
+				cmdIssuer.turnRight(45);
+				cmdIssuer.driveForward(40); // diagonally from start to far side of near switch
+				cmdIssuer.turnLeft(45);
+			}
+			cmdIssuer.raiseElevator(AutoCmd.MAX_ELEVATOR / 2);
+			cmdIssuer.placeCube();
+			cmdIssuer.lowerElevator();			
+		}
+//				cmdIssuer.driveForward(20);
+//				cmdIssuer.curveClockForward(45, .7);
+//				cmdIssuer.driveForward(20);
+//				cmdIssuer.curveCounterForward(50, .7);
+//				cmdIssuer.driveForward(15);
+//				cmdIssuer.raiseElevator();
+//				cmdIssuer.placeCube();
+//				cmdIssuer.lowerElevator();
+//				cmdIssuer.sleep(2);
+//				cmdIssuer.curveClockBackward(90, .6);
+//				cmdIssuer.curveCounterBackward(68, .5);
+//				cmdIssuer.driveForward(12);
 		}
 		System.out.println("AutonomousCommand:  Wheel circumference is "+RobotMap.WHEEL_CIRCUMFERENCE);
 		// Robot.driveTrain.quadratureEncoder1.reset();
