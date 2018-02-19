@@ -46,7 +46,7 @@ public class PIDMoveElevator extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
     	System.out.println("MoveElevator:isFinished:  rate was: "+fps+", getDistance is: "+Robot.elevator.encoder.getDistance());
-		return false;
+		return Robot.elevator.limitSwitch.get() == true;
 	}
 
 	// Called once after isFinished returns true or another command which requires
