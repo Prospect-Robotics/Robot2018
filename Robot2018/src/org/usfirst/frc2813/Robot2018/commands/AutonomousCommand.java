@@ -29,6 +29,7 @@ public class AutonomousCommand extends CommandGroup {
 	public static final double ONE_INCH = 1;			//  The Encoder code in WPI Lib translates the distance to inches based on the
 														//  
 	public static final double ONE_FOOT = 12 * ONE_INCH;
+	public int directionBias;  // used to share code between left/right
 	
 	static {
 		positionSelector.addDefault("LEFT", 0);
@@ -127,15 +128,14 @@ public class AutonomousCommand extends CommandGroup {
 		AutoCmd cmdIssuer = new AutoCmd();
 		GameData gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 		FieldPosition position = FieldPosition.values()[positionSelector.getSelected()];
+		
+		 // allows left->right and right->left to share code
+		directionBias = (position == FieldPosition.LEFT) ? 1 : -1;
+		
 		if (position == gameData.scale) {
 			// we are on the same side as the scale. Leave switch for team mates
 			cmdIssuer.driveForward(150);
-			if (position == FieldPosition.LEFT) {
-				cmdIssuer.turnRight();
-			}
-			else {
-				cmdIssuer.turnLeft();
-			}
+			cmdIssuer.turnRight(90 * directionBias);
 			cmdIssuer.raiseElevator();
 			cmdIssuer.placeCube();
 			cmdIssuer.lowerElevator();
@@ -143,36 +143,22 @@ public class AutonomousCommand extends CommandGroup {
 		else if (position != FieldPosition.CENTER) {
 			// from far side we cross over between switch and scale and place block on scale
 			cmdIssuer.driveForward(50);
-			if (position == FieldPosition.LEFT) {
-				cmdIssuer.turnRight(45);
-			}
-			else {
-				cmdIssuer.turnLeft(45);
-			}
+			cmdIssuer.turnRight(45 * directionBias);
 			cmdIssuer.driveForward(50); // diagonally across field
-			if (position == FieldPosition.LEFT) {
-				cmdIssuer.turnLeft(45);
-			}
-			else {
-				cmdIssuer.turnRight(45);
-			}
+			cmdIssuer.turnLeft(45 * directionBias);
 			cmdIssuer.raiseElevator();
 			cmdIssuer.placeCube();
 			cmdIssuer.lowerElevator();			
 		}
 		else {
 			// We are in the center start position
+			 // allows left->right and right->left to share code
+			directionBias = (position == FieldPosition.LEFT) ? 1 : -1;
+
 			cmdIssuer.driveForward(10); // enough to turn
-			if (gameData.nearSwitch == FieldPosition.LEFT) {
-				cmdIssuer.turnLeft(45);
-				cmdIssuer.driveForward(40); // diagonally from start to far side of near switch
-				cmdIssuer.turnRight(45);
-			}
-			else if (gameData.nearSwitch == FieldPosition.RIGHT) {
-				cmdIssuer.turnRight(45);
-				cmdIssuer.driveForward(40); // diagonally from start to far side of near switch
-				cmdIssuer.turnLeft(45);
-			}
+			cmdIssuer.turnLeft(45 * directionBias);
+			cmdIssuer.driveForward(40); // diagonally from start to far side of near switch
+			cmdIssuer.turnRight(45);
 			cmdIssuer.raiseElevator(AutoCmd.MAX_ELEVATOR / 2);
 			cmdIssuer.placeCube();
 			cmdIssuer.lowerElevator();			
