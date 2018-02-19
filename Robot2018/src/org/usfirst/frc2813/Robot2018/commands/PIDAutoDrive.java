@@ -103,7 +103,7 @@ public class PIDAutoDrive extends Command {
     }
     private double calcThrottleDecelerate(double inchesTraveled) {
     	if (inchesTraveled > distance) {
-    		return 0.1;
+    		return 0.2;
     	}
     	//Robot.driveTrain.setBrakeCoast(inchesTraveled < distance - DECELERATION)
     	return interpolate(distance-DECELERATION, 1, distance, 0.2, inchesTraveled);
@@ -113,10 +113,11 @@ public class PIDAutoDrive extends Command {
     	if (inchesTraveled < 0) {
     		return 0.2;
     	}
-    	return interpolate(0,0.2,ACCELERATION, 1, inchesTraveled);
+    	return interpolate(0,0.3,ACCELERATION, 1, inchesTraveled);
     }
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	//new PrintOutEncoderValues(60,Robot.driveTrain.encoderPort,Robot.driveTrain.encoderStarboard);
 //    	watchdog.feed();
     }
 
@@ -173,7 +174,7 @@ public class PIDAutoDrive extends Command {
     	System.out.printf("PID: t %.3f; a %.3f; ss %.3f; d %.3f;\nnT %.3f; fS %.3f; dist %.3f; output %.3f\n", distanceTraveled(), accel, steadyState, decel, newThrottle, this.forwardSpeed, distance,output);
     	//System.out.printf("PID: traveled %.3f; throttle %.3f\n", distanceTraveled(), newThrottle);
     	
-    	
-    	Robot.driveTrain.arcadeDrive(newThrottle, -output);//replace .3 with newThrottle or -newThrottle
+    	//Robot.driveTrain.arcadeDrive(1, 0);
+    	Robot.driveTrain.arcadeDrive(newThrottle, -output);
     }
 }
