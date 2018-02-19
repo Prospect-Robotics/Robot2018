@@ -141,15 +141,16 @@ public class DriveTrain extends Subsystem {
     	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
     	 */
+
 		if (encoderPortFunctional && encoderStarboardFunctional)
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		else if(encoderPortFunctional) {
 			System.out.println("encoderPort NOT FUNCTIONAL");
-			return encoderStarboard.getDistance();
+			return -encoderPort.getDistance();
 		}
 		else if(encoderStarboardFunctional) {
 			System.out.println("encoderStarboard NOT FUNCTIONAL");
-			return -encoderPort.getDistance();
+			return encoderStarboard.getDistance();
 		}
 		else {
 			System.out.println("Both Encoders NOT FUNCTIONAL");

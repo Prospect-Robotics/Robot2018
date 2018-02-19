@@ -18,6 +18,8 @@ import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -88,7 +90,10 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit(){
-
+    	RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Coast);
+    	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Coast);
+    	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Coast);
+    	RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Coast);
     }
 
     @Override
@@ -101,6 +106,10 @@ public class Robot extends TimedRobot {
     	System.out.println("Autonomous Init");
     	autonomousCommand = new AutonomousCommand();
         // schedule the autonomous  (example)
+    	RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
+    	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
+    	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
+    	RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
         new POST(autonomousCommand).start();
     }
 
@@ -119,6 +128,10 @@ public class Robot extends TimedRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) autonomousCommand.cancel();
+        RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
+    	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
+    	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
+    	RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
         new POST().start();
     }
 

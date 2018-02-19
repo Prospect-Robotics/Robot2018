@@ -182,7 +182,7 @@ public class RobotMap {
 		LiveWindow.addSensor("Elevator", "Quadrature Encoder", elevatorQuadratureEncoder1);
 		
 		elevatorLimitSwitch = new DigitalInput(0);
-
+		LiveWindow.addSensor("Elevator", "Limit Switch", elevatorLimitSwitch);
 		
 		armSpeedController = new WPI_VictorSPX(11);//USE WITH PRACTICE BOT
 		//armSpeedController = new WPI_TalonSRX(12);//USE WITH COMPETITION BOT
