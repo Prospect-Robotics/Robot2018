@@ -56,9 +56,7 @@ public class AutonomousCommand extends CommandGroup {
 		}
 		class AutoCmd {
 			/*
-			 * autoCmd contains classes containing functions to drive and move
-			 * parts of robot during Autonomous
-			 * Call cmdIssuer.(function) to drive that command
+			 * autoCmd performs autonomous movement and elevator commands
 			 */
 			private static final int FORWARD = -1;
 			private static final int BACKWARD = 1;
