@@ -1,17 +1,26 @@
 package org.usfirst.frc2813.Robot2018.commands;
+import org.usfirst.frc2813.Robot2018.Constants;
 
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.RobotMap;
 
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.*;
+
+
 /**
  *
  */
 public class MaintainElevatorPosition extends Command {
 
+	
+	
     //private PIDOutput debugPrintPIDOutput;
 	private double targetPosition;
     public final PIDController controller = new PIDController(2.0, 0, 0, Robot.elevator.encoder, this::debugPrintPIDOutput);	// Kp, Ki, Kd
@@ -35,12 +44,23 @@ public class MaintainElevatorPosition extends Command {
     	controller.setSetpoint(pos);
     	controller.enable();
     	
+    	/*
+    	 * When we release the elevator button the Maintain Elevator will take over
+    	 * Talon SRX takes a primary posiiton
+    	 * TODO:  Clean up Talon stuff once we are sure it works
+    	 */
+    	targetPosition = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);		// TODO:  temp variable only for debug output - can remove when working
+    	RobotMap.srxElevator.set(ControlMode.Position, targetPosition);
+
+    	
+    	
 		System.out.println("MaintainElevator:initialize:  pos ("+Robot.elevator.encoder.getPIDSourceType()+") to maintain is: "+pos+" (getDistance)");
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	System.out.println("MaintainElevator:execute:  target position is: "+targetPosition+", getDistance is: "+Robot.elevator.encoder.getDistance());
+    	System.out.println("MaintainElevator:execute:  target position is: "+targetPosition+", getDistance is: "+RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
+//    	System.out.println("MaintainElevator:execute:  target position is: "+targetPosition+", getDistance is: "+Robot.elevator.encoder.getDistance());
     	// nothing to do here, just let the PID controller run.
     }
 

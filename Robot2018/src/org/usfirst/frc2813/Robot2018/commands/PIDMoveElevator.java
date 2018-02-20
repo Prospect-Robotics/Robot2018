@@ -19,8 +19,8 @@ public class PIDMoveElevator extends Command {
 		fps = feetPerSecond;
 	}
 	public void debugPrintPIDOutput(double pidOutput) {
-		System.out.println("Output updated to: "+pidOutput);
-		Robot.elevator.speedController.pidWrite(pidOutput);
+//		System.out.println("Output updated to: "+pidOutput);
+//		Robot.elevator.speedController.pidWrite(pidOutput);
 	}
 
 	// Called just before this Command runs the first time

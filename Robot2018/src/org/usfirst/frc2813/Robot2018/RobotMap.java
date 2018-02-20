@@ -49,6 +49,9 @@ public class RobotMap {
 	public static DoubleSolenoid driveTrainDoubleSolenoid;
 	public static Solenoid armSingleSolenoid;//for the competition bot
 	public static DoubleSolenoid armDoubleSolenoid;//for the practice bot
+
+	public static TalonSRX srxElevator;		// TODO:  rename when we are sure this works; NOT WPI_TalonSRX - need the CTRE libraries
+	
 	public static WPI_VictorSPX elevatorSpeedControllerPort;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
 															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
 	public static VictorSPX elevatorSpeedControllerStarboard;		//  Controller Starboard will follow controller Port; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
@@ -156,11 +159,18 @@ public class RobotMap {
 		elevatorSpeedControllerPortFollow = new VictorSPX(4);
 		elevatorSpeedControllerPortFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
 		elevatorSpeedControllerPortFollow.setInverted(elevatorSpeedControllerPort.getInverted());
-		elevatorSpeedControllerStarboardFollow = new VictorSPX(10);
-		elevatorSpeedControllerStarboardFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
-		elevatorSpeedControllerStarboardFollow.setInverted(false);
+//		elevatorSpeedControllerStarboardFollow = new VictorSPX(10);	//  TODO:  10 is now the Talon
+//		elevatorSpeedControllerStarboardFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
+//		elevatorSpeedControllerStarboardFollow.setInverted(false);
 		
-		intakeSpeedController = new WPI_VictorSPX(5);
+		/*
+		 * Testing the Talon motor controller
+		 * TODO:  if this works, set up the Victors to follow the Talon
+		 */
+		srxElevator = new WPI_TalonSRX(12);
+		
+		
+		intakeSpeedController = new WPI_VictorSPX(11);	//  Competiton bot changed from 5 to 11
 		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController);
 		intakeSpeedController.setInverted(false);
 		intakeSpeedControllerFollow = new VictorSPX(6);
@@ -184,7 +194,7 @@ public class RobotMap {
 		elevatorLimitSwitch = new DigitalInput(0);
 		LiveWindow.addSensor("Elevator", "Limit Switch", elevatorLimitSwitch);
 		
-		armSpeedController = new WPI_VictorSPX(11);//USE WITH PRACTICE BOT
+		armSpeedController = new WPI_VictorSPX(5);		// TODO:  5 is NOT USED on production bot, was 11 on practice bot USE WITH PRACTICE BOT
 		//armSpeedController = new WPI_TalonSRX(12);//USE WITH COMPETITION BOT
 		armQuadratureEncoder = new Encoder(14, 15, true, EncodingType.k4X);	// Spartan Board Encoder #2
 		armLimitSwitch = new DigitalInput(1);
