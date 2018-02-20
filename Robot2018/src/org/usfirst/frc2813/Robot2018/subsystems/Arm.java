@@ -2,6 +2,8 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class Arm extends Subsystem {
 	public final SpeedController speedController= RobotMap.armSpeedController;
+	public final TalonSRX srxController = RobotMap.srxArm;
 	public final Encoder encoder = RobotMap.armQuadratureEncoder;
 	public boolean encoderFunctional = true;
 	public final DigitalInput limitSwitch = RobotMap.armLimitSwitch;

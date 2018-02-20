@@ -56,7 +56,7 @@ public class RobotMap {
 
 	
 	
-	public static WPI_VictorSPX elevatorSpeedControllerPort;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
+	public static VictorSPX elevatorSpeedControllerPort;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
 															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
 	public static VictorSPX elevatorSpeedControllerStarboard;		//  Controller Starboard will follow controller Port; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
 	public static VictorSPX elevatorSpeedControllerPortFollow;		//  Controller PortFollow is the paired motor with controller Port; it will follow 1
@@ -152,17 +152,18 @@ public class RobotMap {
 		// The intake motors are an anomaly because the wire for the intake motors just goes up one side of the
 		// elevator carriage, so both controllers are on the same side of the robot (ports 5 and 6)
 		// Note:  all of the VictorSPX controllers are under CAN bus control, so we use 1-based addressing, reserving
-		// port 0 on the CAN bus for new controllers / uninitilized controllers
-		elevatorSpeedControllerPort = new WPI_VictorSPX(3);
-		LiveWindow.addActuator("Elevator", "Speed Controller 1", (WPI_VictorSPX) elevatorSpeedControllerPort);
+		// port 0 on the CAN bus for new controllers / uninitialized controllers
+		elevatorSpeedControllerPort = new VictorSPX(3);
+//		LiveWindow.addActuator("Elevator", "Speed Controller 1", (WPI_VictorSPX) elevatorSpeedControllerPort);
+		elevatorSpeedControllerPort.set(ControlMode.Follower, srxElevator.getDeviceID());
 		elevatorSpeedControllerPort.setInverted(false);	// Motors on the Port side spin forward
 		elevatorSpeedControllerStarboard = new VictorSPX(9);
-		elevatorSpeedControllerStarboard.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
+		elevatorSpeedControllerStarboard.set(ControlMode.Follower, srxElevator.getDeviceID());
 		elevatorSpeedControllerStarboard.setInverted(false);	// Motors on the Starboard side spin backward
 		
 		elevatorSpeedControllerPortFollow = new VictorSPX(4);
-		elevatorSpeedControllerPortFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
-		elevatorSpeedControllerPortFollow.setInverted(elevatorSpeedControllerPort.getInverted());
+		elevatorSpeedControllerPortFollow.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerPortFollow.setInverted(false);
 //		elevatorSpeedControllerStarboardFollow = new VictorSPX(10);	//  TODO:  10 is now the Talon
 //		elevatorSpeedControllerStarboardFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
 //		elevatorSpeedControllerStarboardFollow.setInverted(false);
@@ -171,15 +172,15 @@ public class RobotMap {
 		 * Testing the Talon motor controller
 		 * TODO:  if this works, set up the Victors to follow the Talon
 		 */
-		srxElevator = new WPI_TalonSRX(10);		// CAN bus slot 10
-		
+		srxElevator = new TalonSRX(10);		// CAN bus slot 10
+		srxElevator.setInverted(false);
 		/*
 		 * Talon motor controller for Arm
 		 */
-		srxArm = new WPI_TalonSRX(12);		// CAN bus slot 12
+		srxArm = new TalonSRX(12);		// CAN bus slot 12
+		srxArm.setInverted(false);
 		
-		
-		intakeSpeedController = new WPI_VictorSPX(11);	//  Competiton bot changed from 5 to 11
+		intakeSpeedController = new WPI_VictorSPX(11);	//  Competition bot changed from 5 to 11
 		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController);
 		intakeSpeedController.setInverted(false);
 		intakeSpeedControllerFollow = new VictorSPX(6);

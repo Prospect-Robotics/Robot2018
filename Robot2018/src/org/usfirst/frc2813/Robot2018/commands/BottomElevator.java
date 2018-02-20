@@ -42,13 +42,13 @@ public class BottomElevator extends Command {
     //@Override
     protected void initialize() {
     	digitalInput = Robot.elevator.limitSwitch;
-    	speedController = Robot.elevator.speedController;
+    	//speedController = Robot.elevator.speedController;
     }
 
     // Called repeatedly when this Command is scheduled to run
     //@Override
     protected void execute() {
-    	speedController.set(-.1);//TODO not sure if -1 or 1 is down
+    	//speedController.set(-.1);//TODO not sure if -1 or 1 is down
     }
 
     // Make this return true when this Command no longer needs to run execute()

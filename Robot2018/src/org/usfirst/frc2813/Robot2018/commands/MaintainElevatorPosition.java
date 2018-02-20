@@ -30,7 +30,7 @@ public class MaintainElevatorPosition extends Command {
 	
 	public void debugPrintPIDOutput(double pidOutput) {
 		System.out.println("Output updated to: "+pidOutput);
-		Robot.elevator.speedController.pidWrite(pidOutput);
+		//Robot.elevator.speedController.pidWrite(pidOutput);TODO? REMOVE
 	}
 
     // Called just before this Command runs the first time

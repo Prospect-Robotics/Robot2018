@@ -136,7 +136,42 @@ public class Robot extends TimedRobot {
 		RobotMap.srxElevator.config_kP(Constants.kPIDLoopIdx, 0.1, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kI(Constants.kPIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kD(Constants.kPIDLoopIdx, 0.0, Constants.kTimeoutMs);
+		
+		/*
+         * Test Talon PID code from Team 217
+         */
+        
+		/* choose the sensor and sensor direction */
+		RobotMap.srxArm.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kPIDLoopIdx,
+				Constants.kTimeoutMs);
 
+		/* choose to ensure sensor is positive when output is positive */
+		RobotMap.srxArm.setSensorPhase(Constants.kSensorPhase);
+
+		/* choose based on what direction you want forward/positive to be.
+		 * This does not affect sensor phase. */ 
+		RobotMap.srxArm.setInverted(Constants.kMotorInvert);
+
+		/* set the peak and nominal outputs, 12V means full */
+		RobotMap.srxArm.configNominalOutputForward(0, Constants.kTimeoutMs);
+		RobotMap.srxArm.configNominalOutputReverse(0, Constants.kTimeoutMs);
+		RobotMap.srxArm.configPeakOutputForward(1, Constants.kTimeoutMs);
+		RobotMap.srxArm.configPeakOutputReverse(-1, Constants.kTimeoutMs);
+		
+		/*
+		 * set the allowable closed-loop error, Closed-Loop output will be
+		 * neutral within this range. See Table in Section 17.2.1 for native
+		 * units per rotation.
+		 */
+		RobotMap.srxArm.configAllowableClosedloopError(0, Constants.kPIDLoopIdx, Constants.kTimeoutMs);
+
+		/* set closed loop gains in slot0, typically kF stays zero. */
+		RobotMap.srxArm.config_kF(Constants.kPIDLoopIdx, 0.0, Constants.kTimeoutMs);
+		RobotMap.srxArm.config_kP(Constants.kPIDLoopIdx, 0.1, Constants.kTimeoutMs);
+		RobotMap.srxArm.config_kI(Constants.kPIDLoopIdx, 0.0, Constants.kTimeoutMs);
+		RobotMap.srxArm.config_kD(Constants.kPIDLoopIdx, 0.0, Constants.kTimeoutMs);
+
+		
 		/*
 //		 * lets grab the 360 degree position of the MagEncoder's absolute
 //		 * position, and intitally set the relative sensor to match.

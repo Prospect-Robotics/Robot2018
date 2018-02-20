@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 /**
  *
  */
@@ -51,14 +53,14 @@ public class MoveElevator extends Command {
     protected void initialize() {
     	quadratureEncoder1 = Robot.elevator.encoder;
     	digitalInput1 = Robot.elevator.limitSwitch;
-    	speedController1 = Robot.elevator.speedController;
+    	//speedController1 = Robot.elevator.speedController;
     }
 
     // Called repeatedly when this Command is scheduled to run
     //@Override
     protected void execute() {
     	if(direction == true && stop == false) {
-    		speedController1.set(.5);//TODO not sure if 1 or -1 is up
+    		//speedController1.set(.5);//TODO not sure if 1 or -1 is up
     		speedController2.set(-.5);
     	}
     	else if (direction == false && stop == false) {
