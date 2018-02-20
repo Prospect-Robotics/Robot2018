@@ -54,7 +54,8 @@ public class MaintainElevatorPosition extends Command {
 
     	
     	
-		System.out.println("MaintainElevator:initialize:  pos ("+Robot.elevator.encoder.getPIDSourceType()+") to maintain is: "+pos+" (getDistance)");
+    	System.out.println("MaintainElevator:initialize:  target position is: "+targetPosition+", getDistance is: "+RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
+//		System.out.println("MaintainElevator:initialize:  pos ("+Robot.elevator.encoder.getPIDSourceType()+") to maintain is: "+pos+" (getDistance)");
     }
 
     // Called repeatedly when this Command is scheduled to run

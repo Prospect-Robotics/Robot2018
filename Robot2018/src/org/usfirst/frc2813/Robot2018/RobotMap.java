@@ -52,6 +52,10 @@ public class RobotMap {
 
 	public static TalonSRX srxElevator;		// TODO:  rename when we are sure this works; NOT WPI_TalonSRX - need the CTRE libraries
 	
+	public static TalonSRX srxArm;			// TODO:  rename when we are sure this works; NOT WPI_TalonSRX - need the CTRE libraries
+
+	
+	
 	public static WPI_VictorSPX elevatorSpeedControllerPort;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
 															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
 	public static VictorSPX elevatorSpeedControllerStarboard;		//  Controller Starboard will follow controller Port; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
@@ -167,7 +171,12 @@ public class RobotMap {
 		 * Testing the Talon motor controller
 		 * TODO:  if this works, set up the Victors to follow the Talon
 		 */
-		srxElevator = new WPI_TalonSRX(12);
+		srxElevator = new WPI_TalonSRX(10);		// CAN bus slot 10
+		
+		/*
+		 * Talon motor controller for Arm
+		 */
+		srxArm = new WPI_TalonSRX(12);		// CAN bus slot 12
 		
 		
 		intakeSpeedController = new WPI_VictorSPX(11);	//  Competiton bot changed from 5 to 11

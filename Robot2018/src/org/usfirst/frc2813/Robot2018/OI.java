@@ -126,9 +126,9 @@ public class OI {
         trigger = new JoystickButton(joystick1, 1);
         trigger.whileHeld(new ResetEncoders());
         
-        Compressor c = new Compressor();
-        LiveWindow.add(c);
-        new RoboRIOUserButton().whenPressed(new ToggleCompressor(c));
+        Compressor compressor = new Compressor();
+        LiveWindow.add(compressor);
+        new RoboRIOUserButton().whenPressed(new ToggleCompressor(compressor));
 
 
         // SmartDashboard Buttons
