@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -35,6 +36,9 @@ public class MoveArm extends Command {
 	private static final double DESIRED_ENCODER_VALUE = 10;//the desired encoder value to stop at top TODO replace with desired encoder value
 	private boolean direction;
 	private boolean stop;
+	
+	private static final double ONE_DEGREE_PER_SECOND = RobotMap.ARM_ONE_DEGREE_PER_SECOND; // 36 = 360 (number of degrees in a circle) / 10 (set(ControlMode.Velocity) expects velocity in units of ticks per 100ms; a second is 1000ms).
+	
     public MoveArm(boolean upDown, boolean stop) {//if moving up, true; down, false; stop is for release of button
     	direction=upDown;
     	this.stop=stop;
@@ -59,23 +63,17 @@ public class MoveArm extends Command {
     // Called repeatedly when this Command is scheduled to run
     //@Override
     protected void execute() {
-    	if (stop == true) {//stop when button is released
-    		speedController1.set(ControlMode.PercentOutput, 0);
-    	}
-    	else if(direction == true) {
-    		speedController1.set(ControlMode.PercentOutput,.4);//TODO not sure if 1 or -1 is up
+    	if(direction == true) {
+    		speedController1.set(ControlMode.Velocity,-25*ONE_DEGREE_PER_SECOND);//TODO not sure if 1 or -1 is up
     	}
     	else if (direction == false) {
-    		speedController1.set(ControlMode.PercentOutput,-.4);//TODO not sure if -1 or 1 is down
+    		speedController1.set(ControlMode.Velocity,25*ONE_DEGREE_PER_SECOND);//TODO not sure if -1 or 1 is down
     	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     //@Override
     protected boolean isFinished() {
-    	if (digitalInput1.get()==true) {//if limit switch has been pressed, reset the encoder
-    		quadratureEncoder1.reset();
-    	}
         return false;//quadratureEncoder1.getDistance()>=DESIRED_ENCODER_VALUE || digitalInput1.get()==true;//If limit switch pressed OR desired encoder value is reached, STOP
     }
 

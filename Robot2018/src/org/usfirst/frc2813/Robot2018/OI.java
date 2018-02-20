@@ -100,9 +100,9 @@ public class OI {
         toggleRelay0 = new JoystickButton(buttonPanel, 7);
         toggleRelay0.whenPressed(new ShiftGears());
         spin4MotorsBackwardsElevator = new JoystickButton(buttonPanel, 5);
-        spin4MotorsBackwardsElevator.whileHeld(new SetSpeed(-6));		// units of inches per second!
+        //spin4MotorsBackwardsElevator.whileHeld(new SetSpeed(-6));		// units of inches per second!
         spin4MotorsElevator = new JoystickButton(buttonPanel, 4);
-        spin4MotorsElevator.whileHeld(new SetSpeed(6));
+        //spin4MotorsElevator.whileHeld(new SetSpeed(6));
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
         // TODO reenable this when we add a limit switch!
         //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
@@ -116,10 +116,10 @@ public class OI {
         //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
         armMoveUp = new JoystickButton(buttonPanel, 11);
         armMoveUp.whileHeld(new MoveArm(true, false));
-        armMoveUp.whenReleased(new MoveArm(true, true));
+        //armMoveUp.whenReleased(new MoveArm(true, true));
         armMoveDown = new JoystickButton(buttonPanel, 12);
         armMoveDown.whileHeld(new MoveArm(false, false));
-        armMoveDown.whenReleased(new MoveArm(false, true));
+        //armMoveDown.whenReleased(new MoveArm(false, true));
         joystick1 = new Joystick(1);
         joystick2 = new Joystick(2);
         

@@ -1,6 +1,8 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.Robot2018.commands.MaintainArmPosition;
+import org.usfirst.frc2813.Robot2018.commands.MaintainElevatorPosition;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -43,25 +45,29 @@ public class Arm extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
+		setDefaultCommand(new MaintainArmPosition());
     }
 	
 	@Override
 	public void periodic() {
-		if(limitSwitch.get()) { // If the limit switch is pressed, the elevator is at the bottom, so...
-			encoder.reset();    // ...reset the encoder to zero...
-			controller.reset(); // ...and reset the PID controller so that it doesn't get confused because the 
-		}
-		
-		if(!encoderFunctional && controller.isEnabled()) {
-			DriverStation.reportError("Can't use PID control on the arm - the encoder is malfunctioning.", false);
-			controller.disable();
-		}
-		
-		if(disableGripper > 0) {
-			disableGripper--;
-			if(disableGripper == 0)
-				gripper.set(Value.kOff);
-		}
+		if(getCurrentCommand() == null) {
+    		new MaintainArmPosition().start();
+    	}
+//		if(limitSwitch.get()) { // If the limit switch is pressed, the elevator is at the bottom, so...
+//			encoder.reset();    // ...reset the encoder to zero...
+//			controller.reset(); // ...and reset the PID controller so that it doesn't get confused because the 
+//		}
+//		
+//		if(!encoderFunctional && controller.isEnabled()) {
+//			DriverStation.reportError("Can't use PID control on the arm - the encoder is malfunctioning.", false);
+//			controller.disable();
+//		}
+//		
+//		if(disableGripper > 0) {
+//			disableGripper--;
+//			if(disableGripper == 0)
+//				gripper.set(Value.kOff);
+//		}
 	}
 	
 	public void grabCube() {
