@@ -35,6 +35,7 @@ public class MaintainElevatorPosition extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	RobotMap.srxElevator.selectProfileSlot(Constants.maintainPIDLoopIdx, Constants.maintainPIDLoopIdx);
     	/*double pos = Robot.SRXElevator.encoder.getDistance();
     	targetPosition = pos;		// TODO:  Used only for debug output - can remove when working
     	

@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.Robot2018.commands.ActivelyMaintainCurrentPosition;
 import org.usfirst.frc2813.Robot2018.commands.MaintainArmPosition;
 import org.usfirst.frc2813.Robot2018.commands.MaintainElevatorPosition;
 
@@ -55,8 +56,9 @@ public class SRXElevator extends Subsystem {
 		 */
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		// For some reason CTRE decided that two slots would be enough for everything.
-		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		//motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
+		
+		//motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
 		motor.configForwardSoftLimitEnable(true, 10);
 		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
@@ -75,15 +77,16 @@ public class SRXElevator extends Subsystem {
 	}
 	
 	public void activelyMaintainCurrentPosition() {
+		System.out.println("Elevator"+motor.getSelectedSensorPosition(0));
 		motor.set(ControlMode.Position, motor.getSelectedSensorPosition(0));
 	}
 
 	public void initDefaultCommand() {
-        //setDefaultCommand(new MaintainElevatorPosition());
+        setDefaultCommand(new MaintainElevatorPosition());
     }
 	public void periodic() {
 		if(getCurrentCommand() == null) {
-    		//new MaintainElevatorPosition().start();
+    		new MaintainElevatorPosition().start();
     	}
 	}
 }

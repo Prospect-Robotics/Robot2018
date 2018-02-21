@@ -108,7 +108,7 @@ public class Robot extends TimedRobot {
          */
         
 		/* choose the sensor and sensor direction */
-		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.maintainPIDLoopIdx,
+		RobotMap.srxElevator.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
 
 		/* choose to ensure sensor is positive when output is positive */
@@ -133,7 +133,7 @@ public class Robot extends TimedRobot {
 
 		/* set closed loop gains in slot0, typically kF stays zero. */
 		RobotMap.srxElevator.config_kF(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
-		RobotMap.srxElevator.config_kP(Constants.maintainPIDLoopIdx, 2, Constants.kTimeoutMs);
+		RobotMap.srxElevator.config_kP(Constants.maintainPIDLoopIdx, 0.8, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kI(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kD(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		
