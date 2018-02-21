@@ -21,6 +21,7 @@ import org.usfirst.frc2813.Robot2018.commands.MoveElevator;
 import org.usfirst.frc2813.Robot2018.commands.OIDrive;
 //import org.usfirst.frc2813.Robot2018.commands.PIDMoveElevator;
 import org.usfirst.frc2813.Robot2018.commands.ResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.SetSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ShiftGears;
 import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
@@ -74,8 +75,8 @@ public class OI {
     public JoystickButton spinIntakeIn;
     public JoystickButton spinIntakeOut;
     public JoystickButton bottomElevatorToLimitSwitch;
-    public JoystickButton spin4MotorsElevator;
-    public JoystickButton spin4MotorsBackwardsElevator;
+    public JoystickButton elevatorUp;
+    public JoystickButton elevatorDown;
     public JoystickButton toggleRelay0;
     public JoystickButton toggleRelay1;
     public JoystickButton toggleRelay2;
@@ -99,10 +100,10 @@ public class OI {
         //toggleRelay1.whenPressed(new ToggleRelay1());
         toggleRelay0 = new JoystickButton(buttonPanel, 7);
         toggleRelay0.whenPressed(new ShiftGears());
-        spin4MotorsBackwardsElevator = new JoystickButton(buttonPanel, 5);
-        //spin4MotorsBackwardsElevator.whileHeld(new SetSpeed(-6));		// units of inches per second!
-        spin4MotorsElevator = new JoystickButton(buttonPanel, 4);
-        //spin4MotorsElevator.whileHeld(new SetSpeed(6));
+        elevatorDown = new JoystickButton(buttonPanel, 5);
+        elevatorDown.whileHeld(new SetSpeed(-6));		// units of inches per second!
+        elevatorUp = new JoystickButton(buttonPanel, 4);
+        elevatorUp.whileHeld(new SetSpeed(6));
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
         // TODO reenable this when we add a limit switch!
         //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());

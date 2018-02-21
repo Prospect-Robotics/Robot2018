@@ -60,16 +60,16 @@ public class Elevator extends Subsystem {
     @Override
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new MaintainElevatorPosition());
+        //setDefaultCommand(new MaintainElevatorPosition());
     }
 
     @Override
     public void periodic() {
         // Put code here to be run every loop
     	
-    	if(getCurrentCommand() == null) {
-    		new MaintainElevatorPosition().start();
-    	}
+    	//if(getCurrentCommand() == null) {
+    		//new MaintainElevatorPosition().start();
+    	//}
     	
     }
 

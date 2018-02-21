@@ -23,7 +23,6 @@ public class MaintainArmPosition extends Command {
 	
     //private PIDOutput debugPrintPIDOutput;
 	private double targetPosition;
-    public final PIDController controller = new PIDController(2.0, 0, 0, Robot.elevator.encoder, this::debugPrintPIDOutput);	// Kp, Ki, Kd
     public MaintainArmPosition() {
         requires(Robot.arm);
     }
@@ -35,15 +34,13 @@ public class MaintainArmPosition extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	double pos = Robot.elevator.encoder.getDistance();
-    	targetPosition = pos;		// TODO:  Used only for debug output - can remove when working
+    	//double pos = Robot.SRXElevator.encoder.getDistance();
+    	//targetPosition = pos;		// TODO:  Used only for debug output - can remove when working
     	
-    	controller.disable(); // If the source type changes, the encoder value will change suddenly, which will confuse the PID controller which will be BAD.
     	//PIDMoveElevator.controller.disable();
-    	Robot.elevator.encoder.setPIDSourceType(PIDSourceType.kDisplacement);
-    	controller.setSetpoint(pos);
-    	controller.enable();
-    	
+    	//Robot.SRXElevator.encoder.setPIDSourceType(PIDSourceType.kDisplacement);
+    	//controller.setSetpoint(pos);
+    	RobotMap.srxArm.selectProfileSlot(0, 0);
     	/*
     	 * When we release the elevator button the Maintain Elevator will take over
     	 * Talon SRX takes a primary posiiton
@@ -72,15 +69,13 @@ public class MaintainArmPosition extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+Robot.elevator.encoder.getDistance());
-    	controller.disable();
+    	//System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	System.out.println("MaintainElevator:interrupted:  getDistance is: "+Robot.elevator.encoder.getDistance());
-    	controller.disable();
+    	//System.out.println("MaintainElevator:interrupted:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
     }
     
 }

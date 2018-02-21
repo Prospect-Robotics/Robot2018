@@ -55,8 +55,10 @@ public class MoveArm extends Command {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	quadratureEncoder1 = Robot.arm.encoder;
-    	digitalInput1 = Robot.arm.limitSwitch;
+    	RobotMap.srxArm.selectProfileSlot(1, 1);
+    	
+    	quadratureEncoder1 = Robot.arm.encoder;		// TODO:  remove - from legacy code, left to avoid compile errors
+    	digitalInput1 = Robot.arm.limitSwitch;		// TODO:  remove - from legacy code, left to avoid compile errors
     	speedController1 = Robot.arm.srxController;
     }
 
@@ -64,10 +66,10 @@ public class MoveArm extends Command {
     //@Override
     protected void execute() {
     	if(direction == true) {
-    		speedController1.set(ControlMode.Velocity,-25*ONE_DEGREE_PER_SECOND);//TODO not sure if 1 or -1 is up
+    		speedController1.set(ControlMode.Velocity,-5*ONE_DEGREE_PER_SECOND);//TODO not sure if 1 or -1 is up
     	}
     	else if (direction == false) {
-    		speedController1.set(ControlMode.Velocity,25*ONE_DEGREE_PER_SECOND);//TODO not sure if -1 or 1 is down
+    		speedController1.set(ControlMode.Velocity,5*ONE_DEGREE_PER_SECOND);//TODO not sure if -1 or 1 is down
     	}
     }
 

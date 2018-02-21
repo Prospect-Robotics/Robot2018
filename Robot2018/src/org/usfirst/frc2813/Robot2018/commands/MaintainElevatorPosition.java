@@ -23,9 +23,9 @@ public class MaintainElevatorPosition extends Command {
 	
     //private PIDOutput debugPrintPIDOutput;
 	private double targetPosition;
-    public final PIDController controller = new PIDController(2.0, 0, 0, Robot.elevator.encoder, this::debugPrintPIDOutput);	// Kp, Ki, Kd
+    public final PIDController controller = new PIDController(2.0, 0, 0, Robot.SRXElevator.encoder, this::debugPrintPIDOutput);	// Kp, Ki, Kd
     public MaintainElevatorPosition() {
-        requires(Robot.elevator);
+        requires(Robot.SRXElevator);
     }
 	
 	public void debugPrintPIDOutput(double pidOutput) {
@@ -35,14 +35,14 @@ public class MaintainElevatorPosition extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	double pos = Robot.elevator.encoder.getDistance();
+    	/*double pos = Robot.SRXElevator.encoder.getDistance();
     	targetPosition = pos;		// TODO:  Used only for debug output - can remove when working
     	
     	controller.disable(); // If the source type changes, the encoder value will change suddenly, which will confuse the PID controller which will be BAD.
     	//PIDMoveElevator.controller.disable();
-    	Robot.elevator.encoder.setPIDSourceType(PIDSourceType.kDisplacement);
+    	Robot.SRXElevator.encoder.setPIDSourceType(PIDSourceType.kDisplacement);
     	controller.setSetpoint(pos);
-    	controller.enable();
+    	controller.enable();*/
     	
     	/*
     	 * When we release the elevator button the Maintain Elevator will take over
@@ -72,14 +72,14 @@ public class MaintainElevatorPosition extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+Robot.elevator.encoder.getDistance());
+    	System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
     	controller.disable();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	System.out.println("MaintainElevator:interrupted:  getDistance is: "+Robot.elevator.encoder.getDistance());
+    	System.out.println("MaintainElevator:interrupted:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
     	controller.disable();
     }
     

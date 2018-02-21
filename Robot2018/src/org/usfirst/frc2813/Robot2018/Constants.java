@@ -24,7 +24,8 @@ public class Constants {
 	 * Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops. For
 	 * now we just want the primary one.
 	 */
-	public static final int kPIDLoopIdx = 0;
+	public static final int maintainPIDLoopIdx = 0;
+	public static final int movePIDLoopIdx = 1;
 
 	/*
 	 * set to zero to skip waiting for confirmation, set to nonzero to wait and
