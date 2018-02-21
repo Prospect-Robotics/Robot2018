@@ -15,6 +15,7 @@ public class SetSpeed extends Command {
 	double speed;
     public SetSpeed(double speed) {
         this.speed=speed;
+        requires(Robot.SRXElevator);
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     }
@@ -34,6 +35,7 @@ public class SetSpeed extends Command {
 	}
 	protected void end() {
 		System.out.println("SetSpeed End" + RobotMap.srxElevator.getSelectedSensorPosition(0) + " Speed " + speed);
+		//Robot.SRXElevator.setSpeed(0);
 		//new MaintainElevatorPosition().start();
 	}
 

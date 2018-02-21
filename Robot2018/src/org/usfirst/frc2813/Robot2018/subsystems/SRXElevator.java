@@ -59,8 +59,8 @@ public class SRXElevator extends Subsystem {
 		
 		//motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
-		motor.configForwardSoftLimitEnable(true, 10);
-		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		/*motor.configForwardSoftLimitEnable(true, 10);
+		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);*/
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 	}
 	

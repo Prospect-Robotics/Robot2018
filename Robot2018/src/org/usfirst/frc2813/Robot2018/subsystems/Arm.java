@@ -25,7 +25,7 @@ public class Arm extends Subsystem {
 	public final Encoder encoder = RobotMap.armQuadratureEncoder;
 	public boolean encoderFunctional = true;
 	public final DigitalInput limitSwitch = RobotMap.armLimitSwitch;
-	public final DoubleSolenoid gripper = RobotMap.armDoubleSolenoid;
+	public final Solenoid gripper = RobotMap.armSingleSolenoid;
 	private boolean jawsOpen;
 	/**
 	 * Double solenoids are two independent coils.
@@ -71,11 +71,11 @@ public class Arm extends Subsystem {
 	}
 	
 	public void grabCube() {
-		gripper.set(Value.kForward);
+	//	gripper.set(Value.kForward); // TODO FIX ME  - REMOVED TO AVOID COMPILER ERROR
 		disableGripper = 2;
 	}
 	public void dropCube() {
-		gripper.set(Value.kReverse);
+	//	gripper.set(Value.kReverse);
 		disableGripper = 2;
 	}
 
