@@ -66,7 +66,7 @@ public class SRXElevator extends Subsystem {
 	
 	public void setSpeed(double feetPerSecond) {
 		// set() accepts a velocity in position change per 100ms.  Divide by 10 to convert position change per 1000ms to that.
-		motor.set(ControlMode.Velocity, (feetPerSecond * 12 * PULSES_PER_INCH) / 10.0, 1);
+		motor.set(ControlMode.Velocity, (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);
 	}
 	
 	public void setPosition(double inchesFromBottom) {

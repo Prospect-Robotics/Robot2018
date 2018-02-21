@@ -34,7 +34,7 @@ public class SetSpeed extends Command {
 	}
 	protected void end() {
 		System.out.println("SetSpeed End" + RobotMap.srxElevator.getSelectedSensorPosition(0) + " Speed " + speed);
-		new MaintainElevatorPosition().start();
+		//new MaintainElevatorPosition().start();
 	}
 
 }
