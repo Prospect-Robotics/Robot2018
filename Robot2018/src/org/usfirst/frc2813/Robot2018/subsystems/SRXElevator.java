@@ -34,8 +34,7 @@ public class SRXElevator extends Subsystem {
 	public static final int TALON_SRX_RUNTIME_TIMEOUT_DEFAULT_MS = 0;
 
 	
-	public final Encoder encoder = RobotMap.armQuadratureEncoder;	// TODO:  Remove - this is here to keep compile errors quiet (from old code)
-
+	
 	private final TalonSRX motor = RobotMap.srxElevator;
 	// No need for any other variables.
 	

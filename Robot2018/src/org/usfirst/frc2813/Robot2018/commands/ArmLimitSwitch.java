@@ -16,8 +16,9 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Robot;
 
-/**
- *
+/*
+ * TODO: This class needs to be coded for the Talon SRX
+ * Need to decide what this class is used for
  */
 public class ArmLimitSwitch extends Command {
 
@@ -45,9 +46,9 @@ public class ArmLimitSwitch extends Command {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	digitalInput = Robot.arm.limitSwitch;
+    	/*digitalInput = Robot.arm.limitSwitch;
     	speedController = Robot.arm.speedController;
-    	encoder = Robot.arm.encoder;
+    	encoder = Robot.arm.encoder;*/
     }
 
     // Called repeatedly when this Command is scheduled to run

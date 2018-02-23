@@ -18,8 +18,8 @@ import org.usfirst.frc2813.Robot2018.Robot;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-/**
- *
+/*
+ * TODO: THIS CLASS TO BE REMOVED
  */
 public class MoveElevator extends Command {
 
@@ -51,7 +51,7 @@ public class MoveElevator extends Command {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	quadratureEncoder1 = Robot.SRXElevator.encoder;
+    //	quadratureEncoder1 = Robot.SRXElevator.encoder;
     	//digitalInput1 = Robot.SRXElevator.limitSwitch;
     	//speedController1 = Robot.elevator.speedController;
     }

@@ -23,7 +23,6 @@ public class MaintainElevatorPosition extends Command {
 	
     //private PIDOutput debugPrintPIDOutput;
 	private double targetPosition;
-    public final PIDController controller = new PIDController(2.0, 0, 0, Robot.SRXElevator.encoder, this::debugPrintPIDOutput);	// Kp, Ki, Kd
     public MaintainElevatorPosition() {
         requires(Robot.SRXElevator);
     }
@@ -73,15 +72,13 @@ public class MaintainElevatorPosition extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
-    	controller.disable();
+    	System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	System.out.println("MaintainElevator:interrupted:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
-    	controller.disable();
+    	System.out.println("MaintainElevator:interrupted:  getDistance is: "+RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
     }
     
 }

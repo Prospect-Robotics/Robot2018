@@ -20,11 +20,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  *
  */
 public class Arm extends Subsystem {
-	public final SpeedController speedController= RobotMap.armSpeedController;
 	public final TalonSRX srxController = RobotMap.srxArm;
-	public final Encoder encoder = RobotMap.armQuadratureEncoder;
 	public boolean encoderFunctional = true;
-	public final DigitalInput limitSwitch = RobotMap.armLimitSwitch;
 	public final Solenoid gripper = RobotMap.armSingleSolenoid;
 	private boolean jawsOpen;
 	/**
@@ -37,8 +34,7 @@ public class Arm extends Subsystem {
 	private int disableGripper = 0;
 	
 	
-	public final PIDController controller = new PIDController(0, 0, 0, encoder, speedController);
-
+	
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	@Override

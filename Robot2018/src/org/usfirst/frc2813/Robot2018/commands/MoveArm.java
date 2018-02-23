@@ -57,8 +57,6 @@ public class MoveArm extends Command {
     protected void initialize() {
     	RobotMap.srxArm.selectProfileSlot(1, 1);
     	
-    	quadratureEncoder1 = Robot.arm.encoder;		// TODO:  remove - from legacy code, left to avoid compile errors
-    	digitalInput1 = Robot.arm.limitSwitch;		// TODO:  remove - from legacy code, left to avoid compile errors
     	speedController1 = Robot.arm.srxController;
     }
 
