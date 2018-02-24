@@ -13,17 +13,17 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ArmSolenoid;
 import org.usfirst.frc2813.Robot2018.commands.ClimbingBar;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorRatchet;
+import org.usfirst.frc2813.Robot2018.commands.FloorElevator;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveArm;
+import org.usfirst.frc2813.Robot2018.commands.SetSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.AutoDrive.AutonomousCommand;
-import org.usfirst.frc2813.Robot2018.commands.AutoDrive.BottomElevator;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ShiftGears;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ArmSolenoid;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorRatchet;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveArm;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.SpinIntake;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 
@@ -115,8 +115,7 @@ public class OI {
         //elevatorUp.whenReleased(new SetSpeed(0));
         //elevatorUp.whenReleased(new PrintButtonStatus(false, true));
         bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
-        // TODO reenable this when we add a limit switch!
-        //bottomElevatorToLimitSwitch.whenPressed(new BottomElevator());
+        bottomElevatorToLimitSwitch.whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
         spinIntakeOut.whileHeld(new SpinIntake(false, false));
         spinIntakeOut.whenReleased(new SpinIntake(false, true));
@@ -152,7 +151,7 @@ public class OI {
         //SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
         //SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
         //SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
-        SmartDashboard.putData("BottomElevator", new BottomElevator());
+        SmartDashboard.putData("BottomElevator", new FloorElevator());
         //SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
         //SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
         

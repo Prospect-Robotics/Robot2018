@@ -49,12 +49,12 @@ public class SRXElevator extends Subsystem {
 		 */
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		// For some reason CTRE decided that two slots would be enough for everything.
-		
 		//motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
 		/*motor.configForwardSoftLimitEnable(true, 10);
 		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);*/
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		
 	}
 	
 	public void setSpeed(double feetPerSecond) {
@@ -68,7 +68,9 @@ public class SRXElevator extends Subsystem {
 		// It might floor it (it *should* floor it), but it *might* puke.
 		motor.set(ControlMode.Position, (int) (inchesFromBottom * PULSES_PER_INCH));
 	}
-	
+	/**
+	 * TODO REMOVE
+	 */
 	public void activelyMaintainCurrentPosition() {
 		System.out.println("Elevator"+motor.getSelectedSensorPosition(0));
 		motor.set(ControlMode.Position, motor.getSelectedSensorPosition(0));
@@ -81,6 +83,11 @@ public class SRXElevator extends Subsystem {
 		if(getCurrentCommand() == null) {
     		new MaintainElevatorPosition().start();
     	}
+	}
+
+	public boolean isLimitSwitchPressed() {
+		// TODO Auto-generated method stub
+		return motor.getSensorCollection().isRevLimitSwitchClosed();
 	}
 }
 

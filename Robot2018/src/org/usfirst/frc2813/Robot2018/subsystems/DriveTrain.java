@@ -12,7 +12,6 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.*;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
