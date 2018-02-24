@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.Robot2018.commands.Arm.ArmSolenoid;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MaintainArmPosition;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -15,7 +16,7 @@ public class Arm extends Subsystem {
 	public final TalonSRX srxController = RobotMap.srxArm;
 	public boolean encoderFunctional = true;
 	public final Solenoid gripper = RobotMap.armSingleSolenoid;
-	private boolean jawsOpen;
+	private boolean jawsOpen = false;
 	/**
 	 * Double solenoids are two independent coils.
 	 * 
@@ -60,14 +61,18 @@ public class Arm extends Subsystem {
 	}
 	
 	public void grabCube() {
-	//	gripper.set(Value.kForward); // TODO FIX ME  - REMOVED TO AVOID COMPILER ERROR
-		disableGripper = 2;
+		jawsOpen = false;
+		if (RobotMap.armSingleSolenoid.get() == false) 
+			new ArmSolenoid().start();
 	}
 	public void dropCube() {
-	//	gripper.set(Value.kReverse);
-		disableGripper = 2;
+		jawsOpen = true;
+		if (RobotMap.armSingleSolenoid.get() == true)
+			new ArmSolenoid().start();
 	}
-
+	/**
+	 * The position of the jaws. True if open, false if closed
+	 */
 	public boolean jawsOpen() {
 		return jawsOpen;
 	}

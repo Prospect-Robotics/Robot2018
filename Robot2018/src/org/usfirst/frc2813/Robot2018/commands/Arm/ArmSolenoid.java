@@ -27,6 +27,6 @@ public class ArmSolenoid extends InstantCommand {
     // Called just before this Command runs the first time
     //@Override
     protected void initialize() {
-    	RobotMap.armSingleSolenoid.set(!RobotMap.armSingleSolenoid.get());
+    	RobotMap.armSingleSolenoid.set(!RobotMap.armSingleSolenoid.get());//.get is true if open, false if closed
     }
 }
