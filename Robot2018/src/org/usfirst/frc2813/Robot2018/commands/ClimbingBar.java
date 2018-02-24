@@ -10,11 +10,8 @@
 
 
 package org.usfirst.frc2813.Robot2018.commands;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
-import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
 /**

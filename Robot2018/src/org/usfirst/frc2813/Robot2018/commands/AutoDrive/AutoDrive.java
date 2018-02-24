@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.AutoDrive;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;

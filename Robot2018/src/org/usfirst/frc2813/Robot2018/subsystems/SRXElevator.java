@@ -1,9 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.ActivelyMaintainCurrentPosition;
-import org.usfirst.frc2813.Robot2018.commands.MaintainArmPosition;
-import org.usfirst.frc2813.Robot2018.commands.MaintainElevatorPosition;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MaintainElevatorPosition;
 
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -11,10 +9,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**

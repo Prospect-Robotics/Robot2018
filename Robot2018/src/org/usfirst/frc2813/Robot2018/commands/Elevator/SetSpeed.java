@@ -1,12 +1,9 @@
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
 import org.usfirst.frc2813.Robot2018.Constants;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.subsystems.SRXElevator;
-
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.InstantCommand;
 
 /**
  *

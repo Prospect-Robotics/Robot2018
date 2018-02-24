@@ -1,19 +1,11 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.MaintainArmPosition;
-import org.usfirst.frc2813.Robot2018.commands.MaintainElevatorPosition;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MaintainArmPosition;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**

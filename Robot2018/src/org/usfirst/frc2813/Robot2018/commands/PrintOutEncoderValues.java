@@ -4,7 +4,6 @@ import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 
 /**

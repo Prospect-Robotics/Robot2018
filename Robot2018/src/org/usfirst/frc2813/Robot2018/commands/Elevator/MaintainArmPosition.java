@@ -1,17 +1,12 @@
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.Elevator;
 import org.usfirst.frc2813.Robot2018.Constants;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.*;
 
 
 /**

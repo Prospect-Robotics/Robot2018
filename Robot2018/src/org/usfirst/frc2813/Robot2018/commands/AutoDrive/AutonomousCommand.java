@@ -8,9 +8,10 @@
 // update. Deleting the comments indicating the section will prevent
 // it from being updated in the future.
 
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.AutoDrive;
 
-import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.CommandGroup;

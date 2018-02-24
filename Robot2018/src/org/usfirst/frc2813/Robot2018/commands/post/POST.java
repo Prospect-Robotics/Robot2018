@@ -6,7 +6,6 @@ import org.usfirst.frc2813.Robot2018.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import edu.wpi.first.wpilibj.command.WaitForChildren;
 
 /**
  *

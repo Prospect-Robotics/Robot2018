@@ -9,10 +9,9 @@
 // it from being updated in the future.
 
 
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.Elevator;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;

@@ -13,22 +13,18 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.ArmLimitSwitch;
-import org.usfirst.frc2813.Robot2018.commands.ArmSolenoid;
-import org.usfirst.frc2813.Robot2018.commands.AutonomousCommand;
-import org.usfirst.frc2813.Robot2018.commands.BottomElevator;
 import org.usfirst.frc2813.Robot2018.commands.ClimbingBar;
-import org.usfirst.frc2813.Robot2018.commands.ElevatorRatchet;
-import org.usfirst.frc2813.Robot2018.commands.MoveArm;
-import org.usfirst.frc2813.Robot2018.commands.MoveElevator;
-import org.usfirst.frc2813.Robot2018.commands.OIDrive;
-import org.usfirst.frc2813.Robot2018.commands.PrintButtonStatus;
-//import org.usfirst.frc2813.Robot2018.commands.PIDMoveElevator;
-import org.usfirst.frc2813.Robot2018.commands.ResetEncoders;
-import org.usfirst.frc2813.Robot2018.commands.SetSpeed;
-import org.usfirst.frc2813.Robot2018.commands.ShiftGears;
-import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
+import org.usfirst.frc2813.Robot2018.commands.AutoDrive.AutonomousCommand;
+import org.usfirst.frc2813.Robot2018.commands.AutoDrive.BottomElevator;
+import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
+import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ShiftGears;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ArmSolenoid;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorRatchet;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveArm;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.SpinIntake;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 
 import edu.wpi.first.wpilibj.Compressor;

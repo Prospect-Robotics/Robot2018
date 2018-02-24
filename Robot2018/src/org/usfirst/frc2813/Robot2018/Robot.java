@@ -11,7 +11,7 @@
 
 package org.usfirst.frc2813.Robot2018;
 
-import org.usfirst.frc2813.Robot2018.commands.AutonomousCommand;
+import org.usfirst.frc2813.Robot2018.commands.AutoDrive.AutonomousCommand;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
@@ -19,11 +19,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.SRXElevator;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.*;
-
-
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
