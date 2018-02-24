@@ -43,21 +43,6 @@ public class Arm extends Subsystem {
 		if(getCurrentCommand() == null) {
     		new MaintainArmPosition().start();
     	}
-//		if(limitSwitch.get()) { // If the limit switch is pressed, the elevator is at the bottom, so...
-//			encoder.reset();    // ...reset the encoder to zero...
-//			controller.reset(); // ...and reset the PID controller so that it doesn't get confused because the 
-//		}
-//		
-//		if(!encoderFunctional && controller.isEnabled()) {
-//			DriverStation.reportError("Can't use PID control on the arm - the encoder is malfunctioning.", false);
-//			controller.disable();
-//		}
-//		
-//		if(disableGripper > 0) {
-//			disableGripper--;
-//			if(disableGripper == 0)
-//				gripper.set(Value.kOff);
-//		}
 	}
 	
 	public void grabCube() {
