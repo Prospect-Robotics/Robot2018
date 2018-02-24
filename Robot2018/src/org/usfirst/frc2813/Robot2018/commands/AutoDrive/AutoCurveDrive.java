@@ -10,9 +10,13 @@ import edu.wpi.first.wpilibj.command.Command;
 public class AutoCurveDrive extends Command {
 	private final double degrees, rate;
 	private double startingOrientation;
+	@SuppressWarnings("unused")
 	private static final double LERP_START=60;
+	@SuppressWarnings("unused")
 	private static final double LERP_STOP=40;
+	@SuppressWarnings("unused")
 	private static final double LERP_END=0.2;
+	@SuppressWarnings("unused")
 	private static final double MIN_DEG=0.01;
 	private final double turnRadius;
     public AutoCurveDrive(double rate, double degrees, double turnRadius) {

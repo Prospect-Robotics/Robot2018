@@ -22,6 +22,7 @@ public class SRXElevator extends Subsystem {
 	private static final double PULSES_PER_INCH = RobotMap.SRX_MAG_PULSES_PER_REVOLUTION / RobotMap.ELEVATOR_INCHES_PER_REVOLUTION;
 	
 	// TODO find maximum allowable elevator height; 24 is only a placeholder.
+	@SuppressWarnings("unused")
 	private static final double ELEVATOR_HEIGHT = 24; // inches
 
 	public static final int TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS = 10;

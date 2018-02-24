@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.AutoDrive;
+package org.usfirst.frc2813.Robot2018.commands.AutoDrive.Obsolete;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.command.Command;
  * OBSOLETE
  */
 public class AutoDrive extends Command {
+	@SuppressWarnings("unused")
 	private double m_forwardSpeed;
 	private double m_distance;
 	private Encoder encoder1;

@@ -42,7 +42,7 @@ public class AutonomousCommand extends CommandGroup {
 	public AutonomousCommand() {
 		class GameData {
 			// Class to take a gameData sequence such as "RLR" and split into 3 enum values
-			public FieldPosition nearSwitch, scale, farSwitch;
+			public FieldPosition nearSwitch, scale, farSwitch;//Will be fixed
 			private FieldPosition splitChar(char c) {
 				return (c == 'L') ? FieldPosition.LEFT : FieldPosition.RIGHT;
 			}
@@ -68,17 +68,17 @@ public class AutonomousCommand extends CommandGroup {
 				addSequential(new ResetEncoders());
 				addSequential(new ResetGyro());
 			}
-			public void setDriveSpeed(double speed) {
+			public void setDriveSpeed(double speed) {//Will be fixed
 				driveSpeed=speed;
 			}
-			public void setTurnSpeed(double speed) {
+			public void setTurnSpeed(double speed) {//Will be fixed
 				turnSpeed=speed;
 			}
 			public void driveForward(double distance) {
 				System.out.println("DRIVEFORWARD");
 				addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance));
 			}
-			public void driveBackward(double distance) {
+			public void driveBackward(double distance) {//Will be fixed
 				addSequential(new PIDAutoDrive(BACKWARD*driveSpeed, distance));
 			}
 			public void turnLeft() {
@@ -87,22 +87,22 @@ public class AutonomousCommand extends CommandGroup {
 			public void turnLeft(double angle) {
 				addSequential(new AutoTurn(turnSpeed, angle));
 			}
-			public void turnRight() {
+			public void turnRight() {//Will be fixed
 				turnLeft(-90);
 			}
 			public void turnRight(double angle) {
 				turnLeft(-angle);
 			}
-			public void curveCounterForward(double angle, double radius) {
+			public void curveCounterForward(double angle, double radius) {//Will be fixed
 				addSequential(new AutoCurveDrive(-curveSpeed, -angle, radius));
 			}
-			public void curveClockForward(double angle, double radius) {
+			public void curveClockForward(double angle, double radius) {//Will be fixed
 				addSequential(new AutoCurveDrive(curveSpeed, angle, -radius));
 			}
-			public void curveCounterBackward(double angle, double radius) {
+			public void curveCounterBackward(double angle, double radius) {//Will be fixed
 				addSequential(new AutoCurveDrive(curveSpeed, -angle, radius));
 			}
-			public void curveClockBackward(double angle, double radius) {
+			public void curveClockBackward(double angle, double radius) {//Will be fixed
 				addSequential(new AutoCurveDrive(-curveSpeed, angle, -radius));
 			}
 			
@@ -116,13 +116,13 @@ public class AutonomousCommand extends CommandGroup {
 			public void lowerElevator() {
 				raiseElevator(-MAX_ELEVATOR);
 			}
-			public void lowerElevator(double amount) {
+			public void lowerElevator(double amount) {//Will be fixed
 				raiseElevator(-amount);
 			}
 			public void placeCube() {
 				//TODO addSequential(s) to place cube
 			}
-			public void sleep(double seconds) {
+			public void sleep(double seconds) {//Will be fixed
 				addSequential(new TimedCommand(seconds));
 			}
 		}

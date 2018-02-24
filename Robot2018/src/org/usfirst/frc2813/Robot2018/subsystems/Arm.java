@@ -23,6 +23,7 @@ public class Arm extends Subsystem {
 	 * whereafter it is decremented each time through the {@link Scheduler} main loop.  When
 	 * it reaches zero, the coil is turned off again.
 	 */
+	@SuppressWarnings("unused")
 	private int disableGripper = 0;
 	
 	
