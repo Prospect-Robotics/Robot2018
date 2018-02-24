@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.Elevator;
+package org.usfirst.frc2813.Robot2018.commands.Arm;
 import org.usfirst.frc2813.Robot2018.Constants;
 
 import org.usfirst.frc2813.Robot2018.Robot;
