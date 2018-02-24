@@ -51,8 +51,6 @@ public class PIDAutoDrive extends Command {
         System.out.println("SetContinuous");
         controller.setOutputRange(-1, 1);
         System.out.println("SetOutputRange");
-   //     watchdog.setSafetyEnabled(true);
-   //     watchdog.setExpiration(0.1);
         this.forwardSpeed=forwardSpeed;
         this.distance = distance;
         maxSpeed = Math.abs(forwardSpeed);
@@ -118,7 +116,6 @@ public class PIDAutoDrive extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	//new PrintOutEncoderValues(60,Robot.driveTrain.encoderPort,Robot.driveTrain.encoderStarboard);
-//    	watchdog.feed();
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -128,15 +125,6 @@ public class PIDAutoDrive extends Command {
     	 * Want to stop when we have reached the desired Encoder position
     	 * The encoder position "stopAt" is recoreded 
     	 */
-    	//  stopAt is an encoder position; it is signed 
-    	// Encoder 2 spins the opposite direction of Encoder 1.  Encoder 1 has a postive sense, Encoder 2 will therefore have a negative sense.
-    	// In order to add the two values correctly, you should add Encoder 1 to the negative of Encoder 2, or "Encoder 1 - Encoder 2"
-    	// This will, counter intuitively, add the two values, NOT take the difference between the two values
-    	//        double distanceRemaining = stopAt - ((Math.abs(Robot.driveTrain.quadratureEncoder1.getDistance())+Math.abs(Robot.driveTrain.quadratureEncoder2.getDistance()))/2);
-        //double distanceRemaining = stopAt - Robot.driveTrain.getDistance();
-        //if(distance < 0)
-        //	distanceRemaining *= -1;
-        //System.out.println("Distance remaining: "+distanceRemaining+",  stopAt:"+stopAt+", Encoder1:"+ Robot.driveTrain.quadratureEncoder1.getDistance());
         if (distanceTraveled() >= distance) System.out.println("ISFINISHED");
     	return Math.abs(distanceTraveled()) >= Math.abs(distance);
     }
@@ -156,7 +144,6 @@ public class PIDAutoDrive extends Command {
     	 * we cause the robot to move.  If the watchdog isn't alive,
     	 * don't accept input.
     	 */
-//    	if(!watchdog.isAlive()) return;
     	//System.out.println("Output updated to: "+output);//+", Time since last run: "+controller.getTimeDelta());
     	double rawDistance = Math.abs(distanceTraveled());
     	double steadyState = calcThrottleSteadyState();
@@ -165,16 +152,12 @@ public class PIDAutoDrive extends Command {
     	double decel = calcThrottleDecelerate(rawDistance);
     	double potentialThrottle = Math.min(steadyState, decel);
     	double newThrottle = Math.min(potentialThrottle, accel);
-    	//if (newThrottle > 0) {
-    		//newThrottle=0;
-    	//}
     	if (this.forwardSpeed <0) {
     		newThrottle *= -1;
     	}
     	System.out.printf("PID: t %.3f; a %.3f; ss %.3f; d %.3f;\nnT %.3f; fS %.3f; dist %.3f; output %.3f\n", distanceTraveled(), accel, steadyState, decel, newThrottle, this.forwardSpeed, distance,output);
     	//System.out.printf("PID: traveled %.3f; throttle %.3f\n", distanceTraveled(), newThrottle);
     	
-    	//Robot.driveTrain.arcadeDrive(1, 0);
     	Robot.driveTrain.arcadeDrive(newThrottle, -output);
     }
 }
