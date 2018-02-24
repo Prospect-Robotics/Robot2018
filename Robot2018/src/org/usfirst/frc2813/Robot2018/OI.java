@@ -102,12 +102,9 @@ public class OI {
     	 */
         buttonPanel = new Joystick(0);
         
-        elevatorRatchet = new JoystickButton(buttonPanel, 8);
-        elevatorRatchet.whenPressed(new ElevatorRatchet());
-        climbingBar = new JoystickButton(buttonPanel, 6);
-        climbingBar.whenPressed(new ClimbingBar());
-        shiftGears = new JoystickButton(buttonPanel, 7);
-        shiftGears.whenPressed(new ShiftGears());
+        new JoystickButton(buttonPanel, 8).whenPressed(new ElevatorRatchet());
+        new JoystickButton(buttonPanel, 6).whenPressed(new ClimbingBar());
+        new JoystickButton(buttonPanel, 7).whenPressed(new ShiftGears());
         //elevatorDown.whenPressed(new PrintButtonStatus(true, false));
         elevatorUp = new JoystickButton(buttonPanel, 5);
         elevatorUp.whileHeld(new SetSpeed(-1));		// units of inches per second!
@@ -118,8 +115,7 @@ public class OI {
         elevatorDown.whileHeld(new SetSpeed(1));
         //elevatorUp.whenReleased(new SetSpeed(0));
         //elevatorUp.whenReleased(new PrintButtonStatus(false, true));
-        bottomElevatorToLimitSwitch = new JoystickButton(buttonPanel, 3);
-        bottomElevatorToLimitSwitch.whenPressed(new FloorElevator());
+        new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
         spinIntakeOut.whileHeld(new SpinIntake(false, false));
         spinIntakeOut.whenReleased(new SpinIntake(false, true));
@@ -128,17 +124,13 @@ public class OI {
         spinIntakeIn.whenReleased(new SpinIntake(true, true));
         //new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
         //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
-        armMoveUp = new JoystickButton(buttonPanel, 11);
-        armMoveUp.whileHeld(new MoveArm(true));
-        armMoveDown = new JoystickButton(buttonPanel, 12);
-        armMoveDown.whileHeld(new MoveArm(false));
-        armSolenoid = new JoystickButton(buttonPanel, 9);
-        armSolenoid.whenPressed(new ArmSolenoid());
+        new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(true));
+        new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(false));
+        new JoystickButton(buttonPanel, 9).whenPressed(new ArmSolenoid());
         joystick1 = new Joystick(1);
         joystick2 = new Joystick(2);
         
-        trigger = new JoystickButton(joystick1, 1);
-        trigger.whileHeld(new ResetEncoders());
+        new JoystickButton(joystick1, 1).whileHeld(new ResetEncoders());//the trigger on most joysticks
         
         Compressor compressor = new Compressor();
         LiveWindow.add(compressor);
