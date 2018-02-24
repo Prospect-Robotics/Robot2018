@@ -8,8 +8,9 @@ import org.usfirst.frc2813.Robot2018.subsystems.SRXElevator;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
-/**
- *
+/*
+ * MOVES THE ELEVATOR
+ * Enter + speed for UP or - speed for DOWN
  */
 public class SetSpeed extends Command {
 	double speed;
