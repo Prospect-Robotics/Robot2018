@@ -66,6 +66,10 @@ public class SRXElevator extends Subsystem {
 		motor.set(ControlMode.Velocity, (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);
 	}
 	
+	/**
+	 * Set the position of the elevator
+	 * @param inchesFromBottom
+	 */
 	public void setPosition(double inchesFromBottom) {
 		// round to nearest int because unless we're using an analog sensor, this expects values in inches.
 		// Not sure what the talon will do if we give it a float value when it expects an int value.

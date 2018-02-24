@@ -93,7 +93,7 @@ public class AutoDrive extends Command {
     	if (distanceLeft<=.25*m_distance) {
     		newThrottle=minSpeed;
     	}
-    	Robot.driveTrain.tankAutoDrive(newThrottle,newThrottle);
+    	//Robot.driveTrain.tankAutoDrive(newThrottle,newThrottle);
     }
 
     // Make this return true when this Command no longer needs to run execute()

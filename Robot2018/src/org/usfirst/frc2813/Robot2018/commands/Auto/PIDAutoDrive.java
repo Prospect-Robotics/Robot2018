@@ -31,8 +31,6 @@ public class PIDAutoDrive extends Command {
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
 	private final RandomPIDController2 controller = new RandomPIDController2(.05, 0.00, 0, m_source, this::usePIDOutput);
-	//private final PIDController controller = new PIDController(0.15, 0, 0.2);
-	//private final WatchdogPIDInterface watchdog = new WatchdogPIDInterface(controller);
 	private final double forwardSpeed;
 	private final double distance;
 	private double stopAt;

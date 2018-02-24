@@ -44,12 +44,18 @@ public class Arm extends Subsystem {
     		new MaintainArmPosition().start();
     	}
 	}
-	
+	/**
+	 * Close jaws
+	 */
 	public void grabCube() {
 		jawsOpen = false;
 		if (RobotMap.armSingleSolenoid.get() == false) 
 			new ArmSolenoid().start();
 	}
+	
+	/**
+	 * Open jaws
+	 */
 	public void dropCube() {
 		jawsOpen = true;
 		if (RobotMap.armSingleSolenoid.get() == true)

@@ -112,22 +112,12 @@ public class RobotMap {
 		driveTrainSpeedControllerStarFollow = new VictorSPX(8);
 		driveTrainSpeedControllerStarFollow.set(ControlMode.Follower, driveTrainSpeedControllerStarboard.getDeviceID());
 		driveTrainSpeedControllerStarFollow.setInverted(false);
-
-		// driveTrainSpeedController3 = new PWMVictorSPX(2);
-		// LiveWindow.addActuator("DriveTrain", "Speed Controller 3", (PWMVictorSPX)
-		// driveTrainSpeedController3);
-		// driveTrainSpeedController3.setInverted(false);
-		// driveTrainSpeedController4 = new PWMVictorSPX(3);
-		// LiveWindow.addActuator("DriveTrain", "Speed Controller 4", (PWMVictorSPX)
-		// driveTrainSpeedController4);
-		// driveTrainSpeedController4.setInverted(false);
 		driveTrainRobotDrive = new DifferentialDrive(driveTrainSpeedControllerPort, driveTrainSpeedControllerStarboard);
 		LiveWindow.add(driveTrainRobotDrive);
-		// driveTrainSpeedController3, driveTrainSpeedController4);
 
 		driveTrainRobotDrive.setSafetyEnabled(true);
 		driveTrainRobotDrive.setExpiration(0.1);
-		// driveTrainRobotDrive.setSensitivity(0.5);
+		// driveTrainRobotDrive.setSensitivity(0.5);//TODO Why aren't we setting sensitivity?
 		driveTrainRobotDrive.setMaxOutput(1.0);
 
 		driveTrainQuadratureEncoderStarboard = new Encoder(10, 11, true, EncodingType.k4X);// port 0 2*0+10=10, port 0 2*0+11=11
@@ -141,16 +131,6 @@ public class RobotMap {
 		driveTrainQuadratureEncoderPort.setDistancePerPulse(DRIVE_TRAIN_INCHES_PER_PULSE);
 		driveTrainQuadratureEncoderPort.setSamplesToAverage(1);
 		driveTrainQuadratureEncoderPort.setPIDSourceType(PIDSourceType.kRate);
-		// driveTrainQuadratureEncoder3 = new Encoder(4, 5, true, EncodingType.k4X);
-		// LiveWindow.addSensor("DriveTrain", "Quadrature Encoder 3",
-		// driveTrainQuadratureEncoder3);
-		// driveTrainQuadratureEncoder3.setDistancePerPulse(1.0);
-		// driveTrainQuadratureEncoder3.setPIDSourceType(PIDSourceType.kRate);
-		// driveTrainQuadratureEncoder4 = new Encoder(6, 7, true, EncodingType.k4X);
-		// LiveWindow.addSensor("DriveTrain", "Quadrature Encoder 4",
-		// driveTrainQuadratureEncoder4);
-		// driveTrainQuadratureEncoder4.setDistancePerPulse(1.0);
-		// driveTrainQuadratureEncoder4.setPIDSourceType(PIDSourceType.kRate);
 		driveTrainSingleSolenoid = new Solenoid(0, 0);
 		LiveWindow.addActuator("DriveTrain", "Solenoid 1", driveTrainSingleSolenoid);
 		
@@ -180,9 +160,6 @@ public class RobotMap {
 		elevatorSpeedControllerPortFollow = new VictorSPX(4);
 		elevatorSpeedControllerPortFollow.set(ControlMode.Follower, srxElevator.getDeviceID());
 		elevatorSpeedControllerPortFollow.setInverted(false);
-//		elevatorSpeedControllerStarboardFollow = new VictorSPX(10);	//  TODO:  10 is now the Talon
-//		elevatorSpeedControllerStarboardFollow.set(ControlMode.Follower, elevatorSpeedControllerPort.getDeviceID());
-//		elevatorSpeedControllerStarboardFollow.setInverted(false);
 		
 		
 		/*
