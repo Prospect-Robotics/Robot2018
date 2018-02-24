@@ -8,6 +8,10 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
  */
 public class ToggleCompressor extends InstantCommand {
 	private final Compressor compressor;
+	/**
+	 * Turn the compressor on and off
+	 * @param c the compressor to be toggled
+	 */
     public ToggleCompressor(Compressor c) {
         super();
         compressor=c;

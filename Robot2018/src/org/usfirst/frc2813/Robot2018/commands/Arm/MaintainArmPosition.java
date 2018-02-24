@@ -13,10 +13,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
  *
  */
 public class MaintainArmPosition extends Command {
-
-	
-	
-    //private PIDOutput debugPrintPIDOutput;
 	private double targetPosition;
     public MaintainArmPosition() {
         requires(Robot.arm);
@@ -29,12 +25,6 @@ public class MaintainArmPosition extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	//double pos = Robot.SRXElevator.encoder.getDistance();
-    	//targetPosition = pos;		// TODO:  Used only for debug output - can remove when working
-    	
-    	//PIDMoveElevator.controller.disable();
-    	//Robot.SRXElevator.encoder.setPIDSourceType(PIDSourceType.kDisplacement);
-    	//controller.setSetpoint(pos);
     	RobotMap.srxArm.selectProfileSlot(0, 0);
     	/*
     	 * When we release the elevator button the Maintain Elevator will take over
@@ -43,18 +33,13 @@ public class MaintainArmPosition extends Command {
     	 */
     	targetPosition = RobotMap.srxArm.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);		// TODO:  temp variable only for debug output - can remove when working
     	RobotMap.srxArm.set(ControlMode.Position, targetPosition);
-
-    	
-    	
     	System.out.println("MaintainArm:initialize:  target position is: "+targetPosition+", getDistance is: "+RobotMap.srxArm.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
-//		System.out.println("MaintainElevator:initialize:  pos ("+Robot.elevator.encoder.getPIDSourceType()+") to maintain is: "+pos+" (getDistance)");
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	//Let PID Controller Run
     	System.out.println("MaintainArm:execute:  target position is: "+targetPosition+", getDistance is: "+RobotMap.srxArm.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
-//    	System.out.println("MaintainElevator:execute:  target position is: "+targetPosition+", getDistance is: "+Robot.elevator.encoder.getDistance());
-    	// nothing to do here, just let the PID controller run.
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -64,13 +49,11 @@ public class MaintainArmPosition extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	//System.out.println("MaintainElevator:end [Should never get here!]:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	//System.out.println("MaintainElevator:interrupted:  getDistance is: "+Robot.SRXElevator.encoder.getDistance());
     }
     
 }

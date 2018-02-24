@@ -66,6 +66,11 @@ public class Intake extends Subsystem {
         // Put code here to be run every loop
 
     }
+    /**
+     * Spin the intake wheels at a set speed
+     * 
+     * @param spinDirectionIn If in, true; If out, false
+     */
     public void spin(boolean spinDirectionIn) {
     	if (spinDirectionIn == true) {		// Spin direction is IN
     		speedController1.set(INTAKE_DIRECTION_MULTIPLIER_IN * INTAKE_SPEED_IN);			// NOTE:  2nd speed controller is slaved to this one in RobotMap

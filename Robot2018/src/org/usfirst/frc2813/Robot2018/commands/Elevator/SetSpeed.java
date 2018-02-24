@@ -10,11 +10,13 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class SetSpeed extends Command {
 	double speed;
+	/**
+	 * Set the speed of the elevator
+	 * @param speed in feet per second
+	 */
     public SetSpeed(double speed) {
         this.speed=speed;
         requires(Robot.SRXElevator);
-        // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
     }
 
     // Called once when the command executes
@@ -27,13 +29,10 @@ public class SetSpeed extends Command {
     }
 	@Override
 	protected boolean isFinished() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	protected void end() {
 		System.out.println("SetSpeed End" + RobotMap.srxElevator.getSelectedSensorPosition(0) + " Speed " + speed);
-		//Robot.SRXElevator.setSpeed(0);
-		//new MaintainElevatorPosition().start();
 	}
 
 }

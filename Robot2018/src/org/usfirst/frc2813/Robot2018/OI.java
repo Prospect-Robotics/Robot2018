@@ -21,7 +21,7 @@ import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmSolenoid;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
-import org.usfirst.frc2813.Robot2018.commands.AutoDrive.AutonomousCommand;
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommand;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ShiftGears;

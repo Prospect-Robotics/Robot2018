@@ -57,7 +57,10 @@ public class SRXElevator extends Subsystem {
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		
 	}
-	
+	/**
+	 * Set the speed of the elevator
+	 * @param feetPerSecond
+	 */
 	public void setSpeed(double feetPerSecond) {
 		// set() accepts a velocity in position change per 100ms.  Divide by 10 to convert position change per 1000ms to that.
 		motor.set(ControlMode.Velocity, (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);

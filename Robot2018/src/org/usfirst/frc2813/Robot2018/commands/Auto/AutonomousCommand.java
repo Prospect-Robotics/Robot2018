@@ -8,7 +8,7 @@
 // update. Deleting the comments indicating the section will prevent
 // it from being updated in the future.
 
-package org.usfirst.frc2813.Robot2018.commands.AutoDrive;
+package org.usfirst.frc2813.Robot2018.commands.Auto;
 
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
@@ -38,8 +38,18 @@ public class AutonomousCommand extends CommandGroup {
 		positionSelector.addObject("RIGHT", 2);
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
 	}
-	
+	/**
+	 * Code to be run during the Autonomous 15 second period. 
+	 * This code uses the gameData from the driver station and a 
+	 * sendable chooser on the Smart Dashboard to decide which
+	 * sequence to run.
+	 */
 	public AutonomousCommand() {
+		/**
+		 * The game data from the driver station:
+		 * Which side of the near switch, scale,
+		 * and far switch we have.
+		 */
 		class GameData {
 			// Class to take a gameData sequence such as "RLR" and split into 3 enum values
 			public FieldPosition nearSwitch, scale, farSwitch;//Will be fixed
@@ -52,10 +62,10 @@ public class AutonomousCommand extends CommandGroup {
 				farSwitch = splitChar(gd.charAt(2));
 			}
 		}
+		/**
+		 * The movement commands used in the sequences
+		 */
 		class AutoCmd {
-			/*
-			 * autoCmd performs autonomous movement and elevator commands
-			 */
 			private static final int FORWARD = -1;
 			private static final int BACKWARD = 1;
 			private double driveSpeed = 1;

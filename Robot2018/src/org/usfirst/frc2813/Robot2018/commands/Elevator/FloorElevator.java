@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class FloorElevator extends Command {
 	private static final double FEET_PER_SECOND = -1;
+	/**
+	 * Bring elevator down to limit switch
+	 */
     public FloorElevator() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);

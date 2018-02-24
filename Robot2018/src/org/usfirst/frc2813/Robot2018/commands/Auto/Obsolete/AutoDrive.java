@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.AutoDrive.Obsolete;
+package org.usfirst.frc2813.Robot2018.commands.Auto.Obsolete;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;

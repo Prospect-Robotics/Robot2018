@@ -11,7 +11,7 @@
 
 package org.usfirst.frc2813.Robot2018;
 
-import org.usfirst.frc2813.Robot2018.commands.AutoDrive.AutonomousCommand;
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommand;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;

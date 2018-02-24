@@ -18,7 +18,7 @@ import org.usfirst.frc2813.Robot2018.Robot;
 
 /*
  * TODO: This class needs to be coded for the Talon SRX
- * Need to decide what this class is used for
+ * Need to decide what this class is used for - SHOULD IT STILL BE USED?
  */
 public class ArmLimitSwitch extends Command {
 
