@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.Obsolete;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
