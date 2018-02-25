@@ -9,13 +9,13 @@
 // it from being updated in the future.
 
 
-package org.usfirst.frc2813.Robot2018.commands.Arm;
+package org.usfirst.frc2813.Robot2018.commands.Arm.Obsolete;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
 /**
- *
+ *  OBSOLETE - REPLACED BY TOGGLESOLENOIDGENERAL
  */
 public class ArmSolenoid extends InstantCommand {
 	/**

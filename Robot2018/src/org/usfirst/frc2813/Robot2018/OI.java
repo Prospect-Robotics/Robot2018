@@ -13,18 +13,19 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.ClimbingBar;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorRatchet;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.FloorElevator;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.Obsolete.ElevatorRatchet;
+import org.usfirst.frc2813.Robot2018.commands.Obsolete.ClimbingBar;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
-import org.usfirst.frc2813.Robot2018.commands.Arm.ArmSolenoid;
+import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.Arm.Obsolete.ArmSolenoid;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommand;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
-import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ShiftGears;
+import org.usfirst.frc2813.Robot2018.commands.DriveTrain.Obsolete.ShiftGears;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 
 import edu.wpi.first.wpilibj.Compressor;
@@ -102,10 +103,13 @@ public class OI {
     	 */
         buttonPanel = new Joystick(0);
         
-        new JoystickButton(buttonPanel, 8).whenPressed(new ElevatorRatchet());
-        new JoystickButton(buttonPanel, 6).whenPressed(new ClimbingBar());
-        new JoystickButton(buttonPanel, 7).whenPressed(new ShiftGears());
-        //elevatorDown.whenPressed(new PrintButtonStatus(true, false));
+        new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
+        new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
+        new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainSingleSolenoid));
+        
+        //BELOW IS THE CORRECT CODE FOR THE COMPETITION BOT. IT WAS CHANGED TO SATISFY WIRING ON PRACTICE BOT
+        
+        /*//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
         elevatorUp = new JoystickButton(buttonPanel, 5);
         elevatorUp.whileHeld(new SetSpeed(-1));		// units of inches per second!
         //elevatorDown.whenReleased(new SetSpeed(0));
@@ -114,7 +118,14 @@ public class OI {
         //elevatorUp.whenPressed(new PrintButtonStatus(true, true));
         elevatorDown.whileHeld(new SetSpeed(1));
         //elevatorUp.whenReleased(new SetSpeed(0));
-        //elevatorUp.whenReleased(new PrintButtonStatus(false, true));
+        //elevatorUp.whenReleased(new PrintButtonStatus(false, true));*/
+        
+        //BELOW IS THE CODE THAT WAS CHANGED TO SATISFY WIRING ON PRACTICE BOT
+        
+        elevatorUp = new JoystickButton(buttonPanel, 5);
+        
+        
+        
         new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
         spinIntakeOut.whileHeld(new SpinIntake(false, false));
@@ -126,7 +137,7 @@ public class OI {
         //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
         new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(true));
         new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(false));
-        new JoystickButton(buttonPanel, 9).whenPressed(new ArmSolenoid());
+        new JoystickButton(buttonPanel, 9).whenPressed(new ToggleSolenoidGeneral(RobotMap.armSingleSolenoid));
         
         
         joystick1 = new Joystick(1);

@@ -1,8 +1,8 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.Arm.ArmSolenoid;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MaintainArmPosition;
+import org.usfirst.frc2813.Robot2018.commands.Arm.Obsolete.ArmSolenoid;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
