@@ -4,7 +4,6 @@ import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MaintainElevatorPosition;
 
 import com.ctre.phoenix.ParamEnum;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -19,7 +18,6 @@ public class SRXElevator extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
-	private static final double PULSES_PER_INCH = RobotMap.SRX_MAG_PULSES_PER_REVOLUTION / RobotMap.ELEVATOR_INCHES_PER_REVOLUTION;
 	
 	// TODO find maximum allowable elevator height; 24 is only a placeholder.
 	@SuppressWarnings("unused")
@@ -61,28 +59,28 @@ public class SRXElevator extends Subsystem {
 	 * Set the speed of the elevator
 	 * @param feetPerSecond
 	 */
-	public void setSpeed(double feetPerSecond) {
+	/*public void setSpeed(double feetPerSecond) {
 		// set() accepts a velocity in position change per 100ms.  Divide by 10 to convert position change per 1000ms to that.
 		motor.set(ControlMode.Velocity, (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);
-	}
+	}*/
 	
 	/**
 	 * Set the position of the elevator
 	 * @param inchesFromBottom
 	 */
-	public void setPosition(double inchesFromBottom) {
+	/*public void setPosition(double inchesFromBottom) {
 		// round to nearest int because unless we're using an analog sensor, this expects values in inches.
 		// Not sure what the talon will do if we give it a float value when it expects an int value.
 		// It might floor it (it *should* floor it), but it *might* puke.
 		motor.set(ControlMode.Position, (int) (inchesFromBottom * PULSES_PER_INCH));
-	}
+	}*/
 	/**
 	 * TODO REMOVE
 	 */
-	public void activelyMaintainCurrentPosition() {
+	/*public void activelyMaintainCurrentPosition() {
 		System.out.println("Elevator"+motor.getSelectedSensorPosition(0));
 		motor.set(ControlMode.Position, motor.getSelectedSensorPosition(0));
-	}
+	}*/
 
 	public void initDefaultCommand() {
         setDefaultCommand(new MaintainElevatorPosition());

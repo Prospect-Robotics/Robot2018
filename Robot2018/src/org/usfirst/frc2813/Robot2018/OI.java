@@ -14,14 +14,10 @@ package org.usfirst.frc2813.Robot2018;
 import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.Elevator.FloorElevator;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.Obsolete.ElevatorRatchet;
-import org.usfirst.frc2813.Robot2018.commands.Obsolete.ClimbingBar;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
-import org.usfirst.frc2813.Robot2018.commands.Arm.Obsolete.ArmSolenoid;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommand;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
