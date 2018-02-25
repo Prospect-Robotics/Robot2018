@@ -14,6 +14,7 @@ package org.usfirst.frc2813.Robot2018;
 import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.Elevator.FloorElevator;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
