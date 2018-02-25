@@ -41,7 +41,7 @@ public class Robot extends TimedRobot {
 
     public static OI oi;
     public static DriveTrain driveTrain;
-    public static SRXElevator SRXElevator;
+    public static SRXElevator elevator;
     public static Intake intake;
     public static Arm arm;
     public static UsbCamera camera;
@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
     	
     	RobotMap.init();
         driveTrain = new DriveTrain();
-        SRXElevator = new SRXElevator();
+        elevator = new SRXElevator();
         intake = new Intake();
         arm = new Arm();
 

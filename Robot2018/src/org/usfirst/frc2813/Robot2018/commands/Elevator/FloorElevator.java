@@ -17,7 +17,7 @@ public class FloorElevator extends Command {
     public FloorElevator() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(Robot.SRXElevator);
+    	requires(Robot.elevator);
     }
 
     // Called just before this Command runs the first time
@@ -32,7 +32,7 @@ public class FloorElevator extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return Robot.SRXElevator.isLimitSwitchPressed() == true;
+        return Robot.elevator.isLimitSwitchPressed() == true;
     }
 
     // Called once after isFinished returns true

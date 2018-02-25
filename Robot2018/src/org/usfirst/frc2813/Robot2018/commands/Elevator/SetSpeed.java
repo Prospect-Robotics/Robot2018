@@ -22,7 +22,7 @@ public class SetSpeed extends Command {
 	 */
     public SetSpeed(double speed) {
         this.speed=speed;
-        requires(Robot.SRXElevator);
+        requires(Robot.elevator);
     }
 
     // Called once when the command executes

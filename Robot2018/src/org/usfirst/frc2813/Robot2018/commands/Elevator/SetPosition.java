@@ -19,7 +19,7 @@ public class SetPosition extends InstantCommand {
         this.inchesFromBottom=inchesFromBottom;
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-        requires(Robot.SRXElevator);
+        requires(Robot.elevator);
     }
 
     // Called once when the command executes
