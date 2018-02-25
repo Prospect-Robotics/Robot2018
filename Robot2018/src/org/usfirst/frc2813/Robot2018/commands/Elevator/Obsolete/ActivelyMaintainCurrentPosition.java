@@ -1,6 +1,8 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator.Obsolete;
 
-import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.RobotMap;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
@@ -17,7 +19,8 @@ public class ActivelyMaintainCurrentPosition extends InstantCommand {
 
     // Called once when the command executes
     protected void initialize() {
-    	Robot.SRXElevator.activelyMaintainCurrentPosition();
+    	System.out.println("Elevator"+RobotMap.srxElevator.getSelectedSensorPosition(0));
+    	RobotMap.srxElevator.set(ControlMode.Position, RobotMap.srxElevator.getSelectedSensorPosition(0));
     }
 
 }
