@@ -122,9 +122,12 @@ public class OI {
         
         //BELOW IS THE CODE THAT WAS CHANGED TO SATISFY WIRING ON PRACTICE BOT
         
-        elevatorUp = new JoystickButton(buttonPanel, 5);
+        elevatorUp = new JoystickButton(buttonPanel, 4);
+        elevatorUp.whileHeld(new SetSpeed(-1));
+        elevatorDown = new JoystickButton(buttonPanel, 5);
+        elevatorDown.whileHeld(new SetSpeed(1));
         
-        
+        //END CHANGED CODE
         
         new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
