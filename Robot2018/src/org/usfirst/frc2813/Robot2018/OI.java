@@ -127,6 +127,8 @@ public class OI {
         new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(true));
         new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(false));
         new JoystickButton(buttonPanel, 9).whenPressed(new ArmSolenoid());
+        
+        
         joystick1 = new Joystick(1);
         joystick2 = new Joystick(2);
         

@@ -22,6 +22,7 @@ public class ElevatorRatchet extends InstantCommand {
 	 * Switches the elevator ratchet solenoid on and off
 	 */
     public ElevatorRatchet() {
+    	super();
     }
 
     // Called just before this Command runs the first time

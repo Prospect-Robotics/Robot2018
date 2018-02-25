@@ -22,6 +22,7 @@ public class ArmSolenoid extends InstantCommand {
 	 * Switch the position of the intake pistons
 	 */
     public ArmSolenoid() {
+    	super();
     }
 
     // Called just before this Command runs the first time

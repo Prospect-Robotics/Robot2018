@@ -22,6 +22,7 @@ public class ShiftGears extends InstantCommand {
 	 * Shift from high to low gear on the DriveTrain
 	 */
     public ShiftGears() {
+    	super();
     }
 
     // Called just before this Command runs the first time

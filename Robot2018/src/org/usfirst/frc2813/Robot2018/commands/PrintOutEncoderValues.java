@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 public class PrintOutEncoderValues extends TimedCommand {
 	private Encoder myEncoder1;
 	private Encoder myEncoder2;
-	//private Encoder myEncoder3;
 	private long last;
-	//private int time;
 
     public PrintOutEncoderValues(double timeout, Encoder myEncoder1, Encoder myEncoder2) {
         // Use requires() here to declare subsystem dependencies
@@ -24,13 +22,10 @@ public class PrintOutEncoderValues extends TimedCommand {
     	this.last = 0;
     	this.myEncoder1 = myEncoder1;
     	this.myEncoder2=myEncoder2;
-    	//this.myEncoder3=myEncoder3;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	//Robot.driveTrain.quadratureEncoder1.reset();
-    	//Robot.driveTrain.quadratureEncoder2.reset();
     }
 
     // Called repeatedly when this Command is scheduled to run

@@ -22,6 +22,7 @@ public class ClimbingBar extends InstantCommand {
 	 * Switches the solenoid of the climbing bar on and off.
 	 */
     public ClimbingBar() {
+    	super();
     }
 
     //@Override

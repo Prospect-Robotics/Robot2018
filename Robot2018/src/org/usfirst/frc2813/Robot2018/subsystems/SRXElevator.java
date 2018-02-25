@@ -34,7 +34,7 @@ public class SRXElevator extends Subsystem {
 	// No need for any other variables.
 	
 	public SRXElevator() {
-		// Do some motor configization
+		// Do some motor configuration
 		// XXX Should we reconfigure the Talon every power on?  It should store the config, right?
 		// probably should be fine.
 
@@ -94,7 +94,6 @@ public class SRXElevator extends Subsystem {
 	}
 
 	public boolean isLimitSwitchPressed() {
-		// TODO Auto-generated method stub
 		return motor.getSensorCollection().isRevLimitSwitchClosed();
 	}
 }

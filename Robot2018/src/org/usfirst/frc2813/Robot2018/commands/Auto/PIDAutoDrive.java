@@ -78,11 +78,11 @@ public class PIDAutoDrive extends Command {
      * 
      * x is distance and y is speed when used in calcThrottle
      * 
-     * @param x1 - x value of first point
-     * @param y1 - y value of first point
-     * @param x2 - x value of second point
-     * @param y2 - y value of second point
-     * @param x - x value of third point
+     * @param x1 x value of first point
+     * @param y1 y value of first point
+     * @param x2 x value of second point
+     * @param y2 y value of second point
+     * @param x x value of third point
      * @return y value of third point
      */
     
@@ -154,8 +154,7 @@ public class PIDAutoDrive extends Command {
     		newThrottle *= -1;
     	}
     	System.out.printf("PID: t %.3f; a %.3f; ss %.3f; d %.3f;\nnT %.3f; fS %.3f; dist %.3f; output %.3f\n", distanceTraveled(), accel, steadyState, decel, newThrottle, this.forwardSpeed, distance,output);
-    	//System.out.printf("PID: traveled %.3f; throttle %.3f\n", distanceTraveled(), newThrottle);
-    	
+    	    	
     	Robot.driveTrain.arcadeDrive(newThrottle, -output);
     }
 }
