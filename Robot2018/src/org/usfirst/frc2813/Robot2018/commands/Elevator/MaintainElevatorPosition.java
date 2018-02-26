@@ -19,7 +19,7 @@ public class MaintainElevatorPosition extends Command {
     //private PIDOutput debugPrintPIDOutput;
 	private double targetPosition;
     public MaintainElevatorPosition() {
-        requires(Robot.SRXElevator);
+        requires(Robot.elevator);
     }
 	
 	public void debugPrintPIDOutput(double pidOutput) {
