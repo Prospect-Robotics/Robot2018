@@ -27,7 +27,7 @@ public class SetSpeed extends Command {
 
     // Called once when the command executes
     protected void initialize() {
-    	RobotMap.srxElevator.selectProfileSlot(1, Constants.movePIDLoopIdx);
+    	RobotMap.srxElevator.selectProfileSlot(Constants.movePIDLoopIdx, Constants.kSlotIdx);
     }
     protected void execute() {
     	System.out.println("SetSpeed Execute" + RobotMap.srxElevator.getSelectedSensorPosition(0)+" Speed " + speed);

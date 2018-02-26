@@ -29,7 +29,7 @@ public class MaintainElevatorPosition extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	RobotMap.srxElevator.selectProfileSlot(Constants.maintainPIDLoopIdx, Constants.maintainPIDLoopIdx);
+    	RobotMap.srxElevator.selectProfileSlot(Constants.maintainPIDLoopIdx, Constants.kSlotIdx);
     	/*double pos = Robot.SRXElevator.encoder.getDistance();
     	targetPosition = pos;		// TODO:  Used only for debug output - can remove when working
     	
@@ -45,9 +45,11 @@ public class MaintainElevatorPosition extends Command {
     	 * TODO:  Clean up Talon stuff once we are sure it works
     	 */
     	targetPosition = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);		// TODO:  temp variable only for debug output - can remove when working
-    	RobotMap.srxElevator.set(ControlMode.Position, targetPosition);
-
+    	//TODO***THE CODE WORKS ON THE COMPETITION BOT. IT HAS BEEN COMMENTED OUT FOR WIRING REASONS ON THE PRACTICE BOT***
+    	//RobotMap.srxElevator.set(ControlMode.Position, targetPosition);
     	
+    	//BELOW IS THE CODE USED FOR THE CURRENT WIRING
+    	RobotMap.srxElevator.set(ControlMode.Position, targetPosition);
     	
     	System.out.println("MaintainElevator:initialize:  target position is: "+targetPosition+", getDistance is: "+RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
 //		System.out.println("MaintainElevator:initialize:  pos ("+Robot.elevator.encoder.getPIDSourceType()+") to maintain is: "+pos+" (getDistance)");

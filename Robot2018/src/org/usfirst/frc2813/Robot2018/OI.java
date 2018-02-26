@@ -104,27 +104,18 @@ public class OI {
         new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
         new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainSingleSolenoid));
         
-        //BELOW IS THE CORRECT CODE FOR THE COMPETITION BOT. IT WAS CHANGED TO SATISFY WIRING ON PRACTICE BOT
         
-        /*//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
+        //elevatorDown.whenPressed(new PrintButtonStatus(true, false));
         elevatorUp = new JoystickButton(buttonPanel, 5);
-        elevatorUp.whileHeld(new SetSpeed(-1));		// units of inches per second!
+        elevatorUp.whileHeld(new SetSpeed(-.4));		// units of inches per second!
         //elevatorDown.whenReleased(new SetSpeed(0));
         //elevatorDown.whenReleased(new PrintButtonStatus(false, false));
         elevatorDown = new JoystickButton(buttonPanel, 4);
         //elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-        elevatorDown.whileHeld(new SetSpeed(1));
+        elevatorDown.whileHeld(new SetSpeed(.4));
         //elevatorUp.whenReleased(new SetSpeed(0));
-        //elevatorUp.whenReleased(new PrintButtonStatus(false, true));*/
+        //elevatorUp.whenReleased(new PrintButtonStatus(false, true));
         
-        //BELOW IS THE CODE THAT WAS CHANGED TO SATISFY WIRING ON PRACTICE BOT
-        
-        elevatorUp = new JoystickButton(buttonPanel, 4);
-        elevatorUp.whileHeld(new SetSpeed(-1));
-        elevatorDown = new JoystickButton(buttonPanel, 5);
-        elevatorDown.whileHeld(new SetSpeed(1));
-        
-        //END CHANGED CODE
         
         new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);

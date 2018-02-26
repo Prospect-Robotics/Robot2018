@@ -49,11 +49,13 @@ public class MaintainArmPosition extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+    	System.out.println("MaintainArm:End [ SHOULD NEVER GET HERE]");
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	System.out.println("MaintainArm:Interrupted: target Position is: "+targetPosition+", getDistance is: "+RobotMap.srxArm.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR));
     }
     
 }

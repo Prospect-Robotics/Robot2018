@@ -46,6 +46,10 @@ public class SRXElevator extends Subsystem {
 		 * public static final int TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS = 10;
 		 *  
 		 */
+		
+		
+		//TODO BELOW IS CODE FOR THE COMPETITION BOT; CHANGED FOR PRACTICE WIRING ISSUES 
+		//"TODO" lines are lines previously uncommented
 		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		// For some reason CTRE decided that two slots would be enough for everything.
 		//motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
@@ -53,7 +57,10 @@ public class SRXElevator extends Subsystem {
 		/*motor.configForwardSoftLimitEnable(true, 10);
 		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);*/
 		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		
+		/*//TODO BELOW IS THE CHANGED CODE - REMOVE WHEN CORRECTED
+		motor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+	    motor.configSetParameter(ParamEnum.eClearPositionOnLimitF, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);*/
 	}
 	/**
 	 * Set the speed of the elevator

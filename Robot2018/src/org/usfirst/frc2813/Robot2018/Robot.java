@@ -121,10 +121,10 @@ public class Robot extends TimedRobot {
 		RobotMap.srxElevator.config_kI(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kD(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		
-		RobotMap.srxElevator.config_kF(Constants.movePIDLoopIdx, 0, Constants.kTimeoutMs);
-		RobotMap.srxElevator.config_kP(Constants.movePIDLoopIdx, 0, Constants.kTimeoutMs);
-		RobotMap.srxElevator.config_kI(Constants.movePIDLoopIdx, 0, Constants.kTimeoutMs);
-		RobotMap.srxElevator.config_kD(Constants.movePIDLoopIdx, 0, Constants.kTimeoutMs);
+		RobotMap.srxElevator.config_kF(Constants.movePIDLoopIdx, 0.0, Constants.kTimeoutMs);
+		RobotMap.srxElevator.config_kP(Constants.movePIDLoopIdx, 0.75, Constants.kTimeoutMs);
+		RobotMap.srxElevator.config_kI(Constants.movePIDLoopIdx, 0.01, Constants.kTimeoutMs);
+		RobotMap.srxElevator.config_kD(Constants.movePIDLoopIdx, 40.0, Constants.kTimeoutMs);
 		/*
          * Test Talon PID code from Team 217
          */
