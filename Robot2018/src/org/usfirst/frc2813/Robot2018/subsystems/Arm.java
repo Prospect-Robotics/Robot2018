@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  *
  */
 public class Arm extends Subsystem {
-	private final TalonSRX srxController = RobotMap.srxArm;
+	public final TalonSRX srxController = RobotMap.srxArm;
 	public boolean encoderFunctional = true;
 	public static final Solenoid gripper = RobotMap.armSingleSolenoid;
 	/**
