@@ -11,7 +11,11 @@
 
 package org.usfirst.frc2813.Robot2018;
 
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommand;
+import edu.wpi.first.wpilibj.command.CommandGroup;
+
+//TODO: move to commandGroups
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
+
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
@@ -37,7 +41,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 public class Robot extends TimedRobot {
 	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
 
-    Command autonomousCommand;
+    public static AutonomousCommandGroup autonomousCommand;
 
     public static OI oi;
     public static DriveTrain driveTrain;
@@ -69,7 +73,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
 		System.out.println("In robotInit");      
     	
-    	RobotMap.init();
+		RobotMap.init();
         driveTrain = new DriveTrain();
         elevator = new SRXElevator();
         intake = new Intake();
@@ -200,8 +204,9 @@ public class Robot extends TimedRobot {
     //@Override
     public void autonomousInit() {
     	System.out.println("Autonomous Init");
-    	autonomousCommand = new AutonomousCommand();
-        // schedule the autonomous  (example)
+    	autonomousCommand = new AutonomousCommandGroup();
+    	
+
     	RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
     	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
     	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);

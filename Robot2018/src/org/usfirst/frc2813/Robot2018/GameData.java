@@ -7,7 +7,7 @@ package org.usfirst.frc2813.Robot2018;
  */
 public class GameData {
 	private Direction nearSwitch, scale, farSwitch;
-	private Direction splitChar(char c) {
+	private static Direction splitChar(char c) {
 		return (c == 'L') ? Direction.LEFT : Direction.RIGHT;
 	}
 	GameData(String gd) {
