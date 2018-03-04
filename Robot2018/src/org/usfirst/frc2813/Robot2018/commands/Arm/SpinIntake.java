@@ -4,13 +4,15 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
+
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 
 /**
  *
  */
 public class SpinIntake extends Command {
-	private boolean spinDirectionIn;
+	private Direction spinDirection;
 	private boolean stopAtEnd;
 	private SpeedController speedController1;
 	/**
@@ -19,8 +21,8 @@ public class SpinIntake extends Command {
 	 * @param spinDirectionIn - true is spin direction in; false if out
 	 * @param stopAtEnd - set motors to 0 when button is released
 	 */
-	public SpinIntake(boolean spinDirectionIn, boolean stopAtEnd) {
-		this.spinDirectionIn=spinDirectionIn;
+	public SpinIntake(Direction spinDirectionIn, boolean stopAtEnd) {
+		this.spinDirection=spinDirectionIn;
 		this.stopAtEnd=stopAtEnd;
 		requires(Robot.intake);
 	}
@@ -38,7 +40,7 @@ public class SpinIntake extends Command {
 			speedController1.set(0);
 		}
 		else { 
-			Robot.intake.spin(spinDirectionIn);
+			Robot.intake.spin(spinDirection.equals(Direction.IN));
 		}
 	}
 

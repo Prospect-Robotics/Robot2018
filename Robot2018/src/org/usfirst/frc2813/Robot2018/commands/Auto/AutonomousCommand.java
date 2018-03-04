@@ -12,6 +12,7 @@ package org.usfirst.frc2813.Robot2018.commands.Auto;
 
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -128,11 +129,11 @@ public class AutonomousCommand extends CommandGroup {
 			// arm control commands
 			public void dropCube() {
 				// TODO: add command to close arms
-				addSequential(new SpinIntake(false, true));
+				addSequential(new SpinIntake(Direction.OUT, true));
 			}
 			public void grabCube() {
 				// TODO: add command to open arms
-				addSequential(new SpinIntake(true, false));
+				addSequential(new SpinIntake(Direction.IN, false));
 			}
 
 			public void sleep(double seconds) {
