@@ -32,7 +32,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public AutonomousCommandGroup() {
 		addSequential(new ResetEncoders());
 		addSequential(new ResetGyro());
-		autoGenerator = new AutonomousCommandGroupGenerator();
 	}
 
 	// track state

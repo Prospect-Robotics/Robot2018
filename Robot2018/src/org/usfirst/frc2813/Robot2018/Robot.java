@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 //TODO: move to commandGroups
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
 
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroupGenerator;
+
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
@@ -40,19 +42,20 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 public class Robot extends TimedRobot {
 	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
 
-    public static AutonomousCommandGroup autonomousCommand;
+	public static AutonomousCommandGroup autonomousCommand;
+	public static AutonomousCommandGroupGenerator autoCmdGenerator;
 
-    public static OI oi;
-    public static DriveTrain driveTrain;
-    public static Elevator elevator;
-    public static Arm arm;
-    public static UsbCamera camera;
-    
-    /*
-     * Test code for the Talon SRX PID controllers - using another team's odd variable names 
-     * to avoid conflict with our own
-     */
-    /*
+	public static OI oi;
+	public static DriveTrain driveTrain;
+	public static Elevator elevator;
+	public static Arm arm;
+	public static UsbCamera camera;
+
+	/*
+	 * Test code for the Talon SRX PID controllers - using another team's odd variable names 
+	 * to avoid conflict with our own
+	 */
+	/*
 	TalonSRX _talon = new TalonSRX(2);
 	Joystick _joy = new Joystick(0);
 	StringBuilder _sb = new StringBuilder();
@@ -60,38 +63,38 @@ public class Robot extends TimedRobot {
 	boolean _lastButton1 = false;
 
 	double targetPositionRotations;
-	*/
+	 */
 
 
-    /**
-     * This function is run when the robot is first started up and should be
-     * used for any initialization code.
-     */
-    //@Override
-    public void robotInit() {
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
+	//@Override
+	public void robotInit() {
 		System.out.println("In robotInit");      
-    	
-		RobotMap.init();
-        driveTrain = new DriveTrain();
-        elevator = new Elevator();
-        arm = new Arm();
 
-        // OI must be constructed after subsystems. If the OI creates Commands
-        //(which it very likely will), subsystems are not guaranteed to be
-        // constructed yet. Thus, their requires() statements may grab null
-        // pointers. Bad news. Don't move it.
-        oi = new OI();
-        // Add commands to Autonomous Sendable Chooser
-        
-        // initialize the camera
-        camera = CameraServer.getInstance().startAutomaticCapture();
-        camera.setResolution(640, 480);
-        
-        
-        /*
-         * Test Talon PID code from Team 217
-         */
-        
+		RobotMap.init();
+		driveTrain = new DriveTrain();
+		elevator = new Elevator();
+		arm = new Arm();
+
+		// OI must be constructed after subsystems. If the OI creates Commands
+		//(which it very likely will), subsystems are not guaranteed to be
+		// constructed yet. Thus, their requires() statements may grab null
+		// pointers. Bad news. Don't move it.
+		oi = new OI();
+		// Add commands to Autonomous Sendable Chooser
+
+		// initialize the camera
+		camera = CameraServer.getInstance().startAutomaticCapture();
+		camera.setResolution(640, 480);
+
+
+		/*
+		 * Test Talon PID code from Team 217
+		 */
+
 		/* choose the sensor and sensor direction */
 		RobotMap.srxElevator.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
@@ -108,7 +111,7 @@ public class Robot extends TimedRobot {
 		RobotMap.srxElevator.configNominalOutputReverse(0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.configPeakOutputForward(1, Constants.kTimeoutMs);
 		RobotMap.srxElevator.configPeakOutputReverse(-1, Constants.kTimeoutMs);
-		
+
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be
 		 * neutral within this range. See Table in Section 17.2.1 for native
@@ -121,15 +124,15 @@ public class Robot extends TimedRobot {
 		RobotMap.srxElevator.config_kP(Constants.maintainPIDLoopIdx, 0.8, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kI(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kD(Constants.maintainPIDLoopIdx, 0.0, Constants.kTimeoutMs);
-		
+
 		RobotMap.srxElevator.config_kF(Constants.movePIDLoopIdx, 0.0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kP(Constants.movePIDLoopIdx, 0.75, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kI(Constants.movePIDLoopIdx, 0.01, Constants.kTimeoutMs);
 		RobotMap.srxElevator.config_kD(Constants.movePIDLoopIdx, 40.0, Constants.kTimeoutMs);
 		/*
-         * Test Talon PID code from Team 217
-         */
-        
+		 * Test Talon PID code from Team 217
+		 */
+
 		/* choose the sensor and sensor direction */
 		RobotMap.srxArm.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
@@ -146,7 +149,7 @@ public class Robot extends TimedRobot {
 		RobotMap.srxArm.configNominalOutputReverse(0, Constants.kTimeoutMs);
 		RobotMap.srxArm.configPeakOutputForward(1, Constants.kTimeoutMs);
 		RobotMap.srxArm.configPeakOutputReverse(-1, Constants.kTimeoutMs);
-		
+
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be
 		 * neutral within this range. See Table in Section 17.2.1 for native
@@ -164,80 +167,80 @@ public class Robot extends TimedRobot {
 		RobotMap.srxArm.config_kP(Constants.movePIDLoopIdx, 2, Constants.kTimeoutMs);
 		RobotMap.srxArm.config_kI(Constants.movePIDLoopIdx, 0, Constants.kTimeoutMs);
 		RobotMap.srxArm.config_kD(Constants.movePIDLoopIdx, 0, Constants.kTimeoutMs);
-		
+
 		/*
 //		 * lets grab the 360 degree position of the MagEncoder's absolute
 //		 * position, and intitally set the relative sensor to match.
 //		 */
-//		int absolutePosition = _talon.getSensorCollection().getPulseWidthPosition();
-//		/* mask out overflows, keep bottom 12 bits */
-//		absolutePosition &= 0xFFF;
-//		if (Constants.kSensorPhase)
-//			absolutePosition *= -1;
-//		if (Constants.kMotorInvert)
-//			absolutePosition *= -1;
-//		/* set the quadrature (relative) sensor to match absolute */
-//		_talon.setSelectedSensorPosition(absolutePosition, Constants.kPIDLoopIdx, Constants.kTimeoutMs);
+		//		int absolutePosition = _talon.getSensorCollection().getPulseWidthPosition();
+		//		/* mask out overflows, keep bottom 12 bits */
+		//		absolutePosition &= 0xFFF;
+		//		if (Constants.kSensorPhase)
+		//			absolutePosition *= -1;
+		//		if (Constants.kMotorInvert)
+		//			absolutePosition *= -1;
+		//		/* set the quadrature (relative) sensor to match absolute */
+		//		_talon.setSelectedSensorPosition(absolutePosition, Constants.kPIDLoopIdx, Constants.kTimeoutMs);
 
-    }
+	}
 
-    /**
-     * This function is called when the disabled button is hit.
-     * You can use it to reset subsystems before shutting down.
-     */
-    @Override
-    public void disabledInit(){
-    	RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Coast);
-    	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Coast);
-    	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Coast);
-    	RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Coast);
-    }
+	/**
+	 * This function is called when the disabled button is hit.
+	 * You can use it to reset subsystems before shutting down.
+	 */
+	@Override
+	public void disabledInit(){
+		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Coast);
+		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Coast);
+		RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Coast);
+		RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Coast);
+	}
 
-    @Override
-    public void disabledPeriodic() {
-        Scheduler.getInstance().run();
-    }
+	@Override
+	public void disabledPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
-    //@Override
-    public void autonomousInit() {
-    	System.out.println("Autonomous Init");
-    	autonomousCommand = new AutonomousCommandGroup();
-    	
+	//@Override
+	public void autonomousInit() {
+		System.out.println("Autonomous Init");
+		autonomousCommand = new AutonomousCommandGroup();
+		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
-    	RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
-    	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
-    	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
-    	RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
-        new POST(autonomousCommand).start();
-    }
+		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
+		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
+		RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
+		RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
+		new POST(autonomousCommand).start();
+	}
 
-    /**
-     * This function is called periodically during autonomous
-     */
-    //@Override
-    public void autonomousPeriodic() {
-        Scheduler.getInstance().run();
-    }
+	/**
+	 * This function is called periodically during autonomous
+	 */
+	//@Override
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
-    //@Override
-    public void teleopInit() {
-        // This makes sure that the autonomous stops running when
-        // teleop starts running. If you want the autonomous to
-        // continue until interrupted by another command, remove
-        // this line or comment it out.
-        if (autonomousCommand != null) autonomousCommand.cancel();
-        RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
-    	RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
-    	RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
-    	RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
-        new POST().start();
-    }
+	//@Override
+	public void teleopInit() {
+		// This makes sure that the autonomous stops running when
+		// teleop starts running. If you want the autonomous to
+		// continue until interrupted by another command, remove
+		// this line or comment it out.
+		if (autonomousCommand != null) autonomousCommand.cancel();
+		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
+		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
+		RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
+		RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
+		new POST().start();
+	}
 
-    /**
-     * This function is called periodically during operator control
-     */
-    //@Override
-    public void teleopPeriodic() {
-        Scheduler.getInstance().run();
-    }
+	/**
+	 * This function is called periodically during operator control
+	 */
+	//@Override
+	public void teleopPeriodic() {
+		Scheduler.getInstance().run();
+	}
 }
