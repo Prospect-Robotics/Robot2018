@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  *
  */
-public class SRXElevator extends Subsystem {
+public class Elevator extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
@@ -31,7 +31,7 @@ public class SRXElevator extends Subsystem {
 	private final TalonSRX motor = RobotMap.srxElevator;
 	// No need for any other variables.
 	
-	public SRXElevator() {
+	public Elevator() {
 		// Do some motor configuration
 		// XXX Should we reconfigure the Talon every power on?  It should store the config, right?
 		// probably should be fine.

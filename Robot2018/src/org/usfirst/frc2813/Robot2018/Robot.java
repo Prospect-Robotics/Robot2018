@@ -19,7 +19,7 @@ import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
-import org.usfirst.frc2813.Robot2018.subsystems.SRXElevator;
+import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
 
     public static OI oi;
     public static DriveTrain driveTrain;
-    public static SRXElevator elevator;
+    public static Elevator elevator;
     public static Intake intake;
     public static Arm arm;
     public static UsbCamera camera;
@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
     	
 		RobotMap.init();
         driveTrain = new DriveTrain();
-        elevator = new SRXElevator();
+        elevator = new Elevator();
         intake = new Intake();
         arm = new Arm();
 
