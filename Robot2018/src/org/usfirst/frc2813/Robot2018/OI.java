@@ -143,7 +143,6 @@ public class OI {
 
         // SmartDashboard Buttons
         SmartDashboard.putData("OIDrive", new OIDrive());
-        SmartDashboard.putData("Autonomous Command", new AutonomousCommandGroup());
         SmartDashboard.putData("ToggleRelay0", new ShiftGears());
         //SmartDashboard.putData("ToggleRelay1", new ToggleRelay1());
         //SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
