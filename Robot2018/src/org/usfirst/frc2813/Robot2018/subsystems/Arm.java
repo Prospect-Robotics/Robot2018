@@ -15,8 +15,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Arm extends Subsystem {
 	public final TalonSRX srxController = RobotMap.srxArm;
 	public boolean encoderFunctional = true;
-	public final Solenoid gripper = RobotMap.armSingleSolenoid;
-	private boolean jawsOpen = false;
+	public static final Solenoid gripper = RobotMap.armSingleSolenoid;
 	/**
 	 * Double solenoids are two independent coils.
 	 * 
@@ -26,46 +25,35 @@ public class Arm extends Subsystem {
 	 */
 	@SuppressWarnings("unused")
 	private int disableGripper = 0;
-	
-	
-	
-    // Put methods for controlling this subsystem
-    // here. Call these from Commands.
+
+	// Put methods for controlling this subsystem
+	// here. Call these from Commands.
 	@Override
-    public void initDefaultCommand() {
-        // Set the default command for a subsystem here.
-        //setDefaultCommand(new MySpecialCommand());
+	public void initDefaultCommand() {
+		// Set the default command for a subsystem here.
+		//setDefaultCommand(new MySpecialCommand());
 		setDefaultCommand(new MaintainArmPosition());
-    }
-	
+	}
+
 	@Override
 	public void periodic() {
 		if(getCurrentCommand() == null) {
-    		new MaintainArmPosition().start();
-    	}
+			new MaintainArmPosition().start();
+		}
 	}
-	/**
-	 * Close jaws
-	 */
-	public void grabCube() {
-		jawsOpen = false;
-		if (RobotMap.armSingleSolenoid.get() == false) 
+
+	// Manage jaws
+	public static void closeJaws() {
+		if (!jawsAreOpen()) {
 			new ArmSolenoid().start();
+		}
 	}
-	
-	/**
-	 * Open jaws
-	 */
-	public void dropCube() {
-		jawsOpen = true;
-		if (RobotMap.armSingleSolenoid.get() == true)
+	public static void openJaws() {
+		if (jawsAreOpen()) {
 			new ArmSolenoid().start();
+		}
 	}
-	/**
-	 * The position of the jaws. True if open, false if closed
-	 */
-	public boolean jawsOpen() {
-		return jawsOpen;
-	}
+	// accessor for state of jaws
+	public static Boolean jawsAreOpen() { return gripper.get(); }
 }
 

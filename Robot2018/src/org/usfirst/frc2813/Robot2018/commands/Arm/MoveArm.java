@@ -11,6 +11,8 @@
 
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 import edu.wpi.first.wpilibj.command.Command;
+
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
@@ -22,7 +24,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
  */
 public class MoveArm extends Command {
 	private TalonSRX speedController1;
-	private boolean direction;
+	private Direction direction;
 	
 	private static final double ONE_DEGREE_PER_SECOND = RobotMap.ARM_ONE_DEGREE_PER_SECOND; // 36 = 360 (number of degrees in a circle) / 10 (set(ControlMode.Velocity) expects velocity in units of ticks per 100ms; a second is 1000ms).
 	
@@ -30,7 +32,7 @@ public class MoveArm extends Command {
 	 * Move the arm up or down
 	 * @param upDown the direction, true for up, false for down
 	 */
-    public MoveArm(boolean upDown) {//if moving up, true; down, false; stop is for release of button
+    public MoveArm(Direction upDown) {//if moving up, true; down, false; stop is for release of button
     	direction=upDown;
         requires(Robot.arm);
     }
@@ -46,10 +48,10 @@ public class MoveArm extends Command {
     // Called repeatedly when this Command is scheduled to run
     //@Override
     protected void execute() {
-    	if(direction == true) {
+    	if(direction == Direction.UP) {
     		speedController1.set(ControlMode.Velocity,-5*ONE_DEGREE_PER_SECOND);//TODO not sure if 1 or -1 is up
     	}
-    	else if (direction == false) {
+    	else if (direction == Direction.DOWN) {
     		speedController1.set(ControlMode.Velocity,5*ONE_DEGREE_PER_SECOND);//TODO not sure if -1 or 1 is down
     	}
     }

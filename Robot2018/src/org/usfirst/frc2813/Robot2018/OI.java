@@ -119,15 +119,15 @@ public class OI {
         
         new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
-        spinIntakeOut.whileHeld(new SpinIntake(false, false));
-        spinIntakeOut.whenReleased(new SpinIntake(false, true));
+        spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT, false));
+        spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT, true));
         spinIntakeIn = new JoystickButton(buttonPanel, 1);
-        spinIntakeIn.whileHeld(new SpinIntake(true, false));
-        spinIntakeIn.whenReleased(new SpinIntake(true, true));
+        spinIntakeIn.whileHeld(new SpinIntake(Direction.IN, false));
+        spinIntakeIn.whenReleased(new SpinIntake(Direction.IN, true));
         //new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
         //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
-        new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(true));
-        new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(false));
+        new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(Direction.UP));
+        new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(Direction.DOWN));
         new JoystickButton(buttonPanel, 9).whenPressed(new ToggleSolenoidGeneral(RobotMap.armSingleSolenoid));
         
         
