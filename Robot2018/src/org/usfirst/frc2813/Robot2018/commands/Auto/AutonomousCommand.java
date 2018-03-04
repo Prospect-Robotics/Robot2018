@@ -12,6 +12,7 @@ package org.usfirst.frc2813.Robot2018.commands.Auto;
 
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -20,7 +21,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- *
+ * Generate a series of sequential commands to operate autonomously. Takes into
+ * account game data.
  */
 public class AutonomousCommand extends CommandGroup {
 	private static enum FieldPosition {
@@ -123,8 +125,14 @@ public class AutonomousCommand extends CommandGroup {
 			public void lowerElevator(double amount) { raiseElevator(-amount); }
 			public void lowerElevator() { raiseElevator(-MAX_ELEVATOR); }
 
-			public void placeCube() {
-				//TODO addSequential(s) to place cube
+			// arm control commands
+			public void dropCube() {
+				// TODO: add command to close arms
+				addSequential(new SpinIntake(false, true));
+			}
+			public void grabCube() {
+				// TODO: add command to open arms
+				addSequential(new SpinIntake(true, false));
 			}
 
 			public void sleep(double seconds) {
@@ -143,7 +151,7 @@ public class AutonomousCommand extends CommandGroup {
 			cmdIssuer.driveForward(150);
 			cmdIssuer.turnRight(90 * directionBias);
 			cmdIssuer.raiseElevator();
-			cmdIssuer.placeCube();
+			cmdIssuer.dropCube();
 			cmdIssuer.lowerElevator();
 		}
 		else if (position != FieldPosition.CENTER) {
@@ -153,7 +161,7 @@ public class AutonomousCommand extends CommandGroup {
 			cmdIssuer.driveForward(50); // diagonally across field
 			cmdIssuer.turnLeft(45 * directionBias);
 			cmdIssuer.raiseElevator();
-			cmdIssuer.placeCube();
+			cmdIssuer.dropCube();
 			cmdIssuer.lowerElevator();			
 		}
 		else {
@@ -166,7 +174,7 @@ public class AutonomousCommand extends CommandGroup {
 			cmdIssuer.driveForward(40); // diagonally from start to far side of near switch
 			cmdIssuer.turnRight(45);
 			cmdIssuer.raiseElevator(AutoCmd.MAX_ELEVATOR / 2);
-			cmdIssuer.placeCube();
+			cmdIssuer.dropCube();
 			cmdIssuer.lowerElevator();			
 		}
 	}
