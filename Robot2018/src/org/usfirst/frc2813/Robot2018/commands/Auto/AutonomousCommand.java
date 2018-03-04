@@ -23,15 +23,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  */
 public class AutonomousCommand extends CommandGroup {
-
+	private static enum FieldPosition {
+		LEFT, CENTER, RIGHT
+	}
+	private static final double ONE_INCH = 1;			//  The Encoder code in WPI Lib translates the distance to inches based on the
+	private static final double ONE_FOOT = 12 * ONE_INCH;
+	private int directionBias;  // used to share code between left/right
 	private static final SendableChooser<Integer> positionSelector = new SendableChooser<Integer>();
-	public static enum FieldPosition { LEFT, CENTER, RIGHT };
-	
-	public static final double ONE_INCH = 1;			//  The Encoder code in WPI Lib translates the distance to inches based on the
-														//  
-	public static final double ONE_FOOT = 12 * ONE_INCH;
-	public int directionBias;  // used to share code between left/right
-	
 	static {
 		positionSelector.addDefault("LEFT", 0);
 		positionSelector.addObject("CENTER", 1);
@@ -52,7 +50,7 @@ public class AutonomousCommand extends CommandGroup {
 		 */
 		class GameData {
 			// Class to take a gameData sequence such as "RLR" and split into 3 enum values
-			public FieldPosition nearSwitch, scale, farSwitch;//Will be fixed
+			private FieldPosition nearSwitch, scale, farSwitch;
 			private FieldPosition splitChar(char c) {
 				return (c == 'L') ? FieldPosition.LEFT : FieldPosition.RIGHT;
 			}
@@ -61,6 +59,9 @@ public class AutonomousCommand extends CommandGroup {
 				scale = splitChar(gd.charAt(1));
 				farSwitch = splitChar(gd.charAt(2));
 			}
+			public FieldPosition getNearSwitch() { return nearSwitch; }
+			public FieldPosition getScale() { return scale; }
+			public FieldPosition getFarSwitch() { return farSwitch; }
 		}
 		/**
 		 * The movement commands used in the sequences
@@ -72,78 +73,72 @@ public class AutonomousCommand extends CommandGroup {
 			private double turnSpeed = 0.25;
 			private double curveSpeed = 0.4;
 			private static final int MAX_ELEVATOR = 0;//TODO replace with correct value
-			
+
 			//robot driving commands
 			public AutoCmd() {
 				addSequential(new ResetEncoders());
 				addSequential(new ResetGyro());
 			}
-			public void setDriveSpeed(double speed) {//Will be fixed
-				driveSpeed=speed;
-			}
-			public void setTurnSpeed(double speed) {//Will be fixed
-				turnSpeed=speed;
-			}
+			public void setDriveSpeed(double speed) { driveSpeed=speed; }
+			public void setTurnSpeed(double speed) { turnSpeed=speed; }
+
+	    	/*
+	    	 * A note on Encoders and the sign of distance:
+	    	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
+	    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
+	    	 */
 			public void driveForward(double distance) {
 				System.out.println("DRIVEFORWARD");
 				addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance));
 			}
-			public void driveBackward(double distance) {//Will be fixed
+			public void driveBackward(double distance) {
 				addSequential(new PIDAutoDrive(BACKWARD*driveSpeed, distance));
 			}
-			public void turnLeft() {
-				turnLeft(90);
-			}
+
 			public void turnLeft(double angle) {
 				addSequential(new AutoTurn(turnSpeed, angle));
 			}
-			public void turnRight() {//Will be fixed
-				turnLeft(-90);
-			}
-			public void turnRight(double angle) {
-				turnLeft(-angle);
-			}
-			public void curveCounterForward(double angle, double radius) {//Will be fixed
+			public void turnLeft() { turnLeft(90); } // Default turns are 90 degree
+			public void turnRight(double angle) { turnLeft(-angle); } // right turn is a negative left turn
+			public void turnRight() { turnLeft(-90); }
+
+			public void curveCounterForward(double angle, double radius) {
 				addSequential(new AutoCurveDrive(-curveSpeed, -angle, radius));
 			}
-			public void curveClockForward(double angle, double radius) {//Will be fixed
+			public void curveClockForward(double angle, double radius) {
 				addSequential(new AutoCurveDrive(curveSpeed, angle, -radius));
 			}
-			public void curveCounterBackward(double angle, double radius) {//Will be fixed
+			public void curveCounterBackward(double angle, double radius) {
 				addSequential(new AutoCurveDrive(curveSpeed, -angle, radius));
 			}
-			public void curveClockBackward(double angle, double radius) {//Will be fixed
+			public void curveClockBackward(double angle, double radius) {
 				addSequential(new AutoCurveDrive(-curveSpeed, angle, -radius));
 			}
-			
+
 			//elevator commands
-			public void raiseElevator() {
-				//TODO create method //addSequential();
-			}
 			public void raiseElevator(double amount) {
 				//TODO create method //addSequential();
 			}
-			public void lowerElevator() {
-				raiseElevator(-MAX_ELEVATOR);
-			}
-			public void lowerElevator(double amount) {//Will be fixed
-				raiseElevator(-amount);
-			}
+			public void raiseElevator() { raiseElevator(MAX_ELEVATOR); }
+			public void lowerElevator(double amount) { raiseElevator(-amount); }
+			public void lowerElevator() { raiseElevator(-MAX_ELEVATOR); }
+
 			public void placeCube() {
 				//TODO addSequential(s) to place cube
 			}
-			public void sleep(double seconds) {//Will be fixed
+
+			public void sleep(double seconds) {
 				addSequential(new TimedCommand(seconds));
 			}
 		}
 		AutoCmd cmdIssuer = new AutoCmd();
 		GameData gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 		FieldPosition position = FieldPosition.values()[positionSelector.getSelected()];
-		
+
 		 // allows left->right and right->left to share code
 		directionBias = (position == FieldPosition.LEFT) ? 1 : -1;
-		
-		if (position == gameData.scale) {
+
+		if (position == gameData.getScale()) {
 			// we are on the same side as the scale. Leave switch for team mates
 			cmdIssuer.driveForward(150);
 			cmdIssuer.turnRight(90 * directionBias);
@@ -174,41 +169,5 @@ public class AutonomousCommand extends CommandGroup {
 			cmdIssuer.placeCube();
 			cmdIssuer.lowerElevator();			
 		}
-//				cmdIssuer.driveForward(20);
-//				cmdIssuer.curveClockForward(45, .7);
-//				cmdIssuer.driveForward(20);
-//				cmdIssuer.curveCounterForward(50, .7);
-//				cmdIssuer.driveForward(15);
-//				cmdIssuer.raiseElevator();
-//				cmdIssuer.placeCube();
-//				cmdIssuer.lowerElevator();
-//				cmdIssuer.sleep(2);
-//				cmdIssuer.curveClockBackward(90, .6);
-//				cmdIssuer.curveCounterBackward(68, .5);
-//				cmdIssuer.driveForward(12);
-		}
-		/*System.out.println("AutonomousCommand:  Wheel circumference is "+RobotMap.WHEEL_CIRCUMFERENCE);
-		// Robot.driveTrain.quadratureEncoder1.reset();
-		// Robot.driveTrain.quadratureEncoder2.reset();
-
-    	/*
-    	 * A note on Encoders and the sign of distance:
-    	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
-    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
-    	 */
-		
-		//addSequential(new PIDAutoDrive( FORWARD_SPEED_x_percent_power * 0.75, FORWARD_DISTANCE * 10 * ONE_FOOT));				// drive at % of max speed some distance
-		//addSequential(new PIDAutoDrive( BACKWARD_SPEED_x_percent_power * 0.75, BACKWARD_DISTANCE * 10 * ONE_FOOT));	// drive at % of max speed some distance
-		//  This code makes the robot drive backwards, but it doesn't stop...  FLAG  - fix this!
-//		addSequential(new PIDAutoDrive(BACKWARD_x_PERCENT_POWER * 0.2, 6 * ONE_FOOT));	// drive back the same distance - are we where we started?
-		// addSequential(new
-		// PrintOutEncoderValues(60,Robot.driveTrain.quadratureEncoder1,Robot.driveTrain.quadratureEncoder2));
-		// addSequential(new AutoTurn(0.1,180));
-		/*
-		 * From here down is for choosing Auto program There are 10 possibilities
-		 */
-
-		//final String gameData = DriverStation.getInstance().getGameSpecificMessage();
-		//int position = positionSelector.getSelected();
-
+	}
 }
