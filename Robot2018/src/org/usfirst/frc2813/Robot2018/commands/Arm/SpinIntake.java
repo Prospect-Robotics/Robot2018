@@ -14,7 +14,7 @@ import org.usfirst.frc2813.Robot2018.Robot;
 public class SpinIntake extends Command {
 	private Direction spinDirection;
 	private boolean stopAtEnd;
-	private SpeedController speedController1;
+	private SpeedController speedController;
 	/**
 	 * Spin the intake wheels
 	 * 
@@ -30,14 +30,14 @@ public class SpinIntake extends Command {
 	// Called just before this Command runs the first time
 	//@Override
 	protected void initialize() {
-		speedController1 = Robot.intake.speedController1;
+		speedController = Robot.intake.speedController;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
 		if (stopAtEnd) {
-			speedController1.set(0);
+			speedController.set(0);
 		}
 		else { 
 			Robot.intake.spin(spinDirection);
