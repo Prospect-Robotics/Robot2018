@@ -40,7 +40,7 @@ public class SpinIntake extends Command {
 			speedController1.set(0);
 		}
 		else { 
-			Robot.intake.spin(spinDirection.equals(Direction.IN));
+			Robot.intake.spin(spinDirection);
 		}
 	}
 
