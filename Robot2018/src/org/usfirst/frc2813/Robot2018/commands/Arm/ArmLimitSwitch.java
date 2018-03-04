@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
+
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 
 /*
@@ -24,11 +26,11 @@ public class ArmLimitSwitch extends Command {
 	private DigitalInput digitalInput;
 	private SpeedController speedController;
 	private Encoder encoder;
-	private boolean up;
+	private Direction direction;
 	private static final double DESIRED_ENCODER_VALUE  = 1;//TODO change value
 
-	public ArmLimitSwitch(boolean upDown) {
-		up = upDown;
+	public ArmLimitSwitch(Direction upDown) {
+		direction = upDown;
 		requires(Robot.arm);
 	}
 
@@ -41,7 +43,7 @@ public class ArmLimitSwitch extends Command {
 	}
 
 	protected void execute() {
-		if (up) {//going up
+		if (direction.equals(Direction.UP)) {//going up
 			speedController.set(1);//TODO not sure if 1 or -1 is up
 		}
 		else {//going down
@@ -50,8 +52,8 @@ public class ArmLimitSwitch extends Command {
 	}
 
 	protected boolean isFinished() {
-		if (up) {
-			return digitalInput.get() == up;
+		if (direction.equals(Direction.UP)) {
+			return digitalInput.get();
 		}
 		return encoder.getDistance() >= DESIRED_ENCODER_VALUE;
 	}
