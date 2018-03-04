@@ -2,7 +2,6 @@
 
 package org.usfirst.frc2813.Robot2018.commands.Auto;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -10,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 
+import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
@@ -39,26 +39,6 @@ public class AutonomousCommand extends CommandGroup {
 	 * sequence to run.
 	 */
 	public AutonomousCommand() {
-		/**
-		 * The game data from the driver station:
-		 * Which side of the near switch, scale, and far switch we have.
-		 * Data is passed as a single string with each piece as a 'L' or 'R'.
-		 */
-		class GameData {
-			private Direction nearSwitch, scale, farSwitch;
-			private Direction splitChar(char c) {
-				return (c == 'L') ? Direction.LEFT : Direction.RIGHT;
-			}
-			GameData(String gd) {
-				nearSwitch = splitChar(gd.charAt(0));
-				scale = splitChar(gd.charAt(1));
-				farSwitch = splitChar(gd.charAt(2));
-			}
-			public Direction getNearSwitch() { return nearSwitch; }
-			public Direction getScale() { return scale; }
-			public Direction getFarSwitch() { return farSwitch; }
-		}
-
 		/**
 		 * AutoCmd - generate the autonomous command sequence
 		 * constructor sets encoders and gyro.
@@ -137,16 +117,13 @@ public class AutonomousCommand extends CommandGroup {
 		// Generate a command list into which we will place autonomous commands
 		AutoCmd autoCmdList = new AutoCmd();
 
-		// Read the state of the field pieces
-		GameData gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
-
 		// Read our location on the field
 		Direction position = positionSelector.getSelected();
 
 		 // allows left->right and right->left to share code
 		directionBias = (position == Direction.LEFT) ? 1 : -1;
 
-		if (position == gameData.getScale()) {
+		if (position == RobotMap.gameData.getScale()) {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(150);
 			autoCmdList.turnRight(90 * directionBias);
