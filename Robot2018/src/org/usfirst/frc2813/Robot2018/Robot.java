@@ -11,8 +11,6 @@
 
 package org.usfirst.frc2813.Robot2018;
 
-import edu.wpi.first.wpilibj.command.CommandGroup;
-
 //TODO: move to commandGroups
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
 
@@ -29,7 +27,6 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
