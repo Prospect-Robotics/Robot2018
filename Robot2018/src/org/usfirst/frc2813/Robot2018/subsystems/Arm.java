@@ -4,6 +4,7 @@ import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MaintainArmPosition;
 import org.usfirst.frc2813.Robot2018.commands.Arm.Obsolete.ArmSolenoid;
 
+import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -37,7 +38,9 @@ public class Arm extends Subsystem {
 		srxController.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		srxController.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
 		srxController.configForwardSoftLimitEnable(true,10);
-		srxController.configForwardSoftLimitThreshold((int) (ARM_DEGREES *)
+		srxController.configForwardSoftLimitThreshold((int) (ARM_DEGREES * RobotMap.ELEVATOR_PULSES_PER_INCH), ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		srxController.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+
 	}
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
