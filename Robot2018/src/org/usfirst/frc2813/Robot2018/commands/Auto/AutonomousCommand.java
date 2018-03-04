@@ -53,18 +53,18 @@ public class AutonomousCommand extends CommandGroup {
 		 */
 		class GameData {
 			// Class to take a gameData sequence such as "RLR" and split into 3 enum values
-			private FieldPosition nearSwitch, scale, farSwitch;
-			private FieldPosition splitChar(char c) {
-				return (c == 'L') ? FieldPosition.LEFT : FieldPosition.RIGHT;
+			private Direction nearSwitch, scale, farSwitch;
+			private Direction splitChar(char c) {
+				return (c == 'L') ? Direction.LEFT : Direction.RIGHT;
 			}
 			GameData(String gd) {
 				nearSwitch = splitChar(gd.charAt(0));
 				scale = splitChar(gd.charAt(1));
 				farSwitch = splitChar(gd.charAt(2));
 			}
-			public FieldPosition getNearSwitch() { return nearSwitch; }
-			public FieldPosition getScale() { return scale; }
-			public FieldPosition getFarSwitch() { return farSwitch; }
+			public Direction getNearSwitch() { return nearSwitch; }
+			public Direction getScale() { return scale; }
+			public Direction getFarSwitch() { return farSwitch; }
 		}
 		/**
 		 * The movement commands used in the sequences
@@ -142,10 +142,11 @@ public class AutonomousCommand extends CommandGroup {
 		}
 		AutoCmd cmdIssuer = new AutoCmd();
 		GameData gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
-		FieldPosition position = FieldPosition.values()[positionSelector.getSelected()];
+		Direction[] positionsList = {Direction.LEFT,Direction.CENTER,Direction.RIGHT};//TODO do this better
+		Direction position = positionsList[positionSelector.getSelected()];
 
 		 // allows left->right and right->left to share code
-		directionBias = (position == FieldPosition.LEFT) ? 1 : -1;
+		directionBias = (position == Direction.LEFT) ? 1 : -1;
 
 		if (position == gameData.getScale()) {
 			// we are on the same side as the scale. Leave switch for team mates
@@ -155,7 +156,7 @@ public class AutonomousCommand extends CommandGroup {
 			cmdIssuer.dropCube();
 			cmdIssuer.lowerElevator();
 		}
-		else if (position != FieldPosition.CENTER) {
+		else if (position != Direction.CENTER) {
 			// from far side we cross over between switch and scale and place block on scale
 			cmdIssuer.driveForward(50);
 			cmdIssuer.turnRight(45 * directionBias);
@@ -168,7 +169,7 @@ public class AutonomousCommand extends CommandGroup {
 		else {
 			// We are in the center start position
 			 // allows left->right and right->left to share code
-			directionBias = (position == FieldPosition.LEFT) ? 1 : -1;
+			directionBias = (position == Direction.LEFT) ? 1 : -1;
 
 			cmdIssuer.driveForward(10); // enough to turn
 			cmdIssuer.turnLeft(45 * directionBias);
