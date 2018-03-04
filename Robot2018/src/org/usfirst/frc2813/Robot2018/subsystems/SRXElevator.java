@@ -54,9 +54,9 @@ public class SRXElevator extends Subsystem {
 		// For some reason CTRE decided that two slots would be enough for everything.
 		//motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
-		/*motor.configForwardSoftLimitEnable(true, 10);
-		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);*/
-		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		motor.configForwardSoftLimitEnable(true, 10);
+		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * RobotMap.ELEVATOR_PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		/*//TODO BELOW IS THE CHANGED CODE - REMOVE WHEN CORRECTED
 		motor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 		motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);

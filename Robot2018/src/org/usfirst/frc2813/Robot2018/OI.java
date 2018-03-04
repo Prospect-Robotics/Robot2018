@@ -19,7 +19,7 @@ import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommand;
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.Obsolete.ShiftGears;
@@ -143,7 +143,7 @@ public class OI {
 
         // SmartDashboard Buttons
         SmartDashboard.putData("OIDrive", new OIDrive());
-        SmartDashboard.putData("Autonomous Command", new AutonomousCommand());
+        SmartDashboard.putData("Autonomous Command", new AutonomousCommandGroup());
         SmartDashboard.putData("ToggleRelay0", new ShiftGears());
         //SmartDashboard.putData("ToggleRelay1", new ToggleRelay1());
         //SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
