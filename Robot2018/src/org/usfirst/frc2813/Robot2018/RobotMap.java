@@ -72,8 +72,8 @@ public class RobotMap {
 	public static final int SRX_MAG_PULSES_PER_REVOLUTION = 4096; // pulses per revolution on a Talon SRX branded magnetic encoder, commonly known as an "SRX mag".
 	public static final double SRX_VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.  One second equals 1000 millseconds.
 	public static final double ELEVATOR_INCHES_PER_REVOLUTION = Math.PI * 1.25;
-	public static final double ELEVATOR_INCHES_PER_PULSE = ELEVATOR_INCHES_PER_REVOLUTION / (double) SRX_MAG_PULSES_PER_REVOLUTION;
-	public static final double ELEVATOR_PULSES_PER_INCH = SRX_MAG_PULSES_PER_REVOLUTION / (double) ELEVATOR_INCHES_PER_REVOLUTION;
+	public static final double ELEVATOR_INCHES_PER_PULSE = ELEVATOR_INCHES_PER_REVOLUTION / SRX_MAG_PULSES_PER_REVOLUTION;
+	public static final double ELEVATOR_PULSES_PER_INCH = SRX_MAG_PULSES_PER_REVOLUTION / ELEVATOR_INCHES_PER_REVOLUTION;
 
 	public static final double ARM_GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.  You can remove the /1 if you like.
 	public static final double ARM_PULSES_PER_REVOLUTION = ARM_GEAR_RATIO * SRX_MAG_PULSES_PER_REVOLUTION;
