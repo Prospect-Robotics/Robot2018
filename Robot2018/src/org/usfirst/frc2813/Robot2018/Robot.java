@@ -20,7 +20,6 @@ import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
-import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
