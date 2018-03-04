@@ -126,8 +126,8 @@ public class OI {
         spinIntakeIn.whenReleased(new SpinIntake(true, true));
         //new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
         //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
-        new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(true));
-        new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(false));
+        new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(Direction.UP));
+        new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(Direction.DOWN));
         new JoystickButton(buttonPanel, 9).whenPressed(new ToggleSolenoidGeneral(RobotMap.armSingleSolenoid));
         
         
