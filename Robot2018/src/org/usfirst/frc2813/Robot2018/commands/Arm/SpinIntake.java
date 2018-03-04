@@ -24,13 +24,13 @@ public class SpinIntake extends Command {
 	public SpinIntake(Direction spinDirectionIn, boolean stopAtEnd) {
 		this.spinDirection=spinDirectionIn;
 		this.stopAtEnd=stopAtEnd;
-		requires(Robot.intake);
+		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
 	//@Override
 	protected void initialize() {
-		speedController = Robot.intake.speedController;
+		speedController = Robot.arm.speedController;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -40,7 +40,7 @@ public class SpinIntake extends Command {
 			speedController.set(0);
 		}
 		else { 
-			Robot.intake.spin(spinDirection);
+			Robot.arm.spinIntake(spinDirection);
 		}
 	}
 
