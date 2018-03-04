@@ -46,7 +46,6 @@ public class Robot extends TimedRobot {
     public static OI oi;
     public static DriveTrain driveTrain;
     public static Elevator elevator;
-    public static Intake intake;
     public static Arm arm;
     public static UsbCamera camera;
     
@@ -76,7 +75,6 @@ public class Robot extends TimedRobot {
 		RobotMap.init();
         driveTrain = new DriveTrain();
         elevator = new Elevator();
-        intake = new Intake();
         arm = new Arm();
 
         // OI must be constructed after subsystems. If the OI creates Commands
