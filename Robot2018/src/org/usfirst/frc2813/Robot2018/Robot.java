@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
  * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the build.properties file in 
+ * creating this project, you must also update the build.properties file in
  * the project.
  */
 public class Robot extends TimedRobot {
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
 	public static int startRelativePositionArm;
 
 	/*
-	 * Test code for the Talon SRX PID controllers - using another team's odd variable names 
+	 * Test code for the Talon SRX PID controllers - using another team's odd variable names
 	 * to avoid conflict with our own
 	 */
 	/*
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
 	 */
 	//@Override
 	public void robotInit() {
-		System.out.println("In robotInit");      
+		System.out.println("In robotInit");
 
 		RobotMap.init();
 		driveTrain = new DriveTrain();
@@ -101,17 +101,17 @@ public class Robot extends TimedRobot {
 				Constants.kTimeoutMs);
 
 		startAbsolutePositionElevator = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);
-		
-		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.maintainPIDLoopIdx, 
+
+		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
-		
+
 		startRelativePositionElevator = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);
-		
+
 		/* choose to ensure sensor is positive when output is positive */
 		RobotMap.srxElevator.setSensorPhase(Constants.kSensorPhase);
 
 		/* choose based on what direction you want forward/positive to be.
-		 * This does not affect sensor phase. */ 
+		 * This does not affect sensor phase. */
 		RobotMap.srxElevator.setInverted(Constants.kMotorInvert);
 
 		/* set the peak and nominal outputs, 12V means full */
@@ -119,7 +119,7 @@ public class Robot extends TimedRobot {
 		RobotMap.srxElevator.configNominalOutputReverse(0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.configPeakOutputForward(1, Constants.kTimeoutMs);
 		RobotMap.srxElevator.configPeakOutputReverse(-1, Constants.kTimeoutMs);
-		
+
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be
 		 * neutral within this range. See Table in Section 17.2.1 for native
@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
 		RobotMap.srxArm.setSensorPhase(Constants.kSensorPhase);
 
 		/* choose based on what direction you want forward/positive to be.
-		 * This does not affect sensor phase. */ 
+		 * This does not affect sensor phase. */
 		RobotMap.srxArm.setInverted(Constants.kMotorInvert);
 
 		/* set the peak and nominal outputs, 12V means full */

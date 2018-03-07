@@ -13,14 +13,13 @@ import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroupGenerator;
 
 
 /**
  * AutoCmd - generate the autonomous command sequence. Note that this class constructs
  * the command list and provides methods to add new commands and then calls a generator
  * to generate the command list based on field setup.
- * 
+ *
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
@@ -29,7 +28,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private double driveSpeed = 1;
 	private double turnSpeed = 0.25;
 	private double curveSpeed = 0.4;
-	private AutonomousCommandGroupGenerator autoGenerator;
 
 	public AutonomousCommandGroup() {
 		addSequential(new ResetEncoders());
