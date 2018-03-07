@@ -47,6 +47,10 @@ public class Robot extends TimedRobot {
 	public static Elevator elevator;
 	public static Arm arm;
 	public static UsbCamera camera;
+	public static int startAbsolutePositionElevator;
+	public static int startRelativePositionElevator;
+	public static int startAbsolutePositionArm;
+	public static int startRelativePositionArm;
 
 	/*
 	 * Test code for the Talon SRX PID controllers - using another team's odd variable names 
@@ -93,9 +97,16 @@ public class Robot extends TimedRobot {
 		 */
 
 		/* choose the sensor and sensor direction */
-		RobotMap.srxElevator.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, Constants.maintainPIDLoopIdx,
+		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
 
+		startAbsolutePositionElevator = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);
+		
+		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.maintainPIDLoopIdx, 
+				Constants.kTimeoutMs);
+		
+		startRelativePositionElevator = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);
+		
 		/* choose to ensure sensor is positive when output is positive */
 		RobotMap.srxElevator.setSensorPhase(Constants.kSensorPhase);
 
@@ -108,7 +119,7 @@ public class Robot extends TimedRobot {
 		RobotMap.srxElevator.configNominalOutputReverse(0, Constants.kTimeoutMs);
 		RobotMap.srxElevator.configPeakOutputForward(1, Constants.kTimeoutMs);
 		RobotMap.srxElevator.configPeakOutputReverse(-1, Constants.kTimeoutMs);
-
+		
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be
 		 * neutral within this range. See Table in Section 17.2.1 for native

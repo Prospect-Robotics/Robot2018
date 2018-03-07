@@ -20,7 +20,6 @@ public class Elevator extends Subsystem {
 	
 	
 	// TODO find maximum allowable elevator height; 24 is only a placeholder.
-	@SuppressWarnings("unused")
 	private static final double ELEVATOR_HEIGHT = 24; // inches
 
 	public static final int TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS = 10;
