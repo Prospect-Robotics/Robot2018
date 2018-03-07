@@ -2,47 +2,25 @@
 
 // FIXME! This is a command from the intake subsystem, but is in the arm package. Move it!
 package org.usfirst.frc2813.Robot2018.commands.Arm;
+
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 
 /**
- * Spin or halt the Robot arm intake
+ * Open the Robot arm jaws
  */
-public class SpinIntake extends Command {
-	/**
-	 * Spin the intake wheels
-	 * 
-	 * @param spinDirectionIn - true is spin direction in; false if out
-	 * @param stopAtEnd - set motors to 0 when button is released
-	 */
-	private boolean halted;
-	private Direction direction;
-
-	public SpinIntake() {
-		halted = true;
-		requires(Robot.arm);
-	}
-	public SpinIntake(Direction direction) {
-		Robot.arm.setIntakeDirection(direction);
-		halted = false;
+public class OpenJaws extends Command {
+	public OpenJaws() {
 		requires(Robot.arm);
 	}
 
-	// Called just before this Command runs the first time
 	//@Override
 	protected void initialize() {}
 
-	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (halted) {
-			Robot.arm.haltIntake();
-		}
-		else { 
-			Robot.arm.spinIntake();
-		}
+		Robot.arm.openJaws();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

@@ -20,56 +20,67 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
- *
+ * Move or maintain arm position.
  */
 public class MoveArm extends Command {
-	private TalonSRX speedController1;
+	private boolean halted;
 	private Direction direction;
-	
-	private static final double ONE_DEGREE_PER_SECOND = RobotMap.ARM_ONE_DEGREE_PER_SECOND; // 36 = 360 (number of degrees in a circle) / 10 (set(ControlMode.Velocity) expects velocity in units of ticks per 100ms; a second is 1000ms).
-	
-	/**
-	 * Move the arm up or down
-	 * @param upDown the direction, true for up, false for down
-	 */
-    public MoveArm(Direction upDown) {//if moving up, true; down, false; stop is for release of button
-    	direction=upDown;
-        requires(Robot.arm);
-    }
 
-    // Called just before this Command runs the first time
-    //@Override
-    protected void initialize() {
-    	RobotMap.srxArm.selectProfileSlot(1, 1);
-    	
-    	speedController1 = Robot.arm.srxController;
-    }
+	public MoveArm() {
+		halted = true;
+		requires(Robot.arm);
+	}
+	public MoveArm(Direction direction) {
+		Robot.arm.setArmDirection(direction);
+		this.direction = direction;
+		halted = false;
+		requires(Robot.arm);
+	}
 
-    // Called repeatedly when this Command is scheduled to run
-    //@Override
-    protected void execute() {
-    	if(direction == Direction.UP) {
-    		speedController1.set(ControlMode.Velocity,-5*ONE_DEGREE_PER_SECOND);//TODO not sure if 1 or -1 is up
-    	}
-    	else if (direction == Direction.DOWN) {
-    		speedController1.set(ControlMode.Velocity,5*ONE_DEGREE_PER_SECOND);//TODO not sure if -1 or 1 is down
-    	}
-    }
+	// Called just before this Command runs the first time
+	//@Override
+	protected void initialize() {
+		Robot.arm.haltArm();
+	}
 
-    // Make this return true when this Command no longer needs to run execute()
-    //@Override
-    protected boolean isFinished() {
-        return false;
-    }
+	// Called repeatedly when this Command is scheduled to run
+	//@Override
+	protected void execute() {
+		if (halted) {
+			Robot.arm.haltArm();
+		}
+		else {
+			Robot.arm.moveArm();
+		}
+	}
 
-    // Called once after isFinished returns true
-    @Override
-    protected void end() {
-    }
+	// Make this return true when this Command no longer needs to run execute()
+	//@Override
+	protected boolean isFinished() {
+		double current_position, end_position, tmp;
+		if (halted) {
+			return true;
+		}
+		current_position = Robot.arm.readArmPosition();
+		end_position = Robot.arm.readArmEndPosition();
+		
+		// swap so we can do one compare
+		if (direction == Direction.DOWN) {
+			tmp = current_position;
+			current_position = end_position;
+			end_position = tmp;
+		}
+		if (current_position >= end_position) {
+			halted = true;
+			Robot.arm.haltArm();
+			return true;
+		}
+		return false;
+	}
 
-    // Called when another command which requires one or more of the same
-    // subsystems is scheduled to run
-    @Override
-    protected void interrupted() {
-    }
+	@Override
+	protected void end() {}
+
+	@Override
+	protected void interrupted() {}
 }

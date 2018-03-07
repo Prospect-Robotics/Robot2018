@@ -62,6 +62,8 @@ public class RobotMap {
 	//public static Encoder armQuadratureEncoder;
 	//public static DigitalInput armLimitSwitch;
 
+	// TODO: these belong in the subsystems - SRX constants belong in new file - srx class with wrapper
+	// of SRX functions
 	private static final double WHEEL_DIAMETER = 4;
 	public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 	//public static final double REVOLUTIONS_PER_INCH = 1.0 / WHEEL_CIRCUMFERENCE;
@@ -75,10 +77,6 @@ public class RobotMap {
 	public static final double ELEVATOR_INCHES_PER_PULSE = ELEVATOR_INCHES_PER_REVOLUTION / SRX_MAG_PULSES_PER_REVOLUTION;
 	public static final double ELEVATOR_PULSES_PER_INCH = SRX_MAG_PULSES_PER_REVOLUTION / ELEVATOR_INCHES_PER_REVOLUTION;
 
-	public static final double ARM_GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.  You can remove the /1 if you like.
-	public static final double ARM_PULSES_PER_REVOLUTION = ARM_GEAR_RATIO * SRX_MAG_PULSES_PER_REVOLUTION;
-	public static final double ARM_ONE_DEGREE = ARM_PULSES_PER_REVOLUTION / 360;
-	public static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * SRX_VELOCITY_TIME_UNITS_PER_SEC;
 
 	@SuppressWarnings("deprecation")
 	public static void init() {

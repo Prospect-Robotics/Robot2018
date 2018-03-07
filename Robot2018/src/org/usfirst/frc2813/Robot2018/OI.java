@@ -99,11 +99,11 @@ public class OI {
  
         new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
-        spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT, false));
-        spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT, true));
+        spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
+        spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
         spinIntakeIn = new JoystickButton(buttonPanel, 1);
-        spinIntakeIn.whileHeld(new SpinIntake(Direction.IN, false));
-        spinIntakeIn.whenReleased(new SpinIntake(Direction.IN, true));
+        spinIntakeIn.whileHeld(new SpinIntake(Direction.IN));
+        spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
         //new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
         //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
         new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(Direction.UP));

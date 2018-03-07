@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 /*
  * TODO: This class needs to be coded for the Talon SRX
  * Need to decide what this class is used for - SHOULD IT STILL BE USED?
@@ -29,30 +31,29 @@ public class ArmLimitSwitch extends Command {
 	private Direction direction;
 	private static final double DESIRED_ENCODER_VALUE  = 1;//TODO change value
 
-	public ArmLimitSwitch(Direction upDown) {
-		direction = upDown;
+	public ArmLimitSwitch(Direction direction) {
+		this.direction = direction;
 		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
 	//@Override
 	protected void initialize() {
-		/*digitalInput = Robot.arm.limitSwitch;
-    	speedController = Robot.arm.speedController;
-    	encoder = Robot.arm.encoder;*/
+		//FIXME! this is wrong. Command is broken for now
+		//digitalInput = Robot.arm.srxController.limitSwitch;
+    		//speedController = Robot.arm.speedController;
+    		//encoder = Robot.arm.encoder;
 	}
 
 	protected void execute() {
-		if (direction.equals(Direction.UP)) {//going up
-			speedController.set(1);//TODO not sure if 1 or -1 is up
-		}
-		else {//going down
-			speedController.set(-1);//TODO not sure if -1 or 1 is down	
-		}
+		double encoder_value = DESIRED_ENCODER_VALUE;
+		encoder_value *= direction == Direction.UP ? 1 : -1;
+		speedController.set(encoder_value);		
 	}
 
 	protected boolean isFinished() {
-		if (direction.equals(Direction.UP)) {
+		if (direction == Direction.UP) {
+			//FIXME! makes no sense! What are we trying to do here?
 			return digitalInput.get();
 		}
 		return encoder.getDistance() >= DESIRED_ENCODER_VALUE;
