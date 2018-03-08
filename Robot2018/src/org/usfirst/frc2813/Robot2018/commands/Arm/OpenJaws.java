@@ -3,38 +3,20 @@
 // FIXME! This is a command from the intake subsystem, but is in the arm package. Move it!
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.InstantCommand;
 
-import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
 /**
  * Open the Robot arm jaws
  */
-public class OpenJaws extends Command {
+public class OpenJaws extends InstantCommand {
 	public OpenJaws() {
-		requires(Robot.arm);
+		super();
 	}
 
 	//@Override
-	protected void initialize() {}
-
-	@Override
-	protected void execute() {
-		Robot.arm.openJaws();
+	protected void initialize() {
+		Arm.openJaws();
 	}
-
-	// Make this return true when this Command no longer needs to run execute()
-	//@Override
-	protected boolean isFinished() {
-		return true;
-	}
-
-	// Called once after isFinished returns true
-	@Override
-	protected void end() {}
-
-	// Called when another command which requires one or more of the same
-	// subsystems is scheduled to run
-	@Override
-	protected void interrupted() {}
 }
