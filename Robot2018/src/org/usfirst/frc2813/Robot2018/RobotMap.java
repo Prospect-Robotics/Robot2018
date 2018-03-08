@@ -36,6 +36,9 @@ public class RobotMap {
 	// Read the state of the field pieces
 	public static GameData gameData;
 
+	/*
+	 *  Drive Train Subsystem
+	 */
 	public static WPI_VictorSPX driveTrainSpeedControllerPort;// Port Motor
 	public static WPI_VictorSPX driveTrainSpeedControllerStarboard;// Starboard Motor
 	public static VictorSPX driveTrainSpeedControllerPortFollow;
@@ -47,34 +50,31 @@ public class RobotMap {
 	public static Solenoid driveTrainSingleSolenoid;
 	public static Solenoid armSingleSolenoid;//for the competition bot
 
-	public static TalonSRX srxElevator;		// TODO:  rename when we are sure this works; NOT WPI_TalonSRX - need the CTRE libraries
-
-	public static TalonSRX srxArm;			// TODO:  rename when we are sure this works; NOT WPI_TalonSRX - need the CTRE libraries
-
+	/*
+	 * Elevator Subsystem
+	 */
+	public static TalonSRX srxElevator;                     // Elevator motor controller
 	public static Solenoid elevatorRatchet;
 	public static Solenoid climbingBar;
 	public static VictorSPX elevatorSpeedControllerPort;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
 															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
 	public static VictorSPX elevatorSpeedControllerStarboard;		//  Controller Starboard will follow controller Port; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
 	public static VictorSPX elevatorSpeedControllerPortFollow;		//  Controller PortFollow is the paired motor with controller Port; it will follow 1
+	
+	/*
+	 * Arm Subsystem. This subsystem includes the arm, intake and jaws
+	 */
+	public static TalonSRX srxArm;                         // Arm motor controller
 	public static WPI_VictorSPX intakeSpeedController;
 	public static VictorSPX intakeSpeedControllerFollow;
 	//public static Encoder armQuadratureEncoder;
 	//public static DigitalInput armLimitSwitch;
 
-	// TODO: these belong in the subsystems - SRX constants belong in new file - srx class with wrapper
-	// of SRX functions
-	private static final double WHEEL_DIAMETER = 4;
-	public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-	//public static final double REVOLUTIONS_PER_INCH = 1.0 / WHEEL_CIRCUMFERENCE;
-	public static final double PULSES_PER_REVOLUTION = 768; // it should be 256 but the robot only % as far as it should with 256
-	//public static final double PULSES_PER_INCH = PULSES_PER_REVOLUTION * REVOLUTIONS_PER_INCH;goes ~80
-	public static final double DRIVE_TRAIN_INCHES_PER_PULSE = WHEEL_CIRCUMFERENCE / PULSES_PER_REVOLUTION; // inches per revolution times revolutions per pulse (1/pulses per revolution) equals inches per pulse.
-
-	public static final double ELEVATOR_INCHES_PER_REVOLUTION = Math.PI * 1.25;
-	public static final double ELEVATOR_INCHES_PER_PULSE = ELEVATOR_INCHES_PER_REVOLUTION / Talon.PULSES_PER_REVOLUTION;
-	public static final double ELEVATOR_PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / ELEVATOR_INCHES_PER_REVOLUTION;
-
+	/*
+	 * Called from Robot constructor before subsystems are constructed.
+	 * Construct low level objects for the subsystems such as motor controllers
+	 * and solenoids.
+	 */
 	@SuppressWarnings("deprecation")
 	public static void init() {
 
@@ -96,6 +96,9 @@ public class RobotMap {
 		 * (12) TalonSRX Arm
 		 */
 
+		/*
+		 * Drive Train subsystem
+		 */
 		driveTrainSpeedControllerPort = new WPI_VictorSPX(1);
 		driveTrainSpeedControllerPort.setName("DriveTrain", "Port Motor");
 		driveTrainSpeedControllerPort.setInverted(false);
@@ -121,6 +124,8 @@ public class RobotMap {
 
 		driveTrainQuadratureEncoderStarboard = new Encoder(10, 11, true, EncodingType.k4X);// port 0 2*0+10=10, port 0 2*0+11=11
 		LiveWindow.addSensor("DriveTrain", "Starboard Encoder", driveTrainQuadratureEncoderStarboard);
+		
+		// FIXME! move to subsystem
 		driveTrainQuadratureEncoderStarboard.setDistancePerPulse(DRIVE_TRAIN_INCHES_PER_PULSE);
 		driveTrainQuadratureEncoderStarboard.setSamplesToAverage(1);
 		driveTrainQuadratureEncoderStarboard.setPIDSourceType(PIDSourceType.kRate);
@@ -134,10 +139,9 @@ public class RobotMap {
 		LiveWindow.addActuator("DriveTrain", "Solenoid 1", driveTrainSingleSolenoid);
 
 		/*
-		 * Testing the Talon motor controller
+		 * Elevator subsystem
 		 */
 		srxElevator = new TalonSRX(10);		// CAN bus slot 10
-		srxElevator.setInverted(false);
 
 		//  TODO:  Add better comments about port numbering
 		//  In the 2018 robot, we have motor controllers mounted on each side of the robot (Port and Starboard)
@@ -163,11 +167,15 @@ public class RobotMap {
 		/*
 		 * Talon motor controller for Arm
 		 */
+		/*
+		 * Arm Subsystem
+		 */
 		srxArm = new TalonSRX(12);		// CAN bus slot 12
-		srxArm.setInverted(false);
 
 		intakeSpeedController = new WPI_VictorSPX(11);	//  Competition bot changed from 5 to 11
-		LiveWindow.addActuator("Intake", "Speed Controller 1", (WPI_VictorSPX) intakeSpeedController);
+		LiveWindow.addActuator("Intake", "Speed Controller 1", intakeSpeedController);
+		
+		// FIXME move to subsystem
 		intakeSpeedController.setInverted(false);
 		intakeSpeedControllerFollow = new VictorSPX(6);
 		intakeSpeedControllerFollow.set(ControlMode.Follower, intakeSpeedController.getDeviceID());

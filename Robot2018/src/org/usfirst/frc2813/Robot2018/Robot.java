@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
 	public static int startAbsolutePositionArm;
 	public static int startRelativePositionArm;
 
-
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -75,8 +74,6 @@ public class Robot extends TimedRobot {
 		/* choose the sensor and sensor direction */
 		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
-
-		startAbsolutePositionElevator = RobotMap.srxElevator.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);
 
 		RobotMap.srxElevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.maintainPIDLoopIdx,
 				Constants.kTimeoutMs);
