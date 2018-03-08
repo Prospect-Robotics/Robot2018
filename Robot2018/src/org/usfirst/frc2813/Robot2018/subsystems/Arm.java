@@ -101,7 +101,7 @@ public class Arm extends Subsystem {
 		double speed = armSpeed;
 		speed *= armDirection == Direction.UP ? 1 : -1;
 		RobotMap.srxArm.set(ControlMode.Velocity, speed);	
-		System.out.printf("Starting arm movement. Speed %lf", speed);
+		System.out.printf("Starting arm movement. Speed %f", speed);
 	}
 	
 	// stop arm from moving - this is active as we require pid to resist gravity
@@ -112,7 +112,7 @@ public class Arm extends Subsystem {
 		armIsHalted = false;//FIXME True or false here?
 		RobotMap.srxArm.selectProfileSlot(0, 0);
 		RobotMap.srxArm.set(ControlMode.Position, readArmPosition());
-		System.out.println(String.format("Halting arm movement. Position {0}", readArmPosition()));
+		System.out.printf("Halting arm movement. Position %f", readArmPosition());
 	}
 
 	// Manage jaws
