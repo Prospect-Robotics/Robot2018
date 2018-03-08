@@ -43,17 +43,19 @@ public class Arm extends Subsystem {
 	static final double ARM_ONE_DEGREE = ARM_PULSES_PER_REVOLUTION / 360;
 	static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * RobotMap.SRX_VELOCITY_TIME_UNITS_PER_SEC;
 	static final double ARM_DEFAULT_SPEED = 5 * ARM_ONE_DEGREE_PER_SECOND;
+	static final double ARM_MIN = 0.0;
+	static final double ARM_MAX = ARM_ONE_DEGREE * ARM_DEGREES;
 
-	public static final int ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS = 10;
-	public static final int ARM_TALON_SRX_RUNTIME_TIMEOUT_DEFAULT_MS = 0;
+	// TODO: Move to Talon
+	public static final int TALON_TIMEOUT_TO_CONFIGURE_MS = 10;
 	
 	public Arm() {
 		// TODO: create srx controller class. Move most of this code there
-		RobotMap.srxArm.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		RobotMap.srxArm.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_TIMEOUT_TO_CONFIGURE_MS);
 		RobotMap.srxArm.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
-		RobotMap.srxArm.configForwardSoftLimitEnable(true,10);
-		RobotMap.srxArm.configForwardSoftLimitThreshold((int) (ARM_DEGREES * RobotMap.ELEVATOR_PULSES_PER_INCH), ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		RobotMap.srxArm.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, ARM_TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+		RobotMap.srxArm.configForwardSoftLimitEnable(true, 10);
+		RobotMap.srxArm.configForwardSoftLimitThreshold((int) (ARM_MAX), TALON_TIMEOUT_TO_CONFIGURE_MS);
+		// RobotMap.srxArm.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, TALON_TIMEOUT_TO_CONFIGURE_MS);
 
 		// track state and change as required. Start in moving so initialize can halt
 		armIsHalted = false;
@@ -76,7 +78,7 @@ public class Arm extends Subsystem {
 			return 0.0;
 		}
 		else {
-			return ARM_DEGREES; // FIXME! what is the correct value here?
+			return ARM_MAX;
 		}
 	}
 
@@ -90,7 +92,7 @@ public class Arm extends Subsystem {
 		double speed = armSpeed;
 		speed *= armDirection == Direction.UP ? 1 : -1;
 		RobotMap.srxArm.set(ControlMode.Velocity, speed);	
-		System.out.println(String.format("Starting arm movement. Speed {0}", speed));
+		System.out.printf("Starting arm movement. Speed %d", speed);
 	}
 	
 	// stop arm from moving - this is active as we require pid to resist gravity

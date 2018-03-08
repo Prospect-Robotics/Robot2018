@@ -11,10 +11,6 @@ import org.usfirst.frc2813.Robot2018.subsystems.Arm;
  * Open the Robot arm jaws
  */
 public class OpenJaws extends InstantCommand {
-	public OpenJaws() {
-		super();
-	}
-
 	//@Override
 	protected void initialize() {
 		Arm.openJaws();

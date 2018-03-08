@@ -31,7 +31,6 @@ public class MoveArm extends Command {
 		Arm.setArmDirection(direction);
 		this.direction = direction;
 		halted = false;
-		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
