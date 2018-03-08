@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
 /**
  * Spin or halt the Robot arm intake
@@ -22,12 +23,10 @@ public class SpinIntake extends Command {
 
 	public SpinIntake() {
 		halted = true;
-		requires(Robot.arm);
 	}
 	public SpinIntake(Direction direction) {
-		Robot.arm.setIntakeDirection(direction);
+		Arm.setIntakeDirection(direction);
 		halted = false;
-		requires(Robot.arm);
 	}
 
 	// Called just before this Command runs the first time
@@ -38,10 +37,10 @@ public class SpinIntake extends Command {
 	@Override
 	protected void execute() {
 		if (halted) {
-			Robot.arm.haltIntake();
+			Arm.haltIntake();
 		}
 		else { 
-			Robot.arm.spinIntake();
+			Arm.spinIntake();
 		}
 	}
 
