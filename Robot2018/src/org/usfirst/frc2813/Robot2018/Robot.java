@@ -88,8 +88,8 @@ public class Robot extends TimedRobot {
 		// Add commands to Autonomous Sendable Chooser
 
 		// initialize the camera
-		camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(640, 480);
+		//camera = CameraServer.getInstance().startAutomaticCapture();
+		//camera.setResolution(640, 480);
 
 
 		/*
