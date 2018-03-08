@@ -1,0 +1,10 @@
+Calibration Notes: a checklist for gameday code changes
+
+The surface of each playing field is likely to be unique, and different from the tile floors we've been test-driving on. We should have a straightforward process for calibrating our code to the empirical reality of each playing field.
+
+PIDAutoDrive.java: the ACCELERATION and DECELERATION constants may need to be adjusted since competition floors are likely to be less slick than the cafeteria floor.
+
+AutonomousCommandGroupGenerator.java: the turning angle may need to be adjusted. (If inertia takes the robot more than the specified 90 degrees, we may want to set it to 80 degrees or whatever corresponds, empirically, to 90 degrees on the competition game field.)
+
+AutonomousCommandGroupGenerator.java: we may want to add wait commands between other commands, especially turn commands. (If the robot is still moving or turning from its previous command, resetting encoders and gyros may not behave as anticipated.)
+
