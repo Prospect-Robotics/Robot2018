@@ -9,7 +9,7 @@ AutonomousCommandGroupGenerator.java: the turning angle may need to be adjusted.
 AutonomousCommandGroupGenerator.java: we may want to add wait commands between other commands, especially turn commands. (If the robot is still moving or turning from its previous command, resetting encoders and gyros may not behave as anticipated.)
 
 
-A quick calibration test run might look something like this:
+A quick calibration test run might look something like this: (the equations to determine the acceleration/deceleration constants assume driveSpeed has been set at 0.5)
 
   I. Find linear interpolation ACCELERATION and DECELERATION parameters
      A. Confirm encoder accuracy with one slow run:
