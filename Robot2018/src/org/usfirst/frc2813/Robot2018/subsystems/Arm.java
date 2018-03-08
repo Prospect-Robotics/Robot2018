@@ -81,11 +81,11 @@ public class Arm extends Subsystem {
 	}
 
 	// Start arm moving
-	public void moveArm() {
-		if (!armIsHalted) {
+	public static void moveArm() {
+		if (armIsHalted) {
 			return;
 		}
-		armIsHalted = true;
+		armIsHalted = true;//FIXME True or false here?
 		RobotMap.srxArm.selectProfileSlot(1, 1);
 		double speed = armSpeed;
 		speed *= armDirection == Direction.UP ? 1 : -1;
@@ -95,10 +95,10 @@ public class Arm extends Subsystem {
 	
 	// stop arm from moving - this is active as we require pid to resist gravity
 	public static void haltArm() {
-		if (armIsHalted) {
+		if (!armIsHalted) {
 			return;
 		}
-		armIsHalted = false;
+		armIsHalted = false;//FIXME True or false here?
 		RobotMap.srxArm.selectProfileSlot(0, 0);
 		RobotMap.srxArm.set(ControlMode.Position, readArmPosition());
 		System.out.println(String.format("Halting arm movement. Position {0}", readArmPosition()));

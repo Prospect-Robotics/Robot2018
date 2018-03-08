@@ -14,10 +14,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.RobotMap;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
 /**
  * Move or maintain arm position.
@@ -31,7 +28,7 @@ public class MoveArm extends Command {
 		requires(Robot.arm);
 	}
 	public MoveArm(Direction direction) {
-		Robot.arm.setArmDirection(direction);
+		Arm.setArmDirection(direction);
 		this.direction = direction;
 		halted = false;
 		requires(Robot.arm);
@@ -40,17 +37,17 @@ public class MoveArm extends Command {
 	// Called just before this Command runs the first time
 	//@Override
 	protected void initialize() {
-		Robot.arm.haltArm();
+		Arm.haltArm();
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	//@Override
 	protected void execute() {
 		if (halted) {
-			Robot.arm.haltArm();
+			Arm.haltArm();
 		}
 		else {
-			Robot.arm.moveArm();
+			Arm.moveArm();
 		}
 	}
 
@@ -61,8 +58,8 @@ public class MoveArm extends Command {
 		if (halted) {
 			return true;
 		}
-		current_position = Robot.arm.readArmPosition();
-		end_position = Robot.arm.readArmEndPosition();
+		current_position = Arm.readArmPosition();
+		end_position = Arm.readArmEndPosition();
 		
 		// swap so we can do one compare
 		if (direction == Direction.DOWN) {
@@ -72,7 +69,7 @@ public class MoveArm extends Command {
 		}
 		if (current_position >= end_position) {
 			halted = true;
-			Robot.arm.haltArm();
+			Arm.haltArm();
 			return true;
 		}
 		return false;

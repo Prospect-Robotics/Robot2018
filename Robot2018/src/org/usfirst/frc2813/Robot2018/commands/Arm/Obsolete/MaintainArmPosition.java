@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.Arm;
+package org.usfirst.frc2813.Robot2018.commands.Arm.Obsolete;
 import org.usfirst.frc2813.Robot2018.Constants;
 
 import org.usfirst.frc2813.Robot2018.Robot;
