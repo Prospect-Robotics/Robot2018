@@ -8,3 +8,43 @@ AutonomousCommandGroupGenerator.java: the turning angle may need to be adjusted.
 
 AutonomousCommandGroupGenerator.java: we may want to add wait commands between other commands, especially turn commands. (If the robot is still moving or turning from its previous command, resetting encoders and gyros may not behave as anticipated.)
 
+
+A quick calibration test run might look something like this:
+
+  I. Find linear interpolation ACCELERATION and DECELERATION parameters
+     A. Confirm encoder accuracy with one slow run:
+        - set AutonomousCommandGroup's driveSpeed to 0.5
+        - set ACCELERATION to a very large value like 250
+        - set DECELERATION to a very large value like 250
+        - drive a straight path like autoCmdList.driveForward(120)
+        - measure distance D1 (which should be close to 120 inches)
+     B. Find acceleration slip by starting quickly:
+        - set AutonomousCommandGroup's driveSpeed to 0.5
+        - set ACCELERATION to 10 (for very quick acceleration, presumably slipping)
+        - set DECELERATION to 250 (for slow deceleration)
+        - drive a straight path like autoCmdList.driveForward(120)
+        - measure distance D2 (which will probably be smaller than D1)
+     C. Find deceleration slip by stopping quickly:
+        - set AutonomousCommandGroup's driveSpeed to 0.5
+        - set ACCELERATION to 250 (for slow acceleration: it will reach driveSpeed == 0.5 at 94 inches)
+        - set DECELERATION to 10 (for very quick deceleration, presumably slipping)
+        - drive a straight path like autoCmdList.driveForward(120)
+        - measure distance D3 (which will probably be larger than D1)
+     D. Determine ACCELERATION and DECELERATION from measured D1, D2, and D3
+        - ACCELERATION = (D1-D2)/(0.5-0.2)*(1.0-0.2) = (D1-D2)*(8/3)
+        - DECELERATION = (D3-D2)/(0.5-0.2)*(1.0-0.2) = (D3-D2)*(8/3)
+ II. Find turning angles
+     A. Find 90-degree slip
+        - execute autoCmdList.turnRight(90), wait for robot to settle
+        - execute autoCmdList.turnRight(90), wait for robot to settle
+        - execute autoCmdList.turnRight(90), wait for robot to settle
+        - execute autoCmdList.turnRight(90), wait for robot to settle
+        - measure error, divide by four, update autonomous code accordingly
+     B. Find 45-degree slip
+        - execute autoCmdList.turnRight(45), wait for robot to settle
+        - execute autoCmdList.turnRight(45), wait for robot to settle
+        - execute autoCmdList.turnRight(45), wait for robot to settle
+        - execute autoCmdList.turnRight(45), wait for robot to settle
+        - measure error, divide by four, update autonomous code accordingly
+     C. Probably repeat for turning the other direction
+
