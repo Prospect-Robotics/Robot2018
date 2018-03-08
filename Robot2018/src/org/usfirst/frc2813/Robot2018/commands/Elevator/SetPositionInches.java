@@ -7,16 +7,16 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class SetPosition extends InstantCommand {
-	double position;
+public class SetPositionInches extends InstantCommand {
+	double inchesFromBottom;
 
-    public SetPosition(double position) {
-        this.position = position;
+    public SetPositionInches(double inchesFromBottom) {
+        this.inchesFromBottom = inchesFromBottom;
         // Use requires() here to declare subsystem dependencies
         requires(Robot.elevator);
     }
 
     protected void initialize() {
-    	Robot.elevator.setPosition(position);
+    	Robot.elevator.setPositionInInches(inchesFromBottom);
     }
 }

@@ -1,104 +1,99 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.MaintainElevatorPosition;
+import org.usfirst.frc2813.Robot2018.Talon;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.Move;
 
-import com.ctre.phoenix.ParamEnum;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- *
+ * Elevator subsystem. Can set speed and move up/down/to abs position in inches or 0-1
  */
 public class Elevator extends Subsystem {
+	public boolean encoderFunctional = true;
+	private static Direction direction;
+	private static double speed;
+	private static boolean isHalted;
+	private static Talon motorController;
 
-    // Put methods for controlling this subsystem
-    // here. Call these from Commands.
-	
-	
+
+	// ELEVATOR GEOMETRY
 	// TODO find maximum allowable elevator height; 24 is only a placeholder.
-	private static final double ELEVATOR_HEIGHT = 24; // inches
+	public static final double ELEVATOR_HEIGHT = 24; // inches
+	public static final double ELEVATOR_INCHES_PER_REVOLUTION = Math.PI * 1.25;
+	public static final double ELEVATOR_INCHES_PER_PULSE = ELEVATOR_INCHES_PER_REVOLUTION / Talon.PULSES_PER_REVOLUTION;
+	public static final double ELEVATOR_PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / ELEVATOR_INCHES_PER_REVOLUTION;
+    public static final double ELEVATOR_MAX = ELEVATOR_HEIGHT * ELEVATOR_PULSES_PER_INCH;
 
-	public static final int TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS = 10;
-	public static final int TALON_SRX_RUNTIME_TIMEOUT_DEFAULT_MS = 0;
+	private static Talon motorController;
 
-	
-	
-	private final TalonSRX motor = RobotMap.srxElevator;
-	// No need for any other variables.
-	
 	public Elevator() {
-		// Do some motor configuration
-		// XXX Should we reconfigure the Talon every power on?  It should store the config, right?
-		// probably should be fine.
+		motorController = new Talon(RobotMap.srxElevator);
+		motorController.configHardLimitSwitch(Direction.BACKWARD);
+		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)ELEVATOR_MAX);
+		//motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
 
-		
-		// 10 is the CAN receive timeout in milliseconds.
-		// Why do we have to specify it all of a sudden?  Dunno.
-		/*
-		 * Talon documentation suggests 10ms as the default timeout value ON INITIALIZATION
-		 * During teleop, the timeout value should be 0
-		 * TODO:  create constants for those values
-		 * public static final int TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS = 10;
-		 *  
-		 */
-		
-		
-		//TODO BELOW IS CODE FOR THE COMPETITION BOT; CHANGED FOR PRACTICE WIRING ISSUES 
-		//"TODO" lines are lines previously uncommented
-		motor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		// For some reason CTRE decided that two slots would be enough for everything.
-		//motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 1, 10);
-		motor.configForwardSoftLimitEnable(true, 10);
-		motor.configForwardSoftLimitThreshold((int) (ELEVATOR_HEIGHT * RobotMap.ELEVATOR_PULSES_PER_INCH), TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		/*//TODO BELOW IS THE CHANGED CODE - REMOVE WHEN CORRECTED
-		motor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-		motor.configSelectedFeedbackSensor(com.ctre.phoenix.motorcontrol.FeedbackDevice.QuadEncoder, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
-	    motor.configSetParameter(ParamEnum.eClearPositionOnLimitF, 1, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);*/
+		// track state and change as required. Start in moving so initialize can halt
+		isHalted = false;
+        direction = Direction.UP;
+        speed = DEFAULT_SPEED;
 	}
-	/**
-	 * Set the speed of the elevator
-	 * @param feetPerSecond
-	 */
-	/*public void setSpeed(double feetPerSecond) {
-		// set() accepts a velocity in position change per 100ms.  Divide by 10 to convert position change per 1000ms to that.
-		motor.set(ControlMode.Velocity, (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);
-	}*/
-	
-	/**
-	 * Set the position of the elevator
-	 * @param inchesFromBottom
-	 */
-	/*public void setPosition(double inchesFromBottom) {
+
+	// speed and direction for elevator are state
+	public static void setSpeed() { speed = ELEVATOR_DEFAULT_SPEED; }
+	public static void setSpeed(double speed) { speed = speed; }
+
+	public void setSpeedFeetPerSecond(double feetPerSecond) {
+		setSpeed((feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);
+	}
+
+	public static void setDirection(Direction direction) { this.direction = direction; }
+
+	public static double readPosition() {
+		return motorController.readPosition();
+	}
+
+	public static double readEndPosition() {
+		if (direction == Direction.DOWN) {
+			return 0.0;
+		}
+		else {
+			return ELEVATOR_MAX;
+		}
+	}
+
+	// Start elevator moving
+	public static void move() {
+		isHalted = false;
+        srxSpeed = speed * (12.0 * PULSES_PER_INCH) / 10.0;
+		motorController.setSpeedAndDirection(srxSpeed, direction);
+		System.out.format("Starting elevator movement. Speed %f", srxSpeed);
+	}
+
+	// stop elevator from moving - this is active as we require pid to resist gravity
+	public static void halt() {
+		if (isHalted) {
+			return;
+		}
+		isHalted = true;
+		motorController.halt();
+		System.out.format("Halting elevator movement. Position %f", motorController.readPosition());
+	}
+
+	public static void goToPositionInches(double inchesFromBottom) {
 		// round to nearest int because unless we're using an analog sensor, this expects values in inches.
 		// Not sure what the talon will do if we give it a float value when it expects an int value.
 		// It might floor it (it *should* floor it), but it *might* puke.
-		motor.set(ControlMode.Position, (int) (inchesFromBottom * PULSES_PER_INCH));
-	}*/
-	/**
-	 * TODO REMOVE
-	 */
-	/*public void activelyMaintainCurrentPosition() {
-		System.out.println("Elevator"+motor.getSelectedSensorPosition(0));
-		motor.set(ControlMode.Position, motor.getSelectedSensorPosition(0));
-	}*/
+		motorController.goToPosition((int) (inchesFromBottom * PULSES_PER_INCH));
+	}
 
+	// initializes elevator in static position
+	@Override
 	public void initDefaultCommand() {
-        setDefaultCommand(new MaintainElevatorPosition());
-    }
-	public void periodic() {
-		if(getCurrentCommand() == null) {
-    		new MaintainElevatorPosition().start();
-    	}
+		setDefaultCommand(new Move());
 	}
 
-	public boolean isLimitSwitchPressed() {
-		return motor.getSensorCollection().isRevLimitSwitchClosed();
-	}
+	@Override
+	public void periodic() {}
 }
-

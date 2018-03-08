@@ -8,12 +8,6 @@ public class Constants {
 	 */
 
 	/*
-	 * Constants for Talon SRX control
-	 */
-	public static final int PRIMARY_CLOSED_LOOP_SENSOR = 0;
-	public static final int CASCADED_CLOSED_LOOP_SENSOR = 1;
-
-	/*
 	 * Which PID slot to pull gains from. Starting 2018, you can choose from
 	 * 0,1,2 or 3. Only the first two (0,1) are visible in web-based
 	 * configuration.

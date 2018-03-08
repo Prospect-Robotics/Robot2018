@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import org.usfirst.frc2813.Robot2018.Constants;
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
@@ -10,7 +9,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  * Arm subsystem has arm rotation, RobotMap.armSingleSolenoid open/close and intake in/out
- * Arm rotation has default halted state. Move command takes 
+ * Arm rotation has default halted state. Move command takes
  */
 public class Arm extends Subsystem {
 	public boolean encoderFunctional = true;
@@ -19,11 +18,11 @@ public class Arm extends Subsystem {
 	private static boolean armIsHalted;
 	private static Direction intakeDirection;
 	private static double intakeSpeed;
-	private static Talon talon;
+	private static Talon motorController;
 
 	/**
 	 * Double solenoids are two independent coils.
-	 * 
+	 *
 	 * When the RobotMap.armSingleSolenoid solenoid coil is activated, this is set to a relatively small number,
 	 * whereafter it is decremented each time through the {@link Scheduler} main loop.  When
 	 * it reaches zero, the coil is turned off again.
@@ -35,30 +34,27 @@ public class Arm extends Subsystem {
 	// ARM GEOMETRY
 	static final double ARM_DEGREES = 24;
 	static final double ARM_GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
-	static final double ARM_PULSES_PER_REVOLUTION = ARM_GEAR_RATIO * Talon.SRX_MAG_PULSES_PER_REVOLUTION;
+	static final double ARM_PULSES_PER_REVOLUTION = ARM_GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
 	static final double ARM_ONE_DEGREE = ARM_PULSES_PER_REVOLUTION / 360;
-	static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * Talon.SRX_VELOCITY_TIME_UNITS_PER_SEC;
+	static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * Talon.VELOCITY_TIME_UNITS_PER_SEC;
 	static final double ARM_DEFAULT_SPEED = 5 * ARM_ONE_DEGREE_PER_SECOND;
 	static final double ARM_MIN = 0.0;
 	static final double ARM_MAX = ARM_ONE_DEGREE * ARM_DEGREES;
 
 	public Arm() {
-		talon = Talon(RobotMap.srxArm);
-		talon.configHardLimitSwitch(Direction.BACKWARD);
-		talon.configSoftLimitSwitch(Direction.FORWARD, (int)ARM_MAX);
-		
-		int absolutePosition = talon.getSensorCollection().getPulseWidthPosition();
-		if (Constants.kSensorPhase)
-			absolutePosition *= -1;
-		if (Constants.kMotorInvert)
-			absolutePosition *= -1;
-		talon.setSelectedSensorPosition(absolutePosition, Constants.maintainPIDLoopIdx, Constants.kTimeoutMs);
-		
-		
+		motorController = new Talon(RobotMap.srxArm);
+		motorController.configHardLimitSwitch(Direction.BACKWARD);
+		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)ARM_MAX);
+        motorController.initPID();
+        setIntakeSpeed();
+        setArmSpeed();
+        armDirection = Direction.UP;
+        intakeDirection = Direction.IN;
+
 		// track state and change as required. Start in moving so initialize can halt
 		armIsHalted = false;
 	}
-	
+
 	// speed and direction for arm and intake are state
 	public static void setArmSpeed() { armSpeed = ARM_DEFAULT_SPEED; }
 	public static void setArmSpeed(double speed) { armSpeed = speed; }
@@ -68,9 +64,9 @@ public class Arm extends Subsystem {
 	public static void setIntakeDirection(Direction direction) { intakeDirection = direction; }
 
 	public static double readArmPosition() {
-		return talon.getSelectedSensorPosition(Constants.PRIMARY_CLOSED_LOOP_SENSOR);
+		return motorController.readPosition();
 	}
-	
+
 	public static double readArmEndPosition() {
 		if (armDirection == Direction.DOWN) {
 			return 0.0;
@@ -86,7 +82,7 @@ public class Arm extends Subsystem {
 			return;
 		}
 		armIsHalted = true;//FIXME True or false here?
-		talon.setSpeedAndDirection(armSpeed, armDirection);
+		motorController.setSpeedAndDirection(armSpeed, armDirection);
 		System.out.format("Starting arm movement. Speed %f", armSpeed);
 	}
 
@@ -96,8 +92,8 @@ public class Arm extends Subsystem {
 			return;
 		}
 		armIsHalted = false;//FIXME True or false here?
-		talon.halt();
-		System.out.format("Halting arm movement. Position %f", talon.readPosition());
+		motorController.halt();
+		System.out.format("Halting arm movement. Position %f", motorController.readPosition());
 	}
 
 	// Manage jaws
@@ -113,7 +109,7 @@ public class Arm extends Subsystem {
 	}
 	// accessor for state of jaws - TODO - can we initialize and track with boolean?
 	public static Boolean jawsAreOpen() { return RobotMap.armSingleSolenoid.get(); }
-	
+
 	// Manage intake wheels
 	public static void spinIntake() {
 		// NOTE: 2nd speed controller is slaved to this one in RobotMap
