@@ -101,7 +101,7 @@ public class Arm extends Subsystem {
 		double speed = armSpeed;
 		speed *= armDirection == Direction.UP ? 1 : -1;
 		RobotMap.srxArm.set(ControlMode.Velocity, speed);	
-		System.out.printf("Starting arm movement. Speed %f", speed);
+		System.out.printf("Starting arm movement. Speed %lf", speed);
 	}
 	
 	// stop arm from moving - this is active as we require pid to resist gravity
