@@ -32,7 +32,9 @@ A quick calibration test run might look something like this: (the equations to d
         - measure distance D3 (which will probably be larger than D1)
      D. Determine ACCELERATION and DECELERATION from measured D1, D2, and D3
         - ACCELERATION = (D1-D2)/(0.5-0.2)*(1.0-0.2) = (D1-D2)*(8/3)
-        - DECELERATION = (D3-D2)/(0.5-0.2)*(1.0-0.2) = (D3-D2)*(8/3)
+        - DECELERATION = (D3-D1)/(0.5-0.2)*(1.0-0.2) = (D3-D1)*(8/3)
+     E. Possibly fudge the values by increasing them a little, because we don't want to be
+        right on the bleeding edge of the static vs. dynamic coefficient of friction.
  II. Find turning angles
      A. Find 90-degree slip
         - execute autoCmdList.turnRight(90), wait for robot to settle
