@@ -57,6 +57,15 @@ public class Arm extends Subsystem {
 		RobotMap.srxArm.configForwardSoftLimitThreshold((int) (ARM_MAX), TALON_TIMEOUT_TO_CONFIGURE_MS);
 		// RobotMap.srxArm.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, TALON_TIMEOUT_TO_CONFIGURE_MS);
 
+		
+		int absolutePosition = RobotMap.srxArm.getSensorCollection().getPulseWidthPosition();
+		if (Constants.kSensorPhase)
+			absolutePosition *= -1;
+		if (Constants.kMotorInvert)
+			absolutePosition *= -1;
+		RobotMap.srxArm.setSelectedSensorPosition(absolutePosition, Constants.maintainPIDLoopIdx, Constants.kTimeoutMs);
+		
+		
 		// track state and change as required. Start in moving so initialize can halt
 		armIsHalted = false;
 	}
@@ -92,7 +101,7 @@ public class Arm extends Subsystem {
 		double speed = armSpeed;
 		speed *= armDirection == Direction.UP ? 1 : -1;
 		RobotMap.srxArm.set(ControlMode.Velocity, speed);	
-		System.out.printf("Starting arm movement. Speed %d", speed);
+		System.out.printf("Starting arm movement. Speed %f", speed);
 	}
 	
 	// stop arm from moving - this is active as we require pid to resist gravity
