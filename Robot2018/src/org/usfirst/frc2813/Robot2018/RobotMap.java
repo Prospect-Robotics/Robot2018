@@ -83,7 +83,7 @@ public class RobotMap {
 
 		// Get the game setup data from the driver station
 		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
-				
+
 		/* CAN BUS PORT SUMMARY
 		 * (1)  WPI_VictorSPX DriveTrain Port Master
 		 * (2)  VictorSPX DriveTrain Port Follower
@@ -98,7 +98,7 @@ public class RobotMap {
 		 * (11) WPI_VictorSPX Intake Master
 		 * (12) TalonSRX Arm
 		 */
-		
+
 		driveTrainSpeedControllerPort = new WPI_VictorSPX(1);
 		driveTrainSpeedControllerPort.setName("DriveTrain", "Port Motor");
 		driveTrainSpeedControllerPort.setInverted(false);
