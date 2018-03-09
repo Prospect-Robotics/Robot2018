@@ -20,11 +20,10 @@ public class Elevator extends Subsystem {
 	// ELEVATOR GEOMETRY
 	// TODO find maximum allowable elevator height; 24 is only a placeholder.
 	public static final double ELEVATOR_HEIGHT = 24; // inches
-	public static final double PULSES_PER_REVOLUTION = 4096;
-	public static final double ELEVATOR_INCHES_PER_REVOLUTION = Math.PI * 1.25;
-	public static final double ELEVATOR_INCHES_PER_PULSE = ELEVATOR_INCHES_PER_REVOLUTION / PULSES_PER_REVOLUTION;
-	public static final double ELEVATOR_PULSES_PER_INCH = PULSES_PER_REVOLUTION / ELEVATOR_INCHES_PER_REVOLUTION;
-    public static final double ELEVATOR_MAX = ELEVATOR_HEIGHT * ELEVATOR_PULSES_PER_INCH;
+	public static final double INCHES_PER_REVOLUTION = Math.PI * 1.25;
+	public static final double INCHES_PER_PULSE = INCHES_PER_REVOLUTION / Talon.PULSES_PER_REVOLUTION;
+	public static final double PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
+    public static final double ELEVATOR_MAX = ELEVATOR_HEIGHT * PULSES_PER_INCH;
     public static final double ELEVATOR_DEFAULT_SPEED = feetPerSecondToSpeed(2);
 
 	public Elevator() {
@@ -47,7 +46,7 @@ public class Elevator extends Subsystem {
 	public static void setSpeed(double speedParam) { speed = speedParam; }
 
 	public static double feetPerSecondToSpeed(double feetPerSecond) {
-		return (feetPerSecond * 12.0 * ELEVATOR_PULSES_PER_INCH) / 10.0;
+		return (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0;
 	}
 
 	public static void setSpeedFeetPerSecond(double feetPerSecond) {
@@ -90,7 +89,7 @@ public class Elevator extends Subsystem {
 		// round to nearest int because unless we're using an analog sensor, this expects values in inches.
 		// Not sure what the talon will do if we give it a float value when it expects an int value.
 		// It might floor it (it *should* floor it), but it *might* puke.
-		motorController.goToPosition((int) (inchesFromBottom * ELEVATOR_PULSES_PER_INCH));
+		motorController.goToPosition((int) (inchesFromBottom * PULSES_PER_INCH));
 	}
 
 	// initializes elevator in static position

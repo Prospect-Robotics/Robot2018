@@ -30,7 +30,6 @@ public class DriveTrain extends Subsystem {
     public static final double PULSES_PER_REVOLUTION = 768; // it should be 256 but the robot only % as far as it should with 256
     //public static final double PULSES_PER_INCH = PULSES_PER_REVOLUTION * REVOLUTIONS_PER_INCH;goes ~80
     public static final double INCHES_PER_PULSE = WHEEL_CIRCUMFERENCE / PULSES_PER_REVOLUTION; // inches per revolution times revolutions per pulse (1/pulses per revolution) equals ihes per pulse.
-	public static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
 
 	
 	public final SpeedController speedControllerPort = RobotMap.driveTrainSpeedControllerPort;

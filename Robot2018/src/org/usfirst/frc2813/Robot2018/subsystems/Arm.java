@@ -39,7 +39,8 @@ public class Arm extends Subsystem {
 	static final double ARM_GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
 	static final double ARM_PULSES_PER_REVOLUTION = ARM_GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
 	static final double ARM_ONE_DEGREE = ARM_PULSES_PER_REVOLUTION / 360;
-	static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * Talon.VELOCITY_TIME_UNITS_PER_SEC;
+	public static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
+	static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
 	static final double ARM_DEFAULT_SPEED = 5 * ARM_ONE_DEGREE_PER_SECOND;
 	static final double ARM_MIN = 0.0;
 	static final double ARM_MAX = ARM_ONE_DEGREE * ARM_DEGREES;

@@ -18,6 +18,8 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 public class Talon {
 	private TalonSRX srx;
 
+	public static final double PULSES_PER_REVOLUTION = 4096;
+
 	public static final int PRIMARY_CLOSED_LOOP_SENSOR = 0;
 	public static final int CASCADED_CLOSED_LOOP_SENSOR = 1;
 
