@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.Elevator.FloorElevator;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
@@ -97,7 +97,7 @@ public class OI {
 		//elevatorUp.whenReleased(new SetSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
-		new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
+		new JoystickButton(buttonPanel, 3).whenPressed(new MoveElevator(0));
 		spinIntakeOut = new JoystickButton(buttonPanel, 2);
 		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
 		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
@@ -126,7 +126,7 @@ public class OI {
 		//SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
 		//SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
 		//SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
-		SmartDashboard.putData("BottomElevator", new FloorElevator());
+		SmartDashboard.putData("BottomElevator", new MoveElevator(0));
 		//SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
 		//SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
 

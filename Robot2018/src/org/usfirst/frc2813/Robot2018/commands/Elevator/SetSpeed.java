@@ -21,6 +21,6 @@ public class SetSpeed extends InstantCommand {
 
 	// Called once when the command executes
 	protected void initialize() {
-		Elevator.setSpeedFeetPerSecond(speed);
+		Elevator.setSpeed(speed);
 	}
 }
