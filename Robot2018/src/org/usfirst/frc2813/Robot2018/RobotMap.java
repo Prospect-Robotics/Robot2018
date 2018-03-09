@@ -48,7 +48,7 @@ public class RobotMap {
 	public static Encoder driveTrainQuadratureEncoderStarboard;// Starboard Motor
 	public static Encoder driveTrainQuadratureEncoderPort;// Port Motor
 	public static Solenoid driveTrainSingleSolenoid;
-	public static Solenoid armSingleSolenoid;//for the competition bot
+	public static Solenoid armJawsSolenoid;
 
 	/*
 	 * Elevator Subsystem
@@ -181,7 +181,7 @@ public class RobotMap {
 		intakeSpeedControllerFollow.set(ControlMode.Follower, intakeSpeedController.getDeviceID());
 		intakeSpeedControllerFollow.setInverted(true);
 
-		armSingleSolenoid = new Solenoid(0,1);
+		armJawsSolenoid = new Solenoid(0,1);
 		elevatorRatchet = new Solenoid(0,2);
 		climbingBar = new Solenoid(0,4);
 	}

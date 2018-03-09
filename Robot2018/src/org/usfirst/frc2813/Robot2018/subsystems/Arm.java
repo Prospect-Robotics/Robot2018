@@ -8,8 +8,18 @@ import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * Arm subsystem has arm rotation, RobotMap.armSingleSolenoid open/close and intake in/out
- * Arm rotation has default halted state. Move command takes
+ *
+ * Arm subsystem
+ *
+ * Arm rotates through 24 degrees.
+ * Arm has state halted, speed and direction.
+ * Arm can be moving up or down or be halted.
+ *
+ * Intake has state halted and direction.
+ * Intake can be moving in, out or halted.
+ *
+ * Jaws can open and close.
+ * Jaws have state tracking this. - FIXME: can jaws open if closed too long? Should we care?
  */
 public class Arm extends Subsystem {
 	public boolean encoderFunctional = true;
@@ -18,15 +28,8 @@ public class Arm extends Subsystem {
 	private static boolean armIsHalted;
 	private static Direction intakeDirection;
 	private static double intakeSpeed;
+	private static Direction jawsState;
 	private static Talon motorController;
-
-	/**
-	 * Double solenoids are two independent coils.
-	 *
-	 * When the RobotMap.armSingleSolenoid solenoid coil is activated, this is set to a relatively small number,
-	 * whereafter it is decremented each time through the {@link Scheduler} main loop.  When
-	 * it reaches zero, the coil is turned off again.
-	 */
 
 	// INTAKE GEOMETRY
 	private static final double INTAKE_DEFAULT_SPEED = 0.7;
@@ -46,15 +49,14 @@ public class Arm extends Subsystem {
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)ARM_MAX);
         motorController.initPID();
-	    motorController.setPID(MAINTAIN_PID_LOOOP_IDX, 0.1, 0, 0);
-	    motorController.setPID(MOVE_PIDLOOP_IDX, 2, 0, 0);
+	    motorController.setPID(Talon.MAINTAIN_PID_LOOOP_IDX, 0.1, 0, 0);
+	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
         setIntakeSpeed();
         setArmSpeed();
         armDirection = Direction.UP;
         intakeDirection = Direction.IN;
-
-		// track state and change as required. Start in moving so initialize can halt
 		armIsHalted = false;
+		jawsState = RobotMap.armJawsSolenoid.get() ? Direction.OPEN : Direction.CLOSE;
 	}
 
 	// speed and direction for arm and intake are state
@@ -78,14 +80,11 @@ public class Arm extends Subsystem {
 		}
 	}
 
-	// Start arm moving
+	// Start arm moving. Can transition from moving since speed/direction may have changed
 	public static void moveArm() {
-		if (!armIsHalted) {
-			return;
-		}
 		armIsHalted = false;
 		motorController.setSpeedAndDirection(armSpeed, armDirection);
-		System.out.format("Starting arm movement. Speed %f", armSpeed);
+		System.out.println("Starting arm movement. Speed " + armSpeed);
 	}
 
 	// stop arm from moving - this is active as we require pid to resist gravity
@@ -95,22 +94,16 @@ public class Arm extends Subsystem {
 		}
 		armIsHalted = true;
 		motorController.halt();
-		System.out.format("Halting arm movement. Position %f", motorController.readPosition());
+		System.out.println("Halting arm movement. Position " + motorController.readPosition());
 	}
 
 	// Manage jaws
-	public static void closeJaws() {
-		if (!jawsAreOpen()) {
-			RobotMap.armSingleSolenoid.set(false);
+	public static void setJaws(Direction direction) {
+		if (jawsState != direction) {
+			RobotMap.armJawsSolenoid.set(direction == Direction.CLOSE ? true : false);
+			jawsState = direction;
 		}
 	}
-	public static void openJaws() {
-		if (jawsAreOpen()) {
-			RobotMap.armSingleSolenoid.set(false);
-		}
-	}
-	// accessor for state of jaws - TODO - can we initialize and track with boolean?
-	public static Boolean jawsAreOpen() { return RobotMap.armSingleSolenoid.get(); }
 
 	// Manage intake wheels
 	public static void spinIntake() {

@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
- * This class is the glue that binds the controls on the physical operator 
+ * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
@@ -58,14 +58,14 @@ public class OI {
     public JoystickButton spinIntakeIn, spinIntakeOut,
     					  bottomElevatorToLimitSwitch, elevatorUp, elevatorDown, elevatorRatchet,
     					  shiftGears, climbingBar,
-    					  armUpToLimitSwitch, armDownToLimitSwitch, 
+    					  armUpToLimitSwitch, armDownToLimitSwitch,
     					  armMoveUp, armMoveDown, armSolenoid;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 
     public OI() {
     	/*
     	 * BUTTON PANEL BUTTONS:
-    	 * 
+    	 *
     	 * (1)  SPIN INTAKE IN
     	 * (2)  SPIN INTAKE OUT
     	 * (3)  FLOOR ELEVATOR
@@ -78,7 +78,7 @@ public class OI {
     	 * (10) TODO CURRENTLY UNUSED -- WILL MOVE ARM TO SPECIFIED POSITION
     	 * (11) MOVE ARM UP
     	 * (12) MOVE ARM DOWN
-    	 * 
+    	 *
     	 */
         buttonPanel = new Joystick(0);
 
@@ -96,7 +96,7 @@ public class OI {
         elevatorDown.whileHeld(new SetSpeed(.4));
         //elevatorUp.whenReleased(new SetSpeed(0));
         //elevatorUp.whenReleased(new PrintButtonStatus(false, true));
- 
+
         new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
         spinIntakeOut = new JoystickButton(buttonPanel, 2);
         spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
@@ -112,9 +112,9 @@ public class OI {
 
         joystick1 = new Joystick(1);
         joystick2 = new Joystick(2);
-        
+
         new JoystickButton(joystick1, 1).whileHeld(new ResetEncoders());//the trigger on most joysticks
-        
+
         Compressor compressor = new Compressor();
         LiveWindow.add(compressor);
         new RoboRIOUserButton().whenPressed(new ToggleCompressor(compressor));
@@ -129,7 +129,7 @@ public class OI {
         SmartDashboard.putData("BottomElevator", new FloorElevator());
         //SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
         //SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
-        
+
         driveStyleChooser = new SendableChooser<>();
         driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);
         driveStyleChooser.addObject("Tank drive", Robot.driveTrain::tankDrive);

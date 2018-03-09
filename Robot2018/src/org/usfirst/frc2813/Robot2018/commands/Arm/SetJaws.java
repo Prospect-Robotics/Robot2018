@@ -5,14 +5,15 @@ package org.usfirst.frc2813.Robot2018.commands.Arm;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
 /**
  * Open the Robot arm jaws
  */
-public class OpenJaws extends InstantCommand {
+public class SetJaws extends InstantCommand {
 	//@Override
-	protected void initialize() {
-		Arm.openJaws();
+	protected void initialize(Direction state) {
+		Arm.setJaws(state);
 	}
 }
