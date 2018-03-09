@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 /**
  * A wrapper class to handle an SRX Talon motor controller
  * Arm rotation has default halted state. Move command takes
+ * TODO: Create a base class above this for motor controllers.
  */
 public class Talon {
 	private TalonSRX srx;
@@ -25,7 +26,7 @@ public class Talon {
 
 	private static final int TIMEOUT_MS = 10;  // timeout for Talon config function
 
-	/*
+	/**
 	 * Which PID slot to pull gains from. Starting 2018, you can choose from
 	 * 0,1,2 or 3. Only the first two (0,1) are visible in web-based
 	 * configuration.
@@ -123,11 +124,11 @@ public class Talon {
 		}
 	}
 
-	public double readPosition() {
+	public int readPosition() {
 		return srx.getSelectedSensorPosition(PRIMARY_CLOSED_LOOP_SENSOR);
 	}
 
-	public void goToPosition(int position) {
+	public void setPosition(int position) {
 		srx.set(ControlMode.Position, position);
 	}
 
@@ -138,10 +139,6 @@ public class Talon {
 			speedParam *= -1;
 		}
 		srx.set(ControlMode.Velocity, speedParam);
-	}
-
-	public void setPosition(double position) {
-		srx.set(ControlMode.Position, position);
 	}
 
 	// stop arm from moving - this is active as we require pid to resist gravity

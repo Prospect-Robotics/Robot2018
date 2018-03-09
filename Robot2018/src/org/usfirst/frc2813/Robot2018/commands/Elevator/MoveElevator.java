@@ -9,25 +9,31 @@ import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 
 /**
  * Move or maintain elevator position.
+ * No argument to halt.
+ * Direction to move in a direction.
+ * Position to move to that position in inches above floor.
  */
 public class MoveElevator extends Command {
 	private boolean halted;
 	private Direction direction;
-
+	private double position;
+    private boolean positionMode;  // true if we are moving to a position
+                                          // false if we move by direction and speed
 	public MoveElevator() {
 		halted = true;
 		requires(Robot.elevator);
 	}
+
 	public MoveElevator(Direction direction) {
-		Elevator.setDirection(direction);
 		this.direction = direction;
+        positionMode = false;
 		halted = false;
 	}
 
-	// Called just before this Command runs the first time
-	//@Override
-	protected void initialize() {
-		Elevator.halt();
+	public MoveElevator(double position) {
+		this.position = position;
+        positionMode = true;
+		halted = false;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -37,6 +43,9 @@ public class MoveElevator extends Command {
 			Elevator.halt();
 		}
 		else {
+            if (positionMode) {
+                direction = Elevator.readPosition() > position ? Direction.DOWN : Direction.UP;
+            }
 			Elevator.move();
 		}
 	}
@@ -44,20 +53,31 @@ public class MoveElevator extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		double current_position, end_position, tmp;
-		if (halted) {
-			return true;
-		}
-		current_position = Elevator.readPosition();
-		end_position = Elevator.readEndPosition();
+        double currentPosition;
+        double targetPosition;
+		boolean done;
 
-		// swap so we can do one compare
+		if (halted) return true;
+
+		currentPosition = Elevator.readPosition();
+
+        if (positionMode) {
+            targetPosition = position;
+        }
+        else if (direction == Direction.DOWN) {
+            targetPosition = 0;
+        }
+        else {
+            targetPosition = Elevator.HEIGHT;
+        }
+
 		if (direction == Direction.DOWN) {
-			tmp = current_position;
-			current_position = end_position;
-			end_position = tmp;
+            done = currentPosition <= targetPosition;
 		}
-		if (current_position >= end_position) {
+        else {
+            done = currentPosition >= targetPosition;
+        }
+		if (done) {
 			halted = true;
 			Elevator.halt();
 			return true;

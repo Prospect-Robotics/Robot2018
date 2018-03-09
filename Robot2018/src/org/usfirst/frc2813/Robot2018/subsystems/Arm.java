@@ -35,20 +35,20 @@ public class Arm extends Subsystem {
 	private static final double INTAKE_DEFAULT_SPEED = 0.7;
 
 	// ARM GEOMETRY
-	static final double ARM_DEGREES = 24;
-	static final double ARM_GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
-	static final double ARM_PULSES_PER_REVOLUTION = ARM_GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
-	static final double ARM_ONE_DEGREE = ARM_PULSES_PER_REVOLUTION / 360;
-	public static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
-	static final double ARM_ONE_DEGREE_PER_SECOND = ARM_ONE_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
-	static final double ARM_DEFAULT_SPEED = 5 * ARM_ONE_DEGREE_PER_SECOND;
-	static final double ARM_MIN = 0.0;
-	static final double ARM_MAX = ARM_ONE_DEGREE * ARM_DEGREES;
+	private static final double DEGREES = 24;
+	private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
+	private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
+	private static final double ONE_DEGREE = PULSES_PER_REVOLUTION / 360;
+	private static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
+	private static final double ONE_DEGREE_PER_SECOND = ONE_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
+	private static final double DEFAULT_SPEED = 5 * ONE_DEGREE_PER_SECOND;
+	private static final double MIN_POSITION = 0.0;
+	private static final double MAX_POSITION = ONE_DEGREE * DEGREES;
 
 	public Arm() {
 		motorController = new Talon(RobotMap.srxArm);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
-		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)ARM_MAX);
+		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)MAX_POSITION);
         motorController.initPID();
 	    motorController.setPID(Talon.MAINTAIN_PID_LOOOP_IDX, 0.1, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
@@ -62,7 +62,7 @@ public class Arm extends Subsystem {
 
 	// speed and direction for arm and intake are state
 	public static void setArmSpeed(double speed) { armSpeed = speed; }
-	public static void setArmSpeed() { setArmSpeed(ARM_DEFAULT_SPEED); }
+	public static void setArmSpeed() { setArmSpeed(DEFAULT_SPEED); }
 	public static void setArmDirection(Direction direction) { armDirection = direction; }
 	public static void setIntakeSpeed(double speed) { intakeSpeed = speed; }
 	public static void setIntakeSpeed() { setIntakeSpeed(INTAKE_DEFAULT_SPEED); }
@@ -74,10 +74,10 @@ public class Arm extends Subsystem {
 
 	public static double readArmEndPosition() {
 		if (armDirection == Direction.DOWN) {
-			return 0.0;
+			return MIN_POSITION;
 		}
 		else {
-			return ARM_MAX;
+			return MAX_POSITION;
 		}
 	}
 
