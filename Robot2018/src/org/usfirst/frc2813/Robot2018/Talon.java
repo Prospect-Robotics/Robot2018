@@ -18,8 +18,6 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 public class Talon {
 	private TalonSRX srx;
 
-	public static final int PULSES_PER_REVOLUTION = 4096;
-	public static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
 	public static final int PRIMARY_CLOSED_LOOP_SENSOR = 0;
 	public static final int CASCADED_CLOSED_LOOP_SENSOR = 1;
 
