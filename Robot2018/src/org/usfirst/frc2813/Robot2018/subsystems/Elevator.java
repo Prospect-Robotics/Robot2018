@@ -58,6 +58,22 @@ public class Elevator extends Subsystem {
 		return motorController.readPosition();
 	}
 
+	/**
+	 * Set elevator position
+	 * @param position - 0-1
+	 */
+	public static void setPosition(double position) {
+		setPosition(position * ELEVATOR_HEIGHT);
+	}
+
+	/**
+	 * set position in inches
+	 * @param inches - inches from bottom
+	 */
+	public static void setPositionInches(double inches) {
+		motorController.setPosition((int) (inches * PULSES_PER_INCH));
+	}
+
 	public static double readEndPosition() {
 		if (direction == Direction.DOWN) {
 			return 0.0;

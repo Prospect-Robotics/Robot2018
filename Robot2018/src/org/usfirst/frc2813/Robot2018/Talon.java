@@ -140,6 +140,10 @@ public class Talon {
 		srx.set(ControlMode.Velocity, speedParam);
 	}
 
+	public void setPosition(double position) {
+		srx.set(ControlMode.Position, position);
+	}
+
 	// stop arm from moving - this is active as we require pid to resist gravity
 	public void halt() {
 		srx.selectProfileSlot(0, 0);

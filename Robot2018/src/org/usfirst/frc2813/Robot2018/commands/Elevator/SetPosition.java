@@ -6,7 +6,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
 /**
- *
+ * Set elevator position 0.0 - 1.0
  */
 public class SetPosition extends InstantCommand {
 	double position;
