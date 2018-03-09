@@ -33,6 +33,9 @@ public class Elevator extends Subsystem {
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)ELEVATOR_MAX);
 		//motor.configSetParameter(ParamEnum.eClearPositionOnLimitR, 0, 1, 0, TALON_SRX_INITIALIZE_TIMEOUT_DEFAULT_MS);
+        motorController.initPID();
+	    motorController.setPID(MAINTAIN_PID_LOOOP_IDX, 0.8, 0, 0);
+	    motorController.setPID(MOVE_PIDLOOP_IDX, 0.75, 0.01, 40);
 
 		// track state and change as required. Start in moving so initialize can halt
 		isHalted = false;
@@ -42,7 +45,7 @@ public class Elevator extends Subsystem {
 
 	// speed and direction for elevator are state
 	public static void setSpeed() { speed = ELEVATOR_DEFAULT_SPEED; }
-	public static void setSpeed(double speed) { speed = speed; }
+	public static void setSpeed(double speed) { this.speed = speed; }
 
 	public void setSpeedFeetPerSecond(double feetPerSecond) {
 		setSpeed((feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0);
@@ -66,9 +69,8 @@ public class Elevator extends Subsystem {
 	// Start elevator moving
 	public static void move() {
 		isHalted = false;
-        srxSpeed = speed * (12.0 * PULSES_PER_INCH) / 10.0;
-		motorController.setSpeedAndDirection(srxSpeed, direction);
-		System.out.format("Starting elevator movement. Speed %f", srxSpeed);
+		motorController.setSpeedAndDirection(speed, direction);
+		System.out.format("Starting elevator movement. Speed %f", speed);
 	}
 
 	// stop elevator from moving - this is active as we require pid to resist gravity

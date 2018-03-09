@@ -46,6 +46,8 @@ public class Arm extends Subsystem {
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)ARM_MAX);
         motorController.initPID();
+	    motorController.setPID(MAINTAIN_PID_LOOOP_IDX, 0.1, 0, 0);
+	    motorController.setPID(MOVE_PIDLOOP_IDX, 2, 0, 0);
         setIntakeSpeed();
         setArmSpeed();
         armDirection = Direction.UP;
@@ -56,11 +58,11 @@ public class Arm extends Subsystem {
 	}
 
 	// speed and direction for arm and intake are state
-	public static void setArmSpeed() { armSpeed = ARM_DEFAULT_SPEED; }
 	public static void setArmSpeed(double speed) { armSpeed = speed; }
+	public static void setArmSpeed() { setArmSpeed(ARM_DEFAULT_SPEED); }
 	public static void setArmDirection(Direction direction) { armDirection = direction; }
-	public static void setIntakeSpeed() { intakeSpeed = INTAKE_DEFAULT_SPEED; }
 	public static void setIntakeSpeed(double speed) { intakeSpeed = speed; }
+	public static void setIntakeSpeed() { setIntakeSpeed(INTAKE_DEFAULT_SPEED); }
 	public static void setIntakeDirection(Direction direction) { intakeDirection = direction; }
 
 	public static double readArmPosition() {
@@ -78,20 +80,20 @@ public class Arm extends Subsystem {
 
 	// Start arm moving
 	public static void moveArm() {
-		if (armIsHalted) {
+		if (!armIsHalted) {
 			return;
 		}
-		armIsHalted = true;//FIXME True or false here?
+		armIsHalted = false;
 		motorController.setSpeedAndDirection(armSpeed, armDirection);
 		System.out.format("Starting arm movement. Speed %f", armSpeed);
 	}
 
 	// stop arm from moving - this is active as we require pid to resist gravity
 	public static void haltArm() {
-		if (!armIsHalted) {
+		if (armIsHalted) {
 			return;
 		}
-		armIsHalted = false;//FIXME True or false here?
+		armIsHalted = true;
 		motorController.halt();
 		System.out.format("Halting arm movement. Position %f", motorController.readPosition());
 	}

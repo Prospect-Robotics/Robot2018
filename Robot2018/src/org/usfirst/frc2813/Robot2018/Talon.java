@@ -32,19 +32,16 @@ public class Talon {
 	 */
 	private static final int SLOT_IDX = 0;
 
-	/*
-	 * Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops. For
-	 * now we just want the primary one.
-	 */
-	private static final int MAINTAIN_PID_LOOOP_IDX = 0;
-	private static final int MOVE_PIDLOOP_IDX = 1;
+	// Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops.
+	public static final int MAINTAIN_PID_LOOOP_IDX = 0;
+	public static final int MOVE_PIDLOOP_IDX = 1;
 
-	/* choose to ensure sensor is positive when output is positive */
+	// choose to ensure sensor is positive when output is positive
 	public static boolean K_SENSOR_PHASE = true;
 
-	/* choose based on what direction you want to be positive,
-		this does not affect motor invert. */
+	// choose based on what direction you want to be positive, this does not affect motor invert.
 	public static boolean K_MOTOR_INVERT = false;
+
 	// These directions map to the Talon reverse limit switch
     static public Set<Direction> reverseDirections = new HashSet<>();
     static {
@@ -56,6 +53,25 @@ public class Talon {
 
 	public Talon(TalonSRX srx) {
         this.srx = srx;
+
+		// set the peak and nominal outputs, 12V means full
+		srx.configNominalOutputForward(0, TIMEOUT_MS);
+		srx.configNominalOutputReverse(0, TIMEOUT_MS);
+		srx.configPeakOutputForward(1, TIMEOUT_MS);
+		srx.configPeakOutputReverse(-1, TIMEOUT_MS);
+
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MAINTAIN_PID_LOOOP_IDX, TIMEOUT_MS);
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOOP_IDX, TIMEOUT_MS);
+
+		// choose to ensure sensor is positive when output is positive. This does not affect sensor phase.
+		RobotMap.srxArm.setSensorPhase(K_SENSOR_PHASE);
+
+		/*
+		 * set the allowable closed-loop error, Closed-Loop output will be
+		 * neutral within this range. See Table in Section 17.2.1 for native
+		 * units per rotation.
+		 */
+		srx.configAllowableClosedloopError(0, MAINTAIN_PID_LOOOP_IDX, TIMEOUT_MS);
     }
 
 	public void configSoftLimitSwitch(Direction direction, int limit) {
@@ -90,6 +106,13 @@ public class Talon {
         }
 		srx.setSelectedSensorPosition(absolutePosition, MAINTAIN_PID_LOOOP_IDX, TIMEOUT_MS);
     }
+
+    public void setPID(int slot, double p, double i, double d) {
+		srx.config_kF(slot, 0, TIMEOUT_MS); // typically kF stays zero.
+		srx.config_kP(slot, p, TIMEOUT_MS);
+		srx.config_kI(slot, i, TIMEOUT_MS);
+		srx.config_kD(slot, d, TIMEOUT_MS);
+	}
 
 	public double readPosition() {
 		return srx.getSelectedSensorPosition(PRIMARY_CLOSED_LOOP_SENSOR);

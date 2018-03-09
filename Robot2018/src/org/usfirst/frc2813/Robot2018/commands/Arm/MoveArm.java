@@ -59,7 +59,7 @@ public class MoveArm extends Command {
 		}
 		current_position = Arm.readArmPosition();
 		end_position = Arm.readArmEndPosition();
-		
+
 		// swap so we can do one compare
 		if (direction == Direction.DOWN) {
 			tmp = current_position;
