@@ -13,7 +13,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 public class SetJaws extends InstantCommand {
 	Direction state;
 
-    public SetPosition(Direction state) {
+    public void SetPosition(Direction state) {
         this.state = state;
     }
 

@@ -27,8 +27,8 @@ public class AutonomousCommandGroupGenerator {
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
 	}
 	/**
-	 * Code to be run during the Autonomous 15 second period. 
-	 * This code uses the gameData from the driver station and a 
+	 * Code to be run during the Autonomous 15 second period.
+	 * This code uses the gameData from the driver station and a
 	 * sendable chooser on the Smart Dashboard to decide which
 	 * sequence to run. Called by AutonomousCommandGroup
 	 */
@@ -57,7 +57,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnLeft(45 * directionBias);
 			autoCmdList.raiseElevator();
 			autoCmdList.dropCube();
-			autoCmdList.lowerElevator();			
+			autoCmdList.lowerElevator();
 		}
 		else {
 			// We are in the center start position
@@ -70,7 +70,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnRight(45);
 			autoCmdList.raiseElevator(0.5);
 			autoCmdList.dropCube();
-			autoCmdList.lowerElevator();			
+			autoCmdList.lowerElevator();
 		}
 	}
 }

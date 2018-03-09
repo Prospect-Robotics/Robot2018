@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
-import org.usfirst.frc2813.Robot2018.commands.Arm.OpenJaws;
-import org.usfirst.frc2813.Robot2018.commands.Arm.CloseJaws;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 
@@ -83,13 +82,13 @@ public class AutonomousCommandGroup extends CommandGroup {
 		// TODO: should we delay between these?
 		// TODO: consider making this pair a command for arm
 		addSequential(new SpinIntake(Direction.OUT));
-		addSequential(new OpenJaws());
+		addSequential(new SetJaws(Direction.OPEN));
 	}
 	public void grabCube() {
 		// TODO: should we delay between these?
 		// TODO: consider making this pair a command for arm
 		addSequential(new SpinIntake(Direction.IN));
-		addSequential(new CloseJaws());
+		addSequential(new SetJaws(Direction.CLOSE));
 	}
 
 	public void sleep(double seconds) {
