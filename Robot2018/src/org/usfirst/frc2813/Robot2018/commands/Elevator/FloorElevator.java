@@ -1,12 +1,12 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
 import org.usfirst.frc2813.Robot2018.Constants;
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 
 import edu.wpi.first.wpilibj.command.Command;
-
-import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 
 /**
  * Move elevator to bottom position
@@ -35,6 +35,6 @@ public class FloorElevator extends Command {
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		return Elevator.isLimitSwitchPressed() == true;
+		return Elevator.readLimitSwitch(Direction.DOWN);
 	}
 }

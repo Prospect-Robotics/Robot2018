@@ -43,16 +43,16 @@ public class Talon {
 	public static boolean K_MOTOR_INVERT = false;
 
 	// These directions map to the Talon reverse limit switch
-    static public Set<Direction> reverseDirections = new HashSet<>();
-    static {
-        reverseDirections.add(Direction.BACKWARD);
-        reverseDirections.add(Direction.LEFT);
-        reverseDirections.add(Direction.IN);
-        reverseDirections.add(Direction.DOWN);
-    }
+	static public Set<Direction> reverseDirections = new HashSet<>();
+	static {
+		reverseDirections.add(Direction.BACKWARD);
+		reverseDirections.add(Direction.LEFT);
+		reverseDirections.add(Direction.IN);
+		reverseDirections.add(Direction.DOWN);
+	}
 
 	public Talon(TalonSRX srx) {
-        this.srx = srx;
+		this.srx = srx;
 
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, TIMEOUT_MS);
@@ -72,46 +72,55 @@ public class Talon {
 		 * units per rotation.
 		 */
 		srx.configAllowableClosedloopError(0, MAINTAIN_PID_LOOOP_IDX, TIMEOUT_MS);
-    }
+	}
 
 	public void configSoftLimitSwitch(Direction direction, int limit) {
-        if (reverseDirections.contains(direction)) {
-            srx.configReverseSoftLimitEnable(true, TIMEOUT_MS);
-            srx.configReverseSoftLimitThreshold(limit, TIMEOUT_MS);
-        }
-        else {
-            srx.configForwardSoftLimitEnable(true, TIMEOUT_MS);
-            srx.configForwardSoftLimitThreshold(limit, TIMEOUT_MS);
-        }
+		if (reverseDirections.contains(direction)) {
+			srx.configReverseSoftLimitEnable(true, TIMEOUT_MS);
+			srx.configReverseSoftLimitThreshold(limit, TIMEOUT_MS);
+		}
+		else {
+			srx.configForwardSoftLimitEnable(true, TIMEOUT_MS);
+			srx.configForwardSoftLimitThreshold(limit, TIMEOUT_MS);
+		}
 	}
 
 	public void configHardLimitSwitch(Direction direction) {
-        if (reverseDirections.contains(direction)) {
+		if (reverseDirections.contains(direction)) {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TIMEOUT_MS);
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, CASCADED_CLOSED_LOOP_SENSOR, TIMEOUT_MS);
-        }
-        else {
+		}
+		else {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen, TIMEOUT_MS);
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, CASCADED_CLOSED_LOOP_SENSOR, TIMEOUT_MS);
-        }
+		}
 	}
 
-    public void initPID() {
+	public void initPID() {
 		int absolutePosition = srx.getSensorCollection().getPulseWidthPosition();
 		if (K_SENSOR_PHASE) {
 			absolutePosition *= -1;
-        }
+		}
 		if (K_MOTOR_INVERT) {
 			absolutePosition *= -1;
-        }
+		}
 		srx.setSelectedSensorPosition(absolutePosition, MAINTAIN_PID_LOOOP_IDX, TIMEOUT_MS);
-    }
+	}
 
-    public void setPID(int slot, double p, double i, double d) {
+	public void setPID(int slot, double p, double i, double d) {
 		srx.config_kF(slot, 0, TIMEOUT_MS); // typically kF stays zero.
 		srx.config_kP(slot, p, TIMEOUT_MS);
 		srx.config_kI(slot, i, TIMEOUT_MS);
 		srx.config_kD(slot, d, TIMEOUT_MS);
+	}
+
+	public boolean readLimitSwitch(Direction direction) {
+		if (reverseDirections.contains(direction)) {
+			return srx.getSensorCollection().isRevLimitSwitchClosed();
+		}
+		else {
+			return srx.getSensorCollection().isFwdLimitSwitchClosed();
+		}
 	}
 
 	public double readPosition() {

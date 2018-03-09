@@ -42,13 +42,12 @@ public class Elevator extends Subsystem {
 	}
 
 	// speed and direction for elevator are state
-	public static void setSpeed() { speed = ELEVATOR_DEFAULT_SPEED; }
-	public static void setSpeed(double speedParam) { speed = speedParam; }
-
 	public static double feetPerSecondToSpeed(double feetPerSecond) {
 		return (feetPerSecond * 12.0 * PULSES_PER_INCH) / 10.0;
 	}
 
+	public static void setSpeed(double speedParam) { speed = speedParam; }
+	public static void setSpeed() { setSpeed(ELEVATOR_DEFAULT_SPEED); }
 	public static void setSpeedFeetPerSecond(double feetPerSecond) {
 		setSpeed(feetPerSecondToSpeed(feetPerSecond));
 	}
@@ -66,6 +65,10 @@ public class Elevator extends Subsystem {
 		else {
 			return ELEVATOR_MAX;
 		}
+	}
+
+	public static boolean readLimitSwitch(Direction direction) {
+		return Elevator.readLimitSwitch(direction);
 	}
 
 	// Start elevator moving
