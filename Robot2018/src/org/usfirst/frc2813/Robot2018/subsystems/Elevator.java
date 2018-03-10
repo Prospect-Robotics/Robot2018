@@ -31,7 +31,6 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 	 * TODO: find maximum allowable elevator height; 24 is only a placeholder.
 	 */
 	public final double HEIGHT = 24; // inches
-	
 	// State data for debugging/diagnostics only
     private final String label;
 	// State data for debugging/diagnostics only
@@ -44,7 +43,7 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 	private double lastSpeedSrx = 0;
 	// State data for debugging/diagnostics only
 	private double lastSpeedInchesPerSecond = 0;
-   
+
 	public Elevator() {
 		this.label = "Elevator";
 		log = new Log(this.label);
@@ -108,9 +107,6 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 		double newPositionInches = inches;
 		int newPositionSrx = inchesToSrx(inches);
 		motorController.setPosition(inchesToSrx(inches));
-		if(oldState != motorController.getState()) {
-			log.print("setPosition [transitioned from " + oldState + " to " + motorController.getState() + ".");
-		}
 		if(motorController.getState() == TalonState.HOLDING_POSITION) {
 			// TODO: Add flags
 			// NB: this version shows old -> new transitions
@@ -134,9 +130,6 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 		IMotorState oldState = motorController.getState();
 		double newSpeedSrx = speedToSrx(newSpeedInchesPerSecond);
 		motorController.move(newDirection, newSpeedSrx);
-		if(oldState != motorController.getState()) {
-			log.print("move [transitioned from " + oldState + " to " + motorController.getState() + ".");
-		}
 		if(motorController.getState() == TalonState.MOVING) {
 			// TODO: Add flags
 			// NB: this version shows transition

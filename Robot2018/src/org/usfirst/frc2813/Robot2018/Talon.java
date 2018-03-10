@@ -41,9 +41,9 @@ public class Talon {
 
 	// Just a description
 	private final String label;
-	
+
 	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;    // Remember last used pid index, help us implement state transitions 
-	
+
 	// Current state 
 	private TalonState state;
 	// Last control mode send to controller
@@ -184,6 +184,7 @@ public class Talon {
 		/*
 		 * Figure out state variables from current operation:
 		 */
+		TalonState oldState = this.state;
 		ControlMode newControlMode = ControlMode.Disabled;
 		double newControlModeValue = arg;
 		int newSlotIndex  = lastSlotIndex;
@@ -209,11 +210,15 @@ public class Talon {
 		} else {
 			throw new IllegalArgumentException("Unsupported state: " + newState);
 		}
+		// 
+		if(oldState != newState) {
+			log.print("set [transitioned from " + oldState + " to " + newState + "]");
+		}
 		// NB: This log statement shows old and current values, so you can see transitions completely
 		// TODO: Add a debug flag for this
 		log.print(""
 				+ "set Changes "
-				+ "[State (" + this.state + "-> " + newState + ") "
+				+ "[State (" + oldState + "-> " + newState + ") "
 				+ ", ControlMode (" + getControlModeLabel(this.lastControlMode) + "/" + this.lastControlModeValue + " -> " + getControlModeLabel(newControlMode) + "/" + newControlModeValue + ")" 
 				+ ", SlotIndex (" + lastSlotIndex + " -> " + newSlotIndex + ")"
 				+ ", PIDIndex ("  + lastPIDIndex + " -> " + newPIDIndex + ")"

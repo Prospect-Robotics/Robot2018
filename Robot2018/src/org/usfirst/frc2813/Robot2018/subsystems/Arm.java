@@ -217,7 +217,7 @@ public class Arm extends Subsystem {
 
 	@Override
 	public void periodic() {}
-	
+
 	@Override
 	public String toString() {
 		return label;
