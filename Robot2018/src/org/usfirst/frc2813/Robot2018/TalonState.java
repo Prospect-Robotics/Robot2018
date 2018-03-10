@@ -4,7 +4,7 @@ package org.usfirst.frc2813.Robot2018;
  * Create a class to represent the state of the Elevator state machine.
  * Glorified enumeration with the ability to describe itself.
  */
-public class TalonState implements IMotorState {
+public class TalonState {
 	// Zero velocity + brake mode, safe!
 	public static final TalonState DISABLED = new TalonState("DISABLED");
 	// Hold the current position, resist movement 

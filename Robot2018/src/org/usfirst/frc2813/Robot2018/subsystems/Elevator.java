@@ -5,8 +5,6 @@ import org.usfirst.frc2813.Robot2018.Log;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.TalonState;
-import org.usfirst.frc2813.Robot2018.IMotorState;
-import org.usfirst.frc2813.Robot2018.IMotorStateControl;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -19,7 +17,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * position is in inches.
  * speed is in inches per second.
  */
-public class Elevator extends Subsystem implements IMotorState,IMotorStateControl {
+public class Elevator extends Subsystem {
 	private static final double INCHES_PER_REVOLUTION = Math.PI * 1.25;
 	private static final double PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
     private static final double DEFAULT_SPEED = 12;
@@ -38,11 +36,11 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 	// State data for debugging/diagnostics only
 	private int lastPositionSrx = 0;
 	// State data for debugging/diagnostics only
-	private Direction lastDirection = Direction.NEUTRAL;
-	// State data for debugging/diagnostics only
-	private double lastSpeedSrx = 0;
-	// State data for debugging/diagnostics only
-	private double lastSpeedInchesPerSecond = 0;
+	private Direction direction = Direction.NEUTRAL;
+	// Speed in inches per second (last stored/assigned value)
+	private double speedInchesPerSecond = 0;
+	// Speed in SRX units (last stored/assigned value)
+	private double speedSrx = 0;
 
 	public Elevator() {
 		this.label = "Elevator";
@@ -85,7 +83,7 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 
 	// [ACTION]
 	public void disable() {
-		IMotorState oldState = motorController.getState();
+		TalonState oldState = motorController.getState();
 		motorController.disable();
 		if(oldState != motorController.getState()) {
 			log.print("disable [transitioned from " + oldState + " to " + motorController.getState() + ".");
@@ -94,7 +92,7 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 
 	// [ACTION]
 	public void holdCurrentPosition() {
-		IMotorState oldState = motorController.getState();
+		TalonState oldState = motorController.getState();
 		motorController.holdCurrentPosition();
 		if(oldState != motorController.getState()) {
 			log.print("holdCurrentPosition [transitioned from " + oldState + " to " + motorController.getState() + ".");
@@ -103,7 +101,7 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 
 	// [ACTION]
 	public void setPosition(double inches) {
-		IMotorState oldState = motorController.getState();
+		TalonState oldState = motorController.getState();
 		double newPositionInches = inches;
 		int newPositionSrx = inchesToSrx(inches);
 		motorController.setPosition(inchesToSrx(inches));
@@ -124,31 +122,68 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 		this.lastPositionInches = newPositionInches;
 		this.lastPositionSrx = newPositionSrx;
 	}
-	
-	// [ACTION]	
-	public void move(Direction newDirection, double newSpeedInchesPerSecond) {
-		IMotorState oldState = motorController.getState();
-		double newSpeedSrx = speedToSrx(newSpeedInchesPerSecond);
-		motorController.move(newDirection, newSpeedSrx);
+
+	/*
+	 * Set direction and speed in one call, without enabling movement.
+	 */
+	public void setMoveConfiguration(Direction newDirection, double newSpeedInchesPerSecond) {
+		TalonState oldState = motorController.getState();
+		double     newSpeedSrx = speedToSrx(newSpeedInchesPerSecond);
 		if(motorController.getState() == TalonState.MOVING) {
 			// TODO: Add flags
 			// NB: this version shows transition
-			log.print("move ["
-					+ "Direction (" + this.lastDirection + " -> " + newDirection + ")" 
-					+ ", InchesPerSecond (" + this.lastSpeedInchesPerSecond + " -> " + newSpeedInchesPerSecond + ")"
-					+ ", Velocity (" + this.lastSpeedInchesPerSecond + " -> " + newSpeedInchesPerSecond + ")"
+			log.print("setMoveConfiguration ["
+					+ "Direction (" + this.direction + " -> " + newDirection + ")" 
+					+ ", InchesPerSecond (" + this.speedInchesPerSecond + " -> " + newSpeedInchesPerSecond + ")"
+					+ ", Velocity (" + speedSrx + " -> " + newSpeedSrx + ")"
 					+ "]");
 		}
 		// TODO: Add flags
 		// NB: this version shows new values only
-		log.print("move ["
+		log.print("setMoveConfiguration ["
 				+ "Direction=" + newDirection 
 				+ ", InchesPerSecond=" + newSpeedInchesPerSecond
 				+ ", Velocity=" + newSpeedSrx
 				+ "]");
-		this.lastDirection = newDirection;
-		this.lastSpeedInchesPerSecond = newSpeedInchesPerSecond;
-		this.lastSpeedSrx = newSpeedSrx;
+		// If we are currently moving by velocity and the value changes, update the Talon
+		if(motorController.getState() == TalonState.MOVING) {
+			motorController.move(newDirection, newSpeedSrx);
+		}
+		this.direction = newDirection;
+		this.speedInchesPerSecond = newSpeedInchesPerSecond;
+		this.speedSrx = newSpeedSrx;
+	}
+	
+	// Set the speed (will update the controller only if we are already in MOVING state (TalonMode.Velocity)
+	public void setDirection(Direction newDirection) {
+		setMoveConfiguration(newDirection, speedInchesPerSecond);
+	}
+	
+	// Set the speed (will update the controller only if we are already in MOVING state (TalonMode.Velocity)
+	public void setSpeedInchesPerSecond(double newSpeedInchesPerSecond) {
+		setMoveConfiguration(this.direction, newSpeedInchesPerSecond);
+	}
+
+	// [ACTION]
+	public void move(Direction newDirection, double newSpeedInchesPerSecond) {
+		/* Set the new speed and/or direction.  If we are already moving, 
+		 * setMoveConfiguration will update the Talon.  If not, we have to tell it 
+		 * to start moving.
+		 */
+		setMoveConfiguration(newDirection, newSpeedInchesPerSecond);
+		if(motorController.getState() != TalonState.MOVING) {
+			motorController.move(this.direction, this.speedSrx);
+		}
+	}
+
+	// [ACTION] - Change to moving state as necessary and update direction
+	public void move(Direction newDirection) {
+		move(newDirection, this.speedInchesPerSecond);
+	}
+
+	// [ACTION] - Change to moving state using configured direction and speed
+	public void move() {
+		move(this.direction, this.speedInchesPerSecond);
 	}
 
 	// initializes elevator in static position
@@ -168,10 +203,9 @@ public class Elevator extends Subsystem implements IMotorState,IMotorStateContro
 	public boolean isMoving() {
 		return motorController.isMoving();
 	}
-	public IMotorState getState() {
-		return motorController.getState();
+	public double getSpeedInchesPerSecond() {
+		return speedInchesPerSecond;
 	}
-
 	@Override
 	public void periodic() {}
 	

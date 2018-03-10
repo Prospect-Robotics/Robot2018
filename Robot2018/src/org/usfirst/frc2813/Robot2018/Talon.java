@@ -97,8 +97,8 @@ public class Talon {
 		set(TalonState.DISABLED, 0);
 	}
 	
-	public IMotorState getState() {
-		return this.state;
+	public TalonState getState() {
+		return state;
 	}
 
 	public void configSoftLimitSwitch(Direction direction, int limit) {
@@ -289,7 +289,6 @@ public class Talon {
 		set(TalonState.HOLDING_POSITION, readPosition());
 		zeroEncodersIfNecessary();
 	}
-
 	/*
 	 * [ACTION] Set to a speed and direction. Direction will determine whether speed is
 	 * logical forward (positive) or reverse (negative) (not necessarily the same as
@@ -306,7 +305,14 @@ public class Talon {
 			set(TalonState.MOVING, speedParam);
 		}
 	}
-
+	/*
+	 * Talon only uses the velocity
+	 */
+	public void setVelocity(double speed) {
+		if(state == TalonState.MOVING) {
+			set(TalonState.MOVING, speed);
+		}
+	}
 	/*
 	 * [ACTION] Stop output of the motor
 	 */
