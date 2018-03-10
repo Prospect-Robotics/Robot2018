@@ -8,29 +8,29 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  * Subsystem baseclass for subsystems which move in two direction
  * over a range of positions.
- * 
+ *
  * This subsytem can halt, move to an exact position or in a direction.
  * Speed can be set separately.
  */
 public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
 	public boolean encoderFunctional = true;
-	protected static Log log;
-	protected static Direction direction;
-	protected static double speed;
-	protected static double position;
-    protected static boolean positionMode;  // true if we are moving to a position
-                                          // false if we move by direction and speed
-	protected static boolean isHalted;
-	
+	protected Log log;
+	protected Direction direction;
+	protected double speed;
+	protected double position;
+    protected boolean positionMode;  // true if we are moving to a position
+                                     // false if we move by direction and speed
+	protected boolean isHalted;
+
 	/**
 	 * GEOMETRY - define in terms of your motor controller
 	 * You must define these in your subsystem. You must choose units for
 	 * distance and speed and define default min and max.
 	 */
-	public static double MAX_POSITION;
-	public static double MIN_POSITION;
-	protected static double PULSES_PER_UNIT_POSITION;
-    protected static double DEFAULT_SPEED;
+	public double MAX_POSITION;
+	public double MIN_POSITION;
+	protected double PULSES_PER_UNIT_POSITION;
+    protected double DEFAULT_SPEED;
 
     /**
      * Constructor. configure your motor controller and set your
@@ -42,7 +42,7 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
 
 		// track state and change as required. Start in moving so initialize can halt
         direction = Direction.DOWN;
-        position = MIN_POSITION; 
+        position = MIN_POSITION;
         speed = DEFAULT_SPEED;
         positionMode = false;
         isHalted = true;
@@ -51,21 +51,21 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
     /**
     * Map position from inches to controller ticks
     */
-    protected static int positionToController(double pos) {
+    protected int positionToController(double pos) {
 		return (int)(pos * PULSES_PER_UNIT_POSITION);
     }
 
     /**
     * Map position from controller ticks to distance units
     */
-    protected static double controllerToPosition(int ticks) {
+    protected double controllerToPosition(int ticks) {
         return ticks / PULSES_PER_UNIT_POSITION;
     }
 
     /**
     * Map speed from speed units to controller ticks
     */
-    protected static double speedToController(double speedParam) {
+    protected double speedToController(double speedParam) {
         return speedParam * PULSES_PER_UNIT_POSITION;
     }
 
@@ -97,7 +97,7 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
 	 * @return position in controller units
 	 */
 	protected abstract int readControllerPosition();
-	
+
 	/**
 	 * Abstract method to set controller position
 	 * @param positionParam
@@ -130,7 +130,7 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
 	public double readPosition() {
 		return controllerToPosition(readControllerPosition());
 	}
-	
+
 	/**
 	 * Set position in distance units
 	 */

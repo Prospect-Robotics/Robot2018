@@ -8,24 +8,24 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  * Subsystem baseclass for subsystems which move in two direction but
  * are positionless.
- * 
+ *
  * This subsytem can halt or move in a direction.
  * Speed can be set separately.
  */
 public abstract class SubsystemDirectionSpeed extends Subsystem {
 	public boolean encoderFunctional = true;
-	protected static Log log;
-	protected static Direction direction;
-	protected static double speed;
-	protected static boolean isHalted;
-	
+	protected Log log;
+	protected Direction direction;
+	protected double speed;
+	protected boolean isHalted;
+
 	/**
 	 * GEOMETRY - define in terms of your motor controller
 	 * You must define these in your subsystem. You must choose units for
 	 *  speed.
 	 */
-    protected static double DEFAULT_SPEED;
-    protected static double PULSES_PER_UNIT_POSITION; // map user speed to controller speed
+    protected double DEFAULT_SPEED;
+    protected double PULSES_PER_UNIT_POSITION; // map user speed to controller speed
 
     /**
      * Constructor. configure your motor controller and set your
@@ -44,7 +44,7 @@ public abstract class SubsystemDirectionSpeed extends Subsystem {
     /**
     * Map speed from speed units to controller ticks
     */
-    protected static double speedToController(double speedParam) {
+    protected double speedToController(double speedParam) {
         return speedParam * PULSES_PER_UNIT_POSITION;
     }
 

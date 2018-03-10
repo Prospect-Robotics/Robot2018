@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  * Subsystem baseclass for simple subsystems which have one of
  * two states.
- * 
+ *
  */
 public abstract class SubsystemBinary extends Subsystem {
 	public boolean encoderFunctional = true;
 	protected static Log log;
 	protected static Direction state;
-	
+
     /**
      * Constructor. configure your motor controller and set your
      * geometry and state. Override and call super. Note that
