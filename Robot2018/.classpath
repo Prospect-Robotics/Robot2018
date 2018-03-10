@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="CTRE/CTRE_Phoenix-javadoc.jar"/>
 	<classpathentry kind="lib" path="CTRE/CTRE_Phoenix-sources.jar"/>
 	<classpathentry kind="lib" path="CTRE/CTRE_Phoenix.jar" sourcepath="CTRE/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
