@@ -12,17 +12,19 @@ public class GameData {
 		return (c == 'L') ? Direction.LEFT : Direction.RIGHT;
 	}
 	GameData(String gd) {
-		if (gd.length() != 3) {
-			isEnabled = false;
-			nearSwitch = Direction.OFF;
-			scale = Direction.OFF;
-			farSwitch = Direction.OFF;
-		} else {
+		if (gd.equals("LLL") || gd.equals("LRL") || gd.equals("RLR") || gd.equals("RRR")) {
 			isEnabled = true;
 			nearSwitch = splitChar(gd.charAt(0));
 			scale = splitChar(gd.charAt(1));
 			farSwitch = splitChar(gd.charAt(2));
-		}	
+		}
+		else {
+			System.out.println("Invalid GameData: " + gd);
+			isEnabled = false;
+			nearSwitch = Direction.OFF;
+			scale = Direction.OFF;
+			farSwitch = Direction.OFF;
+		} 	
 	}
 	public Direction getNearSwitch() { return nearSwitch; }
 	public Direction getScale() { return scale; }
