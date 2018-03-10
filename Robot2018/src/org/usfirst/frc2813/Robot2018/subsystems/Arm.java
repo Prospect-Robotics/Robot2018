@@ -69,10 +69,12 @@ public class Arm extends Subsystem {
 	private static final double PULSES_PER_DEGREE_PER_SECOND = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
 	private static final double ARM_DEFAULT_SPEED = 5;
 
+	private final String label; 
 	public Arm() {
-		log = new Log("Arm");
+		this.label = "Arm";
+		log = new Log(this.label);
 
-		motorController = new Talon(RobotMap.srxArm, log);
+		motorController = new Talon(RobotMap.srxArm, this.label, log);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, armPositionToSrx(DEGREES));
         motorController.initPID();
@@ -219,4 +221,9 @@ public class Arm extends Subsystem {
 
 	@Override
 	public void periodic() {}
+	
+	@Override
+	public String toString() {
+		return label;
+	}
 }

@@ -36,9 +36,11 @@ public class Elevator extends Subsystem {
 	private static final double PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
     private static final double DEFAULT_SPEED = 12;
 
+    private final String label;    
 	public Elevator() {
-		log = new Log(this.toString());
-		motorController = new Talon(RobotMap.srxElevator, log);
+		this.label = "Elevator";
+		log = new Log(this.label);
+		motorController = new Talon(RobotMap.srxElevator, this.label, log);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(HEIGHT * PULSES_PER_INCH));
         motorController.initPID();
@@ -160,4 +162,9 @@ public class Elevator extends Subsystem {
 
 	@Override
 	public void periodic() {}
+	
+	@Override
+	public String toString() {
+		return label;
+	}
 }
