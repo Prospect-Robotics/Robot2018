@@ -69,24 +69,13 @@ public class MoveElevator extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		switch(state) {
-		case HOLDING_POSITION:
-			// "done" means no more action to take
-			return true;
-		case MOVING:
-			// It's moving at a velocity, with PID.  The command is done.
-			return true;
-		case SET_POSITION:
-			// It's moving to a position, holding with PID.  The command is done.
-			return true;
-		case DISABLED:
-			return true;
-		default:
-			throw new IllegalArgumentException("Unsupported state: " + state);
-		}
+		// Turns out that it's all automatic once you ran execute once.
+		return true;
 	}
 	@Override
 	protected void end() {}
 	@Override
-	protected void interrupted() {}
+	protected void interrupted() {
+		
+	}
 }
