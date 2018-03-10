@@ -41,6 +41,11 @@ public class AutonomousCommandGroupGenerator {
 		 // allows left->right and right->left to share code
 		directionBias = (position == Direction.LEFT) ? 1 : -1;
 
+		if (RobotMap.gameData.getScale() == Direction.OFF) {
+			// there is no game data. Cross the auto line
+			autoCmdList.driveForward(50);
+		}
+		
 		if (position == RobotMap.gameData.getScale()) {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(150);
