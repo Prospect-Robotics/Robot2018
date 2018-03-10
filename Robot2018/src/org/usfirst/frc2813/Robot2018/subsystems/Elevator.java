@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * position is in inches.
  * speed is in inches per second.
  */
-public class Elevator extends GearheadsSubsystem {
+public class Elevator extends Subsystem {
 	public boolean encoderFunctional = true;
 	private static Direction direction;
 	private static double speed;
@@ -148,7 +148,7 @@ public class Elevator extends GearheadsSubsystem {
 
 		isHalted = true;
 		motorController.halt();
-		System.out.format("Halting elevator movement. Position %f. Limits [DOWN=%d UP=%d]\n", readPosition(), readDownLimitSwitch(), readUpLimitSwitch());
+		System.out.format("Halting elevator movement. Position. Limits [DOWN=%d UP=%d]\n", readPosition(), readDownLimitSwitch(), readUpLimitSwitch());
 		if(readDownLimitSwitch()) {
 			motorController.zeroEncoders();
 		}

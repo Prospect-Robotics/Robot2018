@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * Jaws can open and close.
  * Jaws have state tracking this. - FIXME: can jaws open if closed too long? Should we care?
  */
-public class Arm extends GearheadsSubsystem {
+public class Arm extends Subsystem {
 	public boolean encoderFunctional = true;
 	private static Direction armDirection;
 	private static double armSpeed;

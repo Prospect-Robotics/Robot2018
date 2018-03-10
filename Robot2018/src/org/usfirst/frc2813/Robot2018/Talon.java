@@ -59,7 +59,7 @@ public class Talon {
 		reverseDirections.add(Direction.DOWN);
 	}
 
-	private String label = "TalonSRX";
+	private String label;
 	
 	// Remember mode and position.  We only want to zero encoders when we are stopped
 	private ControlMode currentMode = ControlMode.Position;
@@ -68,7 +68,7 @@ public class Talon {
 	public Talon(TalonSRX srx, String label) {
 		this.srx = srx;
 		this.label = label;
-
+		
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configNominalOutputReverse(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -96,6 +96,10 @@ public class Talon {
 		 * units per rotation.
 		 */
 		srx.configAllowableClosedloopError(0, MAINTAIN_PID_LOOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
+	}
+	
+	private void log(String s) {
+		System.out.println(label + ": " + s);
 	}
 
 	public void configSoftLimitSwitch(Direction direction, int limit) {
@@ -148,20 +152,16 @@ public class Talon {
 		}
 	}
 
-	private static String getControlModeLabel(ControlMode mode) {
-		ASDF
-	}
-	
 	private void set(ControlMode mode, double position) {
 		this.currentMode = mode;
 		this.targetPosition = position;
-		System.out.println("SET " + label + " [mode=" + getControlModeLabel(mode) + ", position=" + position + "]");
+		log("SET " + " [mode=" + mode + ", position=" + position + "]");
 		srx.set(mode, position);
 	}
 
 	public int readPosition() {
 		int position = srx.getSelectedSensorPosition(PRIMARY_CLOSED_LOOP_SENSOR);
-		System.out.println("GET " + label + " = @ " + position);
+		log("GET " + " = @ " + position);
 		return position;
 	}
 
@@ -181,7 +181,7 @@ public class Talon {
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.setSelectedSensorPosition(0, PRIMARY_CLOSED_LOOP_SENSOR, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			set(ControlMode.Position, 0);
-			System.out.println("ZEROING ENCODERS " + label);
+			log("ZEROING ENCODERS");
 		}
 	}
 
@@ -192,13 +192,13 @@ public class Talon {
 			speedParam *= -1;
 		}
 		set(ControlMode.Velocity, speedParam);
-		System.out.println("SET " + label + " velocity = " + speedParam);
+		log("SET velocity = " + speedParam);
 	}
 
 	// stop arm from moving - this is active as we require pid to resist gravity
 	public void halt() {
 		srx.selectProfileSlot(0, 0);
 		setPosition(readPosition());
-		System.out.println("HALT " + label);
+		log("HALT");
 	}
 }

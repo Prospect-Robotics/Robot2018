@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
-import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
+
 /**
  * Move or maintain elevator position.
  * No argument to halt.
@@ -18,7 +18,7 @@ public class MoveElevator extends Command {
 	private Direction direction;
 	private double position;
     private boolean positionMode;  // true if we are moving to a position
-                                          // false if we move by direction and speed
+                                   // false if we move by direction and speed
 	public MoveElevator() {
 		halted = true;
 		requires(Robot.elevator);
@@ -89,7 +89,7 @@ public class MoveElevator extends Command {
         else {
             done = currentPosition >= targetPosition;
         }
-		System.out.println("MoveElevator [PositionMode=" + positionMode + ", Direction=" + GearheadsSubsystem.getDirectionLabel(direction) + ", Target=" + targetPosition + ", Position=" + currentPosition + "]");
+		System.out.println("MoveElevator [PositionMode=" + positionMode + ", Direction=" + direction + ", Target=" + targetPosition + ", Position=" + currentPosition + "]");
 		if (done) {
 			System.out.println("MoveElevator_FINISHED");
 			halted = true;
