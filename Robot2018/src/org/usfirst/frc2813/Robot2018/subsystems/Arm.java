@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * Jaws can open and close.
  * Jaws have state tracking this. - FIXME: can jaws open if closed too long? Should we care?
  */
-public class Arm extends Subsystem {
+public class Arm extends GearheadsSubsystem {
 	public boolean encoderFunctional = true;
 	private static Direction armDirection;
 	private static double armSpeed;
@@ -46,7 +46,7 @@ public class Arm extends Subsystem {
 	private static final double MAX_POSITION = ONE_DEGREE * DEGREES;
 
 	public Arm() {
-		motorController = new Talon(RobotMap.srxArm);
+		motorController = new Talon(RobotMap.srxArm, "<<Arm>>");
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)MAX_POSITION);
         motorController.initPID();

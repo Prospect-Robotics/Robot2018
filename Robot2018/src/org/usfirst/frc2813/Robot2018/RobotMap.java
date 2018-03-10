@@ -114,7 +114,7 @@ public class RobotMap {
 		
 		driveTrainQuadratureEncoderPort = new Encoder(12, 13, true, EncodingType.k4X);
 		LiveWindow.addSensor("DriveTrain", "Port Encoder", driveTrainQuadratureEncoderPort);
-		LiveWindow.addActuator("DriveTrain", "Solenoid 1", driveTrainGearShiftSolenoid);
+		//LiveWindow.addActuator("DriveTrain", "Solenoid 1", driveTrainGearShiftSolenoid);
 
 		/*
 		 * Elevator subsystem
@@ -151,7 +151,7 @@ public class RobotMap {
 		srxArm = new TalonSRX(12);		// CAN bus slot 12
 
 		intakeSpeedController = new WPI_VictorSPX(11);	//  Competition bot changed from 5 to 11
-		LiveWindow.addActuator("Intake", "Speed Controller 1", intakeSpeedController);
+		//LiveWindow.addActuator("Intake", "Speed Controller 1", intakeSpeedController);
 		
 		// FIXME move to subsystem
 		intakeSpeedController.setInverted(false);

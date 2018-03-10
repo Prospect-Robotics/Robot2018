@@ -88,16 +88,16 @@ public class OI {
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
-		elevatorUp.whileHeld(new SetSpeed(-.4));		// units of inches per second!
+		elevatorUp.whileHeld(new MoveElevator(Direction.UP));		// units of inches per second!
 		//elevatorDown.whenReleased(new SetSpeed(0));
 		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
 		elevatorDown = new JoystickButton(buttonPanel, 4);
 		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-		elevatorDown.whileHeld(new SetSpeed(.4));
+		elevatorDown.whileHeld(new MoveElevator(Direction.DOWN));
 		//elevatorUp.whenReleased(new SetSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
-		new JoystickButton(buttonPanel, 3).whenPressed(new MoveElevator(0));
+		new JoystickButton(buttonPanel, 3).whenPressed(new MoveElevator(0));//Bottom elevator
 		spinIntakeOut = new JoystickButton(buttonPanel, 2);
 		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
 		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));

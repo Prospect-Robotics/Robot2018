@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * position is in inches.
  * speed is in inches per second.
  */
-public class Elevator extends Subsystem {
+public class Elevator extends GearheadsSubsystem {
 	public boolean encoderFunctional = true;
 	private static Direction direction;
 	private static double speed;
@@ -32,7 +32,7 @@ public class Elevator extends Subsystem {
     private static final double DEFAULT_SPEED = 12;
 
 	public Elevator() {
-		motorController = new Talon(RobotMap.srxElevator);
+		motorController = new Talon(RobotMap.srxElevator, "<<Elevator>>");
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(HEIGHT * PULSES_PER_INCH));
         motorController.initPID();
@@ -40,9 +40,10 @@ public class Elevator extends Subsystem {
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 0.75, 0.01, 40);
 
 		// track state and change as required. Start in moving so initialize can halt
-		isHalted = true;
-        direction = Direction.UP;
+        direction = Direction.DOWN;
+        position = 0; 
         speed = DEFAULT_SPEED;
+        isHalted = true; // NB: Soon we need to go down to zero at startup to initialize/calibrate
 	}
 
     /**
@@ -116,11 +117,11 @@ public class Elevator extends Subsystem {
 		isHalted = false;
         if (positionMode) {
             motorController.setPosition(positionToSrx(position));
-            System.out.format("Starting elevator movement. Target position %f", position);
+            System.out.format("Starting elevator movement. Target position %f\n", position);
         }
         else {
             motorController.setSpeedAndDirection(speedToSrx(speed), direction);
-            System.out.format("Starting elevator movement. Speed %f", speed);
+            System.out.format("Starting elevator movement. Speed %f\n", speed);
         }
 	}
 
@@ -139,6 +140,13 @@ public class Elevator extends Subsystem {
         direction = directionParam;
         move();
     }
+    
+    public static boolean readDownLimitSwitch() {
+    	return motorController.readLimitSwitch(Direction.DOWN);
+    }
+    public static boolean readUpLimitSwitch() {
+    	return motorController.readLimitSwitch(Direction.UP);
+    }
 
 	// stop elevator from moving - this is active as we require pid to resist gravity
 	public static void halt() {
@@ -148,7 +156,10 @@ public class Elevator extends Subsystem {
 
 		isHalted = true;
 		motorController.halt();
-		System.out.format("Halting elevator movement. Position %f", readPosition());
+		System.out.format("Halting elevator movement. Position %f. Limits [DOWN=%d UP=%d]\n", readPosition(), readDownLimitSwitch(), readUpLimitSwitch());
+		if(readDownLimitSwitch()) {
+			motorController.zeroEncoders();
+		}
 	}
 
 	// initializes elevator in static position

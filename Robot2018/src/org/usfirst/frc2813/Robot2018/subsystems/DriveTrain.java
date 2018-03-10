@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 /**
  * This is our drive train. It goes.
  */
-public class DriveTrain extends Subsystem {
+public class DriveTrain extends GearheadsSubsystem {
     private static final double WHEEL_DIAMETER = 4;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
     //public static final double REVOLUTIONS_PER_INCH = 1.0 / WHEEL_CIRCUMFERENCE;
@@ -87,7 +87,7 @@ public class DriveTrain extends Subsystem {
 		// double z = joystick1.getX() + joystick1.getTwist();
 		// double x = joystick1.getY();
 		// Please note: Grady had added this some time ago and it wasn't working.  I just fixed it.  Jack may yell at us for changing it.
-		gearShift.set(Math.abs(joystick1.getY()) > .7);		//  If >70% speed, shift into high gear; if <=70% speed, shift into low gear
+		//gearShift.set(Math.abs(joystick1.getY()) > .7);		//  If >70% speed, shift into high gear; if <=70% speed, shift into low gear
 		
 		/*
 		 *  The arcadeDrive call parameters are (signed) speed and (signed) turn value [-1, 1]

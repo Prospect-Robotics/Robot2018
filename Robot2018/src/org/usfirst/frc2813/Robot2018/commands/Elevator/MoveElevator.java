@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
-
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 /**
  * Move or maintain elevator position.
  * No argument to halt.
@@ -61,6 +61,18 @@ public class MoveElevator extends Command {
 
 		currentPosition = Elevator.readPosition();
 
+		/*
+		 * NB: When holding "up" or "down" buttons we are not
+		 * in positionMode, and targetPosition is set to 0 or HEIGHT
+		 * and limit switches will stop motion.
+		 * One area of concern is that any offset in encoder values
+		 * or inaccuracy will result in never reaching done state
+		 * even if the soft limit is hit or the limit switch triggers.
+		 * "done" should also be checking the controller to see if
+		 * either soft or hard limit is it.  Then we need to adjust
+		 * if we hit a physical limit without hitting the absolute value, 
+		 * HEIGHT or 0.
+		 */
         if (positionMode) {
             targetPosition = position;
         }
@@ -77,7 +89,9 @@ public class MoveElevator extends Command {
         else {
             done = currentPosition >= targetPosition;
         }
+		System.out.println("MoveElevator [PositionMode=" + positionMode + ", Direction=" + GearheadsSubsystem.getDirectionLabel(direction) + ", Target=" + targetPosition + ", Position=" + currentPosition + "]");
 		if (done) {
+			System.out.println("MoveElevator_FINISHED");
 			halted = true;
 			Elevator.halt();
 			return true;
