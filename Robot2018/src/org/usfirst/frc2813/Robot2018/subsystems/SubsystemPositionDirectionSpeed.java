@@ -38,7 +38,7 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
      * to change any of the defaults set here, call super first!
      */
 	public SubsystemPositionDirectionSpeed() {
-		log = new Log(this.getClass().getName()); // do this or call super
+		log = new Log(this.getClass().getName());
 
 		// track state and change as required. Start in moving so initialize can halt
         direction = Direction.DOWN;

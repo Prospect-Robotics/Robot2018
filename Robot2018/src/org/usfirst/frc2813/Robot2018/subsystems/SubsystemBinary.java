@@ -21,7 +21,7 @@ public abstract class SubsystemBinary extends Subsystem {
      * to change any of the defaults set here, call super first!
      */
 	public SubsystemBinary() {
-		log = new Log(this.getClass().getName()); // do this or call super
+		log = new Log(this.getClass().getName());
 
 		// track state and change as required. Start in moving so initialize can halt
         state = Direction.NEGATIVE;

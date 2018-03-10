@@ -3,19 +3,28 @@ package org.usfirst.frc2813.Robot2018;
 /**
  * Very simple logger. Takes a name and saves you passing the name each time.
  */
-// try to get an interface working...
-//public interface Log {
-//	static String label;
-//	public default void print(String s) {
-//		System.out.println(this.getClass().toString() + ": " + s);
-//	}
-//}
+enum LogLevel {DEBUG, INFO, WARN, ERROR}
+
 public class Log {
 	private String label;
-	public Log(String name) {
+	private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.WARN;
+	private LogLevel baseLogLevel;
+	public Log(String name, LogLevel defaultLogLevel) {
+		baseLogLevel = defaultLogLevel;
 		label = name + ": ";
 	}
+	public Log(String name) {
+		this(name, DEFAULT_LOG_LEVEL);
+	}
+	public void print(String s, LogLevel level) {
+		if (level == LogLevel.ERROR) {
+			System.err.println(label + s);
+		}
+		else if (level.compareTo(baseLogLevel) >= 0) {
+			System.out.println(label + s);
+		}
+	}
 	public void print(String s) {
-		System.out.println(label + s);
+		print(s, LogLevel.INFO);
 	}
 }
