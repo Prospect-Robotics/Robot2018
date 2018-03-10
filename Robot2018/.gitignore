@@ -1,1 +1,6 @@
 /bin/
+/dist/
+*.swp
+.classpath
+*.class
+*.jar
