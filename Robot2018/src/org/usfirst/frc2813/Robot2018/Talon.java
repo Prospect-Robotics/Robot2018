@@ -297,7 +297,7 @@ public class Talon {
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			log.print("move [Direction (" + direction.getLabel() + ") x Speed (" + speed + ") -> " + speedParam + "]");
+			log.print("move [Direction (" + direction + ") x Speed (" + speed + ") -> " + speedParam + "]");
 			set(TalonState.MOVING, speedParam);
 		}
 	}

@@ -14,6 +14,12 @@ package org.usfirst.frc2813.Robot2018;
  */
 public enum Direction{
 	/** Alias for POSITIVE */
+	POSITIVE(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	NEGATIVE(Canonical.NEGATIVE),
+	/** Alias for NEUTRAL */
+	NEUTRAL(Canonical.NEUTRAL),
+	/** Alias for POSITIVE */
 	FORWARD(Canonical.POSITIVE),
 	/** Alias for NEGATIVE */
 	BACKWARD(Canonical.NEGATIVE),
@@ -52,6 +58,7 @@ public enum Direction{
 	ON(Canonical.POSITIVE),
 	/** Alias for NEUTRAL */
 	OFF(Canonical.NEUTRAL);
+	
 	
 	Canonical canonicalDirection;
 	Direction(Canonical canonicalDirection) {
