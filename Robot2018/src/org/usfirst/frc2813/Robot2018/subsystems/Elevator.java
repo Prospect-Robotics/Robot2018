@@ -38,9 +38,9 @@ public class Elevator extends Subsystem {
 	// State data for debugging/diagnostics only
 	private Direction direction = Direction.NEUTRAL;
 	// Speed in inches per second (last stored/assigned value)
-	private double speedInchesPerSecond = 0;
+	private double speedInchesPerSecond = DEFAULT_SPEED;
 	// Speed in SRX units (last stored/assigned value)
-	private double speedSrx = 0;
+	private double speedSrx = speedToSrx(DEFAULT_SPEED);
 
 	public Elevator() {
 		this.label = "Elevator";
