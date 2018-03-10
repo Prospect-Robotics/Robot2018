@@ -3,7 +3,7 @@ package org.usfirst.frc2813.Robot2018;
 import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.SetElevatorSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
@@ -89,12 +89,12 @@ public class OI {
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
 		elevatorUp.whileHeld(new MoveElevator(Direction.UP));		// units of inches per second!
-		//elevatorDown.whenReleased(new SetSpeed(0));
+		//elevatorDown.whenReleased(new SetElevatorSpeed(0));
 		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
 		elevatorDown = new JoystickButton(buttonPanel, 4);
 		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
 		elevatorDown.whileHeld(new MoveElevator(Direction.DOWN));
-		//elevatorUp.whenReleased(new SetSpeed(0));
+		//elevatorUp.whenReleased(new SetElevatorSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
 		new JoystickButton(buttonPanel, 3).whenPressed(new MoveElevator(0));//Bottom elevator
