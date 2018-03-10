@@ -43,9 +43,9 @@ public class Elevator extends Subsystem {
 	private double speedSrx = speedToSrx(DEFAULT_SPEED);
 
 	public Elevator() {
-		this.label = "Elevator";
+		this.label = "Elevator-Subsystem";
 		log = new Log(this.label);
-		motorController = new Talon(RobotMap.srxElevator, this.label, log);
+		motorController = new Talon(RobotMap.srxElevator, this.label, new Log("Elevator-Talon"));
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(HEIGHT * PULSES_PER_INCH));
   	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.8, 0, 0);
@@ -189,6 +189,7 @@ public class Elevator extends Subsystem {
 	// initializes elevator in static position
 	@Override
 	public void initDefaultCommand() {
+		// Set to hold position by default
 		setDefaultCommand(new MoveElevator());
 	}
 	public double getSpeedInchesPerSecond() {
