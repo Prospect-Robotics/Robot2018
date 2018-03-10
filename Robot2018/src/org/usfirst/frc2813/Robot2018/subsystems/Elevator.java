@@ -153,12 +153,12 @@ public class Elevator extends Subsystem {
 		this.speedInchesPerSecond = newSpeedInchesPerSecond;
 		this.speedSrx = newSpeedSrx;
 	}
-	
+
 	// Set the speed (will update the controller only if we are already in MOVING state (TalonMode.Velocity)
 	public void setDirection(Direction newDirection) {
 		setMoveConfiguration(newDirection, speedInchesPerSecond);
 	}
-	
+
 	// Set the speed (will update the controller only if we are already in MOVING state (TalonMode.Velocity)
 	public void setSpeedInchesPerSecond(double newSpeedInchesPerSecond) {
 		setMoveConfiguration(this.direction, newSpeedInchesPerSecond);
