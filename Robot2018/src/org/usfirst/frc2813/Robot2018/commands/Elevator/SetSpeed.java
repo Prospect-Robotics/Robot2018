@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class SetSpeed extends Command {
 	double speed;
-	
+	private boolean limitSwitch = false;
 	private static final double PULSES_PER_INCH = RobotMap.SRX_MAG_PULSES_PER_REVOLUTION / RobotMap.ELEVATOR_INCHES_PER_REVOLUTION;
 
 	/**
@@ -33,6 +33,10 @@ public class SetSpeed extends Command {
     	System.out.println("SetSpeed Execute" + RobotMap.srxElevator.getSelectedSensorPosition(0)+" Speed " + speed);
     	// set() accepts a velocity in position change per 100ms.  Divide by 10 to convert position change per 1000ms to that.
     	RobotMap.srxElevator.set(ControlMode.Velocity, (speed * 12.0 * PULSES_PER_INCH) / 10.0);
+    	if (limitSwitch == false && RobotMap.srxElevator.getSensorCollection().isRevLimitSwitchClosed() == true) {
+    		System.out.println("Limit Switch Hit");
+    		limitSwitch = true;
+    	}
     }
 	@Override
 	protected boolean isFinished() {
