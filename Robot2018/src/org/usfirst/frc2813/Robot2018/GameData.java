@@ -7,13 +7,22 @@ package org.usfirst.frc2813.Robot2018;
  */
 public class GameData {
 	private Direction nearSwitch, scale, farSwitch;
+	public boolean isEnabled;
 	private static Direction splitChar(char c) {
 		return (c == 'L') ? Direction.LEFT : Direction.RIGHT;
 	}
 	GameData(String gd) {
-		nearSwitch = splitChar(gd.charAt(0));
-		scale = splitChar(gd.charAt(1));
-		farSwitch = splitChar(gd.charAt(2));
+		if (gd.length() != 3) {
+			isEnabled = false;
+			nearSwitch = Direction.OFF;
+			scale = Direction.OFF;
+			farSwitch = Direction.OFF;
+		} else {
+			isEnabled = true;
+			nearSwitch = splitChar(gd.charAt(0));
+			scale = splitChar(gd.charAt(1));
+			farSwitch = splitChar(gd.charAt(2));
+		}	
 	}
 	public Direction getNearSwitch() { return nearSwitch; }
 	public Direction getScale() { return scale; }

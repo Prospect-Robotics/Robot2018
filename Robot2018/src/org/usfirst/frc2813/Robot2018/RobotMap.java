@@ -71,6 +71,7 @@ public class RobotMap {
 	public static void init() {
 
 		// Get the game setup data from the driver station
+		
 		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 
 		/* CAN BUS PORT SUMMARY
