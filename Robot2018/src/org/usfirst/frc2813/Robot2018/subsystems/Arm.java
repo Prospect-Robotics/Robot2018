@@ -77,8 +77,7 @@ public class Arm extends Subsystem {
 		motorController = new Talon(RobotMap.srxArm, this.label, log);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, armPositionToSrx(DEGREES));
-        motorController.initPID();
-	    motorController.setPID(Talon.MAINTAIN_PID_LOOOP_IDX, 0.1, 0, 0);
+	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.1, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
         armDirection = Direction.DOWN;
         armPosition = 0;

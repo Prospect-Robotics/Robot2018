@@ -35,24 +35,28 @@ public class Elevator extends Subsystem {
 	private static final double INCHES_PER_REVOLUTION = Math.PI * 1.25;
 	private static final double PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
     private static final double DEFAULT_SPEED = 12;
-
-    private final String label;    
+    private final String label;
+    
+//    enum ElevatorState { HALTED, HOLDING, MOVING };
+//    private ElevatorState state = ElevatorState.HALTED; 
+    
 	public Elevator() {
 		this.label = "Elevator";
 		log = new Log(this.label);
 		motorController = new Talon(RobotMap.srxElevator, this.label, log);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(HEIGHT * PULSES_PER_INCH));
-        motorController.initPID();
-	    motorController.setPID(Talon.MAINTAIN_PID_LOOOP_IDX, 0.8, 0, 0);
+  	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.8, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 0.75, 0.01, 40);
 
+	 // NB: Soon we need to go down to zero at startup to initialize/calibrate
 		// track state and change as required. Start in moving so initialize can halt
-        direction = Direction.DOWN;
-        position = 0; 
+        direction = Direction.NEUTRAL;
+        position = 0;
         speed = DEFAULT_SPEED;
         positionMode = false;
-        isHalted = true; // NB: Soon we need to go down to zero at startup to initialize/calibrate
+        isHalted = true;
+//        state = ElevatorState.HALTED; 
 	}
 
     /**

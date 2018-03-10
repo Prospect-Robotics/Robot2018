@@ -28,41 +28,41 @@ public class Direction implements java.lang.Comparable<Direction> {
 	/** Alias for POSITIVE */
 	public static final Direction FORWARD  = new Direction(POSITIVE, "FORWARD");
 	/** Alias for NEGATIVE */
-	public static final Direction BACKWARD = NEGATIVE;
+	public static final Direction BACKWARD = new Direction(NEGATIVE, "BACKWARD");
 	/** Alias for NEGATIVE */
-	public static final Direction REVERSE = NEGATIVE;
+	public static final Direction REVERSE = new Direction(NEGATIVE, "REVERSE");
 	
 	/** Alias for NEGATIVE */
-	public static final Direction IN      = NEGATIVE; // TODO: This should probably be reversed.
+	public static final Direction IN      = new Direction(NEGATIVE, "IN"); // TODO: This should probably be reversed.
 	/** Alias for POSITIVE */
-	public static final Direction OUT     = POSITIVE; // TODO: This should probably be reversed.
+	public static final Direction OUT     = new Direction(POSITIVE, "OUT"); // TODO: This should probably be reversed.
 
 	/** Alias for POSITIVE */
-	public static final Direction CLOCKWISE        = new Direction(POSITIVE_MULTIPLIER, "CLOCKWISE");  
+	public static final Direction CLOCKWISE        = new Direction(POSITIVE, "CLOCKWISE");  
 	/** Alias for NEGATIVE */
-	public static final Direction COUNTERCLOCKWISE = NEGATIVE;
+	public static final Direction COUNTERCLOCKWISE = new Direction(NEGATIVE, "COUNTERCLOCKWISE");
 
 	/** Alias for POSITIVE */
-	public static final Direction UP      = new Direction(POSITIVE_MULTIPLIER, "UP");
+	public static final Direction UP      = new Direction(POSITIVE, "UP");
 	/** Alias for NEGATIVE */
-	public static final Direction DOWN    = NEGATIVE;
+	public static final Direction DOWN    = new Direction(NEGATIVE, "DOWN");
 	
 	/** Alias for POSITIVE */
-	public static final Direction RIGHT   = new Direction(POSITIVE_MULTIPLIER, "RIGHT");
+	public static final Direction RIGHT   = new Direction(POSITIVE, "RIGHT");
 	/** Alias for NEGATIVE */
-	public static final Direction LEFT    = new Direction(NEGATIVE_MULTIPLIER, "LEFT");
+	public static final Direction LEFT    = new Direction(NEGATIVE, "LEFT");
 	
 	/** Alias for POSITIVE */
-	public static final Direction OPEN    = new Direction(POSITIVE_MULTIPLIER, "OPEN");
+	public static final Direction OPEN    = new Direction(POSITIVE, "OPEN");
 	/** Alias for NEGATIVE */
-	public static final Direction CLOSE   = new Direction(NEGATIVE_MULTIPLIER, "CLOSE");
+	public static final Direction CLOSE   = new Direction(NEGATIVE, "CLOSE");
 
 	/** Alias for NEUTRAL */
-	public static final Direction CENTER  = new Direction(NEUTRAL_MULTIPLIER, "CENTER");
+	public static final Direction CENTER  = new Direction(NEUTRAL, "CENTER");
 	/** Alias for NEUTRAL */
-	public static final Direction STOP    = new Direction(NEUTRAL_MULTIPLIER, "STOP");
+	public static final Direction STOP    = new Direction(NEUTRAL, "STOP");
 	/** Alias for NEUTRAL */
-	public static final Direction OFF     = new Direction(NEUTRAL_MULTIPLIER, "OFF");
+	public static final Direction OFF     = new Direction(NEUTRAL, "OFF");
 	
 	// The canonical form, or null if this is a canonical direction
 	private final Direction canonicalDirection;
@@ -93,13 +93,13 @@ public class Direction implements java.lang.Comparable<Direction> {
 	 * Is this a positive direction
 	 */
 	public boolean isPositive() {
-		return canonicalDirection == POSITIVE;
+		return canonicalDirection == FORWARD;
 	}
 	/**
 	 * Is this a negative direction
 	 */
 	public boolean isNegative() {
-		return canonicalDirection == NEGATIVE;
+		return canonicalDirection == REVERSE;
 	}
 	/**
 	 * Get the label
@@ -150,7 +150,7 @@ public class Direction implements java.lang.Comparable<Direction> {
 	public boolean equals(Direction other) {
 		return other.getCanonicalDirection() == this.getCanonicalDirection();
 	}
-	
+
 	/**
 	 * Order by label
 	 */
