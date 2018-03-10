@@ -61,7 +61,7 @@ public class Arm extends Subsystem {
 	/**
 	 * ARM GEOMETRY
 	 */
-	private static final double DEGREES = 24;
+	public static final double DEGREES = 24;
 	private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
 	private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
 	private static final double PULSES_PER_DEGREE = PULSES_PER_REVOLUTION / 360;
