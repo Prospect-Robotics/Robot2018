@@ -40,7 +40,7 @@ public class RobotMap {
 	public static Encoder driveTrainQuadratureEncoderStarboard;// Starboard Motor
 	public static Encoder driveTrainQuadratureEncoderPort;// Port Motor
 	public static Solenoid driveTrainGearShiftSolenoid;
-	public static Solenoid armJawsSolenoid;
+	public static Solenoid jawsSolenoid;
 
 	/*
 	 * Elevator Subsystem
@@ -160,7 +160,7 @@ public class RobotMap {
 		intakeSpeedControllerFollow.set(ControlMode.Follower, intakeSpeedController.getDeviceID());
 		intakeSpeedControllerFollow.setInverted(true);
 
-		armJawsSolenoid = new Solenoid(0,1);
+		jawsSolenoid = new Solenoid(0,1);
 		elevatorRatchet = new Solenoid(0,2);
 		climbingBar = new Solenoid(0,4);
 	}

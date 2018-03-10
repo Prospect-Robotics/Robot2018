@@ -85,7 +85,7 @@ public class Arm extends Subsystem {
 		armIsHalted = false;
         intakeDirection = Direction.IN;
 		intakeIsHalted = false;
-		jawsState = RobotMap.armJawsSolenoid.get() ? Direction.OPEN : Direction.CLOSE;
+		jawsState = RobotMap.jawsSolenoid.get() ? Direction.OPEN : Direction.CLOSE;
 	}
 
     /**
@@ -194,7 +194,7 @@ public class Arm extends Subsystem {
 	// Manage jaws
 	public static void setJaws(Direction direction) {
 		if (jawsState != direction) {
-			RobotMap.armJawsSolenoid.set(direction == Direction.CLOSE ? true : false);
+			RobotMap.jawsSolenoid.set(direction == Direction.CLOSE ? true : false);
 			jawsState = direction;
 		}
 	}
