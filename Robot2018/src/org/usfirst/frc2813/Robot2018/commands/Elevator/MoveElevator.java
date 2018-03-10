@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.Log;
 import org.usfirst.frc2813.Robot2018.TalonState;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 
@@ -21,6 +22,8 @@ public class MoveElevator extends Command {
 	private final Direction direction;
 	// position, only valid if we are moving to a set position
 	private final double positionInInches;
+	// command logger
+	private final Log log;
 	/*
 	 * Hold the current position
 	 */
@@ -28,6 +31,7 @@ public class MoveElevator extends Command {
 		this.state = TalonState.HOLDING_POSITION;
 		this.direction = Direction.NEUTRAL; // Not used
 		this.positionInInches = 0; // Not used
+		this.log = new Log("MoveElevator-HOLD_POSITION");
 		requires(Robot.elevator);
 	}
 	/*
@@ -37,6 +41,8 @@ public class MoveElevator extends Command {
 		this.state = TalonState.MOVING;
 		this.direction = direction; 
 		this.positionInInches = 0; // Not used
+		this.log = new Log("MoveElevator-" + direction);
+		requires(Robot.elevator);
 	}
 	/*
 	 * Move to a specific position and hold the position
@@ -45,10 +51,13 @@ public class MoveElevator extends Command {
 		this.state = TalonState.SET_POSITION;
 		this.positionInInches = positionInInches;
 		this.direction = Direction.NEUTRAL; // Not used
+		this.log = new Log("MoveElevator-" + positionInInches);
+		requires(Robot.elevator);
 	}
 	// Called repeatedly when this Command is scheduled to run
 	// @Override
 	protected void execute() {
+		log.print("execute");
 		switch(state) {
 		case HOLDING_POSITION:
 			Robot.elevator.holdCurrentPosition();
@@ -70,13 +79,19 @@ public class MoveElevator extends Command {
 	//@Override
 	protected boolean isFinished() {
 		// All of the move commands run indefinitely until cancelled
+//		log.print("isFinished is returning false");
 		return false;
 	}
+	
 	@Override
-	protected void end() {}
+	protected void end() {
+		log.print("end");
+	}
 	@Override
 	protected void interrupted() {
+		log.print("interrupted");
 		if(state == TalonState.MOVING || state == TalonState.SET_POSITION) {
+			log.print("was moving, so changing to HOLD.");
 			Robot.elevator.holdCurrentPosition();
 		}
 	}
