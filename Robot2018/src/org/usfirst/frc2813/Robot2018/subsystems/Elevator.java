@@ -96,6 +96,12 @@ public class Elevator extends Subsystem {
 		if(getCurrentCommand() == null) {
     		new MaintainElevatorPosition().start();
     	}
+		
+		System.out.println("Elevator Position: "+getPosition());
+	}
+
+	private double getPosition() {
+		return motor.getSensorCollection().getQuadraturePosition() / RobotMap.ELEVATOR_PULSES_PER_INCH;
 	}
 
 	public boolean isLimitSwitchPressed() {
