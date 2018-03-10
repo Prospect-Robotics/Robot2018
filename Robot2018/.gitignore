@@ -1,6 +1,7 @@
-/bin/
-/dist/
+bin/
+dist/
 *.swp
 .classpath
 *.class
 *.jar
+build/
