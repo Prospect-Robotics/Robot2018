@@ -191,18 +191,6 @@ public class Elevator extends Subsystem {
 	public void initDefaultCommand() {
 		setDefaultCommand(new MoveElevator());
 	}
-	public boolean isDisabled() {
-		return motorController.isDisabled();
-	}
-	public boolean isHoldingCurrentPosition() {
-		return motorController.isHoldingCurrentPosition();
-	}
-	public boolean isMovingToPosition() {
-		return motorController.isMovingToPosition();
-	}
-	public boolean isMoving() {
-		return motorController.isMoving();
-	}
 	public double getSpeedInchesPerSecond() {
 		return speedInchesPerSecond;
 	}

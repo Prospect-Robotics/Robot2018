@@ -145,36 +145,6 @@ public class Talon {
 		}
 	}
 
-	/**
-	 * Get a label for a control mode
-	 */
-	public static String getControlModeLabel(ControlMode mode) {
-		switch (mode) {
-		case Current:
-			return "Current";
-		case Disabled:
-			return "Disabled";
-		case Follower:
-			return "Follower";
-		case MotionMagic:
-			return "MotionMagic";
-		case MotionMagicArc:
-			return "MotionMagicArc";
-		case MotionProfile:
-			return "MotionProfile";
-		case MotionProfileArc:
-			return "MotionProfileArc";
-		case PercentOutput:
-			return "PercentOutput";
-		case Position:
-			return "Postion";
-		case Velocity:
-			return "Velocity";
-		default:
-			return "" + mode;
-		}
-	}
-
 	/*
 	 * All changes to state are done here, and recorded here.
 	 * Optionally reported to the log here.
@@ -219,7 +189,7 @@ public class Talon {
 		log.print(""
 				+ "set Changes "
 				+ "[State (" + oldState + "-> " + newState + ") "
-				+ ", ControlMode (" + getControlModeLabel(this.lastControlMode) + "/" + this.lastControlModeValue + " -> " + getControlModeLabel(newControlMode) + "/" + newControlModeValue + ")" 
+				+ ", ControlMode (" + this.lastControlMode + "/" + this.lastControlModeValue + " -> " + newControlMode + "/" + newControlModeValue + ")" 
 				+ ", SlotIndex (" + lastSlotIndex + " -> " + newSlotIndex + ")"
 				+ ", PIDIndex ("  + lastPIDIndex + " -> " + newPIDIndex + ")"
 				+ "]");
@@ -228,7 +198,7 @@ public class Talon {
 		log.print(""
 				+ "set "
 				+ "[State=" + newState
-				+ ", ControlMode=" + getControlModeLabel(newControlMode)
+				+ ", ControlMode=" + newControlMode
 				+ ", ControlModeValue=" + newControlModeValue
 				+ ", SlotIndex=" + newSlotIndex 
 				+ ", PIDIndex=" + newPIDIndex
@@ -318,17 +288,5 @@ public class Talon {
 	 */
 	public void disable() {
 		set(TalonState.DISABLED, 0);
-	}
-	public boolean isDisabled() {
-		return state == TalonState.DISABLED;
-	}
-	public boolean isHoldingCurrentPosition() {
-		return state == TalonState.HOLDING_POSITION;
-	}
-	public boolean isMovingToPosition() {
-		return state == TalonState.SET_POSITION;
-	}
-	public boolean isMoving() {
-		return state == TalonState.MOVING;
 	}
 }

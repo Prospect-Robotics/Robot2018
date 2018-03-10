@@ -109,12 +109,6 @@ public enum Direction{
 	public boolean isNegative() {
 		return canonicalDirection == Canonical.NEGATIVE;
 	}
-	/**
-
-	
-	public String toString() {
-		return label;
-	}
 	
 	/**
 	 * Two directions are equal if they are the same or have the same canonical representation
