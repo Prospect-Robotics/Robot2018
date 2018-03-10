@@ -2,62 +2,59 @@
 
 // FIXME! This is a command from the intake subsystem, but is in the arm package. Move it!
 package org.usfirst.frc2813.Robot2018.commands.Arm;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
 /**
- *
+ * Spin or halt the Robot arm intake
  */
 public class SpinIntake extends Command {
-	private Direction spinDirection;
-	private boolean stopAtEnd;
-	private SpeedController speedController;
 	/**
 	 * Spin the intake wheels
 	 * 
 	 * @param spinDirectionIn - true is spin direction in; false if out
 	 * @param stopAtEnd - set motors to 0 when button is released
 	 */
-	public SpinIntake(Direction spinDirectionIn, boolean stopAtEnd) {
-		this.spinDirection=spinDirectionIn;
-		this.stopAtEnd=stopAtEnd;
-		requires(Robot.arm);
+	private boolean halted;
+	private Direction direction;
+
+	public SpinIntake() {
+		halted = true;
+	}
+	public SpinIntake(Direction direction) {
+		Arm.setIntakeDirection(direction);
+		halted = false;
 	}
 
 	// Called just before this Command runs the first time
 	//@Override
-	protected void initialize() {
-		speedController = Robot.arm.speedController;
-	}
+	protected void initialize() {}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (stopAtEnd) {
-			speedController.set(0);
+		if (halted) {
+			Arm.haltIntake();
 		}
 		else { 
-			Robot.arm.spinIntake(spinDirection);
+			Arm.spinIntake();
 		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		return false;
+		return true;
 	}
 
 	// Called once after isFinished returns true
 	@Override
-	protected void end() {
-	}
+	protected void end() {}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
-	protected void interrupted() {
-	}
+	protected void interrupted() {}
 }

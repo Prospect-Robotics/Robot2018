@@ -5,20 +5,20 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 
 import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroupGenerator;
 
 
 /**
  * AutoCmd - generate the autonomous command sequence. Note that this class constructs
  * the command list and provides methods to add new commands and then calls a generator
  * to generate the command list based on field setup.
- * 
+ *
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
@@ -27,7 +27,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private double driveSpeed = 1;
 	private double turnSpeed = 0.25;
 	private double curveSpeed = 0.4;
-	private AutonomousCommandGroupGenerator autoGenerator;
 
 	public AutonomousCommandGroup() {
 		addSequential(new ResetEncoders());
@@ -80,12 +79,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	// arm control commands
 	public void dropCube() {
-		// TODO: add command to close arms
-		addSequential(new SpinIntake(Direction.OUT, true));
+		// TODO: should we delay between these?
+		// TODO: consider making this pair a command for arm
+		addSequential(new SpinIntake(Direction.OUT));
+		addSequential(new SetJaws(Direction.OPEN));
 	}
 	public void grabCube() {
-		// TODO: add command to open arms
-		addSequential(new SpinIntake(Direction.IN, false));
+		// TODO: should we delay between these?
+		// TODO: consider making this pair a command for arm
+		addSequential(new SpinIntake(Direction.IN));
+		addSequential(new SetJaws(Direction.CLOSE));
 	}
 
 	public void sleep(double seconds) {

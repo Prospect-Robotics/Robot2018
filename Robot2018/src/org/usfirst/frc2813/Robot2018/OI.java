@@ -2,15 +2,15 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.Elevator.FloorElevator;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.SetSpeed;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.SetElevatorSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
-import org.usfirst.frc2813.Robot2018.commands.DriveTrain.Obsolete.ShiftGears;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 
 import edu.wpi.first.wpilibj.Compressor;
@@ -22,127 +22,127 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
- * This class is the glue that binds the controls on the physical operator 
+ * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
-    //// CREATING BUTTONS
-    // One type of button is a joystick button which is any button on a joystick.
-    // You create one by telling it which joystick it's on and which button
-    // number it is.
-    // Joystick stick = new Joystick(port);
-    // Button button = new JoystickButton(stick, buttonNumber);
+	//// CREATING BUTTONS
+	// One type of button is a joystick button which is any button on a joystick.
+	// You create one by telling it which joystick it's on and which button
+	// number it is.
+	// Joystick stick = new Joystick(port);
+	// Button button = new JoystickButton(stick, buttonNumber);
 
-    // There are a few additional built in buttons you can use. Additionally,
-    // by subclassing Button you can create custom triggers and bind those to
-    // commands the same as any other Button.
+	// There are a few additional built in buttons you can use. Additionally,
+	// by subclassing Button you can create custom triggers and bind those to
+	// commands the same as any other Button.
 
-    //// TRIGGERING COMMANDS WITH BUTTONS
-    // Once you have a button, it's trivial to bind it to a button in one of
-    // three ways:
+	//// TRIGGERING COMMANDS WITH BUTTONS
+	// Once you have a button, it's trivial to bind it to a button in one of
+	// three ways:
 
-    // Start the command when the button is pressed and let it run the command
-    // until it is finished as determined by it's isFinished method.
-    // button.whenPressed(new ExampleCommand());
+	// Start the command when the button is pressed and let it run the command
+	// until it is finished as determined by it's isFinished method.
+	// button.whenPressed(new ExampleCommand());
 
-    // Run the command while the button is being held down and interrupt it once
-    // the button is released.
-    // button.whileHeld(new ExampleCommand());
+	// Run the command while the button is being held down and interrupt it once
+	// the button is released.
+	// button.whileHeld(new ExampleCommand());
 
-    // Start the command when the button is released  and let it run the command
-    // until it is finished as determined by it's isFinished method.
-    // button.whenReleased(new ExampleCommand());
+	// Start the command when the button is released  and let it run the command
+	// until it is finished as determined by it's isFinished method.
+	// button.whenReleased(new ExampleCommand());
 
-    public JoystickButton trigger;
-    public Joystick joystick1, joystick2, buttonPanel;
-    public JoystickButton spinIntakeIn, spinIntakeOut,
-    					  bottomElevatorToLimitSwitch, elevatorUp, elevatorDown, elevatorRatchet,
-    					  shiftGears, climbingBar,
-    					  armUpToLimitSwitch, armDownToLimitSwitch, 
-    					  armMoveUp, armMoveDown, armSolenoid;
+	public JoystickButton trigger;
+	public Joystick joystick1, joystick2, buttonPanel;
+	public JoystickButton spinIntakeIn, spinIntakeOut,
+	bottomElevatorToLimitSwitch, elevatorUp, elevatorDown, elevatorRatchet,
+	shiftGears, climbingBar,
+	armUpToLimitSwitch, armDownToLimitSwitch,
+	armMoveUp, armMoveDown, armSolenoid;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 
-    public OI() {
-    	/*
-    	 * BUTTON PANEL BUTTONS:
-    	 * 
-    	 * (1)  SPIN INTAKE IN
-    	 * (2)  SPIN INTAKE OUT
-    	 * (3)  FLOOR ELEVATOR
-    	 * (4)  ELEVATOR DOWN
-    	 * (5)  ELEVATOR UP
-    	 * (6)  CLIMBING BAR SOLENOID
-    	 * (7)  SHIFT GEARS SOLENOID
-    	 * (8)  ELEVATOR RATCHET SOLENOID
-    	 * (9)  INTAKE/ARM SOLENOID
-    	 * (10) TODO CURRENTLY UNUSED -- WILL MOVE ARM TO SPECIFIED POSITION
-    	 * (11) MOVE ARM UP
-    	 * (12) MOVE ARM DOWN
-    	 * 
-    	 */
-        buttonPanel = new Joystick(0);
+	public OI() {
+		/*
+		 * BUTTON PANEL BUTTONS:
+		 *
+		 * (1)  SPIN INTAKE IN
+		 * (2)  SPIN INTAKE OUT
+		 * (3)  FLOOR ELEVATOR
+		 * (4)  ELEVATOR DOWN
+		 * (5)  ELEVATOR UP
+		 * (6)  CLIMBING BAR SOLENOID
+		 * (7)  SHIFT GEARS SOLENOID
+		 * (8)  ELEVATOR RATCHET SOLENOID
+		 * (9)  INTAKE/ARM SOLENOID
+		 * (10) TODO CURRENTLY UNUSED -- WILL MOVE ARM TO SPECIFIED POSITION
+		 * (11) MOVE ARM UP
+		 * (12) MOVE ARM DOWN
+		 *
+		 */
+		buttonPanel = new Joystick(0);
 
-        new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
-        new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
-        new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainSingleSolenoid));
+		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
+		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
+		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
 
-        //elevatorDown.whenPressed(new PrintButtonStatus(true, false));
-        elevatorUp = new JoystickButton(buttonPanel, 5);
-        elevatorUp.whileHeld(new SetSpeed(-.4));		// units of inches per second!
-        //elevatorDown.whenReleased(new SetSpeed(0));
-        //elevatorDown.whenReleased(new PrintButtonStatus(false, false));
-        elevatorDown = new JoystickButton(buttonPanel, 4);
-        //elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-        elevatorDown.whileHeld(new SetSpeed(.4));
-        //elevatorUp.whenReleased(new SetSpeed(0));
-        //elevatorUp.whenReleased(new PrintButtonStatus(false, true));
- 
-        new JoystickButton(buttonPanel, 3).whenPressed(new FloorElevator());
-        spinIntakeOut = new JoystickButton(buttonPanel, 2);
-        spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT, false));
-        spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT, true));
-        spinIntakeIn = new JoystickButton(buttonPanel, 1);
-        spinIntakeIn.whileHeld(new SpinIntake(Direction.IN, false));
-        spinIntakeIn.whenReleased(new SpinIntake(Direction.IN, true));
-        //new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
-        //new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
-        new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(Direction.UP));
-        new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(Direction.DOWN));
-        new JoystickButton(buttonPanel, 9).whenPressed(new ToggleSolenoidGeneral(RobotMap.armSingleSolenoid));
+		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
+		elevatorUp = new JoystickButton(buttonPanel, 5);
+		elevatorUp.whileHeld(new MoveElevator(Direction.UP));		// units of inches per second!
+		//elevatorDown.whenReleased(new SetElevatorSpeed(0));
+		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
+		elevatorDown = new JoystickButton(buttonPanel, 4);
+		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
+		elevatorDown.whileHeld(new MoveElevator(Direction.DOWN));
+		//elevatorUp.whenReleased(new SetElevatorSpeed(0));
+		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
-        joystick1 = new Joystick(1);
-        joystick2 = new Joystick(2);
-        
-        new JoystickButton(joystick1, 1).whileHeld(new ResetEncoders());//the trigger on most joysticks
-        
-        Compressor compressor = new Compressor();
-        LiveWindow.add(compressor);
-        new RoboRIOUserButton().whenPressed(new ToggleCompressor(compressor));
+		new JoystickButton(buttonPanel, 3).whenPressed(new MoveElevator(0));//Bottom elevator
+		spinIntakeOut = new JoystickButton(buttonPanel, 2);
+		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
+		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
+		spinIntakeIn = new JoystickButton(buttonPanel, 1);
+		spinIntakeIn.whileHeld(new SpinIntake(Direction.IN));
+		spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
+		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
+		//new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
+		new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(Direction.UP));
+		new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(Direction.DOWN));
+		new JoystickButton(buttonPanel, 9).whenPressed(new SetJaws(Direction.OPEN));
 
-        // SmartDashboard Buttons
-        SmartDashboard.putData("OIDrive", new OIDrive());
-        SmartDashboard.putData("ToggleRelay0", new ShiftGears());
-        //SmartDashboard.putData("ToggleRelay1", new ToggleRelay1());
-        //SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
-        //SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
-        //SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
-        SmartDashboard.putData("BottomElevator", new FloorElevator());
-        //SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
-        //SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
-        
-        driveStyleChooser = new SendableChooser<>();
-        driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);
-        driveStyleChooser.addObject("Tank drive", Robot.driveTrain::tankDrive);
-    }
+		joystick1 = new Joystick(1);
+		joystick2 = new Joystick(2);
 
-    public Joystick getJoystick1() {
-        return joystick1;
-    }
-    public Joystick getJoystick2() {
-    	return joystick2;
-    }
-    public Joystick getbuttonPanel() {
-        return buttonPanel;
-    }
+		new JoystickButton(joystick1, 1).whileHeld(new ResetEncoders());//the trigger on most joysticks
+
+		Compressor compressor = new Compressor();
+		LiveWindow.add(compressor);
+		new RoboRIOUserButton().whenPressed(new ToggleCompressor(compressor));
+
+		// SmartDashboard Buttons
+		SmartDashboard.putData("OIDrive", new OIDrive());
+		//SmartDashboard.putData("ToggleRelay0", new ShiftGears());
+		//SmartDashboard.putData("ToggleRelay1", new ToggleRelay1());
+		//SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
+		//SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
+		//SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
+		SmartDashboard.putData("BottomElevator", new MoveElevator(0));
+		//SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
+		//SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
+
+		driveStyleChooser = new SendableChooser<>();
+		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);
+		driveStyleChooser.addObject("Tank drive", Robot.driveTrain::tankDrive);
+	}
+
+	public Joystick getJoystick1() {
+		return joystick1;
+	}
+	public Joystick getJoystick2() {
+		return joystick2;
+	}
+	public Joystick getbuttonPanel() {
+		return buttonPanel;
+	}
 }
 
