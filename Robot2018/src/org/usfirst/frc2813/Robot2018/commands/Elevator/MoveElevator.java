@@ -69,13 +69,15 @@ public class MoveElevator extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		// Turns out that it's all automatic once you ran execute once.
-		return true;
+		// All of the move commands run indefinitely until cancelled
+		return false;
 	}
 	@Override
 	protected void end() {}
 	@Override
 	protected void interrupted() {
-		
+		if(state == TalonState.MOVING || state == TalonState.SET_POSITION) {
+			Robot.elevator.holdCurrentPosition();
+		}
 	}
 }
