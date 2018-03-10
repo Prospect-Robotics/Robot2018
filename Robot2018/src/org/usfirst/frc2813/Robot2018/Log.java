@@ -3,11 +3,11 @@ package org.usfirst.frc2813.Robot2018;
 /**
  * Very simple logger. Takes a name and saves you passing the name each time.
  */
-enum LogLevel {DEBUG, INFO, WARN, ERROR}
 
 public class Log {
+	public enum LogLevel {DEBUG, INFO, WARN, ERROR}
 	private String label;
-	private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.WARN;
+	private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.DEBUG;
 	private LogLevel baseLogLevel;
 	public Log(String name, LogLevel defaultLogLevel) {
 		baseLogLevel = defaultLogLevel;
