@@ -19,18 +19,22 @@ public class MoveElevator extends Command {
 	private double position;
     private boolean positionMode;  // true if we are moving to a position
                                    // false if we move by direction and speed
+    private final Elevator elevator;
 	public MoveElevator() {
+		this.elevator = Robot.elevator;
 		halted = true;
 		requires(Robot.elevator);
 	}
 
 	public MoveElevator(Direction direction) {
+		this.elevator = Robot.elevator;
 		this.direction = direction;
         positionMode = false;
 		halted = false;
 	}
 
 	public MoveElevator(double position) {
+		this.elevator = Robot.elevator;
 		this.position = position;
         positionMode = true;
 		halted = false;
@@ -40,13 +44,13 @@ public class MoveElevator extends Command {
 	//@Override
 	protected void execute() {
 		if (halted) {
-			Elevator.halt();
+			Robot.elevator.holdCurrentPosition();
 		}
 		else {
             if (positionMode) {
-                direction = Elevator.readPosition() > position ? Direction.DOWN : Direction.UP;
+                direction = Robot.elevator.readPosition() > position ? Direction.DOWN : Direction.UP;
             }
-			Elevator.move();
+            Robot.elevator.move(direction, position);
 		}
 	}
 
@@ -59,7 +63,7 @@ public class MoveElevator extends Command {
 
 		if (halted) return true;
 
-		currentPosition = Elevator.readPosition();
+		currentPosition = elevator.readPosition();
 
 		/*
 		 * NB: When holding "up" or "down" buttons we are not
@@ -80,7 +84,7 @@ public class MoveElevator extends Command {
             targetPosition = 0;
         }
         else {
-            targetPosition = Elevator.HEIGHT;
+            targetPosition = elevator.HEIGHT;
         }
 
 		if (direction == Direction.DOWN) {
@@ -93,7 +97,7 @@ public class MoveElevator extends Command {
 		if (done) {
 			System.out.println("MoveElevator_FINISHED");
 			halted = true;
-			Elevator.halt();
+			elevator.holdCurrentPosition();
 			return true;
 		}
 		return false;

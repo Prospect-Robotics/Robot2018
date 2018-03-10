@@ -156,11 +156,11 @@ public class Arm extends Subsystem {
 
 		armIsHalted = false;
         if (armPositionMode) {
-            motorController.setPosition(armPositionToSrx(armPosition));
+            motorController.holdCurrentPosition();
             log.print("Starting elevator movement. Target position " + armPosition);
         }
         else {
-            motorController.setSpeedAndDirection(armSpeedToSrx(armSpeed), armDirection);
+            motorController.move(armDirection, armSpeedToSrx(armSpeed));
             log.print("Starting elevator movement. Speed " + armSpeed);
         }
 	}
@@ -186,12 +186,9 @@ public class Arm extends Subsystem {
 		// FIXME! this one variable requires the whole class to be non-static
 		// We should change POST to use statics
         // if (!encoderFunctional) return;
-
 		armIsHalted = true;
-		motorController.halt();
-		if(motorController.readLimitSwitch(Direction.DOWN)) {
-			motorController.zeroEncoders();
-		}
+		motorController.disable();
+		motorController.zeroEncodersIfNecessary();
 	}
 
 	// Manage jaws

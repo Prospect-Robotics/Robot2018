@@ -39,12 +39,19 @@ public class Talon {
 	// motor invert.
 	public static boolean DEFAULT_MOTOR_INVERSION = false;
 
-	// Remember mode and position. We only want to zero encoders when we are stopped
-	private ControlMode currentMode = ControlMode.Position;
-	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;
-	private Direction currentDirection;
-	private Double targetPosition = null;
+	// Just a description
 	private final String label;
+	
+	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;    // Remember last used pid index, help us implement state transitions 
+	
+	// Current state 
+	private TalonState state;
+	// Last control mode send to controller
+	private ControlMode lastControlMode = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
+	// Last arg sent for controlMode
+	private double lastControlModeValue = 0;
+	private int lastSlotIndex = MAINTAIN_SLOT_IDX;
+	private int lastPIDIndex = MAINTAIN_PID_LOOP_IDX;
 
 	public Talon(TalonSRX srx, String label, Log log) {
 		this.label = label;
@@ -79,13 +86,19 @@ public class Talon {
 		srx.setInverted(DEFAULT_MOTOR_INVERSION);
 		srx.setSelectedSensorPosition(absolutePosition, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.setSelectedSensorPosition(absolutePosition, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
 		 */
 		srx.configAllowableClosedloopError(MAINTAIN_SLOT_IDX, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configAllowableClosedloopError(MOVE_SLOT_IDX, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		
+		// Start disabled
+		set(TalonState.DISABLED, 0);
+	}
+	
+	public IMotorState getState() {
+		return this.state;
 	}
 
 	public void configSoftLimitSwitch(Direction direction, int limit) {
@@ -162,72 +175,85 @@ public class Talon {
 		}
 	}
 
-	private void set(ControlMode mode, double arg) {
+	/*
+	 * All changes to state are done here, and recorded here.
+	 * Optionally reported to the log here.
+	 */
+	
+	private void set(TalonState newState, double arg) {
 		/*
 		 * Figure out state variables from current operation:
-		 * 
-		 * currentDirection - What canonical direction are we going? positive, negative
-		 * or neutral. targetPosition - The set position, or null if we are not in a
-		 * position holding mode. currentMode - The controller mode
 		 */
-		this.currentMode = mode;
-		switch (mode) {
-		case Disabled:
-			this.currentDirection = Direction.NEUTRAL;
-			this.targetPosition = null;
-			break;
-		case Current:
-		case Velocity:
-		case PercentOutput:
-			this.targetPosition = null;
-			if (arg == 0) {
-				this.currentDirection = Direction.NEUTRAL;
-			} else if (arg > 0) {
-				this.currentDirection = Direction.POSITIVE;
-			} else {
-				this.currentDirection = Direction.NEGATIVE;
-			}
-			break;
-		case Position:
-			this.targetPosition = Double.valueOf(arg);
-			int currentPosition = readPosition();
-			if (arg == currentPosition) {
-				this.currentDirection = Direction.NEUTRAL;
-			} else if (arg > currentPosition) {
-				this.currentDirection = Direction.POSITIVE;
-			} else {
-				this.currentDirection = Direction.NEGATIVE;
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported controlMode: " + mode);
+		ControlMode newControlMode = ControlMode.Disabled;
+		double newControlModeValue = arg;
+		int newSlotIndex  = lastSlotIndex;
+		int newPIDIndex   = lastPIDIndex;
+		if(newState == TalonState.DISABLED) {
+			newControlModeValue = 0; // NB: Not used here
+			newControlMode = ControlMode.Disabled;
+			newSlotIndex   = MAINTAIN_SLOT_IDX;
+			newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
+		} else if(newState == TalonState.HOLDING_POSITION) {
+			newControlMode = ControlMode.Position;
+			newSlotIndex   = MAINTAIN_SLOT_IDX;
+			newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
+		} else if(newState == TalonState.SET_POSITION) {
+			newControlMode = ControlMode.Position;
+			// NB: SET_POSITION means "move to position", so use MOVE behavior
+			newSlotIndex   = MOVE_SLOT_IDX;
+			newPIDIndex    = MOVE_PIDLOOP_IDX;
+		} else if(newState == TalonState.MOVING) {
+			newControlMode = ControlMode.Velocity;
+			newSlotIndex   = MOVE_SLOT_IDX;
+			newPIDIndex    = MOVE_PIDLOOP_IDX;
+		} else {
+			throw new IllegalArgumentException("Unsupported state: " + newState);
 		}
-		log.print("SET " + " [mode=" + getControlModeLabel(mode) + ", arg=" + arg + "]");
-		srx.set(mode, arg);
+		// NB: This log statement shows old and current values, so you can see transitions completely
+		// TODO: Add a debug flag for this
+		log.print(""
+				+ "set Changes "
+				+ "[State (" + this.state + "-> " + newState + ") "
+				+ ", ControlMode (" + getControlModeLabel(this.lastControlMode) + "/" + this.lastControlModeValue + " -> " + getControlModeLabel(newControlMode) + "/" + newControlModeValue + ")" 
+				+ ", SlotIndex (" + lastSlotIndex + " -> " + newSlotIndex + ")"
+				+ ", PIDIndex ("  + lastPIDIndex + " -> " + newPIDIndex + ")"
+				+ "]");
+		// TODO: Add a debug flag for this
+		// NB: This log statement shows current values
+		log.print(""
+				+ "set "
+				+ "[State=" + newState
+				+ ", ControlMode=" + getControlModeLabel(newControlMode)
+				+ ", ControlModeValue=" + newControlModeValue
+				+ ", SlotIndex=" + newSlotIndex 
+				+ ", PIDIndex=" + newPIDIndex
+				+ "]");
+		srx.set(ControlMode.Disabled, 0); // NB: Not sure this is necessary...
+		srx.selectProfileSlot(this.lastSlotIndex, this.lastPIDIndex);
+		srx.set(newControlMode, arg);
+		this.state = newState;
+		this.lastControlMode = newControlMode;
+		this.lastControlModeValue = newControlModeValue;
+		this.lastSlotIndex = newSlotIndex;
+		this.lastPIDIndex = newPIDIndex;
 	}
 
 	public int readPosition() {
 		int position = srx.getSelectedSensorPosition(currentPidIndex);
-		log.print("GET " + " = @ " + position);
+		log.print("readPosition " + " = @ " + position);
 		return position;
 	}
 
-	/*
-	 * Set to an absolute encoder position
-	 */
-	public void setPosition(int position) {
-		set(ControlMode.Position, position);
-	}
-
-	public void zeroEncoders() {
+	// Returns true if we zeroed and are now holding position at zero
+	public boolean zeroEncodersIfNecessary() {
 		// TODO: account for inversions
-		if (readLimitSwitch(Direction.NEGATIVE) && (currentMode == ControlMode.Position
-				&& targetPosition <= readPosition()) /* moving backwards + limit == bad or holding at zero */
-				|| (currentMode == ControlMode.Velocity
-						&& targetPosition < 0)) /* moving backwards (negative velocity) + limit == bad */
+		if (readLimitSwitch(Direction.NEGATIVE) 
+				&& (state == TalonState.HOLDING_POSITION && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
+				|| (state == TalonState.MOVING && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
 		{
 			log.print("ZEROING ENCODERS");
-			set(ControlMode.Velocity, 0);
+			TalonState oldState = state;
+			set(TalonState.DISABLED, 0);
 			// Zero out absolute encoder values for both PID slots
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -238,34 +264,60 @@ public class Talon {
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.setSelectedSensorPosition(0, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.setSelectedSensorPosition(0, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			halt();
+			set(TalonState.HOLDING_POSITION, readPosition());
 			log.print("ENCODERS ZEROD");
+			return true;
 		}
+		return false;
+	}
+	/*
+	 * [ACTION] Set to an absolute encoder position
+	 */
+	public void setPosition(int position) {
+		set(TalonState.SET_POSITION, position);
+	}
+	
+	/*
+	 * [ACTION] Hold the current position, resist movement
+	 */
+	public void holdCurrentPosition() {
+		set(TalonState.HOLDING_POSITION, readPosition());
+		zeroEncodersIfNecessary();
 	}
 
 	/*
-	 * Set to a speed and direction. Direction will determine whether speed is
+	 * [ACTION] Set to a speed and direction. Direction will determine whether speed is
 	 * logical forward (positive) or reverse (negative) (not necessarily the same as
 	 * the motor direction. Remember it can be inverted by configuration, to hide
 	 * the difference)
 	 */
-	public void setSpeedAndDirection(double speed, Direction direction) {
+	public void move(Direction direction, double speed) {
 		if(speed == 0) {
-			halt();
+			System.out.println(label + " was told to move with speed zero.  Holding position instead.");
+			holdCurrentPosition();
 		} else {
-			this.currentPidIndex = MOVE_PIDLOOP_IDX; 
-			srx.selectProfileSlot(MOVE_SLOT_IDX, this.currentPidIndex); 
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			log.print("setSpeedAndDirection [Speed=" + speed + " Direction=" + direction.getLabel() + " Velocity=" + speedParam + "]");
-			set(ControlMode.Velocity, speedParam);
+			log.print("move [Direction (" + direction.getLabel() + ") x Speed (" + speed + ") -> " + speedParam + "]");
+			set(TalonState.MOVING, speedParam);
 		}
 	}
 
-	// stop arm from moving - this is active as we require pid to resist gravity
-	public void halt() {
-		this.currentPidIndex = MAINTAIN_PID_LOOP_IDX;
-		srx.selectProfileSlot(MAINTAIN_SLOT_IDX, this.currentPidIndex);
-		setPosition(readPosition());
-		log.print("HALT");
+	/*
+	 * [ACTION] Stop output of the motor
+	 */
+	public void disable() {
+		set(TalonState.DISABLED, 0);
+	}
+	public boolean isDisabled() {
+		return state == TalonState.DISABLED;
+	}
+	public boolean isHoldingCurrentPosition() {
+		return state == TalonState.HOLDING_POSITION;
+	}
+	public boolean isMovingToPosition() {
+		return state == TalonState.SET_POSITION;
+	}
+	public boolean isMoving() {
+		return state == TalonState.MOVING;
 	}
 }
