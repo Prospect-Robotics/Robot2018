@@ -205,7 +205,7 @@ public class Talon {
 				+ "]");
 		srx.set(ControlMode.Disabled, 0); // NB: Not sure this is necessary...
 		srx.selectProfileSlot(this.lastSlotIndex, this.lastPIDIndex);
-		srx.set(newControlMode, arg);
+		srx.set(newControlMode, newControlModeValue);
 		this.state = newState;
 		this.lastControlMode = newControlMode;
 		this.lastControlModeValue = newControlModeValue;
@@ -251,7 +251,6 @@ public class Talon {
 	public void setPosition(int position) {
 		set(TalonState.SET_POSITION, position);
 	}
-	
 	/*
 	 * [ACTION] Hold the current position, resist movement
 	 */
