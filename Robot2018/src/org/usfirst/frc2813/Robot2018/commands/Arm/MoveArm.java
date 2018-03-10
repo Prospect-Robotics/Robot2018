@@ -31,7 +31,7 @@ public class MoveArm extends Command {
 	// false if we move by direction and speed
 	public MoveArm() {
 		halted = true;
-		requires(Robot.elevator);
+		requires(Robot.arm);
 	}
 
 	public MoveArm(Direction direction) {
