@@ -27,7 +27,6 @@ public class Elevator extends GearheadsSubsystem {
 	// TODO find maximum allowable elevator height; 24 is only a placeholder.
 	public static final double HEIGHT = 24; // inches
 	private static final double INCHES_PER_REVOLUTION = Math.PI * 1.25;
-	private static final double INCHES_PER_PULSE = INCHES_PER_REVOLUTION / Talon.PULSES_PER_REVOLUTION;
 	private static final double PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
     private static final double DEFAULT_SPEED = 12;
 
@@ -65,13 +64,6 @@ public class Elevator extends GearheadsSubsystem {
     */
     private static double speedToSrx(double inchesPerSecond) {
         return inchesPerSecond * PULSES_PER_INCH / 10.0;
-    }
-
-    /**
-    * Map speed from controller format to inches per second
-    */
-    private static double srxToSpeed(int controllerSpeed) {
-        return controllerSpeed * 10.0 / PULSES_PER_INCH;
     }
 
 	public static void setSpeed() {
