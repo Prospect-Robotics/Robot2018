@@ -3,10 +3,11 @@ package org.usfirst.frc2813.Robot2018;
 import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevatorInterruptable;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.SetElevatorSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
-import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
+import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArmInterruptable;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
@@ -88,12 +89,12 @@ public class OI {
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
-		elevatorUp.whileHeld(new MoveElevator(Direction.UP));		// units of inches per second!
+		elevatorUp.whileHeld(new MoveElevatorInterruptable(Direction.UP));		// units of inches per second!
 		//elevatorDown.whenReleased(new SetElevatorSpeed(0));
 		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
 		elevatorDown = new JoystickButton(buttonPanel, 4);
 		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-		elevatorDown.whileHeld(new MoveElevator(Direction.DOWN));
+		elevatorDown.whileHeld(new MoveElevatorInterruptable(Direction.DOWN));
 		//elevatorUp.whenReleased(new SetElevatorSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
@@ -106,8 +107,8 @@ public class OI {
 		spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
 		//new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
-		new JoystickButton(buttonPanel, 11).whileHeld(new MoveArm(Direction.UP));
-		new JoystickButton(buttonPanel, 12).whileHeld(new MoveArm(Direction.DOWN));
+		new JoystickButton(buttonPanel, 11).whileHeld(new MoveArmInterruptable(Direction.UP));
+		new JoystickButton(buttonPanel, 12).whileHeld(new MoveArmInterruptable(Direction.DOWN));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SetJaws(Direction.OPEN));
 
 		joystick1 = new Joystick(1);
