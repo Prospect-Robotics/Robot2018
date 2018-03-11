@@ -1,5 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import java.util.logging.Level;
+
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 
@@ -125,6 +127,10 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @return true if state change occurred
 	 */
 	protected boolean changeState(MotorControllerState newState) {
+		logger.fine(String.format("Changing state: encoderFunctional: %s, " +
+								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
+								 "old direction: %s, new direction %s, old position: %s, new position %s",
+				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position));
 		if (!encoderFunctional) return false;
 		if (state == newState) return true;
 
