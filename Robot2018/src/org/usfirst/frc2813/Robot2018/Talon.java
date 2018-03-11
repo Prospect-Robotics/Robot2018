@@ -1,8 +1,5 @@
 package org.usfirst.frc2813.Robot2018;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.usfirst.frc2813.Robot2018.Direction;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -45,7 +42,7 @@ public class Talon {
 	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;    // Remember last used pid index, help us implement state transitions 
 
 	// Current state 
-	private TalonState state;
+	private MotorControllerState state;
 	// Last control mode send to controller
 	private ControlMode lastControlMode = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	// Last arg sent for controlMode
@@ -94,10 +91,10 @@ public class Talon {
 		srx.configAllowableClosedloopError(MOVE_SLOT_IDX, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		
 		// Start disabled
-		set(TalonState.DISABLED, 0);
+		set(MotorControllerState.DISABLED, 0);
 	}
 	
-	public TalonState getState() {
+	public MotorControllerState getState() {
 		return state;
 	}
 
@@ -145,35 +142,34 @@ public class Talon {
 		}
 	}
 
-	/*
+	/**
 	 * All changes to state are done here, and recorded here.
 	 * Optionally reported to the log here.
 	 */
-	
-	private void set(TalonState newState, double arg) {
-		/*
+	private void set(MotorControllerState newState, double arg) {
+		/**
 		 * Figure out state variables from current operation:
 		 */
-		TalonState oldState = this.state;
+		MotorControllerState oldState = this.state;
 		ControlMode newControlMode = ControlMode.Disabled;
 		double newControlModeValue = arg;
 		int newSlotIndex  = lastSlotIndex;
 		int newPIDIndex   = lastPIDIndex;
-		if(newState == TalonState.DISABLED) {
+		if(newState == MotorControllerState.DISABLED) {
 			newControlModeValue = 0; // NB: Not used here
 			newControlMode = ControlMode.Disabled;
 			newSlotIndex   = MAINTAIN_SLOT_IDX;
 			newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
-		} else if(newState == TalonState.HOLDING_POSITION) {
+		} else if(newState == MotorControllerState.HOLDING_POSITION) {
 			newControlMode = ControlMode.Position;
 			newSlotIndex   = MAINTAIN_SLOT_IDX;
 			newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
-		} else if(newState == TalonState.SET_POSITION) {
+		} else if(newState == MotorControllerState.SET_POSITION) {
 			newControlMode = ControlMode.Position;
 			// NB: SET_POSITION means "move to position", so use MOVE behavior
 			newSlotIndex   = MOVE_SLOT_IDX;
 			newPIDIndex    = MOVE_PIDLOOP_IDX;
-		} else if(newState == TalonState.MOVING) {
+		} else if(newState == MotorControllerState.MOVING) {
 			newControlMode = ControlMode.Velocity;
 			newSlotIndex   = MOVE_SLOT_IDX;
 			newPIDIndex    = MOVE_PIDLOOP_IDX;
@@ -223,12 +219,12 @@ public class Talon {
 	public boolean zeroEncodersIfNecessary() {
 		// TODO: account for inversions
 		if (readLimitSwitch(Direction.NEGATIVE) 
-				&& (state == TalonState.HOLDING_POSITION && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
-				|| (state == TalonState.MOVING && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
+				&& (state == MotorControllerState.HOLDING_POSITION && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
+				|| (state == MotorControllerState.MOVING && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
 		{
 			log.print("ZEROING ENCODERS");
-			TalonState oldState = state;
-			set(TalonState.DISABLED, 0);
+			MotorControllerState oldState = state;
+			set(MotorControllerState.DISABLED, 0);
 			// Zero out absolute encoder values for both PID slots
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -239,7 +235,7 @@ public class Talon {
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.setSelectedSensorPosition(0, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.setSelectedSensorPosition(0, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			set(TalonState.HOLDING_POSITION, readPosition());
+			set(MotorControllerState.HOLDING_POSITION, readPosition());
 			log.print("ENCODERS ZEROD");
 			return true;
 		}
@@ -249,13 +245,13 @@ public class Talon {
 	 * [ACTION] Set to an absolute encoder position
 	 */
 	public void setPosition(int position) {
-		set(TalonState.SET_POSITION, position);
+		set(MotorControllerState.SET_POSITION, position);
 	}
 	/*
 	 * [ACTION] Hold the current position, resist movement
 	 */
 	public void holdCurrentPosition() {
-		set(TalonState.HOLDING_POSITION, readPosition());
+		set(MotorControllerState.HOLDING_POSITION, readPosition());
 		zeroEncodersIfNecessary();
 	}
 	/*
@@ -271,21 +267,21 @@ public class Talon {
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
 			log.print("move [Direction (" + direction + ") x Speed (" + speed + ") -> " + speedParam + "]");
-			set(TalonState.MOVING, speedParam);
+			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
 	/*
 	 * Talon only uses the velocity
 	 */
 	public void setVelocity(double speed) {
-		if(state == TalonState.MOVING) {
-			set(TalonState.MOVING, speed);
+		if(state == MotorControllerState.MOVING) {
+			set(MotorControllerState.MOVING, speed);
 		}
 	}
 	/*
 	 * [ACTION] Stop output of the motor
 	 */
 	public void disable() {
-		set(TalonState.DISABLED, 0);
+		set(MotorControllerState.DISABLED, 0);
 	}
 }

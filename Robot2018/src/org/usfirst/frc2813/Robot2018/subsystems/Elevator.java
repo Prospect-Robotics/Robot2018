@@ -4,7 +4,7 @@ import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Log;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
-import org.usfirst.frc2813.Robot2018.TalonState;
+import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -83,7 +83,7 @@ public class Elevator extends Subsystem {
 
 	// [ACTION]
 	public void disable() {
-		TalonState oldState = motorController.getState();
+		MotorControllerState oldState = motorController.getState();
 		motorController.disable();
 		if(oldState != motorController.getState()) {
 			log.print("disable [transitioned from " + oldState + " to " + motorController.getState() + ".");
@@ -92,7 +92,7 @@ public class Elevator extends Subsystem {
 
 	// [ACTION]
 	public void holdCurrentPosition() {
-		TalonState oldState = motorController.getState();
+		MotorControllerState oldState = motorController.getState();
 		motorController.holdCurrentPosition();
 		if(oldState != motorController.getState()) {
 			log.print("holdCurrentPosition [transitioned from " + oldState + " to " + motorController.getState() + ".");
@@ -101,11 +101,11 @@ public class Elevator extends Subsystem {
 
 	// [ACTION]
 	public void setPosition(double inches) {
-		TalonState oldState = motorController.getState();
+		MotorControllerState oldState = motorController.getState();
 		double newPositionInches = inches;
 		int newPositionSrx = inchesToSrx(inches);
 		motorController.setPosition(inchesToSrx(inches));
-		if(motorController.getState() == TalonState.HOLDING_POSITION) {
+		if(motorController.getState() == MotorControllerState.HOLDING_POSITION) {
 			// TODO: Add flags
 			// NB: this version shows old -> new transitions
 			log.print("setPosition ["
@@ -127,9 +127,9 @@ public class Elevator extends Subsystem {
 	 * Set direction and speed in one call, without enabling movement.
 	 */
 	public void setMoveConfiguration(Direction newDirection, double newSpeedInchesPerSecond) {
-		TalonState oldState = motorController.getState();
+		MotorControllerState oldState = motorController.getState();
 		double     newSpeedSrx = speedToSrx(newSpeedInchesPerSecond);
-		if(motorController.getState() == TalonState.MOVING) {
+		if(motorController.getState() == MotorControllerState.MOVING) {
 			// TODO: Add flags
 			// NB: this version shows transition
 			log.print("setMoveConfiguration ["
@@ -146,7 +146,7 @@ public class Elevator extends Subsystem {
 				+ ", Velocity=" + newSpeedSrx
 				+ "]");
 		// If we are currently moving by velocity and the value changes, update the Talon
-		if(motorController.getState() == TalonState.MOVING) {
+		if(motorController.getState() == MotorControllerState.MOVING) {
 			motorController.move(newDirection, newSpeedSrx);
 		}
 		this.direction = newDirection;
@@ -171,7 +171,7 @@ public class Elevator extends Subsystem {
 		 * to start moving.
 		 */
 		setMoveConfiguration(newDirection, newSpeedInchesPerSecond);
-		if(motorController.getState() != TalonState.MOVING) {
+		if(motorController.getState() != MotorControllerState.MOVING) {
 			motorController.move(this.direction, this.speedSrx);
 		}
 	}

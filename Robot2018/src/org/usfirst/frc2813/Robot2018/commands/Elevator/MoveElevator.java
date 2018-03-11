@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.TalonState;
+import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 /**
@@ -13,7 +13,7 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
  */
 public class MoveElevator extends GearheadsCommand {
 	// Desired state/action
-	private final TalonState state;
+	private final MotorControllerState state;
 	// direction, only valid if we are moving at a constant speed
 	private final Direction direction;
 	// position, only valid if we are moving to a set position
@@ -23,7 +23,7 @@ public class MoveElevator extends GearheadsCommand {
 	 * Hold the current position
 	 */
 	public MoveElevator() {
-		this.state = TalonState.HOLDING_POSITION;
+		this.state = MotorControllerState.HOLDING_POSITION;
 		this.direction = Direction.NEUTRAL; // Not used
 		this.positionInInches = 0; // Not used
 		requires(Robot.elevator);
@@ -33,7 +33,7 @@ public class MoveElevator extends GearheadsCommand {
 	 * Move in a particular direction until stopped, hold the velocity
 	 */
 	public MoveElevator(Direction direction) {
-		this.state = TalonState.MOVING;
+		this.state = MotorControllerState.MOVING;
 		this.direction = direction; 
 		this.positionInInches = 0; // Not used
 		logger.info("MoveElevator-" + direction);
@@ -44,7 +44,7 @@ public class MoveElevator extends GearheadsCommand {
 	 * Move to a specific position and hold the position
 	 */
 	public MoveElevator(double positionInInches) {
-		this.state = TalonState.SET_POSITION;
+		this.state = MotorControllerState.SET_POSITION;
 		this.positionInInches = positionInInches;
 		this.direction = Direction.NEUTRAL; // Not used
 		logger.info("MoveElevator-" + positionInInches);
@@ -87,7 +87,7 @@ public class MoveElevator extends GearheadsCommand {
 	@Override
 	protected void interrupted() {
 		logger.finer("in interrupted");
-		if(state == TalonState.MOVING || state == TalonState.SET_POSITION) {
+		if(state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) {
 			logger.info("was moving, so changing to HOLD.");
 			Robot.elevator.holdCurrentPosition();
 		}
