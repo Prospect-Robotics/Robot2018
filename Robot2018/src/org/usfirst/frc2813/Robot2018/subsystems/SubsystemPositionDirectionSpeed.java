@@ -229,8 +229,6 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * stop moving - this is active as we often require pid to resist gravity
 	 */
 	public void holdCurrentPosition() {
-		if (!state.isDisabled()) {
-			changeState(MotorControllerState.SET_POSITION);
-		}
+		changeState(MotorControllerState.HOLDING_POSITION);
 	}
 }
