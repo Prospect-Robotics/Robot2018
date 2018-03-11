@@ -1,21 +1,20 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 
 /**
  * Command to set speed of elevator.
  * FIXME! Does not take effect immediately if not already moving
  */
-public class SetElevatorSpeed extends InstantCommand {
+public class ElevatorSetSpeed extends GearheadsInstantCommand {
 	private double speed;
 
 	/**
 	 * Set the speed of the elevator
 	 * @param speed in feet per second
 	 */
-	public SetElevatorSpeed(double speed) {
+	public ElevatorSetSpeed(double speed) {
 		this.speed=speed;
 	}
 
