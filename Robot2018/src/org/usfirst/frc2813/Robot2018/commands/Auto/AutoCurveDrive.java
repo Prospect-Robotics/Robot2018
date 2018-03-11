@@ -1,13 +1,12 @@
 package org.usfirst.frc2813.Robot2018.commands.Auto;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-
-import edu.wpi.first.wpilibj.command.Command;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 /**
  *
  */
-public class AutoCurveDrive extends Command {
+public class AutoCurveDrive extends GearheadsCommand {
 	private final double degrees, rate;
 	private double startingOrientation;
 	@SuppressWarnings("unused")

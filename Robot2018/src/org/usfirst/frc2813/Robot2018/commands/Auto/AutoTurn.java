@@ -1,14 +1,13 @@
 package org.usfirst.frc2813.Robot2018.commands.Auto;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-
-import edu.wpi.first.wpilibj.command.Command;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 /**
  * Autonomous turn command. Use gyro and linear interpolation
  * to
  */
-public class AutoTurn extends Command {
+public class AutoTurn extends GearheadsCommand {
 	private final double degrees, rate;
 	private double startingAngle;
 	private boolean negativeAngle;

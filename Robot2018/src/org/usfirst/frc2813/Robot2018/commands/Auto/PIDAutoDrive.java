@@ -2,15 +2,15 @@ package org.usfirst.frc2813.Robot2018.commands.Auto;
 
 import org.usfirst.frc2813.RandomPIDController2;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.command.Command;
 
 /**
  * Class to use PID control of autonomous drive
  */
-public class PIDAutoDrive extends Command {
+public class PIDAutoDrive extends GearheadsCommand {
 	private final PIDSource m_source = new PIDSource() {
 
 		@Override
