@@ -1,18 +1,13 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.Log;
-
-import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  * Subsystem baseclass for simple subsystems which have one of
  * two states.
- *
  */
-public abstract class SubsystemBinary extends Subsystem {
+public abstract class SubsystemBinary extends GearheadsSubsystem {
 	public boolean encoderFunctional = true;
-	protected static Log log;
 	protected static Direction state;
 
     /**
@@ -21,8 +16,6 @@ public abstract class SubsystemBinary extends Subsystem {
      * to change any of the defaults set here, call super first!
      */
 	public SubsystemBinary() {
-		log = new Log(this.getClass().getName());
-
 		// track state and change as required. Start in moving so initialize can halt
         state = Direction.NEGATIVE;
 	}

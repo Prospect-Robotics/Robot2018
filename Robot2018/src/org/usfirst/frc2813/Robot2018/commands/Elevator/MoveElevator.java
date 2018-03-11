@@ -1,13 +1,9 @@
-// RobotBuilder Version: 2.0
-
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
-import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.Log;
 import org.usfirst.frc2813.Robot2018.TalonState;
-import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 /**
  * Move or maintain elevator position.
@@ -15,15 +11,14 @@ import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
  * Direction to move in a direction.
  * Position to move to that position in inches above floor.
  */
-public class MoveElevator extends Command {
+public class MoveElevator extends GearheadsCommand {
 	// Desired state/action
 	private final TalonState state;
 	// direction, only valid if we are moving at a constant speed
 	private final Direction direction;
 	// position, only valid if we are moving to a set position
 	private final double positionInInches;
-	// command logger
-	private final Log log;
+
 	/*
 	 * Hold the current position
 	 */
@@ -31,9 +26,9 @@ public class MoveElevator extends Command {
 		this.state = TalonState.HOLDING_POSITION;
 		this.direction = Direction.NEUTRAL; // Not used
 		this.positionInInches = 0; // Not used
-		this.log = new Log("MoveElevator-HOLD_POSITION");
 		requires(Robot.elevator);
 	}
+
 	/*
 	 * Move in a particular direction until stopped, hold the velocity
 	 */
@@ -41,9 +36,10 @@ public class MoveElevator extends Command {
 		this.state = TalonState.MOVING;
 		this.direction = direction; 
 		this.positionInInches = 0; // Not used
-		this.log = new Log("MoveElevator-" + direction);
+		logger.info("MoveElevator-" + direction);
 		requires(Robot.elevator);
 	}
+
 	/*
 	 * Move to a specific position and hold the position
 	 */
@@ -51,13 +47,14 @@ public class MoveElevator extends Command {
 		this.state = TalonState.SET_POSITION;
 		this.positionInInches = positionInInches;
 		this.direction = Direction.NEUTRAL; // Not used
-		this.log = new Log("MoveElevator-" + positionInInches);
+		logger.info("MoveElevator-" + positionInInches);
 		requires(Robot.elevator);
 	}
+
 	// Called repeatedly when this Command is scheduled to run
 	// @Override
 	protected void execute() {
-		log.print("execute");
+		logger.finer("in execute");
 		switch(state) {
 		case HOLDING_POSITION:
 			Robot.elevator.holdCurrentPosition();
@@ -85,13 +82,13 @@ public class MoveElevator extends Command {
 	
 	@Override
 	protected void end() {
-		log.print("end");
+		logger.finer("in end");
 	}
 	@Override
 	protected void interrupted() {
-		log.print("interrupted");
+		logger.finer("in interrupted");
 		if(state == TalonState.MOVING || state == TalonState.SET_POSITION) {
-			log.print("was moving, so changing to HOLD.");
+			logger.info("was moving, so changing to HOLD.");
 			Robot.elevator.holdCurrentPosition();
 		}
 	}

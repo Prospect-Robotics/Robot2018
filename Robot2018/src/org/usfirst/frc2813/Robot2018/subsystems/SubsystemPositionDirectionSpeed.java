@@ -1,9 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.Log;
-
-import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
  * Subsystem baseclass for subsystems which move in two direction
@@ -12,9 +9,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * This subsytem can halt, move to an exact position or in a direction.
  * Speed can be set separately.
  */
-public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
+public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem {
 	public boolean encoderFunctional = true;
-	protected Log log;
 	protected Direction direction;
 	protected double speed;
 	protected double position;
@@ -38,8 +34,6 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
      * to change any of the defaults set here, call super first!
      */
 	public SubsystemPositionDirectionSpeed() {
-		log = new Log(this.getClass().getName());
-
 		// track state and change as required. Start in moving so initialize can halt
         direction = Direction.DOWN;
         position = MIN_POSITION;
@@ -149,11 +143,11 @@ public abstract class SubsystemPositionDirectionSpeed extends Subsystem {
 		isHalted = false;
         if (positionMode) {
             setControllerPosition(positionToController(position));
-            log.print("Starting movement. Target position: " + position);
+            logger.info("Starting movement. Target position: " + position);
         }
         else {
             setControllerDirection(direction);
-            log.print("Starting movement. Speed: " + speed);
+            logger.info("Starting movement. Speed: " + speed);
         }
 	}
 

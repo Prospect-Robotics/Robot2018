@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018;
 
 /**
- * Create a class to represent the state of the Elevator state machine.
+ * Class to represent the state of the Elevator state machine.
  * Glorified enumeration with the ability to describe itself.
  */
 public enum TalonState {
@@ -28,4 +28,4 @@ public enum TalonState {
 	public boolean isMoving() {
 		return this == MOVING;
 	}
-};
+}
