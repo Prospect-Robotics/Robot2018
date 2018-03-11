@@ -1,11 +1,8 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
-//TODO: move to commandGroups
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
-
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroupGenerator;
-
+import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
+import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;

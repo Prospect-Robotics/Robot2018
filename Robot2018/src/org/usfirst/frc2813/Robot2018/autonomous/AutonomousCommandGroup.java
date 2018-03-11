@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.Auto;
+package org.usfirst.frc2813.Robot2018.autonomous;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.TimedCommand;

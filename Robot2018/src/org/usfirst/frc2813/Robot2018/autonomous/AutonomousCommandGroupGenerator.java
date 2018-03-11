@@ -1,6 +1,6 @@
 // AutonomousCommand - a class to run autonomous mode
 
-package org.usfirst.frc2813.Robot2018.commands.Auto;
+package org.usfirst.frc2813.Robot2018.autonomous;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,8 +9,7 @@ import org.usfirst.frc2813.Robot2018.Direction;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutonomousCommandGroup;
+import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 
 
 /**
