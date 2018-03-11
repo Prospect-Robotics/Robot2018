@@ -12,133 +12,98 @@ package org.usfirst.frc2813.Robot2018;
  * but that is completely independent of whether the actual
  * motor wires are inverted, or the sensor phase is reversed.  
  */
-public class Direction implements java.lang.Comparable<Direction> {
-
-	private static final int POSITIVE_MULTIPLIER =  1;
-	private static final int NEUTRAL_MULTIPLIER  =  0;
-	private static final int NEGATIVE_MULTIPLIER = -1;
+public enum Direction{
+	/** Alias for POSITIVE */
+	FORWARD(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	BACKWARD(Canonical.NEGATIVE),
+	/** Alias for NEGATIVE */
+	REVERSE(Canonical.NEGATIVE),
 	
-	/** Logical direction for going in a logically positive/forward/do direction **/
-	public static final Direction POSITIVE = new Direction(POSITIVE_MULTIPLIER, "POSITIVE");
-	/** Logical direction for going in a logically negative/reversed/undo direction **/
-	public static final Direction NEGATIVE = new Direction(NEGATIVE_MULTIPLIER, "NEGATIVE");
-	/** Logical direction for not going anywhere (multiplier is zero!).  Logically stop. **/
-	public static final Direction NEUTRAL = new Direction(NEUTRAL_MULTIPLIER, "NEUTRAL");
+	/** Alias for NEGATIVE */
+	IN(Canonical.NEGATIVE), // TODO: This should probably be reversed.
+	/** Alias for POSITIVE */
+	OUT(Canonical.POSITIVE), // TODO: This should probably be reversed.
+
+	/** Alias for POSITIVE */
+	CLOCKWISE(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	COUNTERCLOCKWISE(Canonical.NEGATIVE),
+
+	/** Alias for POSITIVE */
+	UP(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	DOWN(Canonical.NEGATIVE),
+	
+	/** Alias for POSITIVE */
+	RIGHT(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	LEFT(Canonical.NEGATIVE),
+	
+	/** Alias for POSITIVE */
+	OPEN(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	CLOSE(Canonical.NEGATIVE),
+
+	/** Alias for NEUTRAL */
+	CENTER(Canonical.NEUTRAL),
+	/** Alias for NEUTRAL */
+	STOP(Canonical.NEUTRAL),
+	ON(Canonical.POSITIVE),
+	/** Alias for NEUTRAL */
+	OFF(Canonical.NEUTRAL);
+	
+	Canonical canonicalDirection;
+	Direction(Canonical canonicalDirection) {
+		this.canonicalDirection = canonicalDirection;
+	}
+	
+	public enum Canonical{
+		/** Logical direction for going in a logically positive/forward/do direction **/
+		POSITIVE(1),
+		/** Logical direction for going in a logically negative/reversed/undo direction **/
+		NEGATIVE(-1),
+		/** Logical direction for not going anywhere (multiplier is zero!).  Logically stop. **/
+		NEUTRAL(0);
 		
-	/** Alias for POSITIVE */
-	public static final Direction FORWARD  = new Direction(POSITIVE, "FORWARD");
-	/** Alias for NEGATIVE */
-	public static final Direction BACKWARD = new Direction(NEGATIVE, "BACKWARD");
-	/** Alias for NEGATIVE */
-	public static final Direction REVERSE = new Direction(NEGATIVE, "REVERSE");
-	
-	/** Alias for NEGATIVE */
-	public static final Direction IN      = new Direction(NEGATIVE, "IN"); // TODO: This should probably be reversed.
-	/** Alias for POSITIVE */
-	public static final Direction OUT     = new Direction(POSITIVE, "OUT"); // TODO: This should probably be reversed.
-
-	/** Alias for POSITIVE */
-	public static final Direction CLOCKWISE        = new Direction(POSITIVE, "CLOCKWISE");  
-	/** Alias for NEGATIVE */
-	public static final Direction COUNTERCLOCKWISE = new Direction(NEGATIVE, "COUNTERCLOCKWISE");
-
-	/** Alias for POSITIVE */
-	public static final Direction UP      = new Direction(POSITIVE, "UP");
-	/** Alias for NEGATIVE */
-	public static final Direction DOWN    = new Direction(NEGATIVE, "DOWN");
-	
-	/** Alias for POSITIVE */
-	public static final Direction RIGHT   = new Direction(POSITIVE, "RIGHT");
-	/** Alias for NEGATIVE */
-	public static final Direction LEFT    = new Direction(NEGATIVE, "LEFT");
-	
-	/** Alias for POSITIVE */
-	public static final Direction OPEN    = new Direction(POSITIVE, "OPEN");
-	/** Alias for NEGATIVE */
-	public static final Direction CLOSE   = new Direction(NEGATIVE, "CLOSE");
-
-	/** Alias for NEUTRAL */
-	public static final Direction CENTER  = new Direction(NEUTRAL, "CENTER");
-	/** Alias for NEUTRAL */
-	public static final Direction STOP    = new Direction(NEUTRAL, "STOP");
-	/** Alias for NEUTRAL */
-	public static final Direction OFF     = new Direction(NEUTRAL, "OFF");
-	
-	// The canonical form, or null if this is a canonical direction
-	private final Direction canonicalDirection;
-	// The multiplier for this direction
-	private final int multiplier;
-	// The label for this direction
-	private final String label;
+		int value;
+		Canonical(int value){
+			this.value=value;
+		}
+	}
 	
 	/**
 	 * Get the logical multiplier.  POSITIVE x1, NEGATIVE x-1, NEUTRAL x0
 	 */
 	public double getMultiplierAsDouble() {
-		return multiplier;
+		return canonicalDirection.value;
 	}
 	/**
 	 * Get the logical multiplier.  POSITIVE x1, NEGATIVE x-1, NEUTRAL x0
 	 */
 	public int getMultiplier() {
-		return multiplier;
+		return canonicalDirection.value;
 	}
 	/**
 	 * Is this a neutral direction
 	 */
 	public boolean isNeutral() {
-		return canonicalDirection == NEUTRAL;
+		return canonicalDirection == Canonical.NEUTRAL;
 	}
 	/**
 	 * Is this a positive direction
 	 */
 	public boolean isPositive() {
-		return canonicalDirection == FORWARD;
+		return canonicalDirection == Canonical.POSITIVE;
 	}
 	/**
 	 * Is this a negative direction
 	 */
 	public boolean isNegative() {
-		return canonicalDirection == REVERSE;
+		return canonicalDirection == Canonical.NEGATIVE;
 	}
 	/**
-	 * Get the label
-	 */
-	public String getLabel() {
-		return label;
-	}
-	/**
-	 * Get the canonical form.  If this is a canonical direction, will return the same object.  Don't try to recurse.
-	 */
-	public Direction getCanonicalDirection() {
-		return canonicalDirection;
-	}
-	/**
-	 * Get the base label
-	 */
-	public String getCanonicalLabel() {
-		return getCanonicalDirection().getLabel();
-	}
-	/**
-	 * Create a new "canonical" direction.
-	 * Do not make the constructor public.  Define new constants above.  Don't ever allocate new instances.
-	 * @param multiplier The multiplier used to scale any directional values 
-	 */
-	private Direction(int multiplier, String label) {
-		this.canonicalDirection = this;
-		this.multiplier = multiplier;
-		this.label = label;
-	}	
-	/**
-	 * Create a new "alias" direction.
-	 * Do not make the constructor public.  Define new constants above.  Don't ever allocate new instances.
-	 * @param multiplier The multiplier used to scale any directional values 
-	 */
-	Direction(Direction canonicalDirection, String label) {
-		this.canonicalDirection = canonicalDirection;
-		this.multiplier = canonicalDirection.multiplier;
-		this.label = label;
-	}
+
 	
 	public String toString() {
 		return label;
@@ -148,14 +113,6 @@ public class Direction implements java.lang.Comparable<Direction> {
 	 * Two directions are equal if they are the same or have the same canonical representation
 	 */
 	public boolean equals(Direction other) {
-		return other.getCanonicalDirection() == this.getCanonicalDirection();
-	}
-
-	/**
-	 * Order by label
-	 */
-	@Override
-	public int compareTo(Direction other) {
-		return getLabel().compareTo(other.getLabel());
+		return other.canonicalDirection == this.canonicalDirection;
 	}
 }
