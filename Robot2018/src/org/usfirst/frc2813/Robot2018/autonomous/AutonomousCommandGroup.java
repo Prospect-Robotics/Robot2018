@@ -8,7 +8,7 @@ import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
-
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
 import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
@@ -56,6 +56,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void turnRight(double angle) { turnLeft(-angle); } // right turn is a negative left turn
 	public void turnRight() { turnLeft(-90); }
 
+	/*
+	 * We do not currently use curve drive in autonomous
 	public void curveCounterForward(double angle, double radius) {
 		addSequential(new AutoCurveDrive(-curveSpeed, -angle, radius));
 	}
@@ -68,24 +70,26 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void curveClockBackward(double angle, double radius) {
 		addSequential(new AutoCurveDrive(-curveSpeed, angle, -radius));
 	}
+	*/
 
 	//elevator commands
-	public void raiseElevator(double amount) {
-		//TODO create method //addSequential();
+	public void raiseElevator(double position) {
+		addSequential(new MoveElevator(position));
 	}
-	public void raiseElevator() { raiseElevator(1.0); }
-	public void lowerElevator(double amount) { raiseElevator(-amount); }
-	public void lowerElevator() { raiseElevator(-1.0); }
+	public void lowerElevator() {
+		addSequential(new MoveElevator(0));
+	}
 
 	// arm control commands
 	public void dropCube() {
 		// TODO: should we delay between these?
-		// TODO: consider making this pair a command for arm
+		// TODO: consider making this sequence a command
 		addSequential(new SpinIntake(Direction.OUT));
 		addSequential(new SetJaws(Direction.OPEN));
+		addSequential(new SpinIntake());
 	}
 	public void grabCube() {
-		// TODO: should we delay between these?
+		// TODO: should we delay between these? Change order?
 		// TODO: consider making this pair a command for arm
 		addSequential(new SpinIntake(Direction.IN));
 		addSequential(new SetJaws(Direction.CLOSE));

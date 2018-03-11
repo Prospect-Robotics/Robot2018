@@ -5,6 +5,8 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.util.logging.Logger;
+
 import org.usfirst.frc2813.Robot2018.Direction;
 
 import org.usfirst.frc2813.Robot2018.Robot;
@@ -17,8 +19,14 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
  * account game data. Used exclusively by AutonomousCommandGroup
  */
 public class AutonomousCommandGroupGenerator {
+	Logger logger = Logger.getLogger(this.getClass().getSimpleName());
+
+	// Elevator position to place cubes - FIXME! not correct values
+	private static final double scaleHeight = 60;
+	private static final double switchHeight = 24;
+
 	private int directionBias;  // used to share code between left/right
-	private static final SendableChooser<Direction> positionSelector = new SendableChooser<Direction>();
+	private static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
 	static {
 		positionSelector.addDefault("LEFT", Direction.LEFT);
 		positionSelector.addObject("CENTER", Direction.CENTER);
@@ -49,7 +57,7 @@ public class AutonomousCommandGroupGenerator {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(150);
 			autoCmdList.turnRight(90 * directionBias);
-			autoCmdList.raiseElevator();
+			autoCmdList.raiseElevator(scaleHeight);
 			autoCmdList.dropCube();
 			autoCmdList.lowerElevator();
 		}
@@ -59,7 +67,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnRight(45 * directionBias);
 			autoCmdList.driveForward(50); // diagonally across field
 			autoCmdList.turnLeft(45 * directionBias);
-			autoCmdList.raiseElevator();
+			autoCmdList.raiseElevator(switchHeight);
 			autoCmdList.dropCube();
 			autoCmdList.lowerElevator();
 		}
