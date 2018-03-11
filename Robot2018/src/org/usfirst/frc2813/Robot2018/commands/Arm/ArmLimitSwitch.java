@@ -48,7 +48,7 @@ public class ArmLimitSwitch extends Command {
 	protected void execute() {
 		double encoder_value = DESIRED_ENCODER_VALUE;
 		encoder_value *= direction == Direction.UP ? 1 : -1;
-		speedController.set(encoder_value);		
+		speedController.set(encoder_value);
 	}
 
 	protected boolean isFinished() {

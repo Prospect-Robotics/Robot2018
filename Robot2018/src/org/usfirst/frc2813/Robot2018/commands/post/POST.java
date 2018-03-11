@@ -38,7 +38,7 @@ public class POST extends CommandGroup {
 			Robot.arm.encoderFunctional = functional;
 		}));
 		requires(Robot.arm);
-		
+
 		addSequential(new TestEncoder(Robot.elevator.speedController, Robot.elevator.encoder, (boolean functional) -> {
 			Robot.elevator.encoderFunctional = functional;
 		}));

@@ -17,7 +17,7 @@ import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
 public class Arm extends SubsystemPositionDirectionSpeed {
 	private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
     private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
-    
+
     private static final double PULSES_PER_DEGREE = PULSES_PER_REVOLUTION / 360;
     private static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
 
@@ -36,7 +36,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
 	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.1, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
-	        
+
 	    initialize();
 	}
 

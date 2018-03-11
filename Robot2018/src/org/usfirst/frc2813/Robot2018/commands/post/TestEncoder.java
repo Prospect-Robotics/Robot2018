@@ -38,7 +38,7 @@ public class TestEncoder extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
 		if(encoder.getRaw() != startingPosition) {
-			if(callback != null) 
+			if(callback != null)
 				callback.accept(true);
 			return true;
 		}

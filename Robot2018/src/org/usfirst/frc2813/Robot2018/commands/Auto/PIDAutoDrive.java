@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
- * 
+ *
  */
 public class PIDAutoDrive extends Command {
-	
-	
+
+
 	private final PIDSource m_source = new PIDSource() {
 
 		@Override
@@ -37,10 +37,10 @@ public class PIDAutoDrive extends Command {
 	private final double maxSpeed;
 	private double startPosition;
 	private double startAngle; // which may or may not be zero degrees.
-	
+
 	private static final double ACCELERATION = 60;//inches
 	private static final double DECELERATION = 60;//inches
-	
+
     public PIDAutoDrive(double forwardSpeed, double distance) {	// What are the units of distance?
         requires(Robot.driveTrain);
         controller.setInputRange(0, 360);
@@ -53,7 +53,7 @@ public class PIDAutoDrive extends Command {
         this.distance = distance;
         maxSpeed = Math.abs(forwardSpeed);
     }
-    
+
 
     // Called just before this Command runs the first time
     protected void initialize() {
@@ -71,13 +71,13 @@ public class PIDAutoDrive extends Command {
     	controller.enable();
     	System.out.println("PID AutoDrive initilize: Started  stopAt:"+stopAt+" distance:"+distance);
     }
-    
+
     /**
      * Interpolate: Given two points and the x value of third point, determines
      * y value of that third point.
-     * 
+     *
      * x is distance and y is speed when used in calcThrottle
-     * 
+     *
      * @param x1 x value of first point
      * @param y1 y value of first point
      * @param x2 x value of second point
@@ -85,12 +85,12 @@ public class PIDAutoDrive extends Command {
      * @param x x value of third point
      * @return y value of third point
      */
-    
+
     private double interpolate(double x1, double y1, double x2, double y2, double x) {
         double y = y1 + (y2 - y1) / (x2 - x1) * (x - x1);
         return y;
     }
-    
+
     private double distanceTraveled() {
     	return Robot.driveTrain.getDistance() - startPosition;
     }
@@ -121,7 +121,7 @@ public class PIDAutoDrive extends Command {
     	/*
     	 * isFinished() for PIDAutoDrive
     	 * Want to stop when we have reached the desired Encoder position
-    	 * The encoder position "stopAt" is recoreded 
+    	 * The encoder position "stopAt" is recoreded
     	 */
         if (distanceTraveled() >= distance) System.out.println("ISFINISHED");
     	return Math.abs(distanceTraveled()) >= Math.abs(distance);
@@ -133,7 +133,7 @@ public class PIDAutoDrive extends Command {
     	controller.disable();
     	controller.reset();
     }
-    
+
     private void usePIDOutput(double output) {
     	/*te their output to zero when disabled.
     	 * The watchdog will call disable() every 0.1 seconds when
@@ -154,7 +154,7 @@ public class PIDAutoDrive extends Command {
     		newThrottle *= -1;
     	}
     	System.out.printf("PID: t %.3f; a %.3f; ss %.3f; d %.3f;\nnT %.3f; fS %.3f; dist %.3f; output %.3f\n", distanceTraveled(), accel, steadyState, decel, newThrottle, this.forwardSpeed, distance,output);
-    	    	
+
     	Robot.driveTrain.arcadeDrive(newThrottle, -output);
     }
 }

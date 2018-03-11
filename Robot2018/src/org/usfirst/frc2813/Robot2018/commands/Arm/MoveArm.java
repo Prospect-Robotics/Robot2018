@@ -34,7 +34,7 @@ public class MoveArm extends GearheadsCommand {
 	 */
 	public MoveArm(Direction direction) {
 		state = MotorControllerState.MOVING;
-		this.direction = direction; 
+		this.direction = direction;
 		positionInDegrees = 0; // Not used
 		logger.info("MoveElevator-" + direction);
 		requires(Robot.arm);

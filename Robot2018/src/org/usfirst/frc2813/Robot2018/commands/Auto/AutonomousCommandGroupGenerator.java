@@ -45,7 +45,7 @@ public class AutonomousCommandGroupGenerator {
 			// there is no game data. Cross the auto line
 			autoCmdList.driveForward(50);
 		}
-		
+
 		if (position == RobotMap.gameData.getScale()) {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(150);
