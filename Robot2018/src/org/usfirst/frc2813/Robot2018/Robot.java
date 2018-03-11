@@ -1,6 +1,8 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
+import java.util.logging.Level;
+
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
@@ -123,5 +125,9 @@ public class Robot extends TimedRobot {
 	//@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+	}
+	
+	public void setLevel(Level l){
+		System.setProperty("java.util.logging.ConsoleHandler.level", l.toString());
 	}
 }
