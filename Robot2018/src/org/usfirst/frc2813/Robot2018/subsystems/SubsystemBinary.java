@@ -7,7 +7,6 @@ import org.usfirst.frc2813.Robot2018.Direction;
  * two states.
  */
 public abstract class SubsystemBinary extends GearheadsSubsystem {
-	public boolean encoderFunctional = true;
 	protected static Direction state;
 
     /**

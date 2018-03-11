@@ -1,7 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import java.util.logging.Level;
-
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 

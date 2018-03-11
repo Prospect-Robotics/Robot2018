@@ -11,7 +11,6 @@ import org.usfirst.frc2813.Robot2018.Direction;
  * Speed can be set separately.
  */
 public abstract class SubsystemDirectionSpeed extends GearheadsSubsystem {
-	public boolean encoderFunctional = true;
 	protected Direction direction;
 	protected double speed;
 	protected boolean isHalted;
