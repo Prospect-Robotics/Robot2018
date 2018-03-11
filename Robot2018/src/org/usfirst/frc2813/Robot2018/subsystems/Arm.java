@@ -2,9 +2,11 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Log;
+import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -24,22 +26,25 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * FIXME: can jaws open if closed too long? Should we care?
  */
 public class Arm extends Subsystem {
-	public boolean encoderFunctional = true;
-	private static Log log;
-	private static Talon motorController;
-
-	/**
-	 * Arm state
-	 */
-	private static Direction armDirection;
-	private static double armSpeed;
-	private static double armPosition;
-    /**
-     * True if moving to position, false if moving in direction
-     */
-    private static boolean armPositionMode;
-	private static boolean armIsHalted;
-
+	private static final double INCHES_PER_REVOLUTION = Math.PI * 1.25;
+	private static final double PULSES_PER_INCH = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
+    private static final double DEFAULT_SPEED = 12;
+	
+	private Log log;
+	private Talon motorController;
+	
+	// State data for debugging/diagnostics only
+    private final String label;
+	// State data for debugging/diagnostics only
+	private double lastPositionInches = 0;
+	// State data for debugging/diagnostics only
+	private int lastPositionSrx = 0;
+	// State data for debugging/diagnostics only
+	private Direction direction = Direction.NEUTRAL;
+	// Speed in inches per second (last stored/assigned value)
+	private double speedInchesPerSecond = DEFAULT_SPEED;
+	// Speed in SRX units (last stored/assigned value)
+	private double speedSrx = speedToSrx(DEFAULT_SPEED);
 	/**
 	 * Intake state
 	 */
@@ -60,6 +65,7 @@ public class Arm extends Subsystem {
 
 	/**
 	 * ARM GEOMETRY
+	 * TODO: Find maximum allowable arm rotation. 
 	 */
 	public static final double DEGREES = 24;
 	private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
@@ -69,20 +75,16 @@ public class Arm extends Subsystem {
 	private static final double PULSES_PER_DEGREE_PER_SECOND = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
 	private static final double ARM_DEFAULT_SPEED = 5;
 
-	private final String label; 
 	public Arm() {
-		this.label = "Arm";
+		this.label = "Arm-Subsystem";
 		log = new Log(this.label);
 
-		motorController = new Talon(RobotMap.srxArm, this.label, log);
+		motorController = new Talon(RobotMap.srxArm, this.label, new Log("Elevator-Talon"));
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
-		motorController.configSoftLimitSwitch(Direction.FORWARD, armPositionToSrx(DEGREES));
+		motorController.configSoftLimitSwitch(Direction.FORWARD, revolutionsToSrx(DEGREES));
 	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.1, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
-        armDirection = Direction.DOWN;
-        armPosition = 0;
-        armPositionMode = false;
-		armIsHalted = false;
+	    
         intakeDirection = Direction.IN;
 		intakeIsHalted = false;
 		jawsState = RobotMap.jawsSolenoid.get() ? Direction.OPEN : Direction.CLOSE;
@@ -91,112 +93,163 @@ public class Arm extends Subsystem {
     /**
     * Map position from inches to controller ticks
     */
-    private static int armPositionToSrx(double degrees) {
+    private static int revolutionsToSrx(double degrees) {
 		return (int)(degrees * PULSES_PER_DEGREE);
     }
 
     /**
     * Map position from controller ticks to inches from bottom
     */
-    private static double srxToArmPosition(int ticks) {
+    private static double srxToPosition(int ticks) {
         return ticks / PULSES_PER_DEGREE;
     }
 
     /**
     * Map speed from inches per second to controller format
     */
-    private static double armSpeedToSrx(double degreesPerSecond) {
+    private static double speedToSrx(double degreesPerSecond) {
         return degreesPerSecond * PULSES_PER_DEGREE_PER_SECOND;
     }
-
-	public static void setArmSpeed() {
-        setArmSpeed(ARM_DEFAULT_SPEED);
-    }
-
-	public static void setArmSpeed(double degreesPerSecond) {
-        armSpeed = degreesPerSecond;
-        if (!armIsHalted) moveArm();  // commit state if not halted
+    
+    public boolean readLimitSwitch(Direction switchDirection) {
+		return motorController.readLimitSwitch(switchDirection);
+	}    
+	public double readPosition() {
+		return srxToPosition(motorController.readPosition());
 	}
-
-	public static void setArmDirection(Direction direction) {
-        armDirection = direction;
-        armPositionMode = false;
-        if (!armIsHalted) moveArm();  // commit state if not halted
-    }
-
-	public static double readArmPosition() {
-		return srxToArmPosition(motorController.readPosition());
-	}
-
-	/**
-	 * set position in degrees
-	 */
-	public static void setArmPosition(double degrees) {
-        armPositionMode = true;
-        armPosition = degrees;
-        if (!armIsHalted) moveArm();  // commit state if not halted
-	}
-
-	public static void setIntakeSpeed(double speed) {
-		intakeSpeed = speed;
-        if (!intakeIsHalted) spinIntake();  // commit state if not halted
-	}
-	public static void setIntakeSpeed() { setIntakeSpeed(INTAKE_DEFAULT_SPEED); }
-	
-	public static void setIntakeDirection(Direction direction) {
-		intakeDirection = direction;
-        if (!intakeIsHalted) spinIntake();  // commit state if not halted
-	}
-
-	// Start arm moving
-	public static void moveArm() {
-		// FIXME! this one variable requires the whole class to be non-static
-		// We should change POST to use statics
-        // if (!encoderFunctional) return;
-
-		armIsHalted = false;
-        if (armPositionMode) {
-            motorController.holdCurrentPosition();
-            log.print("Starting elevator movement. Target position " + armPosition);
-        }
-        else {
-            motorController.move(armDirection, armSpeedToSrx(armSpeed));
-            log.print("Starting elevator movement. Speed " + armSpeed);
-        }
-	}
-
-    public static void moveArm(Direction direction) {
-        armDirection = direction;
-        moveArm();
-    }
-
-    public static void moveArm(double speed) {
-        armSpeed = speed;
-        moveArm();
-    }
-
-    public static void moveArm(double speed, Direction direction) {
-        armSpeed = speed;
-        armDirection = direction;
-        moveArm();
-    }
-
-	// stop elevator from moving - this is active as we require pid to resist gravity
-	public static void haltArm() {
-		// FIXME! this one variable requires the whole class to be non-static
-		// We should change POST to use statics
-        // if (!encoderFunctional) return;
-		armIsHalted = true;
+    
+	public void disable() {
+		MotorControllerState oldState = motorController.getState();
 		motorController.disable();
-		motorController.zeroEncodersIfNecessary();
+		if(oldState != motorController.getState()) {
+			log.print("disable [transitioned from " + oldState + " to " + motorController.getState() + ".");
+		}
 	}
 
+	// [ACTION]
+	public void holdCurrentPosition() {
+		MotorControllerState oldState = motorController.getState();
+		motorController.holdCurrentPosition();
+		if(oldState != motorController.getState()) {
+			log.print("holdCurrentPosition [transitioned from " + oldState + " to " + motorController.getState() + ".");
+		}
+	}
+
+	// [ACTION]
+	public void setPosition(double inches) {
+		MotorControllerState oldState = motorController.getState();
+		double newPositionInches = inches;
+		int newPositionSrx = revolutionsToSrx(inches);
+		motorController.setPosition(revolutionsToSrx(inches));
+		if(motorController.getState() == MotorControllerState.HOLDING_POSITION) {
+			// TODO: Add flags
+			// NB: this version shows old -> new transitions
+			log.print("setPosition ["
+					+ "PositionInches (" + lastPositionInches + " -> " + newPositionInches + ")" 
+					+ ", PositionSrx (" + lastPositionSrx + " -> " + newPositionSrx + ")"
+					+ "]");
+		}
+		// TODO: Add flags
+		// NB: this version shows new values only
+		log.print("setPosition ["
+				+ "PositionInches=" + newPositionInches 
+				+ ", PositionSrx=" + newPositionSrx
+				+ "]");
+		this.lastPositionInches = newPositionInches;
+		this.lastPositionSrx = newPositionSrx;
+	}
+
+	/*
+	 * Set direction and speed in one call, without enabling movement.
+	 */
+	public void setMoveConfiguration(Direction newDirection, double newSpeedInchesPerSecond) {
+		MotorControllerState oldState = motorController.getState();
+		double     newSpeedSrx = speedToSrx(newSpeedInchesPerSecond);
+		if(motorController.getState() == MotorControllerState.MOVING) {
+			// TODO: Add flags
+			// NB: this version shows transition
+			log.print("setMoveConfiguration ["
+					+ "Direction (" + this.direction + " -> " + newDirection + ")" 
+					+ ", InchesPerSecond (" + this.speedInchesPerSecond + " -> " + newSpeedInchesPerSecond + ")"
+					+ ", Velocity (" + speedSrx + " -> " + newSpeedSrx + ")"
+					+ "]");
+		}
+		// TODO: Add flags
+		// NB: this version shows new values only
+		log.print("setMoveConfiguration ["
+				+ "Direction=" + newDirection 
+				+ ", InchesPerSecond=" + newSpeedInchesPerSecond
+				+ ", Velocity=" + newSpeedSrx
+				+ "]");
+		// If we are currently moving by velocity and the value changes, update the Talon
+		if(motorController.getState() == MotorControllerState.MOVING) {
+			motorController.move(newDirection, newSpeedSrx);
+		}
+		this.direction = newDirection;
+		this.speedInchesPerSecond = newSpeedInchesPerSecond;
+		this.speedSrx = newSpeedSrx;
+	}
+    
+	// Set the speed (will update the controller only if we are already in MOVING state (TalonMode.Velocity)
+	public void setArmDirection(Direction newDirection) {
+		setMoveConfiguration(newDirection, speedInchesPerSecond);
+	}
+
+	// Set the speed (will update the controller only if we are already in MOVING state (TalonMode.Velocity)
+	public void setSpeedInchesPerSecond(double newSpeedInchesPerSecond) {
+		setMoveConfiguration(this.direction, newSpeedInchesPerSecond);
+	}
+
+	// [ACTION]
+	public void move(Direction newDirection, double newSpeedInchesPerSecond) {
+		/* Set the new speed and/or direction.  If we are already moving, 
+		 * setMoveConfiguration will update the Talon.  If not, we have to tell it 
+		 * to start moving.
+		 */
+		setMoveConfiguration(newDirection, newSpeedInchesPerSecond);
+		if(motorController.getState() != MotorControllerState.MOVING) {
+			motorController.move(this.direction, this.speedSrx);
+		}
+	}
+
+	// [ACTION] - Change to moving state as necessary and update direction
+	public void move(Direction newDirection) {
+		move(newDirection, this.speedInchesPerSecond);
+	}
+
+	// [ACTION] - Change to moving state using configured direction and speed
+	public void move() {
+		move(this.direction, this.speedInchesPerSecond);
+	}
+
+	// initializes elevator in static position
+	@Override
+	public void initDefaultCommand() {
+		// Set to hold position by default
+		setDefaultCommand(new MoveElevator());
+	}
+	public double getSpeedInchesPerSecond() {
+		return speedInchesPerSecond;
+	}
+	@Override
+	public void periodic() {}
+	
+	@Override
+	public String toString() {
+		return label;
+	}
+    
 	// Manage jaws
 	public static void setJaws(Direction direction) {
 		if (jawsState != direction) {
 			RobotMap.jawsSolenoid.set(direction == Direction.CLOSE ? true : false);
 			jawsState = direction;
 		}
+	}
+	
+	public static void setIntakeDirection(Direction direction) {
+		intakeDirection = direction;
+        if (!intakeIsHalted) spinIntake();  // commit state if not halted
 	}
 
 	// Manage intake wheels
@@ -207,19 +260,5 @@ public class Arm extends Subsystem {
 	}
 	public static void haltIntake() {
 		RobotMap.intakeSpeedController.set(0);
-	}
-
-	// initializes arm in static position
-	@Override
-	public void initDefaultCommand() {
-		setDefaultCommand(new MoveArm());
-	}
-
-	@Override
-	public void periodic() {}
-
-	@Override
-	public String toString() {
-		return label;
 	}
 }

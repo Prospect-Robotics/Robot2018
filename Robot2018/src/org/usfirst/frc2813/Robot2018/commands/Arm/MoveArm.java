@@ -1,10 +1,9 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
-import edu.wpi.first.wpilibj.command.Command;
-
 import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
+import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 /**
  * Move or maintain arm position.
@@ -12,98 +11,86 @@ import org.usfirst.frc2813.Robot2018.subsystems.Arm;
  * Direction to move in a direction.
  * Position to move to that position in degrees from bottom.
  */
-public class MoveArm extends Command {
-	private boolean halted;
-	private Direction direction;
-	private double position;
-	private boolean positionMode;  // true if we are moving to a position
-	// false if we move by direction and speed
+public class MoveArm extends GearheadsCommand {
+	// Desired state/action
+	private final MotorControllerState state;
+	// direction, only valid if we are moving at a constant speed
+	private final Direction direction;
+	// position, only valid if we are moving to a set position
+	private final double positionInInches;
+	
+	/*
+	 * Hold the current position
+	 */
 	public MoveArm() {
-		halted = true;
+		this.state = MotorControllerState.HOLDING_POSITION;
+		this.direction = Direction.NEUTRAL; // Not used
+		this.positionInInches = 0; // Not used
 		requires(Robot.arm);
 	}
 
+	/*
+	 * Move in a particular direction until stopped, hold the velocity
+	 */
 	public MoveArm(Direction direction) {
-		this.direction = direction;
-		positionMode = false;
-		halted = false;
+		this.state = MotorControllerState.MOVING;
+		this.direction = direction; 
+		this.positionInInches = 0; // Not used
+		logger.info("MoveArm-" + direction);
+		requires(Robot.arm);
 	}
 
-	public MoveArm(double position) {
-		this.position = position;
-		positionMode = true;
-		halted = false;
+	/*
+	 * Move to a specific position and hold the position
+	 */
+	public MoveArm(double positionInInches) {
+		this.state = MotorControllerState.SET_POSITION;
+		this.positionInInches = positionInInches;
+		this.direction = Direction.NEUTRAL; // Not used
+		logger.info("MoveArm-" + positionInInches);
+		requires(Robot.arm);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	//@Override
 	protected void execute() {
-		if (halted) {
-			Arm.haltArm();
-		}
-		else {
-			if (positionMode) {
-				direction = Arm.readArmPosition() > position ? Direction.DOWN : Direction.UP;
-				Arm.moveArm(position);
-			}
-			else {
-				Arm.moveArm(direction);
-			}
+		logger.finer("in execute");
+		switch(state) {
+		case HOLDING_POSITION:
+			Robot.arm.holdCurrentPosition();
+			break;
+		case MOVING:
+			Robot.arm.move(direction);
+			break;
+		case SET_POSITION:
+			Robot.arm.setPosition(positionInInches);
+			break;
+		case DISABLED:
+			Robot.arm.disable();
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported state: " + state);
 		}
 	}
-
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		double currentPosition;
-		double targetPosition;
-		boolean done;
-
-		if (halted) return true;
-
-		currentPosition = Arm.readArmPosition();
-
-		/*
-		 * NB: When holding "up" or "down" buttons we are not
-		 * in positionMode, and targetPosition is set to 0 or DEGREES
-		 * and limit switches will stop motion.
-		 * One area of concern is that any offset in encoder values
-		 * or inaccuracy will result in never reaching done state
-		 * even if the soft limit is hit or the limit switch triggers.
-		 * "done" should also be checking the controller to see if
-		 * either soft or hard limit is it.  Then we need to adjust
-		 * if we hit a physical limit without hitting the absolute value, 
-		 * HEIGHT or 0.
-		 */
-		if (positionMode) {
-			targetPosition = position;
-		}
-		else if (direction == Direction.DOWN) {
-			targetPosition = 0;
-		}
-		else {
-			targetPosition = Arm.DEGREES;
-		}
-
-		if (direction == Direction.DOWN) {
-			done = currentPosition <= targetPosition;
-		}
-		else {
-			done = currentPosition >= targetPosition;
-		}
-
-		if (done) {
-			System.out.println("MoveArm_FINISHED");
-			halted = true;
-			Arm.haltArm();
-			return true;
-		}
+		// All of the move commands run indefinitely until cancelled
+//		log.print("isFinished is returning false");
 		return false;
 	}
 
 	@Override
-	protected void end() {}
+	protected void end() {
+		logger.finer("in end");}
+	
 
 	@Override
-	protected void interrupted() {}
+	protected void interrupted() {
+		logger.finer("in interrupted");
+		if(state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) {
+			logger.info("was moving, so changing to HOLD.");
+			Robot.arm.holdCurrentPosition();
+		}
+	}
 }

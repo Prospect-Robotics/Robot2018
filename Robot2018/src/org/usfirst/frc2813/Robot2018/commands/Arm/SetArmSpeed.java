@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
-
 import org.usfirst.frc2813.Robot2018.Robot;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
@@ -12,7 +11,6 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 public class SetArmSpeed extends InstantCommand {
 	private double newSpeedInchesPerSecond;
     private final Arm arm;
-
 
 	/**
 	 * Set the speed of the arm
@@ -26,6 +24,6 @@ public class SetArmSpeed extends InstantCommand {
 
 	// Called once when the command executes
 	protected void initialize() {
-		arm.setArmSpeed(newSpeedInchesPerSecond); 
+		arm.setSpeedInchesPerSecond(newSpeedInchesPerSecond); 
 	}
 }
