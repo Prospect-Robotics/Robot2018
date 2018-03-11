@@ -10,6 +10,8 @@ import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
+import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+import org.usfirst.frc2813.Robot2018.subsystems.Jaws;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.cscore.UsbCamera;
@@ -35,6 +37,8 @@ public class Robot extends TimedRobot {
 	public static DriveTrain driveTrain;
 	public static Elevator elevator;
 	public static Arm arm;
+	public static Jaws jaws;
+	public static Intake intake;
 	public static UsbCamera camera;
 
 	/**
@@ -49,6 +53,8 @@ public class Robot extends TimedRobot {
 		driveTrain = new DriveTrain();
 		elevator = new Elevator();
 		arm = new Arm();
+		jaws = new Jaws();
+		intake = new Intake();
 
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be

@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
-import org.usfirst.frc2813.Robot2018.Direction;
 
+import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
@@ -17,15 +17,15 @@ public class MoveArm extends GearheadsCommand {
 	// direction, only valid if we are moving at a constant speed
 	private final Direction direction;
 	// position, only valid if we are moving to a set position
-	private final double positionInInches;
-	
+	private final double positionInDegrees;
+
 	/*
 	 * Hold the current position
 	 */
 	public MoveArm() {
-		this.state = MotorControllerState.HOLDING_POSITION;
-		this.direction = Direction.NEUTRAL; // Not used
-		this.positionInInches = 0; // Not used
+		state = MotorControllerState.HOLDING_POSITION;
+		direction = Direction.NEUTRAL; // Not used
+		positionInDegrees = 0; // Not used
 		requires(Robot.arm);
 	}
 
@@ -33,10 +33,10 @@ public class MoveArm extends GearheadsCommand {
 	 * Move in a particular direction until stopped, hold the velocity
 	 */
 	public MoveArm(Direction direction) {
-		this.state = MotorControllerState.MOVING;
+		state = MotorControllerState.MOVING;
 		this.direction = direction; 
-		this.positionInInches = 0; // Not used
-		logger.info("MoveArm-" + direction);
+		positionInDegrees = 0; // Not used
+		logger.info("MoveElevator-" + direction);
 		requires(Robot.arm);
 	}
 
@@ -44,53 +44,73 @@ public class MoveArm extends GearheadsCommand {
 	 * Move to a specific position and hold the position
 	 */
 	public MoveArm(double positionInInches) {
-		this.state = MotorControllerState.SET_POSITION;
-		this.positionInInches = positionInInches;
-		this.direction = Direction.NEUTRAL; // Not used
+		state = MotorControllerState.SET_POSITION;
+		this.positionInDegrees = positionInInches;
+		if (Robot.arm.readPosition() < positionInInches) {
+			direction = Direction.UP;
+		}
+		else {
+			direction = Direction.DOWN;
+		}
 		logger.info("MoveArm-" + positionInInches);
 		requires(Robot.arm);
 	}
 
-	// Called repeatedly when this Command is scheduled to run
-	//@Override
-	protected void execute() {
+	// Called once to begin the command
+	// @Override
+	protected void initialize() {
 		logger.finer("in execute");
 		switch(state) {
 		case HOLDING_POSITION:
 			Robot.arm.holdCurrentPosition();
 			break;
 		case MOVING:
-			Robot.arm.move(direction);
+			Robot.arm.setDirection(direction);
 			break;
 		case SET_POSITION:
-			Robot.arm.setPosition(positionInInches);
+			Robot.arm.setPosition(positionInDegrees);
 			break;
 		case DISABLED:
 			Robot.arm.disable();
 			break;
-		default:
-			throw new IllegalArgumentException("Unsupported state: " + state);
 		}
 	}
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		// All of the move commands run indefinitely until cancelled
-//		log.print("isFinished is returning false");
-		return false;
+		double targetPosition = 0;
+		double actualPosition;
+
+		switch(state) {
+		case DISABLED:
+		case HOLDING_POSITION:
+			return true;
+		case MOVING:
+			if (direction.isPositive()) {
+				targetPosition = Robot.arm.MAX_POSITION;
+			}
+			else {
+				targetPosition = Robot.arm.MIN_POSITION;
+			}
+			break;
+		case SET_POSITION:
+			targetPosition = positionInDegrees;
+			break;
+		}
+		actualPosition = Robot.arm.readPosition();
+		if (direction.isPositive()) {
+			return actualPosition >= targetPosition;
+		}
+		return actualPosition <= targetPosition;
 	}
 
 	@Override
 	protected void end() {
-		logger.finer("in end");}
-	
+		logger.finer("in end");
+	}
 
 	@Override
 	protected void interrupted() {
 		logger.finer("in interrupted");
-		if(state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) {
-			logger.info("was moving, so changing to HOLD.");
-			Robot.arm.holdCurrentPosition();
-		}
 	}
 }

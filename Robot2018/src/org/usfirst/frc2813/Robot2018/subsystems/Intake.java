@@ -13,7 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  */
 public class Intake extends SubsystemDirectionSpeed {
 	private WPI_VictorSPX motorController;
-	Intake(){
+	public Intake(){
 		super();
 		motorController = RobotMap.intakeSpeedController;
 		DEFAULT_SPEED = 0.7;

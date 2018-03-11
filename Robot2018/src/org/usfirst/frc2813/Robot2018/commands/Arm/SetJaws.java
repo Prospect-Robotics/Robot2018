@@ -5,7 +5,7 @@ package org.usfirst.frc2813.Robot2018.commands.Arm;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
 import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.subsystems.Arm;
+import org.usfirst.frc2813.Robot2018.Robot;
 
 /**
  * Open/Close the Robot arm jaws
@@ -19,6 +19,6 @@ public class SetJaws extends InstantCommand {
 
 	//@Override
 	protected void initialize() {
-		Arm.setJaws(state);
+		Robot.jaws.setState(state);
 	}
 }

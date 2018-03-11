@@ -20,6 +20,10 @@ public enum MotorControllerState {
 	public boolean isHoldingCurrentPosition() {
 		return this == HOLDING_POSITION;
 	}
+	
+	public boolean isIdle() {
+		return this.isDisabled() || this.isHoldingCurrentPosition();
+	}
 
 	public boolean isMovingToPosition() {
 		return this == SET_POSITION;

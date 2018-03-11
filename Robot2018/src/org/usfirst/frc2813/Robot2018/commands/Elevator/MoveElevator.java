@@ -23,9 +23,9 @@ public class MoveElevator extends GearheadsCommand {
 	 * Hold the current position
 	 */
 	public MoveElevator() {
-		this.state = MotorControllerState.HOLDING_POSITION;
-		this.direction = Direction.NEUTRAL; // Not used
-		this.positionInInches = 0; // Not used
+		state = MotorControllerState.HOLDING_POSITION;
+		direction = Direction.NEUTRAL; // Not used
+		positionInInches = 0; // Not used
 		requires(Robot.elevator);
 	}
 
@@ -33,9 +33,9 @@ public class MoveElevator extends GearheadsCommand {
 	 * Move in a particular direction until stopped, hold the velocity
 	 */
 	public MoveElevator(Direction direction) {
-		this.state = MotorControllerState.MOVING;
+		state = MotorControllerState.MOVING;
 		this.direction = direction; 
-		this.positionInInches = 0; // Not used
+		positionInInches = 0; // Not used
 		logger.info("MoveElevator-" + direction);
 		requires(Robot.elevator);
 	}
@@ -44,23 +44,28 @@ public class MoveElevator extends GearheadsCommand {
 	 * Move to a specific position and hold the position
 	 */
 	public MoveElevator(double positionInInches) {
-		this.state = MotorControllerState.SET_POSITION;
+		state = MotorControllerState.SET_POSITION;
 		this.positionInInches = positionInInches;
-		this.direction = Direction.NEUTRAL; // Not used
+		if (Robot.arm.readPosition() < positionInInches) {
+			direction = Direction.UP;
+		}
+		else {
+			direction = Direction.DOWN;
+		}
 		logger.info("MoveElevator-" + positionInInches);
 		requires(Robot.elevator);
 	}
 
-	// Called repeatedly when this Command is scheduled to run
+	// Called once to begin the command
 	// @Override
-	protected void execute() {
+	protected void initialize() {
 		logger.finer("in execute");
 		switch(state) {
 		case HOLDING_POSITION:
 			Robot.elevator.holdCurrentPosition();
 			break;
 		case MOVING:
-			Robot.elevator.move(direction);
+			Robot.elevator.setDirection(direction);
 			break;
 		case SET_POSITION:
 			Robot.elevator.setPosition(positionInInches);
@@ -68,28 +73,44 @@ public class MoveElevator extends GearheadsCommand {
 		case DISABLED:
 			Robot.elevator.disable();
 			break;
-		default:
-			throw new IllegalArgumentException("Unsupported state: " + state);
 		}
 	}
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		// All of the move commands run indefinitely until cancelled
-//		log.print("isFinished is returning false");
-		return false;
+		double targetPosition = 0;
+		double actualPosition;
+
+		switch(state) {
+		case DISABLED:
+		case HOLDING_POSITION:
+			return true;
+		case MOVING:
+			if (direction.isPositive()) {
+				targetPosition = Robot.arm.MAX_POSITION;
+			}
+			else {
+				targetPosition = Robot.arm.MIN_POSITION;
+			}
+			break;
+		case SET_POSITION:
+			targetPosition = positionInInches;
+			break;
+		}
+		actualPosition = Robot.arm.readPosition();
+		if (direction.isPositive()) {
+			return actualPosition >= targetPosition;
+		}
+		return actualPosition <= targetPosition;
 	}
-	
+
 	@Override
 	protected void end() {
 		logger.finer("in end");
 	}
+
 	@Override
 	protected void interrupted() {
 		logger.finer("in interrupted");
-		if(state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) {
-			logger.info("was moving, so changing to HOLD.");
-			Robot.elevator.holdCurrentPosition();
-		}
 	}
 }

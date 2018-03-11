@@ -5,6 +5,7 @@ package org.usfirst.frc2813.Robot2018.commands.Arm;
 import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Direction;
+import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 
 /**
@@ -12,41 +13,37 @@ import org.usfirst.frc2813.Robot2018.subsystems.Arm;
  */
 public class SpinIntake extends Command {
 	/**
-	 * Spin the intake wheels
-	 * 
-	 * @param spinDirectionIn - true is spin direction in; false if out
-	 * @param stopAtEnd - set motors to 0 when button is released
+	 * Spin or stop the intake wheels
 	 */
-	private boolean halted;
 	private Direction direction;
 
 	public SpinIntake() {
-		halted = true;
+		direction = Direction.NEUTRAL;
 	}
+
 	public SpinIntake(Direction direction) {
-		Arm.setIntakeDirection(direction);
-		halted = false;
+		this.direction = direction;
 	}
 
 	// Called just before this Command runs the first time
 	//@Override
-	protected void initialize() {}
+	protected void initialize() {
+		if (direction.isNeutral()) {
+			Robot.intake.halt();
+		}
+		else {
+			Robot.intake.setDirection(direction);
+		}
+	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
-	protected void execute() {
-		if (halted) {
-			Arm.haltIntake();
-		}
-		else { 
-			Arm.spinIntake();
-		}
-	}
+	protected void execute() {}
 
 	// Make this return true when this Command no longer needs to run execute()
 	//@Override
 	protected boolean isFinished() {
-		return true;
+		return direction.isNeutral();
 	}
 
 	// Called once after isFinished returns true

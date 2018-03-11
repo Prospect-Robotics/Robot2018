@@ -9,4 +9,5 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public abstract class GearheadsSubsystem extends Subsystem {
 	protected Logger logger = Logger.getLogger(this.getClass().getSimpleName());
+	public boolean encoderFunctional = true;
 }
