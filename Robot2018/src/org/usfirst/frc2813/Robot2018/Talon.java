@@ -153,26 +153,21 @@ public class Talon {
 		double newControlModeValue = arg;
 		int newSlotIndex  = lastSlotIndex;
 		int newPIDIndex   = lastPIDIndex;
-		if(newState == MotorControllerState.DISABLED) {
-			newControlModeValue = 0; // NB: Not used here
+		newSlotIndex   = MAINTAIN_SLOT_IDX;
+		newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
+		switch(newState) {
+		case DISABLED:
 			newControlMode = ControlMode.Disabled;
-			newSlotIndex   = MAINTAIN_SLOT_IDX;
-			newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
-		} else if(newState == MotorControllerState.HOLDING_POSITION) {
+			break;
+		case HOLDING_POSITION:
 			newControlMode = ControlMode.Position;
-			newSlotIndex   = MAINTAIN_SLOT_IDX;
-			newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
-		} else if(newState == MotorControllerState.SET_POSITION) {
+			break;
+		case SET_POSITION:
 			newControlMode = ControlMode.Position;
-			// NB: SET_POSITION means "move to position", so use MOVE behavior
-			newSlotIndex   = MOVE_SLOT_IDX;
-			newPIDIndex    = MOVE_PIDLOOP_IDX;
-		} else if(newState == MotorControllerState.MOVING) {
+			break;
+		case MOVING:
 			newControlMode = ControlMode.Velocity;
-			newSlotIndex   = MOVE_SLOT_IDX;
-			newPIDIndex    = MOVE_PIDLOOP_IDX;
-		} else {
-			throw new IllegalArgumentException("Unsupported state: " + newState);
+			break;
 		}
 		//
 		if(oldState != newState) {
@@ -217,8 +212,8 @@ public class Talon {
 	public boolean zeroEncodersIfNecessary() {
 		// TODO: account for inversions
 		if (readLimitSwitch(Direction.NEGATIVE)
-				&& (state == MotorControllerState.HOLDING_POSITION && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
-				|| (state == MotorControllerState.MOVING && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
+				&& (state.isHoldingCurrentPosition() && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
+				|| (state.isMoving() && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
 		{
 			logger.info("ZEROING ENCODERS");
 			MotorControllerState oldState = state;
@@ -239,20 +234,23 @@ public class Talon {
 		}
 		return false;
 	}
-	/*
+
+	/**
 	 * [ACTION] Set to an absolute encoder position
 	 */
 	public void setPosition(int position) {
 		set(MotorControllerState.SET_POSITION, position);
 	}
-	/*
+
+	/**
 	 * [ACTION] Hold the current position, resist movement
 	 */
 	public void holdCurrentPosition() {
 		set(MotorControllerState.HOLDING_POSITION, readPosition());
 		zeroEncodersIfNecessary();
 	}
-	/*
+
+	/**
 	 * [ACTION] Set to a speed and direction. Direction will determine whether speed is
 	 * logical forward (positive) or reverse (negative) (not necessarily the same as
 	 * the motor direction. Remember it can be inverted by configuration, to hide
@@ -264,11 +262,12 @@ public class Talon {
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			logger.info("move [Direction (" + direction + ") x Speed (" + speed + ") -> " + speedParam + "]");
+			logger.info(String.format("move [Direction ({0}) x Speed ({1}) -> {2}]", direction, speed, speedParam));
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
-	/*
+
+	/**
 	 * Talon only uses the velocity
 	 */
 	public void setVelocity(double speed) {
@@ -276,7 +275,8 @@ public class Talon {
 			set(MotorControllerState.MOVING, speed);
 		}
 	}
-	/*
+
+	/**
 	 * [ACTION] Stop output of the motor
 	 */
 	public void disable() {
