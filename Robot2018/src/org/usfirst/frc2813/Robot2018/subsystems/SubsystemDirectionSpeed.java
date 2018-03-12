@@ -99,11 +99,6 @@ public abstract class SubsystemDirectionSpeed extends GearheadsSubsystem {
         move();
     }
 
-    public void move(double speedParam) {
-        speed = speedParam;
-        move();
-    }
-
     public void move(double speedParam, Direction directionParam) {
         speed = speedParam;
         direction = directionParam;
