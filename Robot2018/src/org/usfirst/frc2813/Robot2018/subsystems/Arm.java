@@ -4,7 +4,7 @@ import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
-import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArm;
+import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;
 
 /**
  * Arm subsystem. Rotates up and down
@@ -72,7 +72,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 	@Override
 	public void initDefaultCommand() {
 		// Set to hold position by default
-		setDefaultCommand(new MoveArm());
+		setDefaultCommand(new ArmHoldPosition());
 	}
 
 	@Override

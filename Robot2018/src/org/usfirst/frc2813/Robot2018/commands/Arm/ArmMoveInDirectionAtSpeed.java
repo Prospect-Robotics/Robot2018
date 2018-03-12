@@ -1,26 +1,28 @@
-package org.usfirst.frc2813.Robot2018.commands.Elevator;
+package org.usfirst.frc2813.Robot2018.commands.Arm;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 /**
- * Move elevator in given direction until interrupted.
+ * Move arm in given direction at given speed until interrupted.
  * Hold current position with PID when interrupted.
  */
-public class ElevatorMoveInDirection extends GearheadsCommand {
+public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 	private final Direction direction;
+	private final double speed;
 
-	public ElevatorMoveInDirection(Direction direction) {
+	public ArmMoveInDirectionAtSpeed(Direction direction, double speed) {
 		this.direction = direction;
-		logger.info("Move " + direction);
-		requires(Robot.elevator);
+		this.speed = speed;
+		logger.info(String.format("Move %s at speed %s", direction, speed));
+		requires(Robot.arm);
 	}
 
 	// @Override
 	protected void initialize() {
 		logger.finer("in initialize");
-			Robot.elevator.moveInDirection(direction);
+			Robot.arm.moveAtSpeedAndDirection(speed, direction);
 	}
 
 	//@Override
@@ -31,6 +33,6 @@ public class ElevatorMoveInDirection extends GearheadsCommand {
 	@Override
 	protected void interrupted() {
 		logger.finer("in interrupted");
-		Robot.elevator.holdCurrentPosition();
+		Robot.arm.holdCurrentPosition();
 	}
 }

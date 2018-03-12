@@ -12,7 +12,7 @@ public class SetIntakeSpeed extends InstantCommand {
 	private double speed;
 
 	/**
-	 * Set the speed of the elevator
+	 * Set the speed of the intake
 	 * @param speed in feet per second
 	 */
 	public SetIntakeSpeed(double speed) {

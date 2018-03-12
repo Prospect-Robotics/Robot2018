@@ -1,24 +1,24 @@
-package org.usfirst.frc2813.Robot2018.commands.Elevator;
+package org.usfirst.frc2813.Robot2018.commands.Arm;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 
 /**
- * Move elevator to position. Motor controller does this without
+ * Move arm to position. Motor controller does this without
  * further intervention.
  */
-public class ElevatorMoveToPosition extends GearheadsInstantCommand {
+public class ArmMoveToPosition extends GearheadsInstantCommand {
 	private final double positionInInches;
 
-	public ElevatorMoveToPosition(double positionInInches) {
+	public ArmMoveToPosition(double positionInInches) {
 		logger.info("Move to position: " + positionInInches);
 		this.positionInInches = positionInInches;
-		requires(Robot.elevator);
+		requires(Robot.arm);
 	}
 
 	// @Override
 	protected void initialize() {
 		logger.finer("in initialize");
-		Robot.elevator.moveToPosition(positionInInches);
+		Robot.arm.moveToPosition(positionInInches);
 	}
 }

@@ -6,7 +6,7 @@ import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
-import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArmInterruptable;
+import org.usfirst.frc2813.Robot2018.commands.Arm.ArmMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
@@ -106,8 +106,8 @@ public class OI {
 		spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
 		//new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
-		new JoystickButton(buttonPanel, 11).whileHeld(new MoveArmInterruptable(Direction.UP));
-		new JoystickButton(buttonPanel, 12).whileHeld(new MoveArmInterruptable(Direction.DOWN));
+		new JoystickButton(buttonPanel, 11).whileHeld(new ArmMoveInDirection(Direction.UP));
+		new JoystickButton(buttonPanel, 12).whileHeld(new ArmMoveInDirection(Direction.DOWN));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SetJaws(Direction.OPEN));
 
 		joystick1 = new Joystick(1);

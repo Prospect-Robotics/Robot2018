@@ -10,6 +10,7 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
  */
 public class ElevatorHoldPosition extends GearheadsInstantCommand {
 	public ElevatorHoldPosition() {
+		logger.info("Active hold position");
 		requires(Robot.elevator);
 	}
 

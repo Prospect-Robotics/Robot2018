@@ -15,7 +15,7 @@ public class ElevatorMoveInDirectionAtSpeed extends GearheadsCommand {
 	public ElevatorMoveInDirectionAtSpeed(Direction direction, double speed) {
 		this.direction = direction;
 		this.speed = speed;
-		logger.info(String.format("MoveElevator - %s at speed %s", direction, speed));
+		logger.info(String.format("Move %s at speed: %s", direction, speed));
 		requires(Robot.elevator);
 	}
 
