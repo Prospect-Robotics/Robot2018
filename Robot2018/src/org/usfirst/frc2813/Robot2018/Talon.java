@@ -19,7 +19,9 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
  */
 public class Talon {
 	private final TalonSRX srx;
-	private final Logger logger;
+	private final Logger   logger;
+	private final boolean  sensorPhase; // NB: This must never change and must be known at construction
+	private final boolean  motorInversion; // NB: This must never change and must be known at construction
 
 	public static final double PULSES_PER_REVOLUTION = 4096;
 	// Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops.
@@ -33,10 +35,10 @@ public class Talon {
 	// errors, per CTR examples/documentation.
 	private static final int OPERATION_COMMAND_TIMEOUT_MS = 0; // timeout for Talon config function
 	// choose to ensure sensor is positive when output is positive
-	public static boolean DEFAULT_SENSOR_PHASE = true;
+	public static final boolean DEFAULT_SENSOR_PHASE = true;
 	// choose based on what direction you want to be positive, this does not affect
 	// motor invert.
-	public static boolean DEFAULT_MOTOR_INVERSION = false;
+	public static final boolean DEFAULT_MOTOR_INVERSION = false;
 
 	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;    // Remember last used pid index, help us implement state transitions
 
@@ -49,9 +51,12 @@ public class Talon {
 	private int lastSlotIndex = MAINTAIN_SLOT_IDX;
 	private int lastPIDIndex = MAINTAIN_PID_LOOP_IDX;
 
-	public Talon(TalonSRX srx, Logger logger) {
+	// NB: I need 
+	public Talon(TalonSRX srx, Logger logger, boolean motorInversion, boolean sensorPhase) {
 		this.srx = srx;
 		this.logger = logger;
+		this.motorInversion = motorInversion;
+		this.sensorPhase = sensorPhase;
 
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -61,7 +66,6 @@ public class Talon {
 
 		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX,
 				CONFIGURATION_COMMAND_TIMEOUT_MS);
-
 		/*
 		 * This section initializes the relative encoder to the absolute value from the
 		 * absolute encoder position, so that any previous calibration of zero will be
@@ -72,13 +76,12 @@ public class Talon {
 		 * NB: We have not yet set phase or inversion, so we will factor that into the
 		 * absolute position we calculate
 		 */
-		if (!DEFAULT_SENSOR_PHASE)
+		if (!this.sensorPhase)
 			absolutePosition *= -1;
-		if (DEFAULT_MOTOR_INVERSION)
+		if (this.motorInversion)
 			absolutePosition *= -1;
-
-		srx.setSensorPhase(DEFAULT_SENSOR_PHASE);
-		srx.setInverted(DEFAULT_MOTOR_INVERSION);
+		srx.setSensorPhase(this.sensorPhase);
+		srx.setInverted(this.motorInversion);
 		srx.setSelectedSensorPosition(absolutePosition, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.setSelectedSensorPosition(absolutePosition, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		/*
@@ -87,9 +90,12 @@ public class Talon {
 		 */
 		srx.configAllowableClosedloopError(MAINTAIN_SLOT_IDX, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configAllowableClosedloopError(MOVE_SLOT_IDX, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-
 		// Start disabled
 		set(MotorControllerState.DISABLED, 0);
+	}
+
+	public Talon(TalonSRX srx, Logger logger) {
+		this(srx, logger, DEFAULT_MOTOR_INVERSION, DEFAULT_SENSOR_PHASE);
 	}
 
 	public MotorControllerState getState() {
