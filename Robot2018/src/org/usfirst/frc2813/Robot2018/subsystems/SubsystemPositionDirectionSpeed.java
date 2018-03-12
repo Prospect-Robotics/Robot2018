@@ -9,15 +9,22 @@ import org.usfirst.frc2813.Robot2018.MotorControllerState;
  *
  * This subsytem can halt, move to an exact position or in a direction.
  * Speed can be set separately.
+ * 
+ * The public interfaces are:
+ *     readPosition     - return the position in user defined units
+ *     readDefaultSpeed - return the default speed
+ *     disable          - disable all active code
+ *     holdPosition     - actively hold position with PID
+ *     moveToPosition   - move to a position. This is normally a fire and forget
+ *                        command done at the motor controller level.
+ *     moveAtSpeedAndDirection - move in the given speed and direction
+ *     moveInDirection  - move at the last set or default speed in the given direction
  */
 public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem {
-	protected Direction direction;
-	protected Direction oldDirection; // for debugging
-	protected double speed;
-	protected double oldSpeed; // for debugging
-	protected double position;
-	protected double oldPosition; // for debugging
-	protected MotorControllerState state;
+	protected Direction direction, oldDirection;
+	protected double speed, oldSpeed;
+	protected double position, oldPosition;
+	protected MotorControllerState state, oldState;
 
 	/**
 	 * GEOMETRY - define in terms of your motor controller
@@ -28,17 +35,20 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	public double MIN_POSITION;
 	protected double PULSES_PER_UNIT_POSITION;
 	protected double PULSES_PER_UNIT_POSITION_PER_TIME;
-	protected double DEFAULT_SPEED;
+	public double DEFAULT_SPEED;
 
 	/**
 	 * configure your motor controller and set your
 	 * geometry and state, then you MUST call initialize
 	 */
-	public void initialize() {
+	protected void initialize() {
 		// track state and change as required. Start in moving so initialize can halt
 		direction = Direction.NEUTRAL;
 		position = MIN_POSITION;
 		speed = DEFAULT_SPEED;
+		oldSpeed = 0;
+		oldDirection = Direction.NEUTRAL;
+		oldState = MotorControllerState.DISABLED;
 		state = readMotorControllerState();
 	}
 
@@ -71,7 +81,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	}
 	
 	/**
-	 * Abstract method to read contrller state
+	 * Abstract method to read controller state
 	 * @return MotorControllerState
 	 */
 	protected abstract MotorControllerState readMotorControllerState();
@@ -117,41 +127,64 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	}
 
 	/**
-	 * TODO: add more logging
-	 * Method to change state. Depending on state transition, log
-	 * Note that some transitions may be illegal. Disabled may only
-	 * transition to holding_position
+	 * All device change come through here first.
+	 * Log request
+	 * Validate the actual actually changes something
+	 * make the change
+	 * flush old state so we do not get confused next time
+	 * 
 	 * @param newState
+	 * NOTE: state variables other than the state enum are already updated,
+	 * with the old state in oldSpeed, oldPosition and oldDirection
 	 * @return true if state change occurred
 	 */
-	protected boolean changeState(MotorControllerState newState) {
+	protected void changeState(MotorControllerState newState) {
 		logger.fine(String.format("Changing state: encoderFunctional: %s, " +
 								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
 								 "old direction: %s, new direction %s, old position: %s, new position %s",
 				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position));
-		if (!encoderFunctional) return false;
-		if (state == newState) return true;
-
-		if (state.isDisabled() && !newState.isHoldingCurrentPosition()) {
-			logger.severe("Illegal transition from disabled to " + newState);
-			return false;
+		if (!encoderFunctional) {
+			logger.warning("encoder not functional. Refusing action.");
+			return;	
 		}
+
+		oldState = state;
 		state = newState;
+		
+		// Check that state change is actually changing something. If so, do it.
 		switch(state) {
 		case DISABLED:
+			if (oldState == state) {
+				logger.warning("bug in code: Transitioning from disabled to disabled.");
+				return;
+			}
 			disableController();
 			break;
 		case HOLDING_POSITION:
+			if (oldState == state) {
+				logger.warning("bug in code: Transitioning from hold position to hold position.");
+				return;
+			}
 			holdControllerPosition();
 			break;
 		case MOVING:
+			if ((oldState == state) && (oldSpeed == speed) && (oldDirection == direction)) {
+				logger.warning("bug in code: Transitioning from disabled to disabled.");
+				return;
+			}
 			setControllerSpeedAndDirection(speedToController(speed));
 			break;
 		case SET_POSITION:
-			setControllerPosition(positionToController(position));
+			if ((oldState == state) && (oldPosition == position)) {
+				logger.warning("bug in code: Transitioning from disabled to disabled.");
+				return;
+			}
+		setControllerPosition(positionToController(position));
 			break;
 		}
-		return true;
+		oldPosition = position;
+		oldSpeed = speed;
+		oldDirection = direction;
 	}
 	
 	/*************************************************************
@@ -163,65 +196,39 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 */
 	public void disable() {
 		changeState(MotorControllerState.DISABLED);
-		disableController();
 	}
 
 	/**
-	 *  [ACTION] Set the speed to the default speed
-	 */
-	public void setSpeed() {
-		setSpeed(DEFAULT_SPEED);
-	}
-
-	/**
-	 *  [ACTION] Set the speed to a new speed
-	 * @param newSpeed
-	 */
-	public void setSpeed(double newSpeed) {
-		oldSpeed = speed;
-		speed = newSpeed;
-		if (!state.isDisabled()) {
-			changeState(MotorControllerState.MOVING);
-		}
-	}
-
-	/**
-	 *  [ACTION] Set the direction
+	 *  [ACTION] move in direction at current speed
 	 * @param newDirection
 	 */
-	public void setDirection(Direction newDirection) {
+	public void moveInDirection(Direction newDirection) {
 		oldDirection = direction;
 		direction = newDirection;
-		if (!state.isDisabled()) {
-			changeState(MotorControllerState.MOVING);
-		}
+		changeState(MotorControllerState.MOVING);
 	}
 
 	/**
-	 * This is the external interface to set the direction
+	 *  [ACTION] Move in direction at speed
 	 * @param newSpeed
 	 * @param newDirection
 	 */
-	public void setSpeedAndDirection(double newSpeed, Direction newDirection) {
+	public void moveAtSpeedAndDirection(double newSpeed, Direction newDirection) {
 		oldSpeed = speed;
 		speed = newSpeed;
 		oldDirection = direction;
 		direction = newDirection;
-		if (!state.isDisabled()) {
-			changeState(MotorControllerState.MOVING);
-		}
+		changeState(MotorControllerState.MOVING);
 	}
 
 	/**
-	 *  [ACTION] Set the absolutePosition
+	 *  [ACTION] Move to the absolutePosition
 	 * @param newDirection
 	 */
-	public void setPosition(double newPosition) {
+	public void moveToPosition(double newPosition) {
 		oldPosition = position;
 		position = newPosition;
-		if (!state.isDisabled()) {
-			changeState(MotorControllerState.SET_POSITION);
-		}
+		changeState(MotorControllerState.SET_POSITION);
 	}
 
 	/**

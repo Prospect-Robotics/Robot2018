@@ -65,10 +65,10 @@ public class MoveElevator extends GearheadsCommand {
 			Robot.elevator.holdCurrentPosition();
 			break;
 		case MOVING:
-			Robot.elevator.setDirection(direction);
+			Robot.elevator.moveInDirection(direction);
 			break;
 		case SET_POSITION:
-			Robot.elevator.setPosition(positionInInches);
+			Robot.elevator.moveToPosition(positionInInches);
 			break;
 		case DISABLED:
 			Robot.elevator.disable();

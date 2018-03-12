@@ -18,6 +18,6 @@ public class ElevatorMoveToPosition extends GearheadsInstantCommand {
 	// @Override
 	protected void initialize() {
 		logger.finer("in execute");
-		Robot.elevator.setPosition(positionInInches);
+		Robot.elevator.moveToPosition(positionInInches);
 	}
 }

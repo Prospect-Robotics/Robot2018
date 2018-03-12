@@ -65,10 +65,10 @@ public class MoveArm extends GearheadsCommand {
 			Robot.arm.holdCurrentPosition();
 			break;
 		case MOVING:
-			Robot.arm.setDirection(direction);
+			Robot.arm.moveInDirection(direction);
 			break;
 		case SET_POSITION:
-			Robot.arm.setPosition(positionInDegrees);
+			Robot.arm.moveToPosition(positionInDegrees);
 			break;
 		case DISABLED:
 			Robot.arm.disable();

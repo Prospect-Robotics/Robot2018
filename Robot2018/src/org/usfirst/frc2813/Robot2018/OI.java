@@ -4,7 +4,6 @@ import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevatorInterruptable;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorSetSpeed;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArmInterruptable;

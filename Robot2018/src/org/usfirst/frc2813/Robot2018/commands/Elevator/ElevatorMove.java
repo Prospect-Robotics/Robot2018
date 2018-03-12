@@ -9,13 +9,22 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
  */
 public class ElevatorMove extends GearheadsCommand {
 	private final Direction direction;
+	private final double speed;
 
 	/*
 	 * Move in a particular direction until stopped, hold the velocity
 	 */
 	public ElevatorMove(Direction direction) {
 		this.direction = direction;
-		logger.info("MoveElevator-" + direction);
+		speed = Robot.elevator.DEFAULT_SPEED;
+		logger.info(String.format("MoveElevator - %s at default speed %s", direction, speed));
+		requires(Robot.elevator);
+	}
+
+	public ElevatorMove(Direction direction, double speed) {
+		this.direction = direction;
+		this.speed = speed;
+		logger.info(String.format("MoveElevator - %s at speed %s", direction, speed));
 		requires(Robot.elevator);
 	}
 
@@ -23,7 +32,7 @@ public class ElevatorMove extends GearheadsCommand {
 	// @Override
 	protected void initialize() {
 		logger.finer("in initialize");
-			Robot.elevator.setDirection(direction);
+			Robot.elevator.moveAtSpeedAndDirection(speed, direction);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
