@@ -128,6 +128,7 @@ public class Talon {
 					CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX,
 					CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configSetParameter(ParamEnum.eClearPositionOnLimitF, 1 /* enabled */, 0 /* unused */, 0 /* unused */, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		}
 	}
 
