@@ -63,9 +63,6 @@ public class Talon {
 		srx.configNominalOutputReverse(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configPeakOutputForward(1, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configPeakOutputReverse(-1, CONFIGURATION_COMMAND_TIMEOUT_MS);
-
-		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX,
-				CONFIGURATION_COMMAND_TIMEOUT_MS);
 		/*
 		 * This section initializes the relative encoder to the absolute value from the
 		 * absolute encoder position, so that any previous calibration of zero will be
@@ -82,7 +79,11 @@ public class Talon {
 			absolutePosition *= -1;
 		srx.setSensorPhase(this.sensorPhase);
 		srx.setInverted(this.motorInversion);
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX,
+				CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.setSelectedSensorPosition(absolutePosition, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX,
+				CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.setSelectedSensorPosition(absolutePosition, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
@@ -116,17 +117,9 @@ public class Talon {
 		if (direction.isNegative()) {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen,
 					CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX,
-					CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX,
-					CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1 /* enabled */, 0 /* unused */, 0 /* unused */, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		} else {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen,
-					CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX,
-					CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX,
 					CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.configSetParameter(ParamEnum.eClearPositionOnLimitF, 1 /* enabled */, 0 /* unused */, 0 /* unused */, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		}
