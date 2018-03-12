@@ -2,8 +2,8 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevatorInterruptable;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.MoveArmInterruptable;
@@ -88,16 +88,16 @@ public class OI {
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
-		elevatorUp.whileHeld(new MoveElevatorInterruptable(Direction.UP));		// units of inches per second!
+		elevatorUp.whileHeld(new ElevatorMoveInDirection(Direction.UP));
 		//elevatorDown.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
 		elevatorDown = new JoystickButton(buttonPanel, 4);
 		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-		elevatorDown.whileHeld(new MoveElevatorInterruptable(Direction.DOWN));
+		elevatorDown.whileHeld(new ElevatorMoveInDirection(Direction.DOWN));
 		//elevatorUp.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
-		new JoystickButton(buttonPanel, 3).whenPressed(new MoveElevator(0));//Bottom elevator
+		new JoystickButton(buttonPanel, 3).whenPressed(new ElevatorMoveToPosition(Robot.elevator.MIN_POSITION));
 		spinIntakeOut = new JoystickButton(buttonPanel, 2);
 		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
 		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
@@ -126,7 +126,7 @@ public class OI {
 		//SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
 		//SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
 		//SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
-		SmartDashboard.putData("BottomElevator", new MoveElevator(0));
+		SmartDashboard.putData("BottomElevator", new ElevatorMoveToPosition(Robot.elevator.MIN_POSITION));
 		//SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
 		//SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
 

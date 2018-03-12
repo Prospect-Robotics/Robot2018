@@ -4,7 +4,7 @@ import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.MoveElevator;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
 
 /**
  * Elevator subsystem. Moves up and down.
@@ -66,7 +66,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 	@Override
 	public void initDefaultCommand() {
 		// Set to hold position by default
-		setDefaultCommand(new MoveElevator());
+		setDefaultCommand(new ElevatorHoldPosition());
 	}
 
 	@Override

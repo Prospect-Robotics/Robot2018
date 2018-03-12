@@ -4,7 +4,7 @@ import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 
 /**
- * Maintain elevator position.
+ * Disable elevator. Subsystem will quiesce.
  */
 public class ElevatorDisable extends GearheadsInstantCommand {
 	public ElevatorDisable() {
