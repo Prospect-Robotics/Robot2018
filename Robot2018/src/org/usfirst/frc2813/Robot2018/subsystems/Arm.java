@@ -6,6 +6,9 @@ import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;
 
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+
 /**
  * Arm subsystem. Rotates up and down
  *
@@ -32,8 +35,16 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 	    DEFAULT_SPEED = 5;
 
 		motorController = new Talon(RobotMap.srxArm, logger);
-		motorController.configHardLimitSwitch(Direction.BACKWARD);
-		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
+		
+		// Configure the limits for DOWN
+		motorController.configureHardLimitSwitch(Direction.BACKWARD, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+		motorController.disableSoftLimitSwitch(Direction.BACKWARD);
+		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.BACKWARD, true);
+		// Configure the limits for UP
+		motorController.configureHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
+		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
+		motorController.configureSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
+		// Configure the PID profiles
 	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.1, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
 

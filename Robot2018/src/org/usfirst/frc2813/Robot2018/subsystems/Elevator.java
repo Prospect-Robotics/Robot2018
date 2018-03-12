@@ -6,6 +6,9 @@ import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
 
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+
 /**
  * Elevator subsystem. Moves up and down.
  *
@@ -18,7 +21,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 	private final double INCHES_PER_REVOLUTION = Math.PI * 1.25;
 
 	private Talon motorController;
-	
+
 	public Elevator() {
 		MAX_POSITION = 24; //FIXME!!! This is from arm
 		MIN_POSITION = 0;
@@ -26,11 +29,17 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 	    DEFAULT_SPEED = 12;
 
 		motorController = new Talon(RobotMap.srxElevator, logger);
-		motorController.configHardLimitSwitch(Direction.BACKWARD);
-		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
+		// Configure the limits for DOWN
+		motorController.configureHardLimitSwitch(Direction.DOWN, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+		motorController.disableSoftLimitSwitch(Direction.DOWN);
+		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, true);
+		// Configure the limits for UP
+		motorController.configureHardLimitSwitch(Direction.UP, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
+		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, false);
+		motorController.configureSoftLimitSwitch(Direction.UP, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
+		// Configure the PID profiles
   	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.8, 0, 0);
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 0.75, 0.01, 40);
-
 	    initialize();
 	}
 

@@ -39,6 +39,12 @@ public class Talon {
 	// choose based on what direction you want to be positive, this does not affect
 	// motor invert.
 	public static final boolean DEFAULT_MOTOR_INVERSION = false;
+	public static final LimitSwitchNormal DEFAULT_LIMIT_SWITCH_MODE = LimitSwitchNormal.NormallyOpen; // From manual
+	public static final LimitSwitchSource DEFAULT_LIMIT_SWITCH_SOURCE = LimitSwitchSource.FeedbackConnector; // From manual
+	public static final boolean DEFAULT_LIMIT_SWITCH_CLEAR_POSITION = false; // From manual
+	public static final boolean DEFAULT_SOFT_LIMIT_ENABLED = false;
+	public static final boolean DEFAULT_CLEAR_POSITION_ON_QUAD_IDX = false;
+	public static final int DEFAULT_SOFT_LIMIT_THRESHOLD = 0;
 
 	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;    // Remember last used pid index, help us implement state transitions
 
@@ -91,6 +97,15 @@ public class Talon {
 		 */
 		srx.configAllowableClosedloopError(MAINTAIN_SLOT_IDX, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configAllowableClosedloopError(MOVE_SLOT_IDX, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		// Configure limit switches on startup to all off
+		setHardLimitSwitchClearsPositionAutomatically(Direction.POSITIVE); // reset defalts
+		setHardLimitSwitchClearsPositionAutomatically(Direction.NEGATIVE); // reset defalts
+		disableSoftLimitSwitch(Direction.POSITIVE); // reset defaults
+		disableSoftLimitSwitch(Direction.NEGATIVE); // reset defaults
+		configureHardLimitSwitch(Direction.POSITIVE); // reset defaults
+		configureHardLimitSwitch(Direction.NEGATIVE); // reset defaults
+		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
+		configureClearPositionOnQuadIdx();
 		// Start disabled
 		set(MotorControllerState.DISABLED, 0);
 	}
@@ -103,26 +118,101 @@ public class Talon {
 		return state;
 	}
 
-	public void configSoftLimitSwitch(Direction direction, int limit) {
+	/*
+	 * Configure the soft limit switch.  Threshold is in pulses, see PULSES_PER_REVOLUTION (4096/rotation). 
+	 */
+	public void configureSoftLimitSwitch(Direction direction, boolean enabled, int thresholdInPulses) {
 		if (direction.isNegative()) {
-			srx.configReverseSoftLimitEnable(true, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configReverseSoftLimitThreshold(limit, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configReverseSoftLimitEnable(enabled, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configReverseSoftLimitThreshold(thresholdInPulses, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		} else {
-			srx.configForwardSoftLimitEnable(true, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configForwardSoftLimitThreshold(limit, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configForwardSoftLimitEnable(enabled, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configForwardSoftLimitThreshold(thresholdInPulses, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		}
 	}
+	/*
+	 * Enable the soft limit and set the threshold.
+	 */
+	public void configureSoftLimitSwitch(Direction direction, int thresholdInPulses) {
+		configureSoftLimitSwitch(direction, true, thresholdInPulses);	
+	}
+	/*
+	 * Reset soft limit switch to OFF, threshold zero.
+	 * NOTE: Calling this is equivalent to disableSoftLimitSwitch.
+	 */
+	public void configureSoftLimitSwitch(Direction direction) {
+		configureSoftLimitSwitch(direction, DEFAULT_SOFT_LIMIT_ENABLED, DEFAULT_SOFT_LIMIT_THRESHOLD);	
+	}
+	/*
+	 * Disable the soft limit and reset the threshold
+	 */
+	public void disableSoftLimitSwitch(Direction direction) {
+		configureSoftLimitSwitch(direction, false, DEFAULT_SOFT_LIMIT_THRESHOLD);
+	}
 
-	public void configHardLimitSwitch(Direction direction) {
+	/*
+	 * Toggle whether the hard limit resets the position sensor automatically.  Default is off.
+	 */
+	public void setHardLimitSwitchClearsPositionAutomatically(Direction direction, boolean clearPositionAutomatically) {
+			ParamEnum parameter = direction.isNegative() ? ParamEnum.eClearPositionOnLimitR : ParamEnum.eClearPositionOnLimitF;
+			srx.configSetParameter(
+					parameter, 
+					clearPositionAutomatically ? 1 : 0, 
+					0 /* unused */, 
+					0 /* unused */, 
+					CONFIGURATION_COMMAND_TIMEOUT_MS);
+	}
+	/*
+	 * Configure hardware limit switch to default behavior - NOT auto clear the sensor position when activated. 
+	 */
+	public void setHardLimitSwitchClearsPositionAutomatically(Direction direction) {
+		setHardLimitSwitchClearsPositionAutomatically(direction, DEFAULT_LIMIT_SWITCH_CLEAR_POSITION);
+	}
+	/*
+	 * Configure whether quad encoder's index pin will automatically clear the encoder positions
+	 */
+	public void configureClearPositionOnQuadIdx(boolean enabled) {
+		srx.configSetParameter(ParamEnum.eClearPositionOnQuadIdx, enabled ? 1 : 0, 0 /* unused */, 0 /* unused */, CONFIGURATION_COMMAND_TIMEOUT_MS);
+	}	
+	/*
+	 * Reset to default, do not clear sensor position on quad encoder's index pin
+	 */
+	public void configureClearPositionOnQuadIdx() {
+		configureClearPositionOnQuadIdx(DEFAULT_CLEAR_POSITION_ON_QUAD_IDX);
+	}
+	/*
+	 * Set the "hard" limit switch connection and logic.  You can set the source to Disabled,
+	 * Notes: 
+	 *     Set limitSwitchSource to Deactivated to disable the feature entirely.
+	 *     You can choose
+	 *         Deactivated - This is typically not needed because default behavior is to expect a hard-wired limit switch with "normally open" logic, which means if there's no switch then nothing happens.
+	 *                       You may want to use this to be able to have limit switches control a "typical range of motion" that is less than the physical range of motion.
+	 *                       Example: Use limits to keep arm within +/- 30 degrees during tele-op, but use a soft limit in an auto firing sequence to go way back beyond the typical range to "fire over the shoulder".
+	 *         FeedbackConnector - The physically wired switch 
+	 *         RemoteTalonSRX - Another Talon (think follower mode + keep encoders sync'd together with one physical switch) 
+	 *         RemoteCANifier - This is a CAN connected limit switch
+	 */
+	public void configureHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource, LimitSwitchNormal limitSwitchMode) {
 		if (direction.isNegative()) {
-			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen,
-					CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSetParameter(ParamEnum.eClearPositionOnLimitR, 1 /* enabled */, 0 /* unused */, 0 /* unused */, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		} else {
-			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen,
-					CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSetParameter(ParamEnum.eClearPositionOnLimitF, 1 /* enabled */, 0 /* unused */, 0 /* unused */, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		}
+	}
+	/*
+	 * Configure the limit switch source to one of (Deactivated, FeedbackConnector (physical switch), RemoteTalon, or RemoteCANifier), with default "normally open" logic levels.
+	 */
+	public void configureHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource) {
+		configureHardLimitSwitch(direction, limitSwitchSource, DEFAULT_LIMIT_SWITCH_MODE);
+	}
+	/*
+	 * Configure default behavior for the switch input.  By default, "hard" limit switch uses hardware but it can also use network and CAN bus (confusingly).  
+	 * 1.  enabled 
+	 * 2.  set to use the hardware limit switch pins on the MAG Encoder or SRX breakout board.
+	 * 3.  set to normally open
+	 */
+	public void configureHardLimitSwitch(Direction direction) {
+		configureHardLimitSwitch(direction, DEFAULT_LIMIT_SWITCH_SOURCE, DEFAULT_LIMIT_SWITCH_MODE);
 	}
 
 	public void setPID(int slot, double p, double i, double d) {
