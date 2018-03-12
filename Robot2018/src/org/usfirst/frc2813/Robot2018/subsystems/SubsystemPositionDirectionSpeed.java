@@ -155,31 +155,31 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		switch(state) {
 		case DISABLED:
 			if (oldState == state) {
-				logger.warning("bug in code: Transitioning from disabled to disabled.");
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, state));
 				return;
 			}
 			disableController();
 			break;
 		case HOLDING_POSITION:
 			if (oldState == state) {
-				logger.warning("bug in code: Transitioning from hold position to hold position.");
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, state));
 				return;
 			}
 			holdControllerPosition();
 			break;
 		case MOVING:
 			if ((oldState == state) && (oldSpeed == speed) && (oldDirection == direction)) {
-				logger.warning("bug in code: Transitioning from disabled to disabled.");
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, state));
 				return;
 			}
 			setControllerSpeedAndDirection(speedToController(speed));
 			break;
 		case SET_POSITION:
 			if ((oldState == state) && (oldPosition == position)) {
-				logger.warning("bug in code: Transitioning from disabled to disabled.");
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, state));
 				return;
 			}
-		setControllerPosition(positionToController(position));
+			setControllerPosition(positionToController(position));
 			break;
 		}
 		oldPosition = position;
