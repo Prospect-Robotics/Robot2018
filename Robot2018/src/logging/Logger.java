@@ -3,6 +3,11 @@ package logging;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * 
+ * @author Adrian Guerra
+ *
+ */
 public class Logger {
 	private static LogLevel loggingLevel = LogLevel.ISSUE;
 	private static ArrayList<String> knownClasses = new ArrayList<String>();
@@ -10,7 +15,33 @@ public class Logger {
 	public static void setLoggingLevel(LogLevel level) {
 		loggingLevel = level;
 	}
+	
+	public static LogLevel getLoggingLevel() {
+		return loggingLevel;
+	}
 
+	/**
+	 * the code<br>
+	 * <code>
+	 * Logger.print(LogType.DEBUG, "Hello", "World", 1, 2, 3, new int[] { 1, 2, 3 });
+	 * </code><br>
+	 * will return<br>
+	 * <code>
+	 * [Hello, World, 1, 2, 3, [1, 2, 3]]
+	 * </code><br><br>
+	 * the code<br>
+	 * <code>
+	 * Logger.print(LogType.DEBUG, "Hello World");
+	 * </code><br>
+	 * will return<br>
+	 * <code>
+	 * Hello World
+	 * </code>
+	 * @param severity -  {@link LogType} object used along with {@link LogLevel} to determie what should be printed
+	 * @param objects - see examples above
+	 * 
+	 * @author Adrian Guerra
+	 */
 	public static void print(LogType severity, Object... objects) {
 		String finalPrint = "";
 		if (loggingLevel.showTrace) {
@@ -20,10 +51,10 @@ public class Logger {
 			// readability
 		} else {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-			for(int i=trace.length-1;i>0;i--) {
-				if(knownClasses.contains(trace[i].getClassName())) {
-					finalPrint+=simplifyPackage(trace[i].getClassName());
-					finalPrint+=" ";
+			for (int i = trace.length - 1; i > 0; i--) {
+				if (knownClasses.contains(trace[i].getClassName())) {
+					finalPrint += simplifyPackage(trace[i].getClassName());
+					finalPrint += " ";
 				}
 			}
 		}
@@ -48,39 +79,63 @@ public class Logger {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (int i = 0; i < trace.length; i++) {
 			if (trace[i].getClassName() == Logger.class.getName()) {
-				knownClasses.add(trace[i+1].getClassName());
+				knownClasses.add(trace[i + 1].getClassName());//TODO double check this
 				break;
 			}
 		}
 	}
 
+	/**
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#ALWAYS ALWAYS}
+	 * @param objects
+	 * @see #print(LogType, Object...)
+	 */
 	public static void always(Object... objects) {
 		print(LogType.ALWAYS, objects);
 	}
 
+	/**
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#DEBUG DEBUG}
+	 * @param objects
+	 * @see #print(LogType, Object...)
+	 */
 	public static void debug(Object... objects) {
 		print(LogType.DEBUG, objects);
 	}
 
+	/**
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#INFO INFO}
+	 * @param objects
+	 * @see #print(LogType, Object...)
+	 */
 	public static void info(Object... objects) {
 		print(LogType.INFO, objects);
 	}
 
+	/**
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#WARNING WARNING}
+	 * @param objects
+	 * @see #print(LogType, Object...)
+	 */
 	public static void warning(Object... objects) {
 		print(LogType.WARNING, objects);
 	}
 
+	/**
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#ERROR ERROR}
+	 * @param objects
+	 * @see #print(LogType, Object...)
+	 */
 	public static void error(Object... objects) {
 		print(LogType.ERROR, objects);
 	}
 
 	private static String simplifyPackage(String longName) {
 		String[] segments = longName.split("\\.");
-		if(segments.length<2) {
+		if (segments.length < 2) {
 			return longName;
-		}
-		else {
-			return segments[segments.length-1];
+		} else {
+			return segments[segments.length - 1];
 		}
 	}
 
