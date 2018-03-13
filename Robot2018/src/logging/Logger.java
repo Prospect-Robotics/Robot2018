@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Logger {
 	private static LogLevel loggingLevel = LogLevel.ISSUE;
-	private static ArrayList<String> knownClasses;
+	private static ArrayList<String> knownClasses = new ArrayList<String>();
 
 	public static void setLoggingLevel(LogLevel level) {
 		loggingLevel = level;
@@ -20,7 +20,7 @@ public class Logger {
 			// readability
 		} else {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-			for(int i=trace.length-1;i>0;i++) {
+			for(int i=trace.length-1;i>0;i--) {
 				if(knownClasses.contains(trace[i].getClassName())) {
 					finalPrint+=simplifyPackage(trace[i].getClassName());
 					finalPrint+=" ";
@@ -36,6 +36,7 @@ public class Logger {
 				finalPrint += Arrays.deepToString(objects);
 			}
 		}
+		System.out.println(finalPrint);
 	}
 
 	/**
@@ -47,7 +48,7 @@ public class Logger {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (int i = 0; i < trace.length; i++) {
 			if (trace[i].getClassName() == Logger.class.getName()) {
-				knownClasses.add(trace[i].getClassName());
+				knownClasses.add(trace[i+1].getClassName());
 				break;
 			}
 		}
@@ -74,8 +75,14 @@ public class Logger {
 	}
 
 	private static String simplifyPackage(String longName) {
-		String[] segments = longName.split(",");
-		return segments[segments.length - 1];
+		String[] segments = longName.split("\\.");
+		System.out.println(segments.length);
+		if(segments.length<2) {
+			return longName;
+		}
+		else {
+			return segments[segments.length-1];
+		}
 	}
 
 }
