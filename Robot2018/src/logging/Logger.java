@@ -8,7 +8,7 @@ public class Logger {
 		loggingLevel = level;
 	}
 
-	public static void print(Severity severity, Object... objects) {
+	public static void print(LogType severity, Object... objects) {
 		if (loggingLevel.showTrace) {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			System.out.println(Arrays.toString(trace));//TODO remove getStackTrace() from trace
@@ -24,4 +24,24 @@ public class Logger {
 			}
 		}
 	}
+	public static void always(Object...objects) {
+		print(LogType.ALWAYS,objects);
+	}
+	
+	public static void debug(Object...objects) {
+		print(LogType.DEBUG,objects);
+	}
+	
+	public static void info(Object...objects) {
+		print(LogType.INFO,objects);
+	}
+	
+	public static void warning(Object...objects) {
+		print(LogType.WARNING,objects);
+	}
+	
+	public static void error(Object...objects) {
+		print(LogType.ERROR,objects);
+	}
+	
 }
