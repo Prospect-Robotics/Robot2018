@@ -16,7 +16,8 @@ public enum LogLevel {
 	 * warnings} and {@link LogType#ERROR errors}, <b>does not</b> print
 	 * {@link LogType#INFO info}
 	 */
-	DEBUG(LogType.DEBUG, LogType.WARNING, LogType.ERROR),
+	DEBUG(LogType.INFO, LogType.DEBUG, LogType.WARNING, LogType.ERROR),
+	INFO(LogType.INFO, LogType.WARNING, LogType.ERROR),
 	ISSUE(LogType.WARNING, LogType.ERROR),
 	ERROR(LogType.ERROR),
 	NONE();
