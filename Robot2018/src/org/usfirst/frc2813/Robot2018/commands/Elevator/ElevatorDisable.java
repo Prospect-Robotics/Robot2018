@@ -8,7 +8,6 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
  */
 public class ElevatorDisable extends GearheadsInstantCommand {
 	public ElevatorDisable() {
-		logger.info("About to disable");
 		requires(Robot.elevator);
 	}
 

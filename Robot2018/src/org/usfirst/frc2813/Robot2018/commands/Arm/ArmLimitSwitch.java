@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
 
-import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.util.unit.Direction;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 

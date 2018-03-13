@@ -7,11 +7,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.logging.Logger;
 
-import org.usfirst.frc2813.Robot2018.Direction;
-
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
+import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.util.unit.uom.LengthUOM;
+import org.usfirst.frc2813.util.unit.values.Length;
 
 
 /**

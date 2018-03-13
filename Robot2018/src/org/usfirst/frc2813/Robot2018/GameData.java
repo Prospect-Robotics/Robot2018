@@ -1,5 +1,7 @@
 package org.usfirst.frc2813.Robot2018;
 
+import org.usfirst.frc2813.util.unit.Direction;
+
 /**
  * The game data from the driver station:
  * Which side of the near switch, scale, and far switch we have.

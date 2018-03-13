@@ -2,8 +2,8 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import edu.wpi.first.wpilibj.Solenoid;
 
-import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.util.unit.Direction;
 
 /**
  * Jaws subsystems to control robot jaws solenoid

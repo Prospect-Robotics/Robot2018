@@ -1,10 +1,11 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import org.usfirst.frc2813.Robot2018.Direction;
+
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;
+import org.usfirst.frc2813.util.unit.Direction;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;

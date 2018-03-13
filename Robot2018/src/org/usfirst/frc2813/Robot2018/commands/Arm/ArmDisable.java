@@ -8,7 +8,6 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
  */
 public class ArmDisable extends GearheadsInstantCommand {
 	public ArmDisable() {
-		logger.info("About to disable");
 		requires(Robot.arm);
 	}
 

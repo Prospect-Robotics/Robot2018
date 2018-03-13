@@ -1,8 +1,9 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
-import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.util.unit.values.Rate;
 
 /**
  * Move arm in given direction at given speed until interrupted.
@@ -15,7 +16,6 @@ public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 	public ArmMoveInDirectionAtSpeed(Direction direction, double speed) {
 		this.direction = direction;
 		this.speed = speed;
-		logger.info(String.format("Move %s at speed %s", direction, speed));
 		requires(Robot.arm);
 	}
 

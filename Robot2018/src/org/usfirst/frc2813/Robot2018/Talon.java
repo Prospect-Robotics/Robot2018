@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.logging.Logger;
 
-import org.usfirst.frc2813.Robot2018.Direction;
+import org.usfirst.frc2813.util.unit.Direction;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
