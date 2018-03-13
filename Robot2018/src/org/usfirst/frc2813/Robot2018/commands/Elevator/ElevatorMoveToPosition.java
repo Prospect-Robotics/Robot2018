@@ -8,17 +8,16 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
  * further intervention.
  */
 public class ElevatorMoveToPosition extends GearheadsInstantCommand {
-	private final double positionInInches;
+	private final double position;
 
-	public ElevatorMoveToPosition(double positionInInches) {
-		logger.info("Move to position: " + positionInInches);
-		this.positionInInches = positionInInches;
+	public ElevatorMoveToPosition(double position) {
+		this.position = position;
 		requires(Robot.elevator);
 	}
 
 	// @Override
 	protected void initialize() {
 		logger.finer("in initialize");
-		Robot.elevator.moveToPosition(positionInInches);
+		Robot.elevator.moveToPosition(position);
 	}
 }
