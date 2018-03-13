@@ -3,7 +3,7 @@ package org.usfirst.frc2813.Robot2018.commands.Arm;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
-import org.usfirst.frc2813.Robot2018.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 
 /**
  * Maintain arm position. Arm does this actively with

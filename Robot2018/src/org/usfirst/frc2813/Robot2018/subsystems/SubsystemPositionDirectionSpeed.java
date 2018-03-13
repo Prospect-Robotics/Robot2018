@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import org.usfirst.frc2813.Robot2018.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.util.unit.Direction;
 
 /**
