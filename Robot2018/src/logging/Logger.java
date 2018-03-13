@@ -76,7 +76,6 @@ public class Logger {
 
 	private static String simplifyPackage(String longName) {
 		String[] segments = longName.split("\\.");
-		System.out.println(segments.length);
 		if(segments.length<2) {
 			return longName;
 		}
