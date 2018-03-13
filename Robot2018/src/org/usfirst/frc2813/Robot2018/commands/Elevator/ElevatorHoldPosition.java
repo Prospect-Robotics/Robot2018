@@ -3,13 +3,14 @@ package org.usfirst.frc2813.Robot2018.commands.Elevator;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
+import org.usfirst.frc2813.Robot2018.MotorControllerState;
 
 /**
  * Maintain elevator position. Elevator does this actively with
  * PID via the motor controller, so no further intervention is
  * required to maintain this.
  */
-public class ElevatorHoldPosition extends GearheadsInstantCommand {
+public class ElevatorHoldPosition extends GearheadsCommand {
 	public ElevatorHoldPosition() {
 		requires(Robot.elevator);
 	}
@@ -17,6 +18,14 @@ public class ElevatorHoldPosition extends GearheadsInstantCommand {
 	// @Override
 	protected void initialize() {
 		logger.finer("in execute");
-		Robot.elevator.holdCurrentPosition();
+		if(!Robot.elevator.getMotorControllerState().equals(MotorControllerState.HOLDING_POSITION)) {
+			Robot.elevator.holdCurrentPosition();
+		}
+		setInterruptible(true);
+	}
+
+	@Override
+	protected boolean isFinished() {
+		return false;
 	}
 }

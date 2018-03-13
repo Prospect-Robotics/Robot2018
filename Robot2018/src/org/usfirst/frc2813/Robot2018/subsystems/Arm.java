@@ -68,7 +68,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		return motorController.getState();
 	}
 
-	protected void setControllerSpeedAndDirection(int speedParam) {
+	protected void setControllerDirectionAndSpeed(int speedParam) {
 		motorController.move(direction, speedParam);
 	}
 

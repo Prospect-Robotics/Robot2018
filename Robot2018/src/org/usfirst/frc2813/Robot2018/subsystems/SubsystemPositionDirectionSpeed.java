@@ -102,7 +102,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * Abstract method to set controller speed and direction
 	 * @param speedParam
 	 */
-	protected abstract void setControllerSpeedAndDirection(int speedParam);
+	protected abstract void setControllerDirectionAndSpeed(int speedParam);
 
 	/**
 	 * Abstract method to halt the controller movement
@@ -124,6 +124,12 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 */
 	public double readPosition() {
 		return controllerToPosition(readControllerPosition());
+	}
+	/*
+	 * Need to be able to retrieve what we believe is the state
+	 */
+	public MotorControllerState getMotorControllerState() {
+		return state;
 	}
 
 	/**
@@ -172,7 +178,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, state));
 				return;
 			}
-			setControllerSpeedAndDirection(speedToController(speed));
+			setControllerDirectionAndSpeed(speedToController(speed));
 			break;
 		case SET_POSITION:
 			if ((oldState == state) && (oldPosition == position)) {
@@ -213,7 +219,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @param newSpeed
 	 * @param newDirection
 	 */
-	public void moveAtSpeedAndDirection(double newSpeed, Direction newDirection) {
+	public void moveInDirectionAtSpeed(Direction newDirection, double newSpeed) {
 		oldSpeed = speed;
 		speed = newSpeed;
 		oldDirection = direction;
@@ -238,4 +244,11 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	public void holdCurrentPosition() {
 		changeState(MotorControllerState.HOLDING_POSITION);
 	}
+	
+	public void dumpState() {
+		/*logger.fine*/
+		System.out.println(String.format("STATE: [encoderFunctional: %s, state: %s, speed: %s, direction: %s, position %s]",
+				encoderFunctional, state, speed, direction, position));
+	}
+	
 }

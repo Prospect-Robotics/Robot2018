@@ -5,6 +5,7 @@ import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.Talon;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
 import org.usfirst.frc2813.util.unit.Direction;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -43,6 +44,10 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 0.75, 0.01, 40);
 	    initialize();
 	}
+	
+	public TalonSensorPhase getSensorPhase() {
+		return TalonSensorPhase.Normal;
+	}
 
 	public boolean readLimitSwitch(Direction switchDirection) {
 		return motorController.readLimitSwitch(switchDirection);
@@ -60,7 +65,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 		return motorController.getState();
 	}
 
-	protected void setControllerSpeedAndDirection(int speedParam) {
+	protected void setControllerDirectionAndSpeed(int speedParam) {
 		motorController.move(direction, speedParam);
 	}
 
@@ -81,4 +86,17 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 
 	@Override
 	public void periodic() {}
+	
+	/// Dump debug output
+	public void dumpState() {
+		super.dumpState();
+		motorController.dumpState();
+	}
+	
+	public void encoderRelativePositionTestingMode() {
+		disable();
+		motorController.setEncoderPosition(0);
+		disable();
+		dumpState();
+	}
 }

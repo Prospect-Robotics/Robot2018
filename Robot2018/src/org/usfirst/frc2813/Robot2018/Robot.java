@@ -50,7 +50,9 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		logger = Logger.getLogger(this.getClass().getSimpleName());
 
-		logger.setLevel(Level.INFO);
+		// Just for now, let's be verbose
+		Logger.getGlobal().setLevel(java.util.logging.Level.ALL);
+		logger.setLevel(Level.ALL); 
 		logger.info("In robotInit");
 
 		RobotMap.init();
@@ -124,11 +126,20 @@ public class Robot extends TimedRobot {
 		new POST().start();
 	}
 
+	/** TODO: DELETE ALL THIS */
+	private long hack = System.currentTimeMillis();
+	private void dumpStateAtIntervals() {
+		if(System.currentTimeMillis() - hack > 750) {
+			hack = System.currentTimeMillis();
+			Robot.elevator.dumpState();
+		}
+	}
 	/**
 	 * This function is called periodically during operator control
 	 */
 	//@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		dumpStateAtIntervals();
 	}
 }

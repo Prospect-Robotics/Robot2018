@@ -23,7 +23,7 @@ public class ElevatorMoveInDirectionAtSpeed extends GearheadsCommand {
 	// @Override
 	protected void initialize() {
 		logger.finer("in initialize");
-			Robot.elevator.moveAtSpeedAndDirection(speed, direction);
+			Robot.elevator.moveInDirectionAtSpeed(direction, speed);
 	}
 
 	//@Override

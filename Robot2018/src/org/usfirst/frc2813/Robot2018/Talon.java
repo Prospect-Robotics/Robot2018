@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.logging.Logger;
 
+import org.usfirst.frc2813.Robot2018.motor.TalonPID;
 import org.usfirst.frc2813.util.unit.Direction;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -23,6 +24,8 @@ public class Talon {
 	private final boolean  sensorPhase; // NB: This must never change and must be known at construction
 	private final boolean  motorInversion; // NB: This must never change and must be known at construction
 
+	// NB: This is not yet in the firmware apparently, so enable this when it's ready
+	public static final boolean AUXILLIARY_PID_SUPPORTED = false;
 	public static final double PULSES_PER_REVOLUTION = 4096;
 	// Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops.
 	public static final int MAINTAIN_PID_LOOP_IDX = 0;
@@ -110,6 +113,9 @@ public class Talon {
 		set(MotorControllerState.DISABLED, 0);
 	}
 
+	void logger_info(String x) {
+		System.out.println("Talon: " + x);
+	}
 	public Talon(TalonSRX srx, Logger logger) {
 		this(srx, logger, DEFAULT_MOTOR_INVERSION, DEFAULT_SENSOR_PHASE);
 	}
@@ -298,9 +304,37 @@ public class Talon {
 		return position;
 	}
 
+	/*
+	 * Set the reference point for both relative and absolute encoders for a given PID
+	 */
+	
+	private void correctEncoderSensorPositions(TalonPID talonPID, int sensorPosition) {
+		if(talonPID.equals(TalonPID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
+			logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
+			return;
+		}
+		// Select relative & reset
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, talonPID.getPIDIndex(), CONFIGURATION_COMMAND_TIMEOUT_MS);
+		srx.setSelectedSensorPosition(sensorPosition, talonPID.getPIDIndex(), CONFIGURATION_COMMAND_TIMEOUT_MS);
+		// Leave us with relative sensor still.  TODO: remember and restore.
+	}
+
+	/*
+	This is for a forced encoder assignment for debug/testing 
+	*/
+	public void setEncoderPosition(int encoderPosition) {
+		logger_info("setEncoderPosition [new value =" + encoderPosition + "]");
+		set(MotorControllerState.DISABLED, 0);
+		// Zero out absolute encoder values for both PID slots
+		correctEncoderSensorPositions(TalonPID.Primary, encoderPosition);
+		correctEncoderSensorPositions(TalonPID.Auxilliary, encoderPosition);
+		logger_info("setEncoderPosition holding at new value =" + encoderPosition + ".");
+//		set(MotorControllerState.HOLDING_POSITION, readPosition());
+	}
+
 	// Returns true if we zeroed and are now holding position at zero
 	public boolean zeroEncodersIfNecessary() {
-		// TODO: account for inversions
+		// TODO: account for inversions, account for which direction HAS the hard limit!
 		if (readLimitSwitch(Direction.NEGATIVE)
 				&& (state.isHoldingCurrentPosition() && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
 				|| (state.isMoving() && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
@@ -371,5 +405,23 @@ public class Talon {
 	 */
 	public void disable() {
 		set(MotorControllerState.DISABLED, 0);
+	}
+	
+	public void dumpState() {
+		logger_info(""
+				+ "dumpState[SETTINGS] = "
+				+ "[State=" + state
+				+ ", ControlMode=" + lastControlMode
+				+ ", ControlModeValue=" + lastControlModeValue
+				+ ", SlotIndex=" + lastSlotIndex
+				+ ", PIDIndex=" + lastPIDIndex
+				+ "]");
+		logger_info(""
+				+ "dumpState[HW] = "
+				+ "[LimitF=" + readLimitSwitch(Direction.POSITIVE)
+				+ ", LimitR=" + readLimitSwitch(Direction.NEGATIVE)
+				+ ", PWMPos=" + srx.getSensorCollection().getPulseWidthPosition()
+				+ ", QuadPos=" + srx.getSensorCollection().getQuadraturePosition()
+				+ "]");
 	}
 }

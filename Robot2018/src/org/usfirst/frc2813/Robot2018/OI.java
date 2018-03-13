@@ -4,6 +4,7 @@ import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorTesting;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmMoveInDirection;
@@ -76,7 +77,7 @@ public class OI {
 		 * (7)  SHIFT GEARS SOLENOID
 		 * (8)  ELEVATOR RATCHET SOLENOID
 		 * (9)  INTAKE/ARM SOLENOID
-		 * (10) TODO CURRENTLY UNUSED -- WILL MOVE ARM TO SPECIFIED POSITION
+		 * (10) ELEVATOR TESTING
 		 * (11) MOVE ARM UP
 		 * (12) MOVE ARM DOWN
 		 *
@@ -86,6 +87,8 @@ public class OI {
 		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
 		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
+		
+		new JoystickButton(buttonPanel, 10).toggleWhenActive(new ElevatorTesting());
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
@@ -106,7 +109,6 @@ public class OI {
 		spinIntakeIn.whileHeld(new SpinIntake(Direction.IN));
 		spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
-		//new JoystickButton(buttonPanel, 10).whenPressed(new ArmLimitSwitch(false));
 		new JoystickButton(buttonPanel, 11).whileHeld(new ArmMoveInDirection(Direction.UP));
 		new JoystickButton(buttonPanel, 12).whileHeld(new ArmMoveInDirection(Direction.DOWN));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SetJaws(Direction.OPEN));
