@@ -101,7 +101,7 @@ public class OI {
 		//elevatorUp.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
-		new JoystickButton(buttonPanel, 3).whenPressed(new ElevatorMoveToPosition(Robot.elevator.MIN_POSITION));
+//		new JoystickButton(buttonPanel, 3).whenPressed(new ElevatorMoveToPosition(Robot.elevator.getSensorAxisConfiguration().getReverseLimit()));
 		spinIntakeOut = new JoystickButton(buttonPanel, 2);
 		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
 		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
@@ -129,7 +129,7 @@ public class OI {
 		//SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
 		//SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
 		//SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
-		SmartDashboard.putData("BottomElevator", new ElevatorMoveToPosition(Robot.elevator.MIN_POSITION));
+//		SmartDashboard.putData("BottomElevator", new ElevatorMoveToPosition(Robot.elevator.getSensorAxisConfiguration().getReverseLimit()));
 		//SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
 		//SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
 

@@ -1,10 +1,15 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
+import org.usfirst.frc2813.Robot2018.motor.TalonMotorInversion;
+import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
 import org.usfirst.frc2813.util.unit.Direction;
 
@@ -27,21 +32,26 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 	public Elevator() {
 		MAX_POSITION = 24; //FIXME!!! This is from arm
 		MIN_POSITION = 0;
-		PULSES_PER_UNIT_POSITION = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
+		PULSES_PER_UNIT_POSITION = Talon.TALON_SRX_OUTPUTR_PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
 	    DEFAULT_SPEED = 12;
-
-		motorController = new Talon(RobotMap.srxElevator, logger);
+		motorController = new Talon(RobotMap.srxElevator, Logger.getLogger("ElevatorMC"));
 		// Configure the limits for DOWN
 		motorController.configureHardLimitSwitch(Direction.DOWN, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
 		motorController.disableSoftLimitSwitch(Direction.DOWN);
 		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, true);
-		// Configure the limits for UP
-		motorController.configureHardLimitSwitch(Direction.UP, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
-		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, false);
+
+// HW BUG WORKAROUND
+motorController.configureHardLimitSwitch(Direction.UP, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true);
+//		// Configure the limits for UP
+//		motorController.configureHardLimitSwitch(Direction.UP, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
+//		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, false);
+// HW BUG WORKAROUND
 		motorController.configureSoftLimitSwitch(Direction.UP, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
+	
 		// Configure the PID profiles
-  	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.8, 0, 0);
-	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 0.75, 0.01, 40);
+  	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
+	    motorController.configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
 	    initialize();
 	}
 	

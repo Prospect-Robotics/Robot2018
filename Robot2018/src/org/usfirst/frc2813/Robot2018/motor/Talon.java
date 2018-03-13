@@ -4,51 +4,59 @@ import java.util.logging.Logger;
 
 import org.usfirst.frc2813.util.unit.Direction;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  * A wrapper class to handle an SRX Talon motor controller
  * Arm rotation has default halted state. Move command takes
  * TODO: Create a base class above this for motor controllers.
+ * TODO: This class assumes a MAG SRX encoder is attached in some places.
  */
 public class Talon {
-	private final TalonSRX srx;
-	private final Logger   logger;
-	private final boolean  sensorPhase; // NB: This must never change and must be known at construction
-	private final boolean  motorInversion; // NB: This must never change and must be known at construction
+	private final TalonSRX                   srx;
+	private final Logger                     logger;
+	private final TalonSensorPhase           sensorPhase;    // NB: This must never change and must be known at construction
+	private final TalonMotorInversion        motorInversion; // NB: This must never change and must be known at construction
 
 	// NB: This is not yet in the firmware apparently, so enable this when it's ready
 	public static final boolean AUXILLIARY_PID_SUPPORTED = false;
-	public static final double PULSES_PER_REVOLUTION = 4096;
+	// NB: There are other values for different types of sensor.  There's a table.  
+	public static final double SRX_MAG_ENCODER_PULSES_PER_REVOLUTION = 4096;
+	// NB: Talon SRX matches encoder pulses when it's using the relative sensor
+	public static final double TALON_SRX_OUTPUTR_PULSES_PER_REVOLUTION = 4096;
 	// Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops.
-	public static final int MAINTAIN_PID_LOOP_IDX = 0;
-	public static final int MOVE_PIDLOOP_IDX = 1;
-	public static final int MAINTAIN_SLOT_IDX = 0;
-	public static final int MOVE_SLOT_IDX = 1;
 	// During initialization we use 10ms timeout to setup commands
-	private static final int CONFIGURATION_COMMAND_TIMEOUT_MS = 10; // timeout for Talon config function
+	public static final int CONFIGURATION_COMMAND_TIMEOUT_MS = 10; // timeout for Talon config function
 	// During operation, we use 0ms timeout to avoid stalling on transient bus
 	// errors, per CTR examples/documentation.
-	private static final int OPERATION_COMMAND_TIMEOUT_MS = 0; // timeout for Talon config function
+	public static final int OPERATION_COMMAND_TIMEOUT_MS = 0; // timeout for Talon config function
 	// choose to ensure sensor is positive when output is positive
-	public static final boolean DEFAULT_SENSOR_PHASE = true;
+	public static final TalonSensorPhase DEFAULT_SENSOR_PHASE = TalonSensorPhase.Normal;
 	// choose based on what direction you want to be positive, this does not affect
 	// motor invert.
-	public static final boolean DEFAULT_MOTOR_INVERSION = false;
+	public static final TalonMotorInversion DEFAULT_MOTOR_INVERSION = TalonMotorInversion.Normal;
 	public static final LimitSwitchNormal DEFAULT_LIMIT_SWITCH_MODE = LimitSwitchNormal.NormallyOpen; // From manual
 	public static final LimitSwitchSource DEFAULT_LIMIT_SWITCH_SOURCE = LimitSwitchSource.FeedbackConnector; // From manual
 	public static final boolean DEFAULT_LIMIT_SWITCH_CLEAR_POSITION = false; // From manual
 	public static final boolean DEFAULT_SOFT_LIMIT_ENABLED = false;
 	public static final boolean DEFAULT_CLEAR_POSITION_ON_QUAD_IDX = false;
 	public static final int DEFAULT_SOFT_LIMIT_THRESHOLD = 0;
+	public static final int DEFAULT_ALLOWABLE_CLOSED_LOOP_ERROR = 0;
+	public static final TalonProfileSlot DEFAULT_PROFILE_SLOT_FOR_HOLD_POSITION = TalonProfileSlot.HoldingPosition;
+	public static final TalonProfileSlot DEFAULT_PROFILE_SLOT_FOR_MOVE          = TalonProfileSlot.Moving;
+	public static final TalonPID DEFAULT_PID_INDEX_FOR_HOLD_POSITION            = TalonPID.Primary;
+	public static final TalonPID DEFAULT_PID_INDEX_FOR_MOVE                     = TalonPID.Primary;
+	public static final double DEFAULT_F_GAIN = 0; // From manual
+	public static final double DEFAULT_P_GAIN = 0.0; // From manual
+	public static final double DEFAULT_I_GAIN = 0.0; // From manual
+	public static final double DEFAULT_D_GAIN = 0.0; // From manual
 
-	private int currentPidIndex = MAINTAIN_PID_LOOP_IDX;    // Remember last used pid index, help us implement state transitions
+	// TODO: Warning: If we use SET_POSITION --- which profile do we use?  moving or holding?  Needs to transition automatically based on error!!!  
 
 	// Current state
 	private MotorControllerState state;
@@ -56,11 +64,41 @@ public class Talon {
 	private ControlMode lastControlMode = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	// Last arg sent for controlMode
 	private double lastControlModeValue = 0;
-	private int lastSlotIndex = MAINTAIN_SLOT_IDX;
-	private int lastPIDIndex = MAINTAIN_PID_LOOP_IDX;
+	private TalonProfileSlot lastSlotIndex = DEFAULT_PROFILE_SLOT_FOR_HOLD_POSITION;
+	private TalonPID         lastPIDIndex  = DEFAULT_PID_INDEX_FOR_HOLD_POSITION;
+	private TalonProfileSlot slotIndexForHoldPosition = DEFAULT_PROFILE_SLOT_FOR_HOLD_POSITION;
+	private TalonProfileSlot slotIndexForMove         = DEFAULT_PROFILE_SLOT_FOR_MOVE;
+	private TalonPID         PIDIndexForMove          = DEFAULT_PID_INDEX_FOR_MOVE;
+	private TalonPID         PIDIndexForHoldPosition  = DEFAULT_PID_INDEX_FOR_HOLD_POSITION;
 
-	// NB: I need 
-	public Talon(TalonSRX srx, Logger logger, boolean motorInversion, boolean sensorPhase) {
+	public double getEncoderTicksPerRevolution() {
+		// TODO: switch(getSelectedSensor(lastPIDIndex)) and return correct value based on encoder
+		return SRX_MAG_ENCODER_PULSES_PER_REVOLUTION;
+	}
+	
+	public TalonProfileSlot getSlotIndexForHoldPosition() {
+		return slotIndexForHoldPosition;
+	}
+	public TalonProfileSlot getSlotIndexForMove() {
+		return slotIndexForMove;
+	}
+	public void setSlotIndexForHoldPosition(TalonProfileSlot slotIndex) {
+		slotIndexForHoldPosition = slotIndex;
+		if((state == MotorControllerState.HOLDING_POSITION || state == MotorControllerState.SET_POSITION) && lastSlotIndex != slotIndex) {
+			// TODO: Need to update state
+			logger_info("TODO: Need to updateSate after slot index for holding is changed.");
+		}
+	}
+	public void setSlotIndexForMove(TalonProfileSlot slotIndex) {
+		slotIndexForMove = slotIndex;
+		if((state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) && lastSlotIndex != slotIndex) {
+			// NB: SET_POSITION needs to use the profile for "moving" when it's got a large error and switch to the profile for holding when the error is small
+			// TODO: Need to update state
+			logger_info("TODO: Need to updateSate after slot index for move changes while in moving or when high error in set_position state...");
+		}
+	}
+
+	public Talon(TalonSRX srx, Logger logger, TalonMotorInversion motorInversion, TalonSensorPhase sensorPhase) {
 		this.srx = srx;
 		this.logger = logger;
 		this.motorInversion = motorInversion;
@@ -71,37 +109,23 @@ public class Talon {
 		srx.configNominalOutputReverse(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configPeakOutputForward(1, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		srx.configPeakOutputReverse(-1, CONFIGURATION_COMMAND_TIMEOUT_MS);
-		/*
-		 * This section initializes the relative encoder to the absolute value from the
-		 * absolute encoder position, so that any previous calibration of zero will be
-		 * preserved.
-		 */
-		int absolutePosition = srx.getSensorCollection().getPulseWidthPosition();
-		/*
-		 * NB: We have not yet set phase or inversion, so we will factor that into the
-		 * absolute position we calculate
-		 */
-		if (!this.sensorPhase)
-			absolutePosition *= -1;
-		if (this.motorInversion)
-			absolutePosition *= -1;
-		srx.setSensorPhase(this.sensorPhase);
-		srx.setInverted(this.motorInversion);
-		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX,
-				CONFIGURATION_COMMAND_TIMEOUT_MS);
-		srx.setSelectedSensorPosition(absolutePosition, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX,
-				CONFIGURATION_COMMAND_TIMEOUT_MS);
-		srx.setSelectedSensorPosition(absolutePosition, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
+//		correctRelativeEncodersFromAbsolute();
+		// Reset PID controllers
+		configurePID(TalonProfileSlot.ProfileSlot0);
+		configurePID(TalonProfileSlot.ProfileSlot1);
+		configurePID(TalonProfileSlot.ProfileSlot2);
+		configurePID(TalonProfileSlot.ProfileSlot3);
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
 		 */
-		srx.configAllowableClosedloopError(MAINTAIN_SLOT_IDX, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-		srx.configAllowableClosedloopError(MOVE_SLOT_IDX, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot0);
+		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot1);
+		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot2);
+		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot3);
 		// Configure limit switches on startup to all off
-		setHardLimitSwitchClearsPositionAutomatically(Direction.POSITIVE); // reset defalts
-		setHardLimitSwitchClearsPositionAutomatically(Direction.NEGATIVE); // reset defalts
+		resetHardLimitSwitchClearsPositionAutomatically(Direction.POSITIVE); // reset defalts
+		resetHardLimitSwitchClearsPositionAutomatically(Direction.NEGATIVE); // reset defalts
 		disableSoftLimitSwitch(Direction.POSITIVE); // reset defaults
 		disableSoftLimitSwitch(Direction.NEGATIVE); // reset defaults
 		configureHardLimitSwitch(Direction.POSITIVE); // reset defaults
@@ -170,7 +194,7 @@ public class Talon {
 	/*
 	 * Configure hardware limit switch to default behavior - NOT auto clear the sensor position when activated. 
 	 */
-	public void setHardLimitSwitchClearsPositionAutomatically(Direction direction) {
+	public void resetHardLimitSwitchClearsPositionAutomatically(Direction direction) {
 		setHardLimitSwitchClearsPositionAutomatically(direction, DEFAULT_LIMIT_SWITCH_CLEAR_POSITION);
 	}
 	/*
@@ -199,10 +223,24 @@ public class Talon {
 	 */
 	public void configureHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource, LimitSwitchNormal limitSwitchMode) {
 		if (direction.isNegative()) {
-			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configReverseLimitSwitchSource(limitSwitchSource, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		} else {
-			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
+			srx.configForwardLimitSwitchSource(limitSwitchSource, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		}
+	}
+	/*
+	 * Set the allowable closed loop error for the PID profile indicated.  
+	 * When PID is running with this profile, this is how much error it will accept before reacting (I think)
+	 * See getClosedLoopError(TalonPidLoopIndex) to see the current actual error.
+	 */
+	public void configureAllowableClosedLoopError(TalonProfileSlot profileSlot, int allowableClosedLoopError) {
+		srx.configAllowableClosedloopError(profileSlot.getProfileSlotIndex(), allowableClosedLoopError, CONFIGURATION_COMMAND_TIMEOUT_MS);
+	}
+	/*
+	 * Reset the allowable closed loop error for the indicated profile to default.  
+	 */
+	public void configureAllowableClosedLoopError(TalonProfileSlot profileSlot) {
+		configureAllowableClosedLoopError(profileSlot, DEFAULT_ALLOWABLE_CLOSED_LOOP_ERROR);
 	}
 	/*
 	 * Configure the limit switch source to one of (Deactivated, FeedbackConnector (physical switch), RemoteTalon, or RemoteCANifier), with default "normally open" logic levels.
@@ -220,11 +258,28 @@ public class Talon {
 		configureHardLimitSwitch(direction, DEFAULT_LIMIT_SWITCH_SOURCE, DEFAULT_LIMIT_SWITCH_MODE);
 	}
 
-	public void setPID(int slot, double p, double i, double d) {
-		srx.config_kF(slot, 0, CONFIGURATION_COMMAND_TIMEOUT_MS); // typically kF stays zero.
-		srx.config_kP(slot, p, CONFIGURATION_COMMAND_TIMEOUT_MS);
-		srx.config_kI(slot, i, CONFIGURATION_COMMAND_TIMEOUT_MS);
-		srx.config_kD(slot, d, CONFIGURATION_COMMAND_TIMEOUT_MS);
+	/*
+	 * Configure PID values
+	 */
+	public void configurePID(TalonProfileSlot profileSlot, double p, double i, double d, double f) {
+		srx.config_kF(profileSlot.getProfileSlotIndex(), f, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		srx.config_kP(profileSlot.getProfileSlotIndex(), p, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		srx.config_kI(profileSlot.getProfileSlotIndex(), i, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		srx.config_kD(profileSlot.getProfileSlotIndex(), d, CONFIGURATION_COMMAND_TIMEOUT_MS);
+		// I'm not sure if someone has to call selectProfileSlot to reload the values or if it's automatically looking at the right ones (guessing the latter)
+	}
+	/*
+	 * Configure PID values
+	 */
+	public void configurePID(TalonProfileSlot profileSlot, double p, double i, double d) {
+		configurePID(profileSlot, p, i, d, DEFAULT_D_GAIN);
+	}
+
+	/*
+	 * Configure PID values, using defaults
+	 */
+	public void configurePID(TalonProfileSlot profileSlot) {
+		configurePID(profileSlot, DEFAULT_F_GAIN, DEFAULT_P_GAIN, DEFAULT_I_GAIN, DEFAULT_D_GAIN);
 	}
 
 	public boolean readLimitSwitch(Direction direction) {
@@ -234,7 +289,6 @@ public class Talon {
 			return srx.getSensorCollection().isFwdLimitSwitchClosed();
 		}
 	}
-
 	/**
 	 * All changes to state are done here, and recorded here.
 	 * Optionally reported to the log here.
@@ -246,40 +300,45 @@ public class Talon {
 		MotorControllerState oldState = this.state;
 		ControlMode newControlMode = ControlMode.Disabled;
 		double newControlModeValue = arg;
-		int newSlotIndex  = lastSlotIndex;
-		int newPIDIndex   = lastPIDIndex;
-		newSlotIndex   = MAINTAIN_SLOT_IDX;
-		newPIDIndex    = MAINTAIN_PID_LOOP_IDX;
+		// New PID/Slot are almost always maintain
+		TalonProfileSlot newSlotIndex  = lastSlotIndex;
+		TalonPID         newPIDIndex   = lastPIDIndex;
 		switch(newState) {
 		case DISABLED:
 			newControlMode = ControlMode.Disabled;
+			newSlotIndex   = slotIndexForHoldPosition;
+			newPIDIndex    = PIDIndexForHoldPosition;
 			break;
 		case HOLDING_POSITION:
 			newControlMode = ControlMode.Position;
+			newSlotIndex   = slotIndexForHoldPosition;
+			newPIDIndex    = PIDIndexForHoldPosition;
 			break;
 		case SET_POSITION:
 			newControlMode = ControlMode.Position;
+			newSlotIndex   = slotIndexForMove;
+			newPIDIndex    = PIDIndexForMove;
 			break;
 		case MOVING:
 			newControlMode = ControlMode.Velocity;
+			newSlotIndex   = slotIndexForMove;
+			newPIDIndex    = PIDIndexForMove;
 			break;
 		}
 		//
 		if(oldState != newState) {
-			logger.info("set [transitioned from " + oldState + " to " + newState + "]");
+			logger_info("set [transitioned from " + oldState + " to " + newState + "]");
 		}
 		// NB: This log statement shows old and current values, so you can see transitions completely
-		// TODO: Add a debug flag for this
-		logger.info(""
+		logger_info(""
 				+ "set Changes "
 				+ "[State (" + oldState + "-> " + newState + ") "
 				+ ", ControlMode (" + this.lastControlMode + "/" + this.lastControlModeValue + " -> " + newControlMode + "/" + newControlModeValue + ")"
 				+ ", SlotIndex (" + lastSlotIndex + " -> " + newSlotIndex + ")"
 				+ ", PIDIndex ("  + lastPIDIndex + " -> " + newPIDIndex + ")"
 				+ "]");
-		// TODO: Add a debug flag for this
 		// NB: This log statement shows current values
-		logger.info(""
+		logger_info(""
 				+ "set "
 				+ "[State=" + newState
 				+ ", ControlMode=" + newControlMode
@@ -287,8 +346,8 @@ public class Talon {
 				+ ", SlotIndex=" + newSlotIndex
 				+ ", PIDIndex=" + newPIDIndex
 				+ "]");
-		srx.set(ControlMode.Disabled, 0); // NB: Not sure this is necessary...
-		srx.selectProfileSlot(this.lastSlotIndex, this.lastPIDIndex);
+		// Select the profile to use for the control loop (this is almost certainly going to be closed loop)
+		srx.selectProfileSlot(newSlotIndex.getProfileSlotIndex(), newPIDIndex.getPIDIndex());
 		srx.set(newControlMode, newControlModeValue);
 		this.state = newState;
 		this.lastControlMode = newControlMode;
@@ -296,10 +355,10 @@ public class Talon {
 		this.lastSlotIndex = newSlotIndex;
 		this.lastPIDIndex = newPIDIndex;
 	}
-
+	
 	public int readPosition() {
-		int position = srx.getSelectedSensorPosition(currentPidIndex);
-		logger.info("readPosition " + " = @ " + position);
+		int position = srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex());
+		logger_info("readPosition " + " = @ " + position);
 		return position;
 	}
 
@@ -338,25 +397,14 @@ public class Talon {
 				&& (state.isHoldingCurrentPosition() && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
 				|| (state.isMoving() && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
 		{
-			logger.info("ZEROING ENCODERS");
-			MotorControllerState oldState = state;
-			set(MotorControllerState.DISABLED, 0);
-			// Zero out absolute encoder values for both PID slots
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.setSelectedSensorPosition(0, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.setSelectedSensorPosition(0, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			// Zero out relative encoder values for both PID slots
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.setSelectedSensorPosition(0, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			srx.setSelectedSensorPosition(0, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
-			set(MotorControllerState.HOLDING_POSITION, readPosition());
-			logger.info("ENCODERS ZEROD");
+			logger_info("ZEROING ENCODERS");
+			setEncoderPosition(0);
 			return true;
 		}
 		return false;
 	}
+	// TODO: Rename TalonPIDINdex TalonPID
+	// TOOD: Rename TalonProfileSlotIndex TalonProfile
 
 	/**
 	 * [ACTION] Set to an absolute encoder position
@@ -370,7 +418,7 @@ public class Talon {
 	 */
 	public void holdCurrentPosition() {
 		set(MotorControllerState.HOLDING_POSITION, readPosition());
-		zeroEncodersIfNecessary();
+//		zeroEncodersIfNecessary();
 	}
 
 	/**
@@ -381,11 +429,11 @@ public class Talon {
 	 */
 	public void move(Direction direction, double speed) {
 		if(speed == 0) {
-			logger.info(" was told to move with speed zero.  Holding position instead.");
+			logger_info(" was told to move with speed zero.  Holding position instead.");
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			logger.info(String.format("move [Direction ({0}) x Speed ({1}) -> {2}]", direction, speed, speedParam));
+			logger_info(String.format("move %s [Direction (%f) x Speed (%f) -> Velocity %f]", direction, direction.getMultiplierAsDouble(), speed, speedParam));
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}

@@ -1,10 +1,13 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
+import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
 import org.usfirst.frc2813.util.unit.Direction;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
@@ -20,7 +23,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
  */
 public class Arm extends SubsystemPositionDirectionSpeed {
 	private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
-    private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.PULSES_PER_REVOLUTION;
+    private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.TALON_SRX_OUTPUTR_PULSES_PER_REVOLUTION;
 
     private static final double PULSES_PER_DEGREE = PULSES_PER_REVOLUTION / 360;
     private static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
@@ -35,7 +38,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		PULSES_PER_UNIT_POSITION_PER_TIME = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
 	    DEFAULT_SPEED = 5;
 
-		motorController = new Talon(RobotMap.srxArm, logger);
+		motorController = new Talon(RobotMap.srxArm, Logger.getLogger("ArmMC"));
 		
 		// Configure the limits for DOWN
 		motorController.configureHardLimitSwitch(Direction.BACKWARD, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
@@ -46,8 +49,10 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
 		motorController.configureSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
 		// Configure the PID profiles
-	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.1, 0, 0);
-	    motorController.setPID(Talon.MOVE_PIDLOOP_IDX, 2, 0, 0);
+		motorController.setSlotIndexForHoldPosition(TalonProfileSlot.HoldingPosition);
+		motorController.setSlotIndexForMove(TalonProfileSlot.Moving);
+	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.1, 0.0, 0.0);
+	    motorController.configurePID(TalonProfileSlot.Moving, 2.0, 0.0, 0.0);
 
 	    initialize();
 	}
