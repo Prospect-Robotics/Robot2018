@@ -258,7 +258,7 @@ public class Talon {
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			Logger.formatInfo("move [Direction ({0}) x Speed ({1}) -> {2}]", direction, speed, speedParam);
+			Logger.formatInfo("move [Direction (%s) x Speed (%s) -> %s]", direction, speed, speedParam);
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
