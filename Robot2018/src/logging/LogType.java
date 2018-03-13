@@ -2,11 +2,13 @@ package logging;
 
 public enum LogType {
 	/**
-	 * Prints within the {@link LogLevel#DEBUG debug} logging level
+	 * Prints within the {@link LogLevel#DEBUG debug} logging level.
+	 * Use to leave not normally printed message in the code.
 	 */
 	DEBUG,
 	/**
-	 * Prints within the {@link LogLevel#INFO info} logging level
+	 * The default log level. Prints within the {@link LogLevel#INFO info}
+	 * logging level as well as any more verbose levels such as {@link LogLevel#DEBUG debug}
 	 */
 	INFO,
 	/**
