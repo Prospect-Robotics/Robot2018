@@ -1,6 +1,8 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
@@ -12,14 +14,11 @@ import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.Robot2018.subsystems.Jaws;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import logging.LogLevel;
-import logging.Logger;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,6 +29,7 @@ import logging.Logger;
  */
 public class Robot extends TimedRobot {
 	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
+    public static Logger logger;
 
 	public static AutonomousCommandGroup autonomousCommand;
 	public static AutonomousCommandGroupGenerator autoCmdGenerator;
@@ -48,10 +48,10 @@ public class Robot extends TimedRobot {
 	 */
 	//@Override
 	public void robotInit() {
+		logger = Logger.getLogger(this.getClass().getSimpleName());
 
-
-		Logger.setLoggingLevel(LogLevel.INFO);
-		Logger.info("In robotInit");
+		logger.setLevel(Level.INFO);
+		logger.info("In robotInit");
 
 		RobotMap.init();
 		driveTrain = new DriveTrain();
@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
 
 	//@Override
 	public void autonomousInit() {
-		Logger.info("Autonomous Init");
+		logger.info("Autonomous Init");
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 

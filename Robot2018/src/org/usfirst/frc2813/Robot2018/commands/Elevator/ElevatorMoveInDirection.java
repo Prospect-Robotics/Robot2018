@@ -4,8 +4,6 @@ import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
-import logging.Logger;
-
 /**
  * Move elevator in given direction until interrupted.
  * Hold current position with PID when interrupted.
@@ -15,13 +13,13 @@ public class ElevatorMoveInDirection extends GearheadsCommand {
 
 	public ElevatorMoveInDirection(Direction direction) {
 		this.direction = direction;
-		Logger.info("Move " + direction);
+		logger.info("Move " + direction);
 		requires(Robot.elevator);
 	}
 
 	// @Override
 	protected void initialize() {
-		Logger.debug("in initialize");//was finer
+		logger.finer("in initialize");
 			Robot.elevator.moveInDirection(direction);
 	}
 
@@ -32,7 +30,7 @@ public class ElevatorMoveInDirection extends GearheadsCommand {
 
 	@Override
 	protected void interrupted() {
-		Logger.debug("in interrupted");//was finer
+		logger.finer("in interrupted");
 		Robot.elevator.holdCurrentPosition();
 	}
 }

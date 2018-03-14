@@ -5,7 +5,7 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
+import java.util.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 
@@ -19,7 +19,7 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
  * account game data. Used exclusively by AutonomousCommandGroup
  */
 public class AutonomousCommandGroupGenerator {
-
+	Logger logger = Logger.getLogger(this.getClass().getSimpleName());
 
 	// Elevator position to place cubes - FIXME! not correct values
 	private static final double scaleHeight = 60;

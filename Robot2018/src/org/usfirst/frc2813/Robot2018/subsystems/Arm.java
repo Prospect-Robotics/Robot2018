@@ -31,7 +31,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		PULSES_PER_UNIT_POSITION_PER_TIME = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
 	    DEFAULT_SPEED = 5;
 
-		motorController = new Talon(RobotMap.srxArm);
+		motorController = new Talon(RobotMap.srxArm, logger);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
 	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.1, 0, 0);

@@ -3,8 +3,6 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.MotorControllerState;
 
-import logging.Logger;
-
 /**
  * Subsystem baseclass for subsystems which move in two direction
  * over a range of positions.
@@ -141,12 +139,12 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @return true if state change occurred
 	 */
 	protected void changeState(MotorControllerState newState) {
-		Logger.formatDebug("Changing state: encoderFunctional: %s, " +
+		logger.fine(String.format("Changing state: encoderFunctional: %s, " +
 								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
 								 "old direction: %s, new direction %s, old position: %s, new position %s",
-				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position);
+				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position));
 		if (!encoderFunctional) {
-			Logger.warning("encoder not functional. Refusing action.");
+			logger.warning("encoder not functional. Refusing action.");
 			return;	
 		}
 
@@ -157,28 +155,28 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		switch(state) {
 		case DISABLED:
 			if (oldState == state) {
-				Logger.warning("bug in code: Transitioning from disabled to disabled.");
+				logger.warning("bug in code: Transitioning from disabled to disabled.");
 				return;
 			}
 			disableController();
 			break;
 		case HOLDING_POSITION:
 			if (oldState == state) {
-				Logger.warning("bug in code: Transitioning from hold position to hold position.");
+				logger.warning("bug in code: Transitioning from hold position to hold position.");
 				return;
 			}
 			holdControllerPosition();
 			break;
 		case MOVING:
 			if ((oldState == state) && (oldSpeed == speed) && (oldDirection == direction)) {
-				Logger.warning("bug in code: Transitioning from disabled to disabled.");
+				logger.warning("bug in code: Transitioning from disabled to disabled.");
 				return;
 			}
 			setControllerSpeedAndDirection(speedToController(speed));
 			break;
 		case SET_POSITION:
 			if ((oldState == state) && (oldPosition == position)) {
-				Logger.warning("bug in code: Transitioning from disabled to disabled.");
+				logger.warning("bug in code: Transitioning from disabled to disabled.");
 				return;
 			}
 		setControllerPosition(positionToController(position));

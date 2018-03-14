@@ -25,7 +25,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 		PULSES_PER_UNIT_POSITION = Talon.PULSES_PER_REVOLUTION / INCHES_PER_REVOLUTION;
 	    DEFAULT_SPEED = 12;
 
-		motorController = new Talon(RobotMap.srxElevator);
+		motorController = new Talon(RobotMap.srxElevator, logger);
 		motorController.configHardLimitSwitch(Direction.BACKWARD);
 		motorController.configSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
   	    motorController.setPID(Talon.MAINTAIN_PID_LOOP_IDX, 0.8, 0, 0);

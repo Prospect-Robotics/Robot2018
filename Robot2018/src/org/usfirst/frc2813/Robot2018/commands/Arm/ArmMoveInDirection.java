@@ -4,8 +4,6 @@ import org.usfirst.frc2813.Robot2018.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
-import logging.Logger;
-
 /**
  * Move arm in given direction until interrupted.
  * Hold current position with PID when interrupted.
@@ -15,13 +13,13 @@ public class ArmMoveInDirection extends GearheadsCommand {
 
 	public ArmMoveInDirection(Direction direction) {
 		this.direction = direction;
-		Logger.info("Move in " + direction);
+		logger.info("Move in " + direction);
 		requires(Robot.arm);
 	}
 
 	// @Override
 	protected void initialize() {
-		Logger.debug("in initialize");//was finer
+		logger.finer("in initialize");
 			Robot.arm.moveInDirection(direction);
 	}
 
@@ -32,7 +30,7 @@ public class ArmMoveInDirection extends GearheadsCommand {
 
 	@Override
 	protected void interrupted() {
-		Logger.debug("in interrupted");//was finer
+		logger.finer("in interrupted");
 		Robot.arm.holdCurrentPosition();
 	}
 }

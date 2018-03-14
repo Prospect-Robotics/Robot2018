@@ -2,8 +2,6 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.Direction;
 
-import logging.Logger;
-
 
 /**
  * Subsystem baseclass for subsystems which move in two direction but
@@ -93,7 +91,7 @@ public abstract class SubsystemDirectionSpeed extends GearheadsSubsystem {
 
 		isHalted = false;
 		setControllerDirection(direction);
-		Logger.info("Starting movement direction: ",direction," Speed: ",speed);
+		logger.info("Starting movement direction: " + direction + " Speed: " + speed);
 	}
 
     public void move(Direction directionParam) {
