@@ -76,6 +76,26 @@ public class Logger {
 	}
 
 	/**
+	 * 
+	 * @param severity
+	 *            - {@link LogType} object used along with {@link LogLevel} to
+	 *            determie what should be printed
+	 * @param format
+	 *            - format string passed into
+	 *            {@link String#format(String, Object...) String.format}
+	 * @param objects
+	 *            - args passed into {@link String#format(String, Object...)
+	 *            String.format}
+	 * 
+	 * @see String#format(String, Object...)
+	 * @see Logger#print(LogType, Object...)
+	 */
+	public static void printFormat(LogType severity, String format, Object... objects) {
+		String formatted = String.format(format, objects);
+		print(severity, formatted);
+	}
+
+	/**
 	 * <p>
 	 * Add yourself to {@link Logger}'s list of known classes
 	 * </p>
@@ -87,6 +107,15 @@ public class Logger {
 				knownClasses.add(trace[i + 1].getClassName());// TODO double check this
 				break;
 			}
+		}
+	}
+
+	private static String simplifyPackage(String longName) {
+		String[] segments = longName.split("\\.");
+		if (segments.length < 2) {
+			return longName;
+		} else {
+			return segments[segments.length - 1];
 		}
 	}
 
@@ -145,13 +174,64 @@ public class Logger {
 		print(LogType.ERROR, objects);
 	}
 
-	private static String simplifyPackage(String longName) {
-		String[] segments = longName.split("\\.");
-		if (segments.length < 2) {
-			return longName;
-		} else {
-			return segments[segments.length - 1];
-		}
+	/**
+	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
+	 * {@link LogType} of {@link LogType#ALWAYS ALWAYS}
+	 * 
+	 * @param format
+	 * @param objects
+	 * @see #printFormat(Logtype,String, Object...)
+	 */
+	public static void formatAlways(String format, Object... objects) {
+		printFormat(LogType.ALWAYS,format, objects);
+	}
+
+	/**
+	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
+	 * {@link LogType} of {@link LogType#DEBUG DEBUG}
+	 * 
+	 * @param format
+	 * @param objects
+	 * @see #printFormat(Logtype,String, Object...)
+	 */
+	public static void formatDebug(String format, Object... objects) {
+		printFormat(LogType.DEBUG,format, objects);
+	}
+
+	/**
+	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
+	 * {@link LogType} of {@link LogType#INFO INFO}
+	 * 
+	 * @param format
+	 * @param objects
+	 * @see #printFormat(Logtype,String, Object...)
+	 */
+	public static void formatInfo(String format, Object... objects) {
+		printFormat(LogType.INFO,format, objects);
+	}
+
+	/**
+	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
+	 * {@link LogType} of {@link LogType#WARNING WARNING}
+	 * 
+	 * @param format
+	 * @param objects
+	 * @see #printFormat(Logtype,String, Object...)
+	 */
+	public static void formatWarning(String format, Object... objects) {
+		printFormat(LogType.WARNING,format, objects);
+	}
+
+	/**
+	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
+	 * {@link LogType} of {@link LogType#ERROR ERROR}
+	 * 
+	 * @param format
+	 * @param objects
+	 * @see #printFormat(Logtype,String, Object...)
+	 */
+	public static void formatError(String format, Object... objects) {
+		printFormat(LogType.ERROR,format, objects);
 	}
 
 }

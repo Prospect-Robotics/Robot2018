@@ -1,16 +1,14 @@
 package org.usfirst.frc2813.Robot2018;
 
-import java.util.logging.Logger;
-
-import org.usfirst.frc2813.Robot2018.Direction;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import logging.Logger;
 
 /**
  * A wrapper class to handle an SRX Talon motor controller
@@ -19,7 +17,6 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
  */
 public class Talon {
 	private final TalonSRX srx;
-	private final Logger logger;
 
 	public static final double PULSES_PER_REVOLUTION = 4096;
 	// Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops.
@@ -49,9 +46,8 @@ public class Talon {
 	private int lastSlotIndex = MAINTAIN_SLOT_IDX;
 	private int lastPIDIndex = MAINTAIN_PID_LOOP_IDX;
 
-	public Talon(TalonSRX srx, Logger logger) {
+	public Talon(TalonSRX srx) {
 		this.srx = srx;
-		this.logger = logger;
 
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -171,11 +167,11 @@ public class Talon {
 		}
 		//
 		if(oldState != newState) {
-			logger.info("set [transitioned from " + oldState + " to " + newState + "]");
+			Logger.info("set [transitioned from " + oldState + " to " + newState + "]");
 		}
 		// NB: This log statement shows old and current values, so you can see transitions completely
 		// TODO: Add a debug flag for this
-		logger.info(""
+		Logger.info(""
 				+ "set Changes "
 				+ "[State (" + oldState + "-> " + newState + ") "
 				+ ", ControlMode (" + this.lastControlMode + "/" + this.lastControlModeValue + " -> " + newControlMode + "/" + newControlModeValue + ")"
@@ -184,7 +180,7 @@ public class Talon {
 				+ "]");
 		// TODO: Add a debug flag for this
 		// NB: This log statement shows current values
-		logger.info(""
+		Logger.info(""
 				+ "set "
 				+ "[State=" + newState
 				+ ", ControlMode=" + newControlMode
@@ -204,7 +200,7 @@ public class Talon {
 
 	public int readPosition() {
 		int position = srx.getSelectedSensorPosition(currentPidIndex);
-		logger.info("readPosition " + " = @ " + position);
+		Logger.info("readPosition " + " = @ " + position);
 		return position;
 	}
 
@@ -215,7 +211,7 @@ public class Talon {
 				&& (state.isHoldingCurrentPosition() && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
 				|| (state.isMoving() && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
 		{
-			logger.info("ZEROING ENCODERS");
+			Logger.info("ZEROING ENCODERS");
 			MotorControllerState oldState = state;
 			set(MotorControllerState.DISABLED, 0);
 			// Zero out absolute encoder values for both PID slots
@@ -229,7 +225,7 @@ public class Talon {
 			srx.setSelectedSensorPosition(0, MAINTAIN_PID_LOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.setSelectedSensorPosition(0, MOVE_PIDLOOP_IDX, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			set(MotorControllerState.HOLDING_POSITION, readPosition());
-			logger.info("ENCODERS ZEROD");
+			Logger.info("ENCODERS ZEROD");
 			return true;
 		}
 		return false;
@@ -258,11 +254,11 @@ public class Talon {
 	 */
 	public void move(Direction direction, double speed) {
 		if(speed == 0) {
-			logger.info(" was told to move with speed zero.  Holding position instead.");
+			Logger.info(" was told to move with speed zero.  Holding position instead.");
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			logger.info(String.format("move [Direction ({0}) x Speed ({1}) -> {2}]", direction, speed, speedParam));
+			Logger.formatInfo("move [Direction ({0}) x Speed ({1}) -> {2}]", direction, speed, speedParam);
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
