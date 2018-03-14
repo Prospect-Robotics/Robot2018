@@ -1,5 +1,8 @@
 package org.usfirst.frc2813.units.uom;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Value;
@@ -10,28 +13,30 @@ import org.usfirst.frc2813.units.values.Value;
  */
 public class LengthUOM extends UOM<LengthUOM,Length> {
 	
+	private static List<LengthUOM> unitsOfLength = new ArrayList<LengthUOM>();
+
+	public static final LengthUOM CanonicalUOM = new LengthUOM(SystemOfMeasurement.Length, "micrometer", "micrometers", "um");
 	// Metric System
-	public static final LengthUOM Millimeters = new LengthUOM(SystemOfMeasurement.Length, "millimeter", "millimeters", "mm");
-	public static final LengthUOM Centimeters = new LengthUOM("centimeter", "centimeters", "cm", 10);
-	public static final LengthUOM Decimeters  = new LengthUOM("decimeter", "decimeters", "dm", 100);
-	public static final LengthUOM Meters      = new LengthUOM("meter", "meters", "m", 1000);
-	public static final LengthUOM Kilometers  = new LengthUOM("kilometer", "kilometers", "km", 1000000);
+	public static final LengthUOM Micrometers = CanonicalUOM;
+	public static final LengthUOM Millimeters = new LengthUOM("millimeter", "millimeters", "mm", 1000);
+	public static final LengthUOM Centimeters = new LengthUOM("centimeter", "centimeters", "cm", 10000);
+	public static final LengthUOM Decimeters  = new LengthUOM("decimeter", "decimeters", "dm", 100000);
+	public static final LengthUOM Meters      = new LengthUOM("meter", "meters", "m", 1000000);
+	public static final LengthUOM Kilometers  = new LengthUOM("kilometer", "kilometers", "km", 1000000000);
 
 	// Imperial System	
-	public static final LengthUOM Thousandths = new LengthUOM("thousandth", "thousandths", "1/1000 in", 0.0254);
-	public static final LengthUOM Hundredths  = new LengthUOM("hundredth", "hundredths", "1/100 in", 0.254);
-	public static final LengthUOM Tenths      = new LengthUOM("tenth", "tenths", "1/10 in", 2.54);
-	public static final LengthUOM Inches      = new LengthUOM("inch", "inches", "in", 25.4);
-	public static final LengthUOM Feet        = new LengthUOM("foot", "feet", "ft", 304.8);
-	public static final LengthUOM Yards       = new LengthUOM("yard", "yards", "y", 914.4);
-	public static final LengthUOM Miles       = new LengthUOM("mile", "miles", "m", 1609340);
+	public static final LengthUOM Thousandths = new LengthUOM("thousandth", "thousandths", "thousandths", 25.4);
+	public static final LengthUOM Hundredths  = new LengthUOM("hundredth", "hundredths", "hundredths", 254);
+	public static final LengthUOM Tenths      = new LengthUOM("tenth", "tenths", "tenths", 2540);
+	public static final LengthUOM Inches      = new LengthUOM("inch", "inches", "in", 25400);
+	public static final LengthUOM Feet        = new LengthUOM("foot", "feet", "ft", 304800);
+	public static final LengthUOM Yards       = new LengthUOM("yard", "yards", "y", 914400);
+	public static final LengthUOM Miles       = new LengthUOM("mile", "miles", "m", 1609340000);
 
 	// Talon SRX pulses have to be defined by the subsystem for with a specific scale based on the hardware.  The relationship between of pulses (4096/rotation) and the relationship of rotation to distance.
 	// SRX MAG encoder pulses have to be defined by the subsystem for a specific scale, based on the hardware.  The relationship between of pulses (4096/rotation) and the relationship of rotation to distance.
 	
 	// Add derived units of measure here...
-	
-	public static final LengthUOM CanonicalUOM = Millimeters;
 
 	// Create the canonical unit of distance in space 
 	private LengthUOM(SystemOfMeasurement systemOfMeasurement, String unitNameSingular, String unitNamePlural, String unitNameAbbreviation) {

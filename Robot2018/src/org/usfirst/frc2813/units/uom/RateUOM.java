@@ -10,8 +10,10 @@ import org.usfirst.frc2813.units.values.Value;
  * This class of units measures rates, ultimately in terms of the canonical distance and time units.
  */
 public class RateUOM extends UOM<RateUOM,Rate> {
+	// Canonical rate unit of measure
+	public static final RateUOM CanonicalUOM = new RateUOM(SystemOfMeasurement.Rate, LengthUOM.CanonicalUOM, TimeUOM.CanonicalUOM);
 	// Metric System
-	public static   final  RateUOM MillimetersPerMillisecond = new RateUOM(SystemOfMeasurement.Rate, LengthUOM.Millimeters, TimeUOM.Milliseconds);
+	public static   final  RateUOM MillimetersPerMillisecond = CanonicalUOM;
 	public static   final  RateUOM MillimetersPerDecisecond  = new RateUOM(LengthUOM.Millimeters, TimeUOM.Deciseconds);
 	public static   final  RateUOM MillimetersPerSecond      = new RateUOM(LengthUOM.Millimeters, TimeUOM.Seconds);
 	public static   final  RateUOM MillimetersPerMinute      = new RateUOM(LengthUOM.Millimeters, TimeUOM.Minutes);
@@ -86,7 +88,6 @@ public class RateUOM extends UOM<RateUOM,Rate> {
 	
 	// Add derived units of measure here...
 	
-	public static final RateUOM CanonicalUOM = MillimetersPerMillisecond;
 	// Units of distance
 	private final LengthUOM lengthUOM; 
 	// Units of time
@@ -95,26 +96,31 @@ public class RateUOM extends UOM<RateUOM,Rate> {
 	// Create a new canonical unit of rate
 	private RateUOM(SystemOfMeasurement systemOfMeasurement, LengthUOM lengthUOM, TimeUOM timeUOM) {
 		super(systemOfMeasurement, 
-			lengthUOM.getUnitNameSingular() + "/" + lengthUOM.getUnitNameSingular(),
-			lengthUOM.getUnitNamePlural() + "/" + lengthUOM.getUnitNamePlural(),
-			lengthUOM.getUnitNameAbbreviation() + "/" + lengthUOM.getUnitNameAbbreviation());
+			lengthUOM.getUnitNameSingular() + "/" + timeUOM.getUnitNameSingular(),
+			lengthUOM.getUnitNamePlural() + "/" + timeUOM.getUnitNameSingular(),
+			lengthUOM.getUnitNameAbbreviation() + "/" + timeUOM.getUnitNameAbbreviation());
 		this.lengthUOM = lengthUOM;
 		this.timeUOM = timeUOM;
 	}
 	/*
-	 * Create a new canonical unit of distance 
+	 * Create a new canonical unit of rate.
+	 * We must determine the value in canonical unit's rate/time and since rate's canonical measures for length and time
+	 * may not match the canonical units used for length and time, we musts convert first from canonical values to the 
+	 * units used for rate's canonical representation. 
 	 */
 	public RateUOM(LengthUOM lengthUOM, TimeUOM timeUOM) {
-		super(lengthUOM.getUnitNameSingular() + "/" + lengthUOM.getUnitNameSingular(),
-				  lengthUOM.getUnitNamePlural() + "/" + lengthUOM.getUnitNamePlural(),
-				  lengthUOM.getUnitNameAbbreviation() + "/" + lengthUOM.getUnitNameAbbreviation(),
+		super(lengthUOM.getUnitNameSingular() + "/" + timeUOM.getUnitNameSingular(),
+				  lengthUOM.getUnitNamePlural() + "/" + timeUOM.getUnitNameSingular(),
+				  lengthUOM.getUnitNameAbbreviation() + "/" + timeUOM.getUnitNameAbbreviation(),
 				  CanonicalUOM,
-				  100000 /* TODO */);
+				  lengthUOM.getCanonicalValue().convertTo(CanonicalUOM.getLengthUOM()).getValue()
+				  / timeUOM.getCanonicalValue().convertTo(CanonicalUOM.getTimeUOM()).getValue()
+				  );
 		this.timeUOM     = timeUOM;
 		this.lengthUOM = lengthUOM;
 	}
 	// Get the canonical unit of measure
-	public LengthUOM getDistanceUOM() {
+	public LengthUOM getLengthUOM() {
 		return lengthUOM;
 	}
 	/* Get the time unit of measure */

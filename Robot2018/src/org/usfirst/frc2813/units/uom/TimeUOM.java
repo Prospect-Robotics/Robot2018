@@ -6,12 +6,13 @@ import org.usfirst.frc2813.units.values.Time;
 import org.usfirst.frc2813.units.values.Value;
 
 public class TimeUOM extends UOM<TimeUOM, Time> {
-	public static final TimeUOM Milliseconds = new TimeUOM(SystemOfMeasurement.Time, "millisecond", "milliseconds", "ms");
-	public static final TimeUOM Deciseconds  = new TimeUOM("decisecond", "deciseconds", "ds", 1000);
-	public static final TimeUOM Seconds      = new TimeUOM("second", "seconds", "s", 1000);
-	public static final TimeUOM Minutes      = new TimeUOM("minute", "minutes", "m", 60 * 1000);
-	public static final TimeUOM Hours        = new TimeUOM("hour", "hours", "h", 60 * 60 * 1000);
-	public static final TimeUOM CanonicalUOM = Milliseconds;
+	public static final TimeUOM CanonicalUOM = new TimeUOM(SystemOfMeasurement.Time, "microsecond", "microseconds", "us");
+	public static final TimeUOM Microsecond = CanonicalUOM;
+	public static final TimeUOM Milliseconds = new TimeUOM("millisecond", "milliseconds", "ms", 1000.0);
+	public static final TimeUOM Deciseconds  = new TimeUOM("decisecond", "deciseconds", "ds", 100000.0);
+	public static final TimeUOM Seconds      = new TimeUOM("second", "seconds", "sec", 1000000.0);
+	public static final TimeUOM Minutes      = new TimeUOM("minute", "minutes", "min", 60000000.0);
+	public static final TimeUOM Hours        = new TimeUOM("hour", "hours", "hr", 3600000000.0);
 	
 	// Create the canonical unit of time 
 	private TimeUOM(SystemOfMeasurement systemOfMeasurement, String unitNameSingular, String unitNamePlural, String unitNameAbbreviation) {
@@ -19,7 +20,7 @@ public class TimeUOM extends UOM<TimeUOM, Time> {
 	}
 	// Create a new unit of distance in time 
 	public TimeUOM(String unitNameSingular, String unitNamePlural, String unitNameAbbreviation, double canonicalUnitQuanity) {
-		super(unitNameSingular, unitNamePlural, unitNameAbbreviation, Milliseconds, canonicalUnitQuanity);
+		super(unitNameSingular, unitNamePlural, unitNameAbbreviation, CanonicalUOM, canonicalUnitQuanity);
 	}
 	// Create a new value of this type
 	public Time create(double value) {

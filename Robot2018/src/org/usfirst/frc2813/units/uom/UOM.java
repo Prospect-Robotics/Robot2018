@@ -1,6 +1,14 @@
 package org.usfirst.frc2813.units.uom;
 
 import org.usfirst.frc2813.units.SystemOfMeasurement;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Time;
 import org.usfirst.frc2813.units.values.Value;
@@ -19,6 +27,8 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 	private final double canonicalUnitQuantity;
 	// System of measurement
 	private final SystemOfMeasurement systemOfMeasurement;
+	
+	public static Map<SystemOfMeasurement,List<UOM>> allUnits = new HashMap<SystemOfMeasurement,List<UOM>>();
 
 	/* ---------------------------------------------------------------------------------------------------------------
 	 * Constructors
@@ -32,20 +42,46 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 		this.unitNamePlural = unitNamePlural;
 		this.unitNameAbbreviation = unitNameAbbreviation;
 		this.canonicalUnitQuantity = 1;
+		registerUnitOfMeasurement(this);
 	}
 	
 	// Construct a new unit of measure in terms of a canonical unit of measure, including an integral scaling factor.  i.e cm is 10 mm.
-	protected UOM(String unitNameSingular, String unitNamePlural, String unitNameAbbreviation, T_UOM canonicalUOM, double canonicalUnitQuantity) {
-		this.systemOfMeasurement = canonicalUOM.getSystemOfMeasurement();
+	protected UOM(String unitNameSingular, String unitNamePlural, String unitNameAbbreviation, UOM<T_UOM,T_UV> canonicalUOM, double canonicalUnitQuantity) {
 		this.canonicalUOM = canonicalUOM;
+		this.systemOfMeasurement = canonicalUOM.getSystemOfMeasurement();
 		this.unitNameSingular = unitNameSingular;
 		this.unitNamePlural = unitNamePlural;
 		this.unitNameAbbreviation = unitNameAbbreviation;
 		this.canonicalUnitQuantity   = canonicalUnitQuantity;
-		if(canonicalUnitQuantity <= 1) {
-			throw new IllegalArgumentException("Non-canonical unit quantity must be >1, by definition.");
+		registerUnitOfMeasurement(this);
+	}
+
+	/* ---------------------------------------------------------------------------------------------------------------
+	 * Registry of units of measure
+	 * --------------------------------------------------------------------------------------------------------------- */
+	
+	private static void registerUnitOfMeasurement(UOM uom) {
+		List<UOM> unitsOfSystem = allUnits.get(uom.getSystemOfMeasurement());
+		if(unitsOfSystem == null) {
+			allUnits.put(uom.getSystemOfMeasurement(), unitsOfSystem = new ArrayList<UOM>());
+		}
+		unitsOfSystem.add(uom);
+	}
+
+	public static void dumpUnitsOfMeasure() {
+		java.util.Iterator<SystemOfMeasurement> allSystems = allUnits.keySet().iterator();
+		while(allSystems.hasNext()) {
+			SystemOfMeasurement system = allSystems.next();
+			System.out.println("[" + system + "]");
+			Iterator<UOM> units = allUnits.get(system).iterator();
+			while(units.hasNext()) {
+				UOM unitOfMeasure = units.next(); 
+				System.out.println(unitOfMeasure + " = " + unitOfMeasure.getCanonicalValue());
+			}
+			System.out.println();
 		}
 	}
+	
 	/* ---------------------------------------------------------------------------------------------------------------
 	 * Descriptive Information
 	 * --------------------------------------------------------------------------------------------------------------- */
@@ -84,7 +120,7 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 	}
 	// Convert to the canonical units
 	public final T_UV getCanonicalValue() {
-		return (T_UV)canonicalUOM.create(canonicalUnitQuantity);
+		return canonicalUOM.create(canonicalUnitQuantity);
 	}
 	// Return true if the system of measurement is the same
 	public final boolean isCompatibleWith(SystemOfMeasurement som) {
