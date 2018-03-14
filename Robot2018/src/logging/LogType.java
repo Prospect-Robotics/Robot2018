@@ -20,7 +20,7 @@ public enum LogType {
 	 */
 	ERROR,
 	/**
-	 * prints regardless of level, overrides {@link LogLevel#NONE none}
+	 * Prints regardless of level, overrides {@link LogLevel#NONE none}
 	 */
 	ALWAYS;
 }

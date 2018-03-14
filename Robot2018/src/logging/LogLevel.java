@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public enum LogLevel {
 	/**
-	 * Like {@link LogLevel#ALL all}, but with traceback prints on <b>everything</b>
+	 * Like {@link LogLevel#ALL all}, but with traceback prints on <b>all</b> log levels
 	 */
 	TRACEBACK(true, LogType.values()),
 	

@@ -15,7 +15,7 @@ public class Logger {
 	public static void setLoggingLevel(LogLevel level) {
 		loggingLevel = level;
 	}
-	
+
 	public static LogLevel getLoggingLevel() {
 		return loggingLevel;
 	}
@@ -28,7 +28,8 @@ public class Logger {
 	 * will return<br>
 	 * <code>
 	 * [Hello, World, 1, 2, 3, [1, 2, 3]]
-	 * </code><br><br>
+	 * </code><br>
+	 * <br>
 	 * the code<br>
 	 * <code>
 	 * Logger.print(LogType.DEBUG, "Hello World");
@@ -37,8 +38,12 @@ public class Logger {
 	 * <code>
 	 * Hello World
 	 * </code>
-	 * @param severity -  {@link LogType} object used along with {@link LogLevel} to determie what should be printed
-	 * @param objects - see examples above
+	 * 
+	 * @param severity
+	 *            - {@link LogType} object used along with {@link LogLevel} to
+	 *            determie what should be printed
+	 * @param objects
+	 *            - see examples above
 	 * 
 	 * @author Adrian Guerra
 	 */
@@ -79,14 +84,16 @@ public class Logger {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (int i = 0; i < trace.length; i++) {
 			if (trace[i].getClassName() == Logger.class.getName()) {
-				knownClasses.add(trace[i + 1].getClassName());//TODO double check this
+				knownClasses.add(trace[i + 1].getClassName());// TODO double check this
 				break;
 			}
 		}
 	}
 
 	/**
-	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#ALWAYS ALWAYS}
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
+	 * {@link LogType#ALWAYS ALWAYS}
+	 * 
 	 * @param objects
 	 * @see #print(LogType, Object...)
 	 */
@@ -95,7 +102,9 @@ public class Logger {
 	}
 
 	/**
-	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#DEBUG DEBUG}
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
+	 * {@link LogType#DEBUG DEBUG}
+	 * 
 	 * @param objects
 	 * @see #print(LogType, Object...)
 	 */
@@ -104,7 +113,9 @@ public class Logger {
 	}
 
 	/**
-	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#INFO INFO}
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
+	 * {@link LogType#INFO INFO}
+	 * 
 	 * @param objects
 	 * @see #print(LogType, Object...)
 	 */
@@ -113,7 +124,9 @@ public class Logger {
 	}
 
 	/**
-	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#WARNING WARNING}
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
+	 * {@link LogType#WARNING WARNING}
+	 * 
 	 * @param objects
 	 * @see #print(LogType, Object...)
 	 */
@@ -122,7 +135,9 @@ public class Logger {
 	}
 
 	/**
-	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of {@link LogType#ERROR ERROR}
+	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
+	 * {@link LogType#ERROR ERROR}
+	 * 
 	 * @param objects
 	 * @see #print(LogType, Object...)
 	 */
