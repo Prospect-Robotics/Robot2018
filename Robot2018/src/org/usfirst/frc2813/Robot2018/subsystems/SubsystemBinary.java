@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.units.Direction;
 
 /**
  * Subsystem baseclass for simple subsystems which have one of

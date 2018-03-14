@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 

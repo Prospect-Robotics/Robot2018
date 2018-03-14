@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.units.values;
 
+import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.uom.UOM;
@@ -17,6 +18,11 @@ public class Rate extends Value<RateUOM,Rate> {
 	// Convert to to the specified units and return 
 	public Rate convertTo(RateUOM newUOM) {
 		// NB: We already check that it's from the same number system, and this is a private factory that will create another instance of the same class/type.
-		return new Rate(newUOM, getValueIn(newUOM));
+		return create(newUOM, getValueIn(newUOM));
+	}
+
+	// Used by superclass as a factory
+	protected Rate create(RateUOM uom, double value) {
+		return new Rate(uom, value);
 	}
 }

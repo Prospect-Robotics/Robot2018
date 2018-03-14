@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.values.Rate;
 
 
 /**
@@ -99,7 +100,7 @@ public abstract class SubsystemDirectionSpeed extends GearheadsSubsystem {
         move();
     }
 
-    public void move(double speedParam, Direction directionParam) {
+    public void move(Direction directionParam, double speedParam) {
         speed = speedParam;
         direction = directionParam;
         move();

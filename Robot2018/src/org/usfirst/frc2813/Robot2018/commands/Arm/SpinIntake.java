@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.Arm;
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.units.Direction;
 
 /**
  * Spin or halt the Robot arm intake

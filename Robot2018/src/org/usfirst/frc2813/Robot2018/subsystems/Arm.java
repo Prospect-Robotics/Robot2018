@@ -8,7 +8,9 @@ import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
 import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.values.Length;
+import org.usfirst.frc2813.units.values.Rate;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -53,8 +55,6 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		motorController.setSlotIndexForMove(TalonProfileSlot.Moving);
 	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.1, 0.0, 0.0);
 	    motorController.configurePID(TalonProfileSlot.Moving, 2.0, 0.0, 0.0);
-
-	    initialize();
 	}
 
 	public boolean readLimitSwitch(Direction switchDirection) {
@@ -73,7 +73,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		return motorController.getState();
 	}
 
-	protected void setControllerDirectionAndSpeed(int speedParam) {
+	protected void setControllerDirectionAndSpeed(Direction direction, double speedParam) {
 		motorController.move(direction, speedParam);
 	}
 

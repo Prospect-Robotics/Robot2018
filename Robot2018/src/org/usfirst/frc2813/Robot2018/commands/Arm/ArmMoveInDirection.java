@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.Arm;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.units.Direction;
 
 /**
  * Move arm in given direction until interrupted.

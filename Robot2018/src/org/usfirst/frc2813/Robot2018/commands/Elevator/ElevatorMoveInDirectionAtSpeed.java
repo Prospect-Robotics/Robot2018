@@ -2,8 +2,8 @@ package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
-import org.usfirst.frc2813.util.unit.Direction;
-import org.usfirst.frc2813.util.unit.values.Rate;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.values.Rate;
 
 /**
  * Move elevator in given direction at given speed until interrupted.

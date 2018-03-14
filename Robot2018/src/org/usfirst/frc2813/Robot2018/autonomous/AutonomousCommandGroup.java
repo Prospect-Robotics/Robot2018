@@ -9,9 +9,9 @@ import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
-import org.usfirst.frc2813.util.unit.Direction;
-import org.usfirst.frc2813.util.unit.uom.LengthUOM;
-import org.usfirst.frc2813.util.unit.values.Length;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
 //import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
@@ -76,12 +76,12 @@ public class AutonomousCommandGroup extends CommandGroup {
 	*/
 
 	//elevator commands - FIXME! these commands return before they
-	//reach the disired elevator position
-	public void raiseElevator(double position) {
+	//reach the desired elevator position
+	public void elevatorMoveToPosition(int position) {
 		addSequential(new ElevatorMoveToPosition(position));
 	}
 	public void lowerElevator() {
-		addSequential(new ElevatorMoveToPosition(Robot.elevator.MIN_POSITION));
+		elevatorMoveToPosition(0);
 	}
 
 	// arm control commands

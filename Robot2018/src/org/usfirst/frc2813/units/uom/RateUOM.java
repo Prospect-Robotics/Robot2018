@@ -108,16 +108,25 @@ public class RateUOM extends UOM<RateUOM,Rate> {
 	 * may not match the canonical units used for length and time, we musts convert first from canonical values to the 
 	 * units used for rate's canonical representation. 
 	 */
-	public RateUOM(LengthUOM lengthUOM, TimeUOM timeUOM) {
+	public RateUOM(LengthUOM lengthUOM, TimeUOM timeUOM, String customAbbreviation) {
 		super(lengthUOM.getUnitNameSingular() + "/" + timeUOM.getUnitNameSingular(),
 				  lengthUOM.getUnitNamePlural() + "/" + timeUOM.getUnitNameSingular(),
-				  lengthUOM.getUnitNameAbbreviation() + "/" + timeUOM.getUnitNameAbbreviation(),
+				  customAbbreviation,
 				  CanonicalUOM,
 				  lengthUOM.getCanonicalValue().convertTo(CanonicalUOM.getLengthUOM()).getValue()
 				  / timeUOM.getCanonicalValue().convertTo(CanonicalUOM.getTimeUOM()).getValue()
 				  );
 		this.timeUOM     = timeUOM;
 		this.lengthUOM = lengthUOM;
+	}
+	/*
+	 * Create a new canonical unit of rate.
+	 * We must determine the value in canonical unit's rate/time and since rate's canonical measures for length and time
+	 * may not match the canonical units used for length and time, we musts convert first from canonical values to the 
+	 * units used for rate's canonical representation. 
+	 */
+	public RateUOM(LengthUOM lengthUOM, TimeUOM timeUOM) {
+		this(lengthUOM, timeUOM, lengthUOM.getUnitNameAbbreviation() + "/" + timeUOM.getUnitNameAbbreviation());
 	}
 	// Get the canonical unit of measure
 	public LengthUOM getLengthUOM() {

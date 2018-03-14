@@ -1,13 +1,16 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.values.Length;
+import org.usfirst.frc2813.units.values.Rate;
 
 /**
- * Subsystem baseclass for subsystems which move in two direction
+ * Subsystem base class for subsystems which move in two direction
  * over a range of positions.
  *
- * This subsytem can halt, move to an exact position or in a direction.
+ * This subsystem can halt, move to an exact position or in a direction.
  * Speed can be set separately.
  * 
  * The public interfaces are:
@@ -17,34 +20,32 @@ import org.usfirst.frc2813.util.unit.Direction;
  *     holdPosition     - actively hold position with PID
  *     moveToPosition   - move to a position. This is normally a fire and forget
  *                        command done at the motor controller level.
- *     moveAtSpeedAndDirection - move in the given speed and direction
- *     moveInDirection  - move at the last set or default speed in the given direction
+ *     moveInDirectionAtSpeed - move in the given direction at a
+ *     given speed move  - at the last set or default speed in
+ *     the given direction
  */
 public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem {
+	// State information
 	protected Direction direction, oldDirection;
-	protected double speed, oldSpeed;
-	protected double position, oldPosition;
+	double speed;
+	protected double oldSpeed;
+	protected int position, oldPosition;
 	protected MotorControllerState state, oldState;
-
-	/**
-	 * GEOMETRY - define in terms of your motor controller
-	 * You must define these in your subsystem. You must choose units for
-	 * distance and speed and define default min and max.
-	 */
-	public double MAX_POSITION;
-	public double MIN_POSITION;
+    protected double DEFAULT_SPEED;
+    protected double MAX_POSITION;
+	protected double MIN_POSITION;
 	protected double PULSES_PER_UNIT_POSITION;
 	protected double PULSES_PER_UNIT_POSITION_PER_TIME;
-	public double DEFAULT_SPEED;
-
+    
 	/**
 	 * configure your motor controller and set your
 	 * geometry and state, then you MUST call initialize
+	 * @param subsystemAxisConfiguration - This describes the way the subsystem presents the elevator vertical axis to the calling API.
 	 */
-	protected void initialize() {
+	protected SubsystemPositionDirectionSpeed() {
 		// track state and change as required. Start in moving so initialize can halt
 		direction = Direction.NEUTRAL;
-		position = MIN_POSITION;
+		position = readControllerPosition();
 		speed = DEFAULT_SPEED;
 		oldSpeed = 0;
 		oldDirection = Direction.NEUTRAL;
@@ -53,56 +54,28 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	}
 
 	/**
-	 * Map position from inches to controller ticks
-	 */
-	protected int positionToController(double pos) {
-		return (int)(pos / PULSES_PER_UNIT_POSITION);
-	}
-
-	/**
-	 * Map position from controller ticks to distance units
-	 */
-	protected double controllerToPosition(int ticks) {
-		return ticks * PULSES_PER_UNIT_POSITION;
-	}
-
-	/**
-	 * Map speed from speed units to controller ticks
-	 */
-	protected int speedToController(double speedParam) {
-		return (int)(speedParam / PULSES_PER_UNIT_POSITION_PER_TIME);
-	}
-
-	/**
-	 * Map speed from speed units to controller ticks
-	 */
-	protected double controllerToSpeed(int speedParam) {
-		return speedParam * PULSES_PER_UNIT_POSITION_PER_TIME;
-	}
-	
-	/**
 	 * Abstract method to read controller state
 	 * @return MotorControllerState
 	 */
 	protected abstract MotorControllerState readMotorControllerState();
 
 	/**
-	 * Abstract method to read controller position
+	 * Abstract method to read controller position, expect "sensor" units
 	 * @return position in controller units
 	 */
 	protected abstract int readControllerPosition();
 
 	/**
-	 * Abstract method to set controller position
-	 * @param positionParam
+	 * Abstract method to set controller position 
+	 * TODO: convert to "sensor units" before setting
 	 */
-	protected abstract void setControllerPosition(int positionParam);
+	protected abstract void setControllerPosition(int position2);
 
 	/**
 	 * Abstract method to set controller speed and direction
 	 * @param speedParam
 	 */
-	protected abstract void setControllerDirectionAndSpeed(int speedParam);
+	protected abstract void setControllerDirectionAndSpeed(Direction direction, double speedParam);
 
 	/**
 	 * Abstract method to halt the controller movement
@@ -123,7 +96,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @return
 	 */
 	public double readPosition() {
-		return controllerToPosition(readControllerPosition());
+		return readControllerPosition();
 	}
 	/*
 	 * Need to be able to retrieve what we believe is the state
@@ -132,6 +105,40 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		return state;
 	}
 
+	protected boolean isStateTransitionAllowed(MotorControllerState newState) {
+		// Validate the state transition before we do anything
+		switch(state) {
+		case DISABLED:
+			if (state == newState) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", state, newState));
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		case HOLDING_POSITION:
+			if (state == newState) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", state, newState));
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		case MOVING:
+			if ((state == newState) && (oldSpeed == speed) && (oldDirection == direction)) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", state, newState));
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		case SET_POSITION:
+			if ((state == newState) && (oldPosition == position)) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", state, newState));
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		}
+		return true;
+	}
 	/**
 	 * All device change come through here first.
 	 * Log request
@@ -144,53 +151,45 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * with the old state in oldSpeed, oldPosition and oldDirection
 	 * @return true if state change occurred
 	 */
-	protected void changeState(MotorControllerState newState) {
+	protected boolean changeState(MotorControllerState newState) {
 		logger.fine(String.format("Changing state: encoderFunctional: %s, " +
 								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
 								 "old direction: %s, new direction %s, old position: %s, new position %s",
 				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position));
 		if (!encoderFunctional) {
+			disableController();
 			logger.warning("encoder not functional. Refusing action.");
-			return;	
+			return false;	
+		}
+		
+		// Check that the state transition is legal before we do anything.
+		if(!isStateTransitionAllowed(newState)) {
+			return false;
 		}
 
+		// Check state transitions are valid before executing them
 		oldState = state;
 		state = newState;
 		
 		// Check that state change is actually changing something. If so, do it.
 		switch(state) {
 		case DISABLED:
-			if (oldState == state) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, state));
-				return;
-			}
 			disableController();
 			break;
 		case HOLDING_POSITION:
-			if (oldState == state) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, state));
-				return;
-			}
 			holdControllerPosition();
 			break;
 		case MOVING:
-			if ((oldState == state) && (oldSpeed == speed) && (oldDirection == direction)) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, state));
-				return;
-			}
-			setControllerDirectionAndSpeed(speedToController(speed));
+			setControllerDirectionAndSpeed(direction, speed);
 			break;
 		case SET_POSITION:
-			if ((oldState == state) && (oldPosition == position)) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, state));
-				return;
-			}
-			setControllerPosition(positionToController(position));
+			setControllerPosition(position);
 			break;
 		}
 		oldPosition = position;
 		oldSpeed = speed;
 		oldDirection = direction;
+		return true;
 	}
 	
 	/*************************************************************
@@ -231,7 +230,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 *  [ACTION] Move to the absolutePosition
 	 * @param newDirection
 	 */
-	public void moveToPosition(double newPosition) {
+	public void moveToPosition(int newPosition) {
 		oldPosition = position;
 		position = newPosition;
 		changeState(MotorControllerState.SET_POSITION);
@@ -250,5 +249,11 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		System.out.println(String.format("STATE: [encoderFunctional: %s, state: %s, speed: %s, direction: %s, position %s]",
 				encoderFunctional, state, speed, direction, position));
 	}
-	
+	/*
+	 * Is the sensor phase reversed 
+	 */
+	public TalonSensorPhase getSensorPhase() {
+		return TalonSensorPhase.Normal;
+	}
 }
+

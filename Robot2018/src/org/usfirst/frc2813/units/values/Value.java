@@ -144,4 +144,44 @@ public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 		return getCanonicalValue() == other.getCanonicalValue();
 	}
 	
+	/* ---------------------------------------------------------------------------------------------------------------
+	 * Factory
+	 * --------------------------------------------------------------------------------------------------------------- */
+	protected abstract T_UV create(T_UOM uom, double value);
+	
+	/* ---------------------------------------------------------------------------------------------------------------
+	 * Math 
+	 * --------------------------------------------------------------------------------------------------------------- */
+
+	public T_UV add(T_UV other) {
+		return create(this.uom, this.value + other.getValueIn(uom));
+	}
+
+	public T_UV subtract(T_UV other) {
+		return create(this.uom, this.value - other.getValueIn(uom));
+	}
+
+	public T_UV multiply(T_UV other) {
+		return create(this.uom, this.value * other.getValueIn(uom));
+	}
+	
+	public T_UV divide(T_UV other) {
+		return create(this.uom, this.value / other.getValueIn(uom));
+	}
+	
+	public T_UV add(double value) {
+		return create(this.uom, this.value + value);
+	}
+
+	public T_UV subtract(double value) {
+		return create(this.uom, this.value - value);
+	}
+
+	public T_UV multiply(double value) {
+		return create(this.uom, this.value * value);
+	}
+	
+	public T_UV divide(double value) {
+		return create(this.uom, this.value / value);
+	}
 }

@@ -2,7 +2,10 @@ package org.usfirst.frc2813.Robot2018.motor;
 
 import java.util.logging.Logger;
 
-import org.usfirst.frc2813.util.unit.Direction;
+import org.usfirst.frc2813.Robot2018.motor.axis.AxisConfiguration;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.values.Length;
 
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -13,16 +16,17 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  * A wrapper class to handle an SRX Talon motor controller
- * Arm rotation has default halted state. Move command takes
+ * 
+ * NOTE: Unit conversions are handled by subsystems that use the talon.  They are expected to know how they have configured the Talon
+ * and how it is connected, in order for units to have any meaning.
+ * 
  * TODO: Create a base class above this for motor controllers.
  * TODO: This class assumes a MAG SRX encoder is attached in some places.
+ * TODO: We should start in the moving profile and switch to the holding profile when we are in state set_position for maximum stability  
  */
 public class Talon {
 	private final TalonSRX                   srx;
 	private final Logger                     logger;
-	private final TalonSensorPhase           sensorPhase;    // NB: This must never change and must be known at construction
-	private final TalonMotorInversion        motorInversion; // NB: This must never change and must be known at construction
-
 	// NB: This is not yet in the firmware apparently, so enable this when it's ready
 	public static final boolean AUXILLIARY_PID_SUPPORTED = false;
 	// NB: There are other values for different types of sensor.  There's a table.  
@@ -56,8 +60,6 @@ public class Talon {
 	public static final double DEFAULT_I_GAIN = 0.0; // From manual
 	public static final double DEFAULT_D_GAIN = 0.0; // From manual
 
-	// TODO: Warning: If we use SET_POSITION --- which profile do we use?  moving or holding?  Needs to transition automatically based on error!!!  
-
 	// Current state
 	private MotorControllerState state;
 	// Last control mode send to controller
@@ -75,7 +77,7 @@ public class Talon {
 		// TODO: switch(getSelectedSensor(lastPIDIndex)) and return correct value based on encoder
 		return SRX_MAG_ENCODER_PULSES_PER_REVOLUTION;
 	}
-	
+
 	public TalonProfileSlot getSlotIndexForHoldPosition() {
 		return slotIndexForHoldPosition;
 	}
@@ -98,11 +100,9 @@ public class Talon {
 		}
 	}
 
-	public Talon(TalonSRX srx, Logger logger, TalonMotorInversion motorInversion, TalonSensorPhase sensorPhase) {
+	public Talon(TalonSRX srx, Logger logger) {
 		this.srx = srx;
 		this.logger = logger;
-		this.motorInversion = motorInversion;
-		this.sensorPhase = sensorPhase;
 
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -132,6 +132,7 @@ public class Talon {
 		configureHardLimitSwitch(Direction.NEGATIVE); // reset defaults
 		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
 		configureClearPositionOnQuadIdx();
+		zeroSensorPositions();
 		// Start disabled
 		set(MotorControllerState.DISABLED, 0);
 	}
@@ -139,8 +140,14 @@ public class Talon {
 	void logger_info(String x) {
 		System.out.println("Talon: " + x);
 	}
-	public Talon(TalonSRX srx, Logger logger) {
-		this(srx, logger, DEFAULT_MOTOR_INVERSION, DEFAULT_SENSOR_PHASE);
+	
+	// Force zeroing
+	void zeroSensorPositions() {
+		logger_info("Disabling and zeroing sensor positions");
+		set(MotorControllerState.DISABLED, 0);
+		// Zero out absolute encoder values for both PID slots
+		correctEncoderSensorPositions(TalonPID.Primary, 0);
+		correctEncoderSensorPositions(TalonPID.Auxilliary, 0);
 	}
 
 	public MotorControllerState getState() {
@@ -357,15 +364,12 @@ public class Talon {
 	}
 	
 	public int readPosition() {
-		int position = srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex());
-		logger_info("readPosition " + " = @ " + position);
-		return position;
+		return srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex());
 	}
 
 	/*
 	 * Set the reference point for both relative and absolute encoders for a given PID
 	 */
-	
 	private void correctEncoderSensorPositions(TalonPID talonPID, int sensorPosition) {
 		if(talonPID.equals(TalonPID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
 			logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
@@ -403,9 +407,6 @@ public class Talon {
 		}
 		return false;
 	}
-	// TODO: Rename TalonPIDINdex TalonPID
-	// TOOD: Rename TalonProfileSlotIndex TalonProfile
-
 	/**
 	 * [ACTION] Set to an absolute encoder position
 	 */
@@ -418,7 +419,7 @@ public class Talon {
 	 */
 	public void holdCurrentPosition() {
 		set(MotorControllerState.HOLDING_POSITION, readPosition());
-//		zeroEncodersIfNecessary();
+		zeroEncodersIfNecessary();
 	}
 
 	/**
@@ -437,7 +438,6 @@ public class Talon {
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
-
 	/**
 	 * Talon only uses the velocity
 	 */
@@ -446,7 +446,6 @@ public class Talon {
 			set(MotorControllerState.MOVING, speed);
 		}
 	}
-
 	/**
 	 * [ACTION] Stop output of the motor
 	 */
