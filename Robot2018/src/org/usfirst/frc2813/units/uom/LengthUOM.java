@@ -1,8 +1,5 @@
 package org.usfirst.frc2813.units.uom;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.values.Length;
 
@@ -11,9 +8,6 @@ import org.usfirst.frc2813.units.values.Length;
  * @author mike.taylor
  */
 public class LengthUOM extends UOM<LengthUOM,Length> {
-	
-	private static List<LengthUOM> unitsOfLength = new ArrayList<LengthUOM>();
-
 	public static final LengthUOM CanonicalUOM = new LengthUOM(SystemOfMeasurement.Length, "micrometer", "micrometers", "um");
 	// Metric System
 	public static final LengthUOM Micrometers = CanonicalUOM;

@@ -50,6 +50,7 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 	// Percentage for Elevator
 	//private static final ElevatorSRXPercentage = new RateUOM();
 
+	@SuppressWarnings("rawtypes")
 	public static void mathReport() {
 		System.out.println();
 		System.out.println("[Software Settings]");

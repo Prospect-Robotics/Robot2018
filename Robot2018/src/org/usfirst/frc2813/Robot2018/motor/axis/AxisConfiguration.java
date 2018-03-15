@@ -497,9 +497,11 @@ public class AxisConfiguration {
 		System.out.println(getDescription());
 	}
 
+	@SuppressWarnings("rawtypes")
 	private String describeUOM(UOM uom) {
 		return (uom != null ? (uom + " (" + uom.getCanonicalValue() + ")") : null);
 	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private String describeValue(Value value, UOM alt) {
 		return (value != null ? (value + " (" + value.convertTo(alt) + ")") : null);
 	}

@@ -25,11 +25,11 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
  * speed is in inches per second.
  */
 public class Arm extends SubsystemPositionDirectionSpeed {
-	private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
-    private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.TALON_SRX_OUTPUTR_PULSES_PER_REVOLUTION;
+	//private static final double GEAR_RATIO = 100 / 1.0; // 100:1 planetary gearbox.
+    //private static final double PULSES_PER_REVOLUTION = GEAR_RATIO * Talon.TALON_SRX_OUTPUTR_PULSES_PER_REVOLUTION;
 
-    private static final double PULSES_PER_DEGREE = PULSES_PER_REVOLUTION / 360;
-    private static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
+    //private static final double PULSES_PER_DEGREE = PULSES_PER_REVOLUTION / 360;
+    //private static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
     protected Length MAX_POSITION;
 	protected Length MIN_POSITION;
 

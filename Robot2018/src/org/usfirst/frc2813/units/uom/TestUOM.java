@@ -11,6 +11,7 @@ class TestUOM {
 	void test() {
 		try
 		{
+			@SuppressWarnings("unused")
 			LengthUOM x = ElevatorAxisConfiguration.ElevatorSRXMotorRevolution; // Make sure Elevator's units are included.
 			UOM.dumpUnitsOfMeasure();
 		} catch(Throwable t) {

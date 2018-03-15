@@ -6,12 +6,10 @@ import org.usfirst.frc2813.units.uom.LengthUOM;
  * class for passing units of distance type
  */
 public class Length extends Value<LengthUOM,Length> {
-	private final LengthUOM uom;
 	
 	// public constructor takes lengths only
 	public Length(LengthUOM uom, double value) {
 		super(uom, value);
-		this.uom = uom;
 	}
 	// Convert to to the specified units and return 
 	public Length convertTo(LengthUOM newUOM) {

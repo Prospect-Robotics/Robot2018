@@ -28,7 +28,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private static final int BACKWARD = 1;
 	private double driveSpeed = 1;
 	private double turnSpeed = 0.25;
-	private double curveSpeed = 0.4;
+	//private double curveSpeed = 0.4;
 
 	public AutonomousCommandGroup() {
 		addSequential(new ResetEncoders());

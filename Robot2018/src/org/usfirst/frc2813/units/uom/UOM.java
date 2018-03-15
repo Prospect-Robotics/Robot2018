@@ -12,6 +12,7 @@ import org.usfirst.frc2813.units.values.Value;
 /*
  * Abstract unit of measurement 
  */
+@SuppressWarnings("rawtypes")
 public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 	// Name for the unit
 	private final String unitNameSingular;
@@ -64,10 +65,10 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 		unitsOfSystem.add(uom);
 	}
 
+	@SuppressWarnings({ "unchecked" })
 	public static void dumpUnitsOfMeasure() {
-		UOM x = LengthUOM.CanonicalUOM;
-		x = RateUOM.CanonicalUOM;
-		x = TimeUOM.CanonicalUOM;
+		@SuppressWarnings("unused")
+		UOM x = LengthUOM.CanonicalUOM;x = RateUOM.CanonicalUOM;x = TimeUOM.CanonicalUOM;
 		System.out.println();
 		System.out.println("---------------------------------------------------------------------------------------------------------");
 		System.out.println("UNITS OF MEASURE REPORT:");
@@ -79,7 +80,7 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 			Iterator<UOM> units = UOM.allUnits.get(system).iterator();
 			while(units.hasNext()) {
 				UOM unitOfMeasure = units.next(); 
-				Value cu = unitOfMeasure.getCanonicalValue();
+				Value<UOM, Value> cu = unitOfMeasure.getCanonicalValue();
 				Value ou = cu.convertTo(unitOfMeasure);
 				System.out.println(String.format("%25s = %-25s = %30s", unitOfMeasure, ou, cu));
 				if(!cu.equals(ou)) {
@@ -103,6 +104,7 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 		return systemOfMeasurement;
 	}
 	// Get the canonical unit of measure
+	@SuppressWarnings("unchecked")
 	public final T_UOM getCanonicalUOM() {
 		return (T_UOM)canonicalUOM;
 	}

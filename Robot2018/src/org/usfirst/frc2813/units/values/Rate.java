@@ -6,11 +6,9 @@ import org.usfirst.frc2813.units.uom.RateUOM;
  * class for passing units of distance type
  */
 public class Rate extends Value<RateUOM,Rate> {
-	private final RateUOM uom;
 	// private constructor assumes the arguments are already checked
 	public Rate(RateUOM uom, double value) {
 		super(uom, value);
-		this.uom = uom;
 	}
 	// Convert to to the specified units and return 
 	public Rate convertTo(RateUOM newUOM) {

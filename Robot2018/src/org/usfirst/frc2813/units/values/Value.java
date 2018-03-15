@@ -8,6 +8,7 @@ import org.usfirst.frc2813.units.uom.UOM;
  * One subclass is created per measurement type (length, time, rate) and
  * those objects are then interchangeable.
  */
+@SuppressWarnings("rawtypes")
 public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 	private final T_UOM uom;
 	private final double value;
@@ -29,6 +30,7 @@ public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 		return uom;
 	}
 	/* Get the canonical unit of measure */
+	@SuppressWarnings("unchecked")
 	public final T_UOM getCanonicalUOM() {
 		return (T_UOM)uom.getCanonicalUOM();
 	}
@@ -158,18 +160,22 @@ public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 	 * Math 
 	 * --------------------------------------------------------------------------------------------------------------- */
 
+	@SuppressWarnings("unchecked")
 	public T_UV add(T_UV other) {
 		return create(this.uom, this.value + other.getValueIn(uom));
 	}
 
+	@SuppressWarnings("unchecked")
 	public T_UV subtract(T_UV other) {
 		return create(this.uom, this.value - other.getValueIn(uom));
 	}
 
+	@SuppressWarnings("unchecked")
 	public T_UV multiply(T_UV other) {
 		return create(this.uom, this.value * other.getValueIn(uom));
 	}
 	
+	@SuppressWarnings("unchecked")
 	public T_UV divide(T_UV other) {
 		return create(this.uom, this.value / other.getValueIn(uom));
 	}
