@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.units.Direction;
-import org.usfirst.frc2813.units.values.Rate;
 
 
 /**

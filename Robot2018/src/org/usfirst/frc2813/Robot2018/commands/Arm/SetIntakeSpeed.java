@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.units.values.Rate;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
 

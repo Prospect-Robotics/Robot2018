@@ -1,16 +1,12 @@
 package org.usfirst.frc2813.units.uom;
 
-import org.usfirst.frc2813.units.SystemOfMeasurement;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.usfirst.frc2813.units.values.Rate;
-import org.usfirst.frc2813.units.values.Time;
+import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.values.Value;
 
 /*

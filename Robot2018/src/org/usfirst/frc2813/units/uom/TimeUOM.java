@@ -1,9 +1,7 @@
 package org.usfirst.frc2813.units.uom;
 
 import org.usfirst.frc2813.units.SystemOfMeasurement;
-import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Time;
-import org.usfirst.frc2813.units.values.Value;
 
 public class TimeUOM extends UOM<TimeUOM, Time> {
 	public static final TimeUOM CanonicalUOM = new TimeUOM(SystemOfMeasurement.Time, "microsecond", "microseconds", "us");

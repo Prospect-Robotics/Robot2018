@@ -1,20 +1,19 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
-import edu.wpi.first.wpilibj.command.CommandGroup;
-import edu.wpi.first.wpilibj.command.TimedCommand;
-
-import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
+//import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
+import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
-import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
-//import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
+
+import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.command.TimedCommand;
 
 
 /**

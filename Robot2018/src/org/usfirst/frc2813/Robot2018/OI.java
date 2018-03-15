@@ -2,16 +2,15 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorTesting;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmMoveInDirection;
-import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorTesting;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 

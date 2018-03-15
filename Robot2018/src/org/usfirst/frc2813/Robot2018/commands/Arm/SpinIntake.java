@@ -2,11 +2,10 @@
 
 // FIXME! This is a command from the intake subsystem, but is in the arm package. Move it!
 package org.usfirst.frc2813.Robot2018.commands.Arm;
-import edu.wpi.first.wpilibj.command.Command;
-
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.units.Direction;
+
+import edu.wpi.first.wpilibj.command.Command;
 
 /**
  * Spin or halt the Robot arm intake

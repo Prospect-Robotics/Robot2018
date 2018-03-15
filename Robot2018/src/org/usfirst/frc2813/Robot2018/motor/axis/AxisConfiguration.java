@@ -1,16 +1,14 @@
 package org.usfirst.frc2813.Robot2018.motor.axis;
 
-import java.util.BitSet;
-
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
-import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Value;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 /*
  * This class is an immutable description of an axis as used by a motor, a subsystem's API, or a sensor.

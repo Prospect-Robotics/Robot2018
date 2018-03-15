@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
@@ -8,14 +7,8 @@ import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
 import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
-import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
 import org.usfirst.frc2813.Robot2018.motor.axis.AxisConfiguration;
 import org.usfirst.frc2813.units.Direction;
-import org.usfirst.frc2813.units.SystemOfMeasurement;
-import org.usfirst.frc2813.units.uom.LengthUOM;
-import org.usfirst.frc2813.units.uom.RateUOM;
-import org.usfirst.frc2813.units.uom.TimeUOM;
-import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 

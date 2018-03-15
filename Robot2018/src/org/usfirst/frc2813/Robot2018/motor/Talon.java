@@ -2,10 +2,7 @@ package org.usfirst.frc2813.Robot2018.motor;
 
 import java.util.logging.Logger;
 
-import org.usfirst.frc2813.Robot2018.motor.axis.AxisConfiguration;
 import org.usfirst.frc2813.units.Direction;
-import org.usfirst.frc2813.units.uom.LengthUOM;
-import org.usfirst.frc2813.units.values.Length;
 
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;

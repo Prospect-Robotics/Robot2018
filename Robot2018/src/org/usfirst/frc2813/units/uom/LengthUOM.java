@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.values.Length;
-import org.usfirst.frc2813.units.values.Value;
 
 /**
  * This class provides a length unit of measurement and concrete implementations of imperial and metric units in terms of a canonical reference unit of 1mm.

@@ -1,8 +1,6 @@
 package org.usfirst.frc2813.units.values;
 
 import org.usfirst.frc2813.units.SystemOfMeasurement;
-import org.usfirst.frc2813.units.uom.RateUOM;
-import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.uom.UOM;
 
 /*

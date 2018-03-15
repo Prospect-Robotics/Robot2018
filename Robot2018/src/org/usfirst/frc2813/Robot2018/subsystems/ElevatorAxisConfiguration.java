@@ -10,10 +10,8 @@ import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
-import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class ElevatorAxisConfiguration extends AxisConfiguration {
 

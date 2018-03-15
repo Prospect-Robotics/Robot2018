@@ -1,9 +1,6 @@
 package org.usfirst.frc2813.units.values;
 
-import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
-import org.usfirst.frc2813.units.uom.TimeUOM;
-import org.usfirst.frc2813.units.uom.UOM;
 
 /*
  * class for passing units of distance type

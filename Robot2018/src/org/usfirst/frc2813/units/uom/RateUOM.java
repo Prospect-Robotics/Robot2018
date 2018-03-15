@@ -1,10 +1,7 @@
 package org.usfirst.frc2813.units.uom;
 
 import org.usfirst.frc2813.units.SystemOfMeasurement;
-import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
-import org.usfirst.frc2813.units.values.Time;
-import org.usfirst.frc2813.units.values.Value;
 
 /*
  * This class of units measures rates, ultimately in terms of the canonical distance and time units.
