@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 
@@ -13,7 +14,7 @@ public class ElevatorDisable extends GearheadsInstantCommand {
 
 	// @Override
 	protected void initialize() {
-		logger.finer("in execute");
+		Logger.debug("in execute");
 		Robot.elevator.disable();
 	}
 }

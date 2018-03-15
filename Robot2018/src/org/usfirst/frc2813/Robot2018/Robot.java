@@ -1,9 +1,7 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
@@ -30,7 +28,6 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  */
 public class Robot extends TimedRobot {
 	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
-    public static Logger logger;
 
 	public static AutonomousCommandGroup autonomousCommand;
 	public static AutonomousCommandGroupGenerator autoCmdGenerator;
@@ -49,12 +46,7 @@ public class Robot extends TimedRobot {
 	 */
 	//@Override
 	public void robotInit() {
-		logger = Logger.getLogger(this.getClass().getSimpleName());
-
-		// Just for now, let's be verbose
-		Logger.getGlobal().setLevel(java.util.logging.Level.ALL);
-		logger.setLevel(Level.ALL); 
-		logger.info("In robotInit");
+		Logger.info("In robotInit");
 
 		RobotMap.init();
 		driveTrain = new DriveTrain();
@@ -94,7 +86,7 @@ public class Robot extends TimedRobot {
 
 	//@Override
 	public void autonomousInit() {
-		logger.info("Autonomous Init");
+		Logger.info("Autonomous Init");
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 

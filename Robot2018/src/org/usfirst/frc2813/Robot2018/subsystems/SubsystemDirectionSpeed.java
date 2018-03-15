@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 
@@ -91,7 +92,7 @@ public abstract class SubsystemDirectionSpeed extends GearheadsSubsystem {
 
 		isHalted = false;
 		setControllerDirection(direction);
-		logger.info("Starting movement direction: " + direction + " Speed: " + speed);
+		Logger.info("Starting movement direction: " + direction + " Speed: " + speed);
 	}
 
     public void move(Direction directionParam) {

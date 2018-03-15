@@ -2,7 +2,7 @@
 
 package org.usfirst.frc2813.Robot2018.autonomous;
 
-import java.util.logging.Logger;
+import org.usfirst.frc2813.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * account game data. Used exclusively by AutonomousCommandGroup
  */
 public class AutonomousCommandGroupGenerator {
-	Logger logger = Logger.getLogger(this.getClass().getSimpleName());
-
 	// Elevator position to place cubes - FIXME! not correct values
 	private static final Length scaleHeight = LengthUOM.Inches.create(60);
 	private static final Length switchHeight = LengthUOM.Inches.create(24);

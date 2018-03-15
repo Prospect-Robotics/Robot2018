@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
 import org.usfirst.frc2813.units.Direction;
@@ -123,28 +124,28 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		switch(newState) {
 		case DISABLED:
 			if (oldState == newState) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, newState));
+				Logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case HOLDING_POSITION:
 			if (oldState == newState) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, newState));
+				Logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case MOVING:
 			if ((oldState == newState) && (oldSpeed == speed) && (oldDirection == direction)) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, newState));
+				Logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case SET_POSITION:
 			if ((oldState == newState) && (oldPosition == position)) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, newState));
+				Logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
@@ -184,13 +185,13 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @return true if state change occurred
 	 */
 	protected boolean changeState(MotorControllerState newState) {
-		logger.fine(String.format("Changing state: encoderFunctional: %s, " +
+		Logger.debug(String.format("Changing state: encoderFunctional: %s, " +
 								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
 								 "old direction: %s, new direction %s, old position: %s, new position %s",
 				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position));
 		if (!encoderFunctional) {
 			disableController();
-			logger.warning("encoder not functional. Refusing action.");
+			Logger.warning("encoder not functional. Refusing action.");
 			return false;	
 		}
 		
@@ -268,7 +269,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	}
 	
 	public void dumpState() {
-		/*logger.fine*/
+		/*Logger.debug*/
 		System.out.println(String.format("STATE: [encoderFunctional: %s, state: %s, speed: %s, direction: %s, position %s]",
 				encoderFunctional, state, speed, direction, position));
 	}

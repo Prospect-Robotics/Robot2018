@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 import org.usfirst.frc2813.units.values.Length;
@@ -18,7 +19,7 @@ public class ArmMoveToPosition extends GearheadsInstantCommand {
 
 	// @Override
 	protected void initialize() {
-		logger.info("Move to position: " + position);
+		Logger.info("Move to position: " + position);
 		Robot.arm.moveToPosition(position);
 	}
 }

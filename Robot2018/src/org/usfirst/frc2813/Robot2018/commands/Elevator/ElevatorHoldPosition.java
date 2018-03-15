@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
@@ -16,7 +17,7 @@ public class ElevatorHoldPosition extends GearheadsCommand {
 
 	// @Override
 	protected void initialize() {
-		logger.finer("in execute");
+		Logger.debug("in execute");
 		if(!Robot.elevator.getMotorControllerState().equals(MotorControllerState.HOLDING_POSITION)) {
 			Robot.elevator.holdCurrentPosition();
 		}

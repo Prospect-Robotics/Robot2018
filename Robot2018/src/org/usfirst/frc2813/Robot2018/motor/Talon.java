@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
-import java.util.logging.Logger;
+import org.usfirst.frc2813.logging.Logger;
 
 import org.usfirst.frc2813.units.Direction;
 
@@ -24,7 +24,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
  */
 public class Talon {
 	private final TalonSRX                   srx;
-	private final Logger                     logger;
 	// NB: This is not yet in the firmware apparently, so enable this when it's ready
 	public static final boolean AUXILLIARY_PID_SUPPORTED = false;
 	// NB: There are other values for different types of sensor.  There's a table.  
@@ -87,7 +86,7 @@ public class Talon {
 		slotIndexForHoldPosition = slotIndex;
 		if((state == MotorControllerState.HOLDING_POSITION || state == MotorControllerState.SET_POSITION) && lastSlotIndex != slotIndex) {
 			// TODO: Need to update state
-			logger_info("TODO: Need to updateSate after slot index for holding is changed.");
+			Logger.info("TODO: Need to updateSate after slot index for holding is changed.");
 		}
 	}
 	public void setSlotIndexForMove(TalonProfileSlot slotIndex) {
@@ -95,13 +94,12 @@ public class Talon {
 		if((state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) && lastSlotIndex != slotIndex) {
 			// NB: SET_POSITION needs to use the profile for "moving" when it's got a large error and switch to the profile for holding when the error is small
 			// TODO: Need to update state
-			logger_info("TODO: Need to updateSate after slot index for move changes while in moving or when high error in set_position state...");
+			Logger.info("TODO: Need to updateSate after slot index for move changes while in moving or when high error in set_position state...");
 		}
 	}
 
-	public Talon(TalonSRX srx, Logger logger) {
+	public Talon(TalonSRX srx) {
 		this.srx = srx;
-		this.logger = logger;
 
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -137,15 +135,12 @@ public class Talon {
 		set(MotorControllerState.DISABLED, 0);
 	}
 
-	void logger_info(String x) {
-		System.out.println("Talon: " + x);
-	}
 	public void setNeutralMode(NeutralMode neutralMode) {
 		srx.setNeutralMode(neutralMode);
 	}
 	// Force zeroing
 	public void zeroSensorPositions() {
-		logger_info("Disabling and zeroing sensor positions");
+		Logger.info("Disabling and zeroing sensor positions");
 		set(MotorControllerState.DISABLED, 0);
 		// Zero out absolute encoder values for both PID slots
 		correctEncoderSensorPositions(TalonPID.Primary, 0);
@@ -320,10 +315,10 @@ public class Talon {
 		}
 		//
 		if(oldState != newState) {
-			logger_info("set [transitioned from " + oldState + " to " + newState + "]");
+			Logger.info("set [transitioned from " + oldState + " to " + newState + "]");
 		}
 		// NB: This log statement shows old and current values, so you can see transitions completely
-		logger_info(""
+		Logger.info(""
 				+ "set Changes "
 				+ "[State (" + oldState + "-> " + newState + ") "
 				+ ", ControlMode (" + this.lastControlMode + "/" + this.lastControlModeValue + " -> " + newControlMode + "/" + newControlModeValue + ")"
@@ -331,7 +326,7 @@ public class Talon {
 				+ ", PIDIndex ("  + lastPIDIndex + " -> " + newPIDIndex + ")"
 				+ "]");
 		// NB: This log statement shows current values
-		logger_info(""
+		Logger.info(""
 				+ "set "
 				+ "[State=" + newState
 				+ ", ControlMode=" + newControlMode
@@ -358,7 +353,7 @@ public class Talon {
 	 */
 	private void correctEncoderSensorPositions(TalonPID talonPID, int sensorPosition) {
 		if(talonPID.equals(TalonPID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
-			logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
+			Logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
 			return;
 		}
 		// Select relative & reset
@@ -371,12 +366,12 @@ public class Talon {
 	This is for a forced encoder assignment for debug/testing 
 	*/
 	public void setEncoderPosition(int encoderPosition) {
-		logger_info("setEncoderPosition [new value =" + encoderPosition + "]");
+		Logger.info("setEncoderPosition [new value =" + encoderPosition + "]");
 		set(MotorControllerState.DISABLED, 0);
 		// Zero out absolute encoder values for both PID slots
 		correctEncoderSensorPositions(TalonPID.Primary, encoderPosition);
 		correctEncoderSensorPositions(TalonPID.Auxilliary, encoderPosition);
-		logger_info("setEncoderPosition holding at new value =" + encoderPosition + ".");
+		Logger.info("setEncoderPosition holding at new value =" + encoderPosition + ".");
 //		set(MotorControllerState.HOLDING_POSITION, readPosition());
 	}
 
@@ -387,7 +382,7 @@ public class Talon {
 				&& (state.isHoldingCurrentPosition() && lastControlModeValue <= readPosition()) /* moving backwards + limit == bad or holding at zero */
 				|| (state.isMoving() && lastControlModeValue < 0)) /* moving backwards (negative velocity) + limit == bad */
 		{
-			logger_info("ZEROING ENCODERS");
+			Logger.info("ZEROING ENCODERS");
 			setEncoderPosition(0);
 			return true;
 		}
@@ -416,11 +411,11 @@ public class Talon {
 	 */
 	public void move(Direction direction, double speed) {
 		if(speed == 0) {
-			logger_info(" was told to move with speed zero.  Holding position instead.");
+			Logger.info(" was told to move with speed zero.  Holding position instead.");
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			logger_info(String.format("move %s [Direction (%f) x Speed (%f) -> Velocity %f]", direction, direction.getMultiplierAsDouble(), speed, speedParam));
+			Logger.info(String.format("move %s [Direction (%f) x Speed (%f) -> Velocity %f]", direction, direction.getMultiplierAsDouble(), speed, speedParam));
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
@@ -440,7 +435,7 @@ public class Talon {
 	}
 	
 	public void dumpState() {
-		logger_info(""
+		Logger.info(""
 				+ "dumpState[SETTINGS] = "
 				+ "[State=" + state
 				+ ", ControlMode=" + lastControlMode
@@ -448,7 +443,7 @@ public class Talon {
 				+ ", SlotIndex=" + lastSlotIndex
 				+ ", PIDIndex=" + lastPIDIndex
 				+ "]");
-		logger_info(""
+		Logger.info(""
 				+ "dumpState[HW] = "
 				+ "[LimitF=" + readLimitSwitch(Direction.POSITIVE)
 				+ ", LimitR=" + readLimitSwitch(Direction.NEGATIVE)

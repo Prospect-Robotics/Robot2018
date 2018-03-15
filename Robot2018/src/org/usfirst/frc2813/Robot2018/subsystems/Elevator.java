@@ -1,7 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import java.util.logging.Logger;
-
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
@@ -37,7 +35,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 				axisConfiguration.getNativeSensorRateUOM(), 
 				axisConfiguration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
 				);
-		motorController = new Talon(RobotMap.srxElevator, Logger.getLogger("ElevatorMC"));
+		motorController = new Talon(RobotMap.srxElevator);
 		// Set forward hard limits
 		if(axisConfiguration.hasAll(AxisConfiguration.Forward|AxisConfiguration.LimitPosition|AxisConfiguration.ForwardHardLimitSwitch)) {
 			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.FeedbackConnector, axisConfiguration.getForwardHardLimitSwitchNormal());

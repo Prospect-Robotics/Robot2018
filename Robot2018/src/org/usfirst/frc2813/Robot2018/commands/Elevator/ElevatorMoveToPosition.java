@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 import org.usfirst.frc2813.units.values.Length;
@@ -18,7 +19,7 @@ public class ElevatorMoveToPosition extends GearheadsInstantCommand {
 
 	// @Override
 	protected void initialize() {
-		logger.finer("in initialize");
+		Logger.debug("in initialize");
 		Robot.elevator.moveToPosition(position);
 	}
 }

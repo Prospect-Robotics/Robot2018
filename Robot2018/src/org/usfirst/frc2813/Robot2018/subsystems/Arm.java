@@ -1,7 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import java.util.logging.Logger;
-
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
@@ -47,7 +45,7 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		// PULSES_PER_UNIT_POSITION = PULSES_PER_REVOLUTION / 360;
 		// PULSES_PER_UNIT_POSITION_PER_TIME = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
 
-		motorController = new Talon(RobotMap.srxArm, Logger.getLogger("ArmMC"));
+		motorController = new Talon(RobotMap.srxArm);
 		
 		// Configure the limits for DOWN
 		motorController.setHardLimitSwitch(Direction.BACKWARD, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
