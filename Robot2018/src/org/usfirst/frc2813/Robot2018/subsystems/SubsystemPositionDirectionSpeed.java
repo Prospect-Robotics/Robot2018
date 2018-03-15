@@ -3,6 +3,8 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -26,28 +28,44 @@ import org.usfirst.frc2813.units.values.Rate;
  */
 public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem {
 	// State information
+	protected final LengthUOM subsystemLengthUnits;
+	protected final LengthUOM sensorLengthUnits;
+	protected final LengthUOM motorLengthUnits;
+	protected final RateUOM subsystemRateUnits;
+	protected final RateUOM sensorRateUnits;
+	protected final RateUOM motorRateUnits;
+	
 	protected Direction direction, oldDirection;
-	double speed;
-	protected double oldSpeed;
-	protected int position, oldPosition;
+	Rate speed;
+	protected Rate oldSpeed;
+	protected Length position;
+	protected Length oldPosition;
 	protected MotorControllerState state, oldState;
-    protected double DEFAULT_SPEED;
-    protected double MAX_POSITION;
-	protected double MIN_POSITION;
-	protected double PULSES_PER_UNIT_POSITION;
-	protected double PULSES_PER_UNIT_POSITION_PER_TIME;
-    
+    protected Rate DEFAULT_SPEED;
+
 	/**
 	 * configure your motor controller and set your
 	 * geometry and state, then you MUST call initialize
-	 * @param subsystemAxisConfiguration - This describes the way the subsystem presents the elevator vertical axis to the calling API.
+	 * TODO: Pass in axisConfiguration instead of units
 	 */
-	protected SubsystemPositionDirectionSpeed() {
+	protected SubsystemPositionDirectionSpeed(LengthUOM subsystemLengthUnits, LengthUOM sensorLengthUnits, LengthUOM motorLengthUnits, RateUOM subsystemRateUnits, RateUOM sensorRateUnits, RateUOM motorRateUnits) {
+		this.subsystemLengthUnits = subsystemLengthUnits;
+		this.sensorLengthUnits = sensorLengthUnits;
+		this.motorLengthUnits = motorLengthUnits;
+		this.subsystemRateUnits = subsystemRateUnits;
+		this.sensorRateUnits = sensorRateUnits;
+		this.motorRateUnits = motorRateUnits;
+	}
+
+	/*
+	 * Run initialization at the end of the subclass's constructor!
+	 */
+	protected void initialize() {		
 		// track state and change as required. Start in moving so initialize can halt
 		direction = Direction.NEUTRAL;
-		position = readControllerPosition();
+		position = getCurrentPositionInSubsystemUnits();
 		speed = DEFAULT_SPEED;
-		oldSpeed = 0;
+		oldSpeed = RateUOM.InchesPerSecond.create(0);
 		oldDirection = Direction.NEUTRAL;
 		oldState = MotorControllerState.DISABLED;
 		state = readMotorControllerState();
@@ -58,46 +76,39 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @return MotorControllerState
 	 */
 	protected abstract MotorControllerState readMotorControllerState();
-
-	/**
-	 * Abstract method to read controller position, expect "sensor" units
-	 * @return position in controller units
+	/*
+	 * Get the position
 	 */
-	protected abstract int readControllerPosition();
+	protected abstract Length getCurrentPositionInSensorUnits();
 
-	/**
-	 * Abstract method to set controller position 
-	 * TODO: convert to "sensor units" before setting
+	protected Length getTargetPositionInSubsystemUnits() {
+		return position.convertTo(subsystemLengthUnits);
+	}
+
+	protected Length getTargetPositionInSensorUnits() {
+		return toSensorUnits(position);
+	}
+	
+	/* Set the position 
 	 */
-	protected abstract void setControllerPosition(int position2);
-
+	protected abstract void setPosition(Length position);
 	/**
 	 * Abstract method to set controller speed and direction
 	 * @param speedParam
 	 */
-	protected abstract void setControllerDirectionAndSpeed(Direction direction, double speedParam);
-
+	protected abstract void setControllerDirectionAndSpeed(Direction direction, Rate speedParam);
 	/**
 	 * Abstract method to halt the controller movement
 	 * NOTE: if a physical limit switch is set, it may
 	 * be wise to set the controller position
 	 */
 	protected abstract void disableController();
-
 	/**
 	 * Abstract method to halt the controller movement
 	 * NOTE: if a physical limit switch is set, it may
 	 * be wise to set the controller position
 	 */
 	protected abstract void holdControllerPosition();
-
-	/**
-	 * Read the current position in distance units
-	 * @return
-	 */
-	public double readPosition() {
-		return readControllerPosition();
-	}
 	/*
 	 * Need to be able to retrieve what we believe is the state
 	 */
@@ -183,7 +194,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 			setControllerDirectionAndSpeed(direction, speed);
 			break;
 		case SET_POSITION:
-			setControllerPosition(position);
+			setPosition(position);
 			break;
 		}
 		oldPosition = position;
@@ -191,7 +202,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		oldDirection = direction;
 		return true;
 	}
-	
+
 	/*************************************************************
 	 *  And now for the public commands that can transition the subsystem
 	 */	
@@ -218,7 +229,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @param newSpeed
 	 * @param newDirection
 	 */
-	public void moveInDirectionAtSpeed(Direction newDirection, double newSpeed) {
+	public void moveInDirectionAtSpeed(Direction newDirection, Rate newSpeed) {
 		oldSpeed = speed;
 		speed = newSpeed;
 		oldDirection = direction;
@@ -230,7 +241,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 *  [ACTION] Move to the absolutePosition
 	 * @param newDirection
 	 */
-	public void moveToPosition(int newPosition) {
+	public void moveToPosition(Length newPosition) {
 		oldPosition = position;
 		position = newPosition;
 		changeState(MotorControllerState.SET_POSITION);
@@ -254,6 +265,61 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 */
 	public TalonSensorPhase getSensorPhase() {
 		return TalonSensorPhase.Normal;
+	}
+	
+	// Convert a length to sensor units
+	public final Length toSensorUnits(Length l) {
+		return l.convertTo(sensorLengthUnits);
+	}
+	// Convert a length to motor units	
+	public final Length toMotorUnits(Length l) {
+		return l.convertTo(motorLengthUnits);
+	}
+	
+	// Convert a length to display units	
+	public final Length toSubsystemUnits(Length l) {
+		return l.convertTo(subsystemLengthUnits);
+	}
+	
+	// Convert a length to sensor units
+	public final Rate toSensorUnits(Rate l) {
+		return l.convertTo(sensorRateUnits);
+	}
+	// Convert a length to motor units	
+	public final Rate toMotorUnits(Rate l) {
+		return l.convertTo(motorRateUnits);
+	}
+	// Convert a length to display units	
+	public final Rate toSubsystemUnits(Rate l) {
+		return l.convertTo(subsystemRateUnits);
+	}
+	// Wrap a sensor unit value in a Length 	
+	protected final Rate sensorUnitsToRate(double valueInSensorUnits) {
+		return sensorRateUnits.create(valueInSensorUnits);
+	}
+	// Wrap a motor unit value in a Length 	
+	protected final Rate motorUnitsToRate(double valueInMotorUnits) {
+		return motorRateUnits.create(valueInMotorUnits);
+	}
+	// Wrap a display unit value in a Length 	
+	protected final Rate subsystemUnitsToRate(double valueInSubsystemUnits) {
+		return subsystemRateUnits.create(valueInSubsystemUnits);
+	}
+	// Wrap a sensor unit value in a Length 	
+	protected final Length sensorUnitsToLength(double valueInSensorUnits) {
+		return sensorLengthUnits.create(valueInSensorUnits);
+	}
+	// Wrap a motor unit value in a Length 	
+	protected final Length motorUnitsToLength(double valueInMotorUnits) {
+		return motorLengthUnits.create(valueInMotorUnits);
+	}
+	// Wrap a display unit value in a Length 	
+	protected final Length subsystemUnitsToLength(double valueInSubsystemUnits) {
+		return subsystemLengthUnits.create(valueInSubsystemUnits);
+	}
+	// Get controller position in subsystem units
+	public final Length getCurrentPositionInSubsystemUnits() {
+		return toSubsystemUnits(getCurrentPositionInSensorUnits());
 	}
 }
 

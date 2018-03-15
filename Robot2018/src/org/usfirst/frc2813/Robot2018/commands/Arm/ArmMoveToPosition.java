@@ -9,9 +9,9 @@ import org.usfirst.frc2813.units.values.Length;
  * further intervention.  Length can be in any units you like.
  */
 public class ArmMoveToPosition extends GearheadsInstantCommand {
-	private final int position;
+	private final Length position;
 
-	public ArmMoveToPosition(int position) {
+	public ArmMoveToPosition(Length position) {
 		this.position = position;
 		requires(Robot.arm);
 	}

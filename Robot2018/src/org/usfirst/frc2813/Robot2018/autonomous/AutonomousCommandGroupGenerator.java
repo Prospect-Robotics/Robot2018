@@ -23,8 +23,8 @@ public class AutonomousCommandGroupGenerator {
 	Logger logger = Logger.getLogger(this.getClass().getSimpleName());
 
 	// Elevator position to place cubes - FIXME! not correct values
-	private static final int scaleHeight = 60; // LengthUOM.Inches.create(60);
-	private static final int switchHeight = 24; // LengthUOM.Inches.create(24);
+	private static final Length scaleHeight = LengthUOM.Inches.create(60);
+	private static final Length switchHeight = LengthUOM.Inches.create(24);
 
 	private int directionBias;  // used to share code between left/right
 	private static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
@@ -81,7 +81,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnLeft(45 * directionBias);
 			autoCmdList.driveForward(40); // diagonally from start to far side of near switch
 			autoCmdList.turnRight(45);
-			autoCmdList.elevatorMoveToPosition(1); 
+			autoCmdList.elevatorMoveToPosition(LengthUOM.Inches.create(1)); 
 			autoCmdList.dropCube();
 			autoCmdList.lowerElevator();
 		}

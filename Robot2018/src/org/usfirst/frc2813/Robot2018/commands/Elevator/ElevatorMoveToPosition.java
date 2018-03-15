@@ -9,9 +9,9 @@ import org.usfirst.frc2813.units.values.Length;
  * further intervention.
  */
 public class ElevatorMoveToPosition extends GearheadsInstantCommand {
-	private final int position;
+	private final Length position;
 
-	public ElevatorMoveToPosition(int position) {
+	public ElevatorMoveToPosition(Length position) {
 		this.position = position;
 		requires(Robot.elevator);
 	}

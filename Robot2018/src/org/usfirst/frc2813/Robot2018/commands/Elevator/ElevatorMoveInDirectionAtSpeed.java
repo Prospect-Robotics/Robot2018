@@ -11,9 +11,9 @@ import org.usfirst.frc2813.units.values.Rate;
  */
 public class ElevatorMoveInDirectionAtSpeed extends GearheadsCommand {
 	private final Direction direction;
-	private final double speed;
+	private final Rate speed;
 
-	public ElevatorMoveInDirectionAtSpeed(Direction direction, double speed) {
+	public ElevatorMoveInDirectionAtSpeed(Direction direction, Rate speed) {
 		this.direction = direction;
 		this.speed = speed;
 		logger.info(String.format("Move %s at speed: %s", direction, speed));

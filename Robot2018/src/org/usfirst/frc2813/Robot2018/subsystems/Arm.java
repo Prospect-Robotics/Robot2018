@@ -9,6 +9,8 @@ import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
 import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -29,16 +31,24 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 
     private static final double PULSES_PER_DEGREE = PULSES_PER_REVOLUTION / 360;
     private static final double VELOCITY_TIME_UNITS_PER_SEC = 1; // The Velocity control mode expects units of pulses per 100 milliseconds.
+    protected Length MAX_POSITION;
+	protected Length MIN_POSITION;
 
 
 	private Talon motorController;
 
 	public Arm() {
-		MAX_POSITION = 24;
-		MIN_POSITION = 0;
-		PULSES_PER_UNIT_POSITION = PULSES_PER_REVOLUTION / 360;
-		PULSES_PER_UNIT_POSITION_PER_TIME = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
-	    DEFAULT_SPEED = 5;
+		super(LengthUOM.Inches, 
+			  LengthUOM.Micrometers, 
+			  LengthUOM.Micrometers,
+			  RateUOM.InchesPerSecond,
+			  RateUOM.InchesPerSecond,
+			  RateUOM.InchesPerSecond); // TODO: These units should be custom for ARM (see Elevator's AxisConfiguration).  Micrometers should not break anything until this is finished.
+		MAX_POSITION = LengthUOM.Inches.create(20); // NB: totally wrong, needs to know the circumference, less the region we cannot access...
+		MIN_POSITION = LengthUOM.Inches.create(0);
+		// PULSES_PER_UNIT_POSITION = PULSES_PER_REVOLUTION / 360;
+		// PULSES_PER_UNIT_POSITION_PER_TIME = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
+	    DEFAULT_SPEED = RateUOM.InchesPerSecond.create(5);
 
 		motorController = new Talon(RobotMap.srxArm, Logger.getLogger("ArmMC"));
 		
@@ -49,32 +59,25 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		// Configure the limits for UP
 		motorController.configureHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
 		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
-		motorController.configureSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION));
+		// motorController.configureSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION)); NB: This is wrong and needs to be calculated.  See ElevatorAxisConfiguration
 		// Configure the PID profiles
 		motorController.setSlotIndexForHoldPosition(TalonProfileSlot.HoldingPosition);
 		motorController.setSlotIndexForMove(TalonProfileSlot.Moving);
 	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.1, 0.0, 0.0);
 	    motorController.configurePID(TalonProfileSlot.Moving, 2.0, 0.0, 0.0);
+	    initialize();
 	}
 
 	public boolean readLimitSwitch(Direction switchDirection) {
 		return motorController.readLimitSwitch(switchDirection);
 	}
 
-	protected int readControllerPosition() {
-		return motorController.readPosition();
-	}
-
-	protected void setControllerPosition(int positionParam) {
-		motorController.setPosition(positionParam);
-	}
-
 	protected MotorControllerState readMotorControllerState() {
 		return motorController.getState();
 	}
 
-	protected void setControllerDirectionAndSpeed(Direction direction, double speedParam) {
-		motorController.move(direction, speedParam);
+	protected void setControllerDirectionAndSpeed(Direction direction, Rate speedParam) {
+		motorController.move(direction, speedParam.convertTo(motorRateUnits).getValueAsInt());
 	}
 
 	protected void disableController() {
@@ -94,4 +97,27 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 
 	@Override
 	public void periodic() {}
+
+	@Override
+	protected Length getCurrentPositionInSensorUnits() {
+		int rawPosition = motorController.readPosition();
+/*
+		double scaledPosition = rawPosition / armAxis.getMotorToSensorScalingFactor();
+		// NB: Talon supports sensor inversion, so we won't need to do it here.
+		return sensorUnitsToLength(scaledPosition);
+ */
+		return sensorUnitsToLength(rawPosition);
+	}
+
+	@Override
+	protected void setPosition(Length position) {
+/*		
+		double motorPosition = toMotorUnits(position).getValue();
+		double scaledMotorPosition = motorPosition * armAxis.getMotorToSensorScalingFactor();
+		// NB: Talon supports motor inversion, so we won't need to do it here.		
+		motorController.setPosition(toMotorUnits(position).getValueAsInt());
+*/
+		motorController.setPosition(toMotorUnits(position).getValueAsInt());
+	}
+	
 }

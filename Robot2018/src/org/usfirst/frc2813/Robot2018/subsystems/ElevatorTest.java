@@ -1,10 +1,10 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Iterator;
 
-import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.Test;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -43,9 +43,8 @@ class ElevatorTest  {
 	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, "Elevator pulses/decisecond");
 	public static final RateUOM   ElevatorSRXRPM              = new RateUOM(ElevatorSRXMotorRevolution, TimeUOM.Minutes, "Elevator RPMs");
 
-	@Test
 	void test() {
-		Elevator.mathReport();
+		ElevatorAxisConfiguration.mathReport();
 		Elevator.elevatorAxis.dumpDescription();
 	}
 }

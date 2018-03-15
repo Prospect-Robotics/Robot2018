@@ -91,7 +91,14 @@ public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 	public final double getValue() {
 		return this.value;
 	}
-
+	/* Get the value in the units of this type. */
+	public final int getValueAsInt() {
+		return (int)Math.round(this.value);
+	}
+	/* Get the value in the units of this type. */
+	public final long getValueAsLong() {
+		return Math.round(this.value);
+	}
 	/* Get the canonical form of the value */
 	public final double getCanonicalValue() {
 		return this.value * uom.getCanonicalUnitQuantity();

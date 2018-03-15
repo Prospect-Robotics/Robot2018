@@ -77,11 +77,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	//elevator commands - FIXME! these commands return before they
 	//reach the desired elevator position
-	public void elevatorMoveToPosition(int position) {
+	public void elevatorMoveToPosition(Length position) {
 		addSequential(new ElevatorMoveToPosition(position));
 	}
 	public void lowerElevator() {
-		elevatorMoveToPosition(0);
+		elevatorMoveToPosition(LengthUOM.Inches.create(0));
 	}
 
 	// arm control commands

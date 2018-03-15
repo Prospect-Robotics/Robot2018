@@ -12,9 +12,9 @@ import org.usfirst.frc2813.units.values.Rate;
  */
 public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 	private final Direction direction;
-	private final double speed;
+	private final Rate speed;
 
-	public ArmMoveInDirectionAtSpeed(Direction direction, double speed) {
+	public ArmMoveInDirectionAtSpeed(Direction direction, Rate speed) {
 		this.direction = direction;
 		this.speed = speed;
 		requires(Robot.arm);

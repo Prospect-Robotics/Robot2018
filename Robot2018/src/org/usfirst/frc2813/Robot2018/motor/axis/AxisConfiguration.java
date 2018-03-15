@@ -32,17 +32,16 @@ public class AxisConfiguration {
 	public static final int ControlRate                         = 1 <<   2;
 	public static final int Forward                             = 1 <<   3;
 	public static final int ForwardHardLimitSwitch              = 1 <<   4;
-	public static final int ForwardSoftLimitSwitch              = 1 <<   7;
-	public static final int LimitPosition                       = 1 <<   9;
-	public static final int LimitRate                           = 1 <<  10;
-	public static final int MotorToDriveScale                   = 1 <<  12;
-	public static final int MotorToSensorScale                  = 1 <<  13;
-	public static final int ReadDirection                       = 1 <<  14;
-	public static final int ReadPosition                        = 1 <<  15;
-	public static final int ReadRate                            = 1 <<  16;
-	public static final int Reverse                             = 1 <<  17;
-	public static final int ReverseHardLimitSwitch              = 1 <<  18;
-	public static final int ReverseSoftLimitSwitch              = 1 <<  21;
+	public static final int ForwardSoftLimitSwitch              = 1 <<   5;
+	public static final int LimitPosition                       = 1 <<   6;
+	public static final int LimitRate                           = 1 <<   7;
+	public static final int SensorToDriveScale                  = 1 <<   8;
+	public static final int ReadDirection                       = 1 <<   9;
+	public static final int ReadPosition                        = 1 <<  10;
+	public static final int ReadRate                            = 1 <<  11;
+	public static final int Reverse                             = 1 <<  12;
+	public static final int ReverseHardLimitSwitch              = 1 <<  13;
+	public static final int ReverseSoftLimitSwitch              = 1 <<  14;
 
 	public static final int MAX_CAPABILITY = 31;
 	
@@ -56,8 +55,7 @@ public class AxisConfiguration {
         case ForwardSoftLimitSwitch : return "ForwardSoftLimitSwitch";
         case LimitPosition          : return "LimitPosition";
         case LimitRate              : return "LimitRate";
-        case MotorToDriveScale      : return "MotorToDriveScale";
-        case MotorToSensorScale     : return "MotorToSensorScale";
+        case SensorToDriveScale     : return "SensorToDriveScale";
         case ReadDirection          : return "ReadDirection";
         case ReadPosition           : return "ReadPosition";
         case ReadRate               : return "ReadRate";
@@ -142,21 +140,12 @@ public class AxisConfiguration {
 	}
 
 	/*
-	 * If MotorToSensorScale is supported, return the scaling factor to convert from motor to sensor position/rate
+	 * If SensorToMotorScale is supported, return the scaling factor to convert from motor to sensor position/rate
 	 */
-	private final Double motorToSensorScalingFactor;
-	public final double getMotorToSensorScalingFactor() {
-		requireAll(MotorToSensorScale);
-		return motorToSensorScalingFactor;
-	}
-
-	/*
-	 * If MotorToSensorScale is supported, return the scaling factor to convert from motor to sensor position/rate
-	 */
-	private final Double motorToDriveScalingFactor;
-	public final double GetMotorToDriveScalingFactor() {
-		requireAll(MotorToDriveScale);
-		return motorToDriveScalingFactor;
+	private final Double sensorToDriveScalingFactor;
+	public final double getSensorToDriveScalingFactor() {
+		requireAll(SensorToDriveScale);
+		return sensorToDriveScalingFactor;
 	}
 	
 	/*
@@ -257,7 +246,7 @@ public class AxisConfiguration {
 	 * If Reverse and ControlPosition and LimitPosition, return the forward limit
 	 */
 	private final Length reverseLimit;
-	public final Length getReveseLimit() {
+	public final Length getReverseLimit() {
 		requireAll(Reverse|ControlPosition|LimitPosition);
 		return forwardLimit;
 	}
@@ -345,8 +334,7 @@ public class AxisConfiguration {
 			Rate maximumForwardRate, // requireAll(Forward|ControlRate|LimitRate)
 			Rate minimumReverseRate, // requireAll(Reverse|ControlRate|LimitRate)
 			Rate maximumReverseRate, // requireAll(Reverse|ControlRate|LimitRate)
-			Double motorToSensorScalingFactor, // requireAll(MotorToSensorScale)
-			Double motorToDriveScalingFactor,  // requireAll(MotorToDriveScale)
+			Double sensorToDriveScalingFactor, // requireAll(SensorToDriveScale)
 			Length forwardLimit, // requireAll(Forward|ControlPosition|LimitPosition)
 			Length reverseLimit, // requireAll(Reverse|ControlPosition|LimitPosition)
 			LimitSwitchNormal forwardHardLimitSwitchBehavior, // requireAll(Forward|ForwardSoftLimitSwitch)
@@ -360,12 +348,12 @@ public class AxisConfiguration {
 			)
 	{
 		this.axisName = axisName;
+		this.capabilities = capabilities;
 		this.nativeMotorLengthUOM = nativeMotorLengthUOM;
 		this.sensorPhaseIsReversed = sensorPhaseIsReversed;
 		this.motorPhaseIsReversed = motorPhaseIsReversed;
 		this.nativeSensorLengthUOM = nativeSensorLengthUOM;
-		this.motorToSensorScalingFactor = motorToSensorScalingFactor;
-		this.motorToDriveScalingFactor = motorToDriveScalingFactor;
+		this.sensorToDriveScalingFactor = sensorToDriveScalingFactor;
 		this.nativeDisplayRateUOM = nativeDisplayRateUOM;
 		this.nativeMotorRateUOM = nativeMotorRateUOM;
 		this.nativeSensorRateUOM = nativeSensorRateUOM;
@@ -384,7 +372,6 @@ public class AxisConfiguration {
 		this.reverseHardLimitSwitchResetsEncoder = reverseHardLimitSwitchResetsEncoder;
 		this.forwardSoftLimit = forwardSoftLimit;
 		this.reverseSoftLimit = reverseSoftLimit;
-		this.capabilities = capabilities;
 		getDescription();
 //		validateConfiguration();
 	}
@@ -437,7 +424,7 @@ public class AxisConfiguration {
 			throw new IllegalArgumentException("The " + getCapabilityName(capability) + " capability requires at least one of:\n" + listCapabilitiesCSV(requireAny));
 		}
 	}
-	
+
 	public void validateConfiguration() {
 		validateCapabilityDependency(Forward, ControlDirection|ReadDirection, 0);
 		validateCapabilityDependency(Reverse, ControlDirection|ReadDirection, 0);
@@ -446,15 +433,14 @@ public class AxisConfiguration {
 		validateCapabilityDependency(ForwardSoftLimitSwitch, 0, Forward|ControlDirection);
 		validateCapabilityDependency(ReverseHardLimitSwitch, 0, Reverse|ControlDirection);
 		validateCapabilityDependency(ReverseSoftLimitSwitch, 0, Reverse|ControlDirection);
-		validateCapabilityDependency(ControlPosition, 0, MotorToDriveScale|ReadPosition);
-		validateCapabilityDependency(ControlRate, 0, MotorToDriveScale|ReadRate);
+		validateCapabilityDependency(ControlPosition, 0, SensorToDriveScale|ReadPosition);
+		validateCapabilityDependency(ControlRate, 0, SensorToDriveScale|ReadRate);
 		validateCapabilityDependency(LimitPosition, 0, ControlPosition|ReadPosition);
 		validateCapabilityDependency(LimitRate, 0, ControlRate|ReadRate);
-		validateCapabilityDependency(MotorToDriveScale, ControlRate|ControlPosition, 0);
-		validateCapabilityDependency(MotorToSensorScale, ReadRate|ReadPosition, 0);
-		validateCapabilityDependency(ReadDirection, 0, MotorToSensorScale);
-		validateCapabilityDependency(ReadPosition, 0, MotorToSensorScale);
-		validateCapabilityDependency(ReadRate, 0, MotorToSensorScale);
+		validateCapabilityDependency(SensorToDriveScale, ReadRate|ReadPosition, 0);
+		validateCapabilityDependency(ReadDirection, 0, SensorToDriveScale);
+		validateCapabilityDependency(ReadPosition, 0, SensorToDriveScale);
+		validateCapabilityDependency(ReadRate, 0, SensorToDriveScale);
 		// Now validate settings
 		checkParameter("nativeDisplayLengthUOM", nativeDisplayLengthUOM, ReadPosition, 0);
 		checkParameter("nativeMotorLengthUOM", nativeMotorLengthUOM, ControlPosition|ControlDirection, 0);  
@@ -468,8 +454,7 @@ public class AxisConfiguration {
 		checkParameter("maximumForwardRate", maximumForwardRate, 0, Forward|ControlRate|LimitRate);
 		checkParameter("minimumReverseRate", minimumReverseRate, 0, Reverse|ControlRate|LimitRate);
 		checkParameter("maximumReverseRate", maximumReverseRate, 0, Reverse|ControlRate|LimitRate);
-		checkParameter("motorToSensorScalingFactor", motorToSensorScalingFactor, MotorToSensorScale, 0);
-		checkParameter("motorToDriveScalingFactor", motorToDriveScalingFactor, MotorToDriveScale, 0);
+		checkParameter("sensorToDriveScalingFactor", sensorToDriveScalingFactor, SensorToDriveScale, 0);
 		checkParameter("forwardLimit", forwardLimit, 0, Forward|ControlPosition|LimitPosition);
 		checkParameter("reverseLimit", reverseLimit, 0, Reverse|ControlPosition|LimitPosition);
 		checkParameter("forwardHardLimitSwitchBehavior", forwardHardLimitSwitchBehavior, 0, Forward|ForwardSoftLimitSwitch);
@@ -480,7 +465,6 @@ public class AxisConfiguration {
 		checkParameter("reverseHardLimitSwitchResetsEncoder", reverseHardLimitSwitchResetsEncoder, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("forwardSoftLimit", forwardSoftLimit, 0, Forward|ForwardSoftLimitSwitch);
 		checkParameter("reverseSoftLimit", reverseSoftLimit, 0, Reverse|ReverseSoftLimitSwitch);
-
 	}
 
 	public String toString() {
@@ -494,8 +478,8 @@ public class AxisConfiguration {
 	private String describeUOM(UOM uom) {
 		return (uom != null ? (uom + " (" + uom.getCanonicalValue() + ")") : null);
 	}
-	private String describeValue(Value value) {
-		return (value != null ? (value + " (" + value.getCanonicalValue() + ")") : null);
+	private String describeValue(Value value, UOM alt) {
+		return (value != null ? (value + " (" + value.convertTo(alt) + ")") : null);
 	}
 	public String getDescription() {
 		StringBuffer buf = new StringBuffer();
@@ -521,20 +505,20 @@ public class AxisConfiguration {
 		.append("\n")
 		.append("Rates:\n")
 		.append("\n")
-		.append("minimumForwardRate...................." + describeValue(minimumForwardRate) + "\n")
-		.append("maximumForwardRate...................." + describeValue(maximumForwardRate) + "\n")
-		.append("minimumReverseRate...................." + describeValue(minimumReverseRate) + "\n")
-		.append("maximumReverseRate...................." + describeValue(maximumReverseRate) + "\n")
+		.append("minimumForwardRate...................." + describeValue(minimumForwardRate, nativeMotorRateUOM) + "\n")
+		.append("maximumForwardRate...................." + describeValue(maximumForwardRate, nativeMotorRateUOM) + "\n")
+		.append("minimumReverseRate...................." + describeValue(minimumReverseRate, nativeMotorRateUOM) + "\n")
+		.append("maximumReverseRate...................." + describeValue(maximumReverseRate, nativeMotorRateUOM) + "\n")
 		.append("\n")
 		.append("Limits:\n")
 		.append("\n")
-		.append("forwardLimit.........................." + describeValue(forwardLimit) + "\n")
-		.append("reverseLimit.........................." + describeValue(reverseLimit) + "\n")
+		.append("forwardLimit.........................." + describeValue(forwardLimit, nativeMotorLengthUOM) + "\n")
+		.append("reverseLimit.........................." + describeValue(reverseLimit, nativeMotorLengthUOM) + "\n")
 		.append("\n")
 		.append("Limits:\n")
 		.append("\n")
-		.append("forwardSoftLimit......................" + describeValue(forwardSoftLimit) + "\n")
-		.append("reverseSoftLimit......................" + describeValue(reverseSoftLimit) + "\n")
+		.append("forwardSoftLimit......................" + describeValue(forwardSoftLimit, nativeMotorLengthUOM) + "\n")
+		.append("reverseSoftLimit......................" + describeValue(reverseSoftLimit, nativeMotorLengthUOM) + "\n")
 		.append("forwardHardLimitSwitchBehavior........" + forwardHardLimitSwitchBehavior + "\n")
 		.append("forwardHardLimitStopsMotor............" + forwardHardLimitStopsMotor + "\n")
 		.append("forwardHardLimitSwitchResetsEncoder..." + forwardHardLimitSwitchResetsEncoder + "\n")
@@ -546,8 +530,7 @@ public class AxisConfiguration {
 		.append("\n")
 		.append("sensorPhaseIsReversed................." + sensorPhaseIsReversed + "\n")
 		.append("motorPhaseIsReversed.................." + motorPhaseIsReversed + "\n")
-		.append("motorToSensorScalingFactor............" + motorToSensorScalingFactor + "\n")
-		.append("motorToDriveScalingFactor............." + motorToDriveScalingFactor + "\n")
+		.append("sensorToDriveScalingFactor............" + sensorToDriveScalingFactor + "\n")
 		.append("----------------------------------------------------------------------------\n")
 		;
 		return buf.toString();
