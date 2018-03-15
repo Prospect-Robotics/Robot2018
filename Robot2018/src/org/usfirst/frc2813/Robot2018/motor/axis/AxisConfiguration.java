@@ -372,8 +372,7 @@ public class AxisConfiguration {
 		this.reverseHardLimitSwitchResetsEncoder = reverseHardLimitSwitchResetsEncoder;
 		this.forwardSoftLimit = forwardSoftLimit;
 		this.reverseSoftLimit = reverseSoftLimit;
-		getDescription();
-//		validateConfiguration();
+		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
 		StringBuffer buf = new StringBuffer();
@@ -392,7 +391,7 @@ public class AxisConfiguration {
 	}
 
 	private void checkParameter(String name, Object value, int requireAny, int requireAll) {
-		if (nativeDisplayLengthUOM != null) { 
+		if (value != null) { 
 			if(requireAny != 0 && !hasAny(requireAny)) {
 				throw new IllegalArgumentException("Indicated capabilities do not require " + name + ".\nThe following capabilities use " + name + ":\n" + listCapabilitiesCSV(requireAny));
 			}
