@@ -10,6 +10,7 @@ import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
+import org.usfirst.frc2813.units.values.Time;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 
@@ -17,8 +18,15 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 
 	// Talon constants
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
-	private static final double SENSOR_TO_DRIVE = 1.0;
 	
+	// Gearing constants
+	private static final double SENSOR_TO_DRIVE = 1.0;
+	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
+	
+	// Motor constants
+	private static final double    MAX_RPMS_UNLOADED             = 18700;
+	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
+
 	// Software Settings
 	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0.0);
 	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(24.0); // TBD
@@ -37,26 +45,27 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 
 	// Units Of Length for Elevator
 	public static final LengthUOM ElevatorSRXMotorPulses      = new LengthUOM("srxpulse", "srxpulses", "p", PULSE_CANONICAL_LENGTH.getCanonicalValue());
-	public static final LengthUOM ElevatorSRXMotorRevolution  = new LengthUOM("revolution", "revolutions", "rev", INCHES_PER_ENCODER_REVOLUTION.getCanonicalValue()); 
+	public static final LengthUOM ElevatorSRXEncoderRevolution= new LengthUOM("revolution", "revolutions", "rev", INCHES_PER_ENCODER_REVOLUTION.getCanonicalValue());
+
 	// Units Of Rate for Elevator
-	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, "Elevator pulses/100ms");
-	public static final RateUOM   ElevatorSRXRPM              = new RateUOM(ElevatorSRXMotorRevolution, TimeUOM.Minutes, "Elevator RPMs");
+	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, "Elevator-pulses/100ms");
+	public static final RateUOM   ElevatorSRXEncoderRPM       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Minutes, "Elevator-RPMs");
+	public static final RateUOM   ElevatorSRXEncoderRPS       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Seconds, "Elevator-RPSs");
 
-	public static final Rate      ElevatorSRXMotorMaxPulseRate = ElevatorSRXMotorPulseRate.create(PULSES_PER_ENCODER_REVOLUTION);
-	
-	public static final LengthUOM ElevatorSRXMotorPercentage = new LengthUOM("srx%", "srx%", "srx%", PULSE_CANONICAL_LENGTH.getCanonicalValue() * 40.96);
-	public static final Length    ElevatorSRXMotorPercentageValue = ElevatorSRXMotorPercentage.create(10);
-	public static final RateUOM   ElevatorSRXMotorPercentageRate = new RateUOM(ElevatorSRXMotorPercentage, TimeUOM.Deciseconds, "% Elevator");
-	// Percentage for Elevator
-	//private static final ElevatorSRXPercentage = new RateUOM();
+	public static final Rate      ElevatorSRXMotorMaxRPM      = ElevatorSRXEncoderRPM.create(MAX_RPMS_UNLOADED_GEARED_DOWN);
+	public static final Rate      ElevatorSRXMotorMaxRPS      = ElevatorSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
 
-	@SuppressWarnings("rawtypes")
+	private static final Length    maxDistancePerMinute           = ElevatorSRXMotorMaxRPM.getLength(ElevatorSRXMotorMaxRPM.getTimeUOM().getValue());
+	private static final Length    maxDistancePerSecond           = ElevatorSRXMotorMaxRPS.getLength(ElevatorSRXMotorMaxRPS.getTimeUOM().getValue());
+	private static final LengthUOM OneSecondDistanceAtOnePercent  = new LengthUOM("minute-distance","minute-distance","minute-distance",maxDistancePerMinute.getCanonicalValue()/100.0);
+	public static final RateUOM    ElevatorSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, "% Elevator");
+
 	public static void mathReport() {
 		System.out.println();
 		System.out.println("[Software Settings]");
 		System.out.println("Range.............................{" + MINIMUM_POSITION_INCHES + ".." + MAXIMUM_POSITION_INCHES + "}");
 		System.out.println("Default Speed....................." + DEFAULT_SPEED_INCHES_PER_SECOND);
-		System.out.println("Default Speed (RPM)..............." + DEFAULT_SPEED_INCHES_PER_SECOND.convertTo(ElevatorSRXRPM));
+		System.out.println("Default Speed (Encoder RPM)......." + DEFAULT_SPEED_INCHES_PER_SECOND.convertTo(ElevatorSRXEncoderRPM));
 		System.out.println("Default Speed (SRX)..............." + DEFAULT_SPEED_INCHES_PER_SECOND.convertTo(ElevatorSRXMotorPulseRate));
 		System.out.println();
 		System.out.println("[Robot Measurements]");
@@ -64,27 +73,29 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 		System.out.println("CORD..............................d=" + CORD_DIAMETER + ", r=" + CORD_DIAMETER.divide(2) + ", c=" + CORD_DIAMETER.multiply(Math.PI));
 		System.out.println("DRIVE.............................d=" + DRIVE_AXIS_DIAMETER + ", r=" + DRIVE_AXIS_DIAMETER.divide(2) + ", c=" + DRIVE_AXIS_DIAMETER.multiply(Math.PI));
 		System.out.println();
+		System.out.println("[Units Of Measure]");
+		System.out.println("EncoderRevolution................." + ElevatorSRXEncoderRevolution.getValue() + " = " + ElevatorSRXEncoderRevolution.getValue().convertTo(LengthUOM.Inches));
+		System.out.println("Max Pulse/Decisecond.............." + ElevatorSRXMotorPulseRate.getValue() + " = " + ElevatorSRXMotorPulseRate.getCanonicalValue());
+		System.out.println("Max RPMs.........................." + ElevatorSRXMotorMaxRPM + " = " + ElevatorSRXMotorMaxRPM.convertTo(ElevatorSRXEncoderRPS) + " = " + ElevatorSRXMotorMaxRPM.convertTo(RateUOM.InchesPerSecond));
+		System.out.println();
 		System.out.println("[Calculations]");
 		System.out.println("Pulses/rev........................" + PULSES_PER_ENCODER_REVOLUTION);
 		System.out.println("Inches/rev........................" + INCHES_PER_ENCODER_REVOLUTION);
 		System.out.println("Pulses/inch......................." + PULSE_PER_INCH);
 		System.out.println("Pulse Length (Inches)............." + INCHES_PER_PULSE);
 		System.out.println("Pulse Length (Canonical).........." + PULSE_CANONICAL_LENGTH);
-		System.out.println();
-		System.out.println("[Units Of Measure]");
-		System.out.println("Elevator SRX Revolution..........." + ElevatorSRXMotorRevolution.getValue() + " = " + ElevatorSRXMotorRevolution.getCanonicalValue());
-		System.out.println("Elevator SRX Rate................." + ElevatorSRXMotorPulseRate.getValue() + " = " + ElevatorSRXMotorPulseRate.getCanonicalValue());
-		System.out.println("Elevator SRX Max Rate............." + ElevatorSRXMotorMaxPulseRate + " = " + ElevatorSRXMotorMaxPulseRate.convertTo(RateUOM.InchesPerSecond));
-		System.out.println("Elevator SRX 1% Rate.............." + ElevatorSRXMotorPercentageRate);
-		System.out.println("Elevator SRX 1%..................." + ElevatorSRXMotorPercentageRate.create(1));
+		System.out.println("Distance in Second................" + ElevatorSRXMotorMaxRPM.getLength(TimeUOM.Seconds.create(1)).convertTo(LengthUOM.Feet));
+		System.out.println("Distance in Minute................" + ElevatorSRXMotorMaxRPM.getLength(TimeUOM.Minutes.create(1)).convertTo(LengthUOM.Feet));
+ 		System.out.println("Elevator 100% Rate................" + ElevatorSRXMotorPercentageRate.create(100) + " = " + ElevatorSRXMotorPercentageRate.create(100).convertTo(RateUOM.FeetPerSecond));
+ 		System.out.println("Elevator % Rate Table.............");
 		for(int q = 0; q <= 100; q++) {
 			Rate pct = ElevatorSRXMotorPercentageRate.create(q);
 			Rate pr = ElevatorSRXMotorPulseRate.create(pct.convertTo(ElevatorSRXMotorPulseRate).getValueAsInt());
-			Rate rpm = ElevatorSRXRPM.create(pct.convertTo(ElevatorSRXRPM).getValueAsInt());
+			Rate rpm = ElevatorSRXEncoderRPM.create(pct.convertTo(ElevatorSRXEncoderRPM).getValueAsInt());
 			Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
-			System.out.println(pct + " = " + pr + " = " + rpm + " = " + ips);	
+			System.out.println("                                  " + pct + " = " + pr + " = " + rpm + " = " + ips);	
 		}
-		
+/*		
 		System.out.println();
 		System.out.println("[Conversion Table]");
 		System.out.println("Elevator SRX Revolution..........." + ElevatorSRXMotorRevolution.getValue());
@@ -106,8 +117,9 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 					Math.round(RateUOM.InchesPerSecond.create(j).convertTo(ElevatorSRXRPM).getValue()), ElevatorSRXRPM.getUnitNameAbbreviation())
 			);
 		}
+*/		
 	}
-	
+
 	public ElevatorAxisConfiguration() {
 		super(
 			"Elevator Vertical Axis",
@@ -156,7 +168,5 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake // neutralMode
 			);
-//		mathReport();
-//		dumpDescription();
 	}
 }
