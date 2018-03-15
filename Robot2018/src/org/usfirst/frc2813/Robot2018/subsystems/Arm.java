@@ -34,7 +34,6 @@ public class Arm extends SubsystemPositionDirectionSpeed {
     protected Length MAX_POSITION;
 	protected Length MIN_POSITION;
 
-
 	private Talon motorController;
 
 	public Arm() {
@@ -48,16 +47,15 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 		MIN_POSITION = LengthUOM.Inches.create(0);
 		// PULSES_PER_UNIT_POSITION = PULSES_PER_REVOLUTION / 360;
 		// PULSES_PER_UNIT_POSITION_PER_TIME = PULSES_PER_DEGREE * VELOCITY_TIME_UNITS_PER_SEC;
-	    DEFAULT_SPEED = RateUOM.InchesPerSecond.create(5);
 
 		motorController = new Talon(RobotMap.srxArm, Logger.getLogger("ArmMC"));
 		
 		// Configure the limits for DOWN
-		motorController.configureHardLimitSwitch(Direction.BACKWARD, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-		motorController.disableSoftLimitSwitch(Direction.BACKWARD);
+		motorController.setHardLimitSwitch(Direction.BACKWARD, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+		// motorController.setSoftLimitSwitch(Direction.BACKWARD, true, ???);
 		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.BACKWARD, true);
 		// Configure the limits for UP
-		motorController.configureHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
+		motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
 		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
 		// motorController.configureSoftLimitSwitch(Direction.FORWARD, (int)(MAX_POSITION * PULSES_PER_UNIT_POSITION)); NB: This is wrong and needs to be calculated.  See ElevatorAxisConfiguration
 		// Configure the PID profiles
@@ -66,6 +64,9 @@ public class Arm extends SubsystemPositionDirectionSpeed {
 	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.1, 0.0, 0.0);
 	    motorController.configurePID(TalonProfileSlot.Moving, 2.0, 0.0, 0.0);
 	    initialize();
+	}
+	protected Rate getDefaultSpeed() {
+		return RateUOM.InchesPerSecond.create(5);
 	}
 
 	public boolean readLimitSwitch(Direction switchDirection) {

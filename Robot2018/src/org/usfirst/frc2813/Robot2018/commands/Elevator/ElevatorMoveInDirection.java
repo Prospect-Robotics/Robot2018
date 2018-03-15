@@ -13,7 +13,6 @@ public class ElevatorMoveInDirection extends GearheadsCommand {
 
 	public ElevatorMoveInDirection(Direction direction) {
 		this.direction = direction;
-		logger.info("Move " + direction);
 		requires(Robot.elevator);
 	}
 

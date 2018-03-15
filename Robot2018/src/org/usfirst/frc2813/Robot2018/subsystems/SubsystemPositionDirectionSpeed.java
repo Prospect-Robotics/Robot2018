@@ -34,14 +34,15 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	protected final RateUOM subsystemRateUnits;
 	protected final RateUOM sensorRateUnits;
 	protected final RateUOM motorRateUnits;
-	
-	protected Direction direction, oldDirection;
-	Rate speed;
+
+	protected Direction direction;
+	protected Direction oldDirection;
+	protected Rate speed;
 	protected Rate oldSpeed;
 	protected Length position;
 	protected Length oldPosition;
-	protected MotorControllerState state, oldState;
-    protected Rate DEFAULT_SPEED;
+	protected MotorControllerState oldState;
+	protected MotorControllerState state;
 
 	/**
 	 * configure your motor controller and set your
@@ -64,13 +65,14 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		// track state and change as required. Start in moving so initialize can halt
 		direction = Direction.NEUTRAL;
 		position = getCurrentPositionInSubsystemUnits();
-		speed = DEFAULT_SPEED;
+		speed = getDefaultSpeed();
 		oldSpeed = RateUOM.InchesPerSecond.create(0);
 		oldDirection = Direction.NEUTRAL;
 		oldState = MotorControllerState.DISABLED;
 		state = readMotorControllerState();
 	}
-
+	// TODO: Replace with axisConfiguration
+	protected abstract Rate getDefaultSpeed();
 	/**
 	 * Abstract method to read controller state
 	 * @return MotorControllerState
@@ -116,36 +118,55 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		return state;
 	}
 
-	protected boolean isStateTransitionAllowed(MotorControllerState newState) {
+	protected boolean isStateTransitionAllowed(MotorControllerState oldState, MotorControllerState newState) {
 		// Validate the state transition before we do anything
-		switch(state) {
+		switch(newState) {
 		case DISABLED:
-			if (state == newState) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", state, newState));
+			if (oldState == newState) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case HOLDING_POSITION:
-			if (state == newState) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", state, newState));
+			if (oldState == newState) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case MOVING:
-			if ((state == newState) && (oldSpeed == speed) && (oldDirection == direction)) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", state, newState));
+			if ((oldState == newState) && (oldSpeed == speed) && (oldDirection == direction)) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case SET_POSITION:
-			if ((state == newState) && (oldPosition == position)) {
-				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", state, newState));
+			if ((oldState == newState) && (oldPosition == position)) {
+				logger.warning(String.format("bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, newState));
 				new Exception().printStackTrace();
 				return false;
 			}
+			break;
+		}
+		return true;
+	}
+
+	protected boolean executeTransition(MotorControllerState oldState, MotorControllerState newState) {
+		// Check that state change is actually changing something. If so, do it.
+		switch(newState) {
+		case DISABLED:
+			disableController();
+			break;
+		case HOLDING_POSITION:
+			holdControllerPosition();
+			break;
+		case MOVING:
+			setControllerDirectionAndSpeed(direction, speed);
+			break;
+		case SET_POSITION:
+			setPosition(position);
 			break;
 		}
 		return true;
@@ -174,32 +195,21 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		}
 		
 		// Check that the state transition is legal before we do anything.
-		if(!isStateTransitionAllowed(newState)) {
+		if(!isStateTransitionAllowed(state, newState)) {
 			return false;
 		}
 
-		// Check state transitions are valid before executing them
-		oldState = state;
-		state = newState;
-		
-		// Check that state change is actually changing something. If so, do it.
-		switch(state) {
-		case DISABLED:
-			disableController();
-			break;
-		case HOLDING_POSITION:
-			holdControllerPosition();
-			break;
-		case MOVING:
-			setControllerDirectionAndSpeed(direction, speed);
-			break;
-		case SET_POSITION:
-			setPosition(position);
-			break;
+		// Execute the transition
+		if(!executeTransition(oldState, newState)) {
+			return false;
 		}
+
+		// Transition successful, save the state.
+		oldState = state;
 		oldPosition = position;
 		oldSpeed = speed;
 		oldDirection = direction;
+		state = newState;
 		return true;
 	}
 
@@ -235,6 +245,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		oldDirection = direction;
 		direction = newDirection;
 		changeState(MotorControllerState.MOVING);
+		// TODO: Check rate is within limits from axisConfiguration
 	}
 
 	/**
@@ -245,6 +256,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		oldPosition = position;
 		position = newPosition;
 		changeState(MotorControllerState.SET_POSITION);
+		// TODO: Check position is within limits from axisConfiguration
 	}
 
 	/**

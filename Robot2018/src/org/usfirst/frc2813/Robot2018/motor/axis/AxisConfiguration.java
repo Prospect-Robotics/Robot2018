@@ -9,9 +9,8 @@ import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Value;
-
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-
 
 /*
  * This class is an immutable description of an axis as used by a motor, a subsystem's API, or a sensor.
@@ -42,6 +41,8 @@ public class AxisConfiguration {
 	public static final int Reverse                             = 1 <<  12;
 	public static final int ReverseHardLimitSwitch              = 1 <<  13;
 	public static final int ReverseSoftLimitSwitch              = 1 <<  14;
+	public static final int DefaultRate                         = 1 <<  15;
+	public static final int NeutralMode                         = 1 <<  16;
 
 	public static final int MAX_CAPABILITY = 31;
 	
@@ -62,6 +63,8 @@ public class AxisConfiguration {
         case Reverse                : return "Reverse";
         case ReverseHardLimitSwitch : return "ReverseHardLimitSwitch";
         case ReverseSoftLimitSwitch : return "ReverseSoftLimitSwitch";
+        case DefaultRate            : return "DefaultRate";
+        case NeutralMode            : return "NeutralMode";
         default:
                 return "Unknown Capability " + capability;
         }
@@ -204,6 +207,14 @@ public class AxisConfiguration {
 		requireAll(Reverse|ControlRate|LimitRate);
 		return maximumReverseRate;
 	}
+	/*
+	 * If ControlRate is supported, return the default rate. 
+	 */
+	private final Rate defaultRate;
+	public Rate getDefaultRate() {
+		requireAll(ControlRate);
+		return defaultRate;
+	}
 
 	/*
 	 * If ReadRate or ReadPosition are supported, return whether the sensor is reversed
@@ -271,7 +282,7 @@ public class AxisConfiguration {
 	 * If Forward and ForwardHardLimitSwitch return forwardHardLimitSwitchResetsEncoder 
 	 */
 	private final Boolean forwardHardLimitSwitchResetsEncoder;
-	public final boolean getForwardHardLimitResetsEncoder() {
+	public final boolean getForwardHardLimitSwitchResetsEncoder() {
 		requireAll(Forward|ForwardHardLimitSwitch);
 		return forwardHardLimitSwitchResetsEncoder;
 	}
@@ -279,7 +290,7 @@ public class AxisConfiguration {
 	 * If Reverse and Reverse and ReverseHardLimitSwitch return reverseHardLimitSwitchResetsEncoder, 
 	 */
 	private final Boolean reverseHardLimitSwitchResetsEncoder;
-	public final boolean getReverseHardLimitResetsEncoder() {
+	public final boolean getReverseHardLimitSwitchResetsEncoder() {
 		requireAll(Reverse|ReverseHardLimitSwitch);
 		return reverseHardLimitSwitchResetsEncoder;
 	}
@@ -287,18 +298,18 @@ public class AxisConfiguration {
 	/*
 	 * If Forward and ForwardHardLimitSwitch, return the behavior for forward hard limit switch
 	 */
-	private final LimitSwitchNormal forwardHardLimitSwitchBehavior;
-	public final LimitSwitchNormal getForwardHardLimitSwitchBehavior() {
-		requireAll(Forward|ForwardSoftLimitSwitch);
-		return forwardHardLimitSwitchBehavior;
+	private final LimitSwitchNormal forwardHardLimitSwitchNormal;
+	public final LimitSwitchNormal getForwardHardLimitSwitchNormal() {
+		requireAll(Forward|ForwardHardLimitSwitch);
+		return forwardHardLimitSwitchNormal;
 	}
 	/*
 	 * If Reverse and ReverseHardLimitSwitch, return the behavior for forward hard limit switch
 	 */
-	private final LimitSwitchNormal reverseHardLimitSwitchBehavior;
-	public final LimitSwitchNormal getReverseHardLimitSwitchBehavior() {
-		requireAll(Reverse|ReverseSoftLimitSwitch);
-		return reverseHardLimitSwitchBehavior;
+	private final LimitSwitchNormal reverseHardLimitSwitchNormal;
+	public final LimitSwitchNormal getReverseHardLimitSwitchNormal() {
+		requireAll(Reverse|ReverseHardLimitSwitch);
+		return reverseHardLimitSwitchNormal;
 	}
 	/*
 	 * If Forward and ForwardSoftLimitSwitch, return forward soft limit 
@@ -315,6 +326,12 @@ public class AxisConfiguration {
 	public final Length getReverseSoftLimitEnabled() {
 		requireAll(Reverse|ReverseSoftLimitSwitch);
 		return reverseSoftLimit;
+	}
+	private final com.ctre.phoenix.motorcontrol.NeutralMode neutralMode;
+	public final NeutralMode getNeutralMode() {
+		requireAll(NeutralMode);
+		requireAny(ControlRate|ControlPosition);
+		return neutralMode;
 	}
 	/*
 	 * Get the native units for this axis
@@ -337,14 +354,16 @@ public class AxisConfiguration {
 			Double sensorToDriveScalingFactor, // requireAll(SensorToDriveScale)
 			Length forwardLimit, // requireAll(Forward|ControlPosition|LimitPosition)
 			Length reverseLimit, // requireAll(Reverse|ControlPosition|LimitPosition)
-			LimitSwitchNormal forwardHardLimitSwitchBehavior, // requireAll(Forward|ForwardSoftLimitSwitch)
+			LimitSwitchNormal forwardHardLimitSwitchNormal, // requireAll(Forward|ForwardSoftLimitSwitch)
 			Boolean forwardHardLimitStopsMotor, // requireAll(Forward|ForwardHardLimitSwitch)
 			Boolean forwardHardLimitSwitchResetsEncoder, // requireAll(Forward|ForwardHardLimitSwitch)
-			LimitSwitchNormal reverseHardLimitSwitchBehavior, // requireAll(Reverse|ReverseSoftLimitSwitch)
+			LimitSwitchNormal reverseHardLimitSwitchNormal, // requireAll(Reverse|ReverseSoftLimitSwitch)
 			Boolean reverseHardLimitStopsMotor, // requireAll(Reverse|ReverseHardLimitSwitch)
 			Boolean reverseHardLimitSwitchResetsEncoder, // requireAll(Reverse|ReverseHardLimitSwitch)
 			Length forwardSoftLimit, // requireAll(Forward|ForwardSoftLimitSwitch)
-			Length reverseSoftLimit // requireAll(Reverse|ReverseSoftLimitSwitch)
+			Length reverseSoftLimit, // requireAll(Reverse|ReverseSoftLimitSwitch)
+			Rate defaultRate, // requireAll(ControlRate)
+			NeutralMode neutralMode // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
 			)
 	{
 		this.axisName = axisName;
@@ -364,14 +383,16 @@ public class AxisConfiguration {
 		this.nativeDisplayLengthUOM = nativeDisplayLengthUOM;
 		this.forwardLimit = forwardLimit;
 		this.reverseLimit = reverseLimit;
-		this.forwardHardLimitSwitchBehavior = forwardHardLimitSwitchBehavior;
+		this.forwardHardLimitSwitchNormal = forwardHardLimitSwitchNormal;
 		this.forwardHardLimitStopsMotor = forwardHardLimitStopsMotor;
 		this.forwardHardLimitSwitchResetsEncoder = forwardHardLimitSwitchResetsEncoder;
-		this.reverseHardLimitSwitchBehavior = reverseHardLimitSwitchBehavior;
+		this.reverseHardLimitSwitchNormal = reverseHardLimitSwitchNormal;
 		this.reverseHardLimitStopsMotor = reverseHardLimitStopsMotor;
 		this.reverseHardLimitSwitchResetsEncoder = reverseHardLimitSwitchResetsEncoder;
 		this.forwardSoftLimit = forwardSoftLimit;
 		this.reverseSoftLimit = reverseSoftLimit;
+		this.defaultRate = defaultRate;
+		this.neutralMode = neutralMode;
 		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
@@ -396,7 +417,7 @@ public class AxisConfiguration {
 				throw new IllegalArgumentException("Indicated capabilities do not require " + name + ".\nThe following capabilities use " + name + ":\n" + listCapabilitiesCSV(requireAny));
 			}
 			if(requireAll != 0 && !hasAll(requireAll)) {
-				throw new IllegalArgumentException("Indicated capabilities do not require " + name + ".\nThe parameter is ONLY required if you have ALL of these capabilities " + name + ":\n" + listCapabilitiesCSV(requireAll));
+				throw new IllegalArgumentException("Indicated capabilities do not require " + name + ".\nThe " + name + " parameter is ONLY required if you have ALL of these capabilities:\n" + listCapabilitiesCSV(requireAll));
 			}
 		} else {
 			if(requireAny != 0 && hasAny(requireAny)) {
@@ -440,6 +461,8 @@ public class AxisConfiguration {
 		validateCapabilityDependency(ReadDirection, 0, SensorToDriveScale);
 		validateCapabilityDependency(ReadPosition, 0, SensorToDriveScale);
 		validateCapabilityDependency(ReadRate, 0, SensorToDriveScale);
+		validateCapabilityDependency(ReadRate, 0, ControlRate);
+		validateCapabilityDependency(NeutralMode, ControlRate|ControlPosition, 0);
 		// Now validate settings
 		checkParameter("nativeDisplayLengthUOM", nativeDisplayLengthUOM, ReadPosition, 0);
 		checkParameter("nativeMotorLengthUOM", nativeMotorLengthUOM, ControlPosition|ControlDirection, 0);  
@@ -456,14 +479,16 @@ public class AxisConfiguration {
 		checkParameter("sensorToDriveScalingFactor", sensorToDriveScalingFactor, SensorToDriveScale, 0);
 		checkParameter("forwardLimit", forwardLimit, 0, Forward|ControlPosition|LimitPosition);
 		checkParameter("reverseLimit", reverseLimit, 0, Reverse|ControlPosition|LimitPosition);
-		checkParameter("forwardHardLimitSwitchBehavior", forwardHardLimitSwitchBehavior, 0, Forward|ForwardSoftLimitSwitch);
+		checkParameter("forwardHardLimitSwitchNormal", forwardHardLimitSwitchNormal, 0, Forward|ForwardSoftLimitSwitch);
 		checkParameter("forwardHardLimitStopsMotor", forwardHardLimitStopsMotor, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("forwardHardLimitSwitchResetsEncoder", forwardHardLimitSwitchResetsEncoder, 0, Forward|ForwardHardLimitSwitch);
-		checkParameter("reverseHardLimitSwitchBehavior", reverseHardLimitSwitchBehavior, 0, Reverse|ReverseHardLimitSwitch);
+		checkParameter("reverseHardLimitSwitchNormal", reverseHardLimitSwitchNormal, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("reverseHardLimitStopsMotor", reverseHardLimitStopsMotor, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("reverseHardLimitSwitchResetsEncoder", reverseHardLimitSwitchResetsEncoder, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("forwardSoftLimit", forwardSoftLimit, 0, Forward|ForwardSoftLimitSwitch);
 		checkParameter("reverseSoftLimit", reverseSoftLimit, 0, Reverse|ReverseSoftLimitSwitch);
+		checkParameter("defaultRate", defaultRate, 0, ControlRate);
+		checkParameter("neutralMode", neutralMode, ControlRate|ControlPosition, NeutralMode);
 	}
 
 	public String toString() {
@@ -504,6 +529,7 @@ public class AxisConfiguration {
 		.append("\n")
 		.append("Rates:\n")
 		.append("\n")
+		.append("defaultRate..........................." + describeValue(defaultRate, nativeMotorRateUOM) + "\n")
 		.append("minimumForwardRate...................." + describeValue(minimumForwardRate, nativeMotorRateUOM) + "\n")
 		.append("maximumForwardRate...................." + describeValue(maximumForwardRate, nativeMotorRateUOM) + "\n")
 		.append("minimumReverseRate...................." + describeValue(minimumReverseRate, nativeMotorRateUOM) + "\n")
@@ -518,10 +544,10 @@ public class AxisConfiguration {
 		.append("\n")
 		.append("forwardSoftLimit......................" + describeValue(forwardSoftLimit, nativeMotorLengthUOM) + "\n")
 		.append("reverseSoftLimit......................" + describeValue(reverseSoftLimit, nativeMotorLengthUOM) + "\n")
-		.append("forwardHardLimitSwitchBehavior........" + forwardHardLimitSwitchBehavior + "\n")
+		.append("forwardHardLimitSwitchBehavior........" + forwardHardLimitSwitchNormal + "\n")
 		.append("forwardHardLimitStopsMotor............" + forwardHardLimitStopsMotor + "\n")
 		.append("forwardHardLimitSwitchResetsEncoder..." + forwardHardLimitSwitchResetsEncoder + "\n")
-		.append("reverseHardLimitSwitchBehavior........" + reverseHardLimitSwitchBehavior + "\n")
+		.append("reverseHardLimitSwitchBehavior........" + reverseHardLimitSwitchNormal + "\n")
 		.append("reverseHardLimitStopsMotor............" + reverseHardLimitStopsMotor + "\n")
 		.append("reverseHardLimitSwitchResetsEncoder..." + reverseHardLimitSwitchResetsEncoder + "\n")
 		.append("\n")
@@ -530,6 +556,10 @@ public class AxisConfiguration {
 		.append("sensorPhaseIsReversed................." + sensorPhaseIsReversed + "\n")
 		.append("motorPhaseIsReversed.................." + motorPhaseIsReversed + "\n")
 		.append("sensorToDriveScalingFactor............" + sensorToDriveScalingFactor + "\n")
+		.append("\n")
+		.append("Miscellaneous:\n")
+		.append("\n")
+		.append("neutralMode..........................." + neutralMode + "\n")
 		.append("----------------------------------------------------------------------------\n")
 		;
 		return buf.toString();

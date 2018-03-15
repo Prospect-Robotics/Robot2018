@@ -31,41 +31,62 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
  * speed is in inches per second.
  */
 public class Elevator extends SubsystemPositionDirectionSpeed {
+
 	private Talon motorController;
-	public static final ElevatorAxisConfiguration elevatorAxis = new ElevatorAxisConfiguration();
-//	protected double PULSES_PER_UNIT_POSITION = LengthUOM.Inches.getCanonicalValue().convertTo(elevatorAxis.getNativeMotorLengthUOM()).getValue();
+	public static final ElevatorAxisConfiguration axisConfiguration = new ElevatorAxisConfiguration();
 
 	public Elevator() {
 		super(
-				elevatorAxis.getNativeDisplayLengthUOM(), 
-				elevatorAxis.getNativeSensorLengthUOM(), 
-				elevatorAxis.getNativeMotorLengthUOM(),
-				elevatorAxis.getNativeDisplayRateUOM(), 
-				elevatorAxis.getNativeSensorRateUOM(), 
-				elevatorAxis.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
+				axisConfiguration.getNativeDisplayLengthUOM(), 
+				axisConfiguration.getNativeSensorLengthUOM(), 
+				axisConfiguration.getNativeMotorLengthUOM(),
+				axisConfiguration.getNativeDisplayRateUOM(), 
+				axisConfiguration.getNativeSensorRateUOM(), 
+				axisConfiguration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
 				);
-		motorController = new Talon(RobotMap.srxElevator, Logger.getLogger("ElevatorMC"));		
-	    DEFAULT_SPEED = RateUOM.InchesPerSecond.create(12); // In subsystem units inches/second
-//	    MAX_POSITION = elevatorAxis.getForwardLimit(); // In subsystem units inches
-//		MIN_POSITION = elevatorAxis.getReverseLimit(0); // In subsystem units inches
-		// Configure the limits for DOWN
-		motorController.configureHardLimitSwitch(Direction.DOWN, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-		motorController.disableSoftLimitSwitch(Direction.DOWN);
-		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, true);
-
+		motorController = new Talon(RobotMap.srxElevator, Logger.getLogger("ElevatorMC"));
+		// Set forward hard limits
+		if(axisConfiguration.hasAll(AxisConfiguration.Forward|AxisConfiguration.LimitPosition|AxisConfiguration.ForwardHardLimitSwitch)) {
+			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.FeedbackConnector, axisConfiguration.getForwardHardLimitSwitchNormal());
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, axisConfiguration.getForwardHardLimitSwitchResetsEncoder());
+		} else {
+			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
+		}
+		// Set reverse hard limits
+		if(axisConfiguration.hasAll(AxisConfiguration.Reverse|AxisConfiguration.LimitPosition|AxisConfiguration.ReverseHardLimitSwitch)) {
+			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.FeedbackConnector, axisConfiguration.getReverseHardLimitSwitchNormal());
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, axisConfiguration.getReverseHardLimitSwitchResetsEncoder());
+		} else {
+			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
+		}
+		// Set forward soft limit
+		if(axisConfiguration.hasAll(AxisConfiguration.Forward|AxisConfiguration.LimitPosition|AxisConfiguration.ForwardSoftLimitSwitch)) {
+			motorController.setSoftLimitSwitch(Direction.FORWARD, true, axisConfiguration.getForwardLimit().convertTo(axisConfiguration.getNativeSensorLengthUOM()).getValueAsInt());
+		} else {
+			motorController.setSoftLimitSwitch(Direction.FORWARD, false);
+		}
+		// Set reverse soft limit
+		if(axisConfiguration.hasAll(AxisConfiguration.Reverse|AxisConfiguration.LimitPosition|AxisConfiguration.ReverseSoftLimitSwitch)) {
+			motorController.setSoftLimitSwitch(Direction.REVERSE, true, axisConfiguration.getReverseLimit().convertTo(axisConfiguration.getNativeSensorLengthUOM()).getValueAsInt());
+		} else {
+			motorController.setSoftLimitSwitch(Direction.REVERSE, false);
+		}
+		if(axisConfiguration.hasAny(AxisConfiguration.NeutralMode)) {
+			motorController.setNeutralMode(axisConfiguration.getNeutralMode());
+		}
 // HW BUG WORKAROUND
-motorController.configureHardLimitSwitch(Direction.UP, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+motorController.setHardLimitSwitch(Direction.UP, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
 motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true);
-//		// Configure the limits for UP
-//		motorController.configureHardLimitSwitch(Direction.UP, LimitSwitchSource.Deactivated); // Ignore any short in the wiring.  The default is enabled.
-//		motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.DOWN, false);
-// HW BUG WORKAROUND
-//		motorController.configureSoftLimitSwitch(Direction.UP, (int)Math.round(MAX_POSITION.convertTo(elevatorAxis.getNativeMotorLengthUOM()).getValue()));
 
 		// Configure the PID profiles
   	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
 	    motorController.configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
 	    initialize();
+	}
+	protected Rate getDefaultSpeed() {
+		return axisConfiguration.getDefaultRate();
 	}
 	
 	public boolean readLimitSwitch(Direction switchDirection) {
@@ -117,22 +138,20 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	@Override
 	protected Length getCurrentPositionInSensorUnits() {
 		int rawPosition = motorController.readPosition();
-		Length scaledPosition = sensorUnitsToLength(rawPosition * elevatorAxis.getSensorToDriveScalingFactor());
+		Length scaledPosition = sensorUnitsToLength(rawPosition * axisConfiguration.getSensorToDriveScalingFactor());
 		System.out.println("POSITION [RAW=" + rawPosition + " SCALED=" + scaledPosition + " SUBSYSTEM=" + toSubsystemUnits(scaledPosition) + "]");
 		// NB: Talon supports sensor inversion, so we won't need to do it here.
 		return scaledPosition;
 	}
 	/*
 	 * Tell the motor controller a new position.  
-	 * NOTE: This is the ONLY place we should be doing conversions and scaling 
+	 * NOTE: This is the ONLY place we should be doing rate conversions and scaling  
 	 */
 	protected void setControllerDirectionAndSpeed(Direction direction, Rate speedParam) {
 		Rate sensorRate = toSensorUnits(speedParam);
-		Rate scaledRate = toSensorUnits(sensorRate.multiply(elevatorAxis.getSensorToDriveScalingFactor()));
-//		double scaledMotorPosition = motorRate * elevatorAxis.getMotorToDriveScalingFactor();
+		Rate scaledRate = toSensorUnits(sensorRate.multiply(axisConfiguration.getSensorToDriveScalingFactor()));
 		System.out.println("SET RATE [DIR=" + direction + " SPEED=" + speedParam + " SENSOR_U=" + sensorRate + " SCALED=" + scaledRate + "]");
 		motorController.move(direction, scaledRate.getValueAsInt());
-//		System.out.println("UNITS: " + toMotorUnits(speedParam).getValueAsInt());
 	}
 	/*
 	 * Tell the motor controller a new position.  
@@ -141,7 +160,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	@Override
 	protected void setPosition(Length position) {
 		Length sensorPosition = toSensorUnits(position);
-		Length scaledPosition = sensorPosition.multiply(elevatorAxis.getSensorToDriveScalingFactor());
+		Length scaledPosition = sensorPosition.multiply(axisConfiguration.getSensorToDriveScalingFactor());
 		System.out.println("SET POS [POS=" + position + " SENSOR_U=" + sensorPosition + " SCALED=" + scaledPosition);
 		// NB: Talon supports motor inversion, so we won't need to do it here.		
 		motorController.setPosition(scaledPosition.getValueAsInt());

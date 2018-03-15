@@ -126,12 +126,13 @@ public class Robot extends TimedRobot {
 		new POST().start();
 	}
 
-	/** TODO: DELETE ALL THIS */
-	private long hack = System.currentTimeMillis();
-	private void dumpStateAtIntervals() {
-		if(System.currentTimeMillis() - hack > 750) {
-			hack = System.currentTimeMillis();
+	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
+	private long lastPositionReport = System.currentTimeMillis();
+	private void dumpSubsystemStatusAtIntervals() {
+		if(System.currentTimeMillis() - lastPositionReport > 750) {
+			lastPositionReport = System.currentTimeMillis();
 			Robot.elevator.dumpState();
+			Robot.arm.dumpState();
 		}
 	}
 	/**
@@ -140,6 +141,6 @@ public class Robot extends TimedRobot {
 	//@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		dumpStateAtIntervals();
+		dumpSubsystemStatusAtIntervals();
 	}
 }

@@ -13,6 +13,7 @@ import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class ElevatorAxisConfiguration extends AxisConfiguration {
 
@@ -42,7 +43,15 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 	// Units Of Rate for Elevator
 	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, "Elevator pulses/100ms");
 	public static final RateUOM   ElevatorSRXRPM              = new RateUOM(ElevatorSRXMotorRevolution, TimeUOM.Minutes, "Elevator RPMs");
+
+	public static final Rate      ElevatorSRXMotorMaxPulseRate = ElevatorSRXMotorPulseRate.create(PULSES_PER_ENCODER_REVOLUTION);
 	
+	public static final LengthUOM ElevatorSRXMotorPercentage = new LengthUOM("srx%", "srx%", "srx%", PULSE_CANONICAL_LENGTH.getCanonicalValue() * 40.96);
+	public static final Length    ElevatorSRXMotorPercentageValue = ElevatorSRXMotorPercentage.create(10);
+	public static final RateUOM   ElevatorSRXMotorPercentageRate = new RateUOM(ElevatorSRXMotorPercentage, TimeUOM.Deciseconds, "% Elevator");
+	// Percentage for Elevator
+	//private static final ElevatorSRXPercentage = new RateUOM();
+
 	public static void mathReport() {
 		System.out.println();
 		System.out.println("[Software Settings]");
@@ -66,10 +75,21 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 		System.out.println("[Units Of Measure]");
 		System.out.println("Elevator SRX Revolution..........." + ElevatorSRXMotorRevolution.getValue() + " = " + ElevatorSRXMotorRevolution.getCanonicalValue());
 		System.out.println("Elevator SRX Rate................." + ElevatorSRXMotorPulseRate.getValue() + " = " + ElevatorSRXMotorPulseRate.getCanonicalValue());
+		System.out.println("Elevator SRX Max Rate............." + ElevatorSRXMotorMaxPulseRate + " = " + ElevatorSRXMotorMaxPulseRate.convertTo(RateUOM.InchesPerSecond));
+		System.out.println("Elevator SRX 1% Rate.............." + ElevatorSRXMotorPercentageRate);
+		System.out.println("Elevator SRX 1%..................." + ElevatorSRXMotorPercentageRate.create(1));
+		for(int q = 0; q <= 100; q++) {
+			Rate pct = ElevatorSRXMotorPercentageRate.create(q);
+			Rate pr = ElevatorSRXMotorPulseRate.create(pct.convertTo(ElevatorSRXMotorPulseRate).getValueAsInt());
+			Rate rpm = ElevatorSRXRPM.create(pct.convertTo(ElevatorSRXRPM).getValueAsInt());
+			Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
+			System.out.println(pct + " = " + pr + " = " + rpm + " = " + ips);	
+		}
+		
 		System.out.println();
 		System.out.println("[Conversion Table]");
 		System.out.println("Elevator SRX Revolution..........." + ElevatorSRXMotorRevolution.getValue());
-		
+
 		Iterator<UOM> i = UOM.allUnits.get(SystemOfMeasurement.Length).iterator();
 		while(i.hasNext()) {
 			System.out.println("                                  " + ElevatorSRXMotorRevolution.getValue().convertTo((LengthUOM)i.next()));
@@ -108,6 +128,8 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 					|AxisConfiguration.Reverse
 					|AxisConfiguration.ReverseHardLimitSwitch
 //					|AxisConfiguration.ReverseSoftLimitSwitch
+					|AxisConfiguration.DefaultRate
+					|AxisConfiguration.NeutralMode
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM
@@ -124,14 +146,18 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
 			LengthUOM.Inches.create(24),        // forwardLimit (placeholder)
 			LengthUOM.Inches.create(0),         // reverseLimit
-			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchBehavior
+			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
-			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchBehavior
+			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       // reverseHardLimitStopsMotor
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
 			LengthUOM.Inches.create(24),        // forwardSoftLimit
-			null                                // reverseSoftLimit
+			null,                               // reverseSoftLimit
+			RateUOM.InchesPerSecond.create(12), // defaultRate
+			com.ctre.phoenix.motorcontrol.NeutralMode.Brake // neutralMode
 			);
+//		mathReport();
+//		dumpDescription();
 	}
 }

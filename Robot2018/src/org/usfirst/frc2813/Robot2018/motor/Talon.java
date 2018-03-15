@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
@@ -59,6 +60,7 @@ public class Talon {
 	public static final double DEFAULT_P_GAIN = 0.0; // From manual
 	public static final double DEFAULT_I_GAIN = 0.0; // From manual
 	public static final double DEFAULT_D_GAIN = 0.0; // From manual
+	public static final NeutralMode DEFAULT_NEUTRAL_MODE = NeutralMode.Brake;
 
 	// Current state
 	private MotorControllerState state;
@@ -119,19 +121,20 @@ public class Talon {
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
 		 */
-		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot0);
-		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot1);
-		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot2);
-		configureAllowableClosedLoopError(TalonProfileSlot.ProfileSlot3);
+		setAllowableClosedLoopError(TalonProfileSlot.ProfileSlot0);
+		setAllowableClosedLoopError(TalonProfileSlot.ProfileSlot1);
+		setAllowableClosedLoopError(TalonProfileSlot.ProfileSlot2);
+		setAllowableClosedLoopError(TalonProfileSlot.ProfileSlot3);
 		// Configure limit switches on startup to all off
-		resetHardLimitSwitchClearsPositionAutomatically(Direction.POSITIVE); // reset defalts
-		resetHardLimitSwitchClearsPositionAutomatically(Direction.NEGATIVE); // reset defalts
-		disableSoftLimitSwitch(Direction.POSITIVE); // reset defaults
-		disableSoftLimitSwitch(Direction.NEGATIVE); // reset defaults
-		configureHardLimitSwitch(Direction.POSITIVE); // reset defaults
-		configureHardLimitSwitch(Direction.NEGATIVE); // reset defaults
+		setHardLimitSwitchClearsPositionAutomatically(Direction.POSITIVE, DEFAULT_LIMIT_SWITCH_CLEAR_POSITION); // reset defalts
+		setHardLimitSwitchClearsPositionAutomatically(Direction.NEGATIVE, DEFAULT_LIMIT_SWITCH_CLEAR_POSITION); // reset defalts
+		setSoftLimitSwitch(Direction.POSITIVE, DEFAULT_SOFT_LIMIT_ENABLED, DEFAULT_SOFT_LIMIT_THRESHOLD); // reset defaults
+		setSoftLimitSwitch(Direction.NEGATIVE, DEFAULT_SOFT_LIMIT_ENABLED, DEFAULT_SOFT_LIMIT_THRESHOLD); // reset defaults
+		setHardLimitSwitch(Direction.POSITIVE); // reset defaults
+		setHardLimitSwitch(Direction.NEGATIVE); // reset defaults
 		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
 		configureClearPositionOnQuadIdx();
+		setNeutralMode(DEFAULT_NEUTRAL_MODE);
 		zeroSensorPositions();
 		// Start disabled
 		set(MotorControllerState.DISABLED, 0);
@@ -140,9 +143,11 @@ public class Talon {
 	void logger_info(String x) {
 		System.out.println("Talon: " + x);
 	}
-	
+	public void setNeutralMode(NeutralMode neutralMode) {
+		srx.setNeutralMode(neutralMode);
+	}
 	// Force zeroing
-	void zeroSensorPositions() {
+	public void zeroSensorPositions() {
 		logger_info("Disabling and zeroing sensor positions");
 		set(MotorControllerState.DISABLED, 0);
 		// Zero out absolute encoder values for both PID slots
@@ -157,7 +162,7 @@ public class Talon {
 	/*
 	 * Configure the soft limit switch.  Threshold is in pulses, see PULSES_PER_REVOLUTION (4096/rotation). 
 	 */
-	public void configureSoftLimitSwitch(Direction direction, boolean enabled, int thresholdInPulses) {
+	public void setSoftLimitSwitch(Direction direction, boolean enabled, int thresholdInPulses) {
 		if (direction.isNegative()) {
 			srx.configReverseSoftLimitEnable(enabled, CONFIGURATION_COMMAND_TIMEOUT_MS);
 			srx.configReverseSoftLimitThreshold(thresholdInPulses, CONFIGURATION_COMMAND_TIMEOUT_MS);
@@ -169,21 +174,11 @@ public class Talon {
 	/*
 	 * Enable the soft limit and set the threshold.
 	 */
-	public void configureSoftLimitSwitch(Direction direction, int thresholdInPulses) {
-		configureSoftLimitSwitch(direction, true, thresholdInPulses);	
+	public void setSoftLimitSwitch(Direction direction, int thresholdInPulses) {
+		setSoftLimitSwitch(direction, true, thresholdInPulses);	
 	}
-	/*
-	 * Reset soft limit switch to OFF, threshold zero.
-	 * NOTE: Calling this is equivalent to disableSoftLimitSwitch.
-	 */
-	public void configureSoftLimitSwitch(Direction direction) {
-		configureSoftLimitSwitch(direction, DEFAULT_SOFT_LIMIT_ENABLED, DEFAULT_SOFT_LIMIT_THRESHOLD);	
-	}
-	/*
-	 * Disable the soft limit and reset the threshold
-	 */
-	public void disableSoftLimitSwitch(Direction direction) {
-		configureSoftLimitSwitch(direction, false, DEFAULT_SOFT_LIMIT_THRESHOLD);
+	public void setSoftLimitSwitch(Direction direction, boolean enabled) {
+		setSoftLimitSwitch(direction, enabled, DEFAULT_SOFT_LIMIT_THRESHOLD);
 	}
 
 	/*
@@ -197,12 +192,6 @@ public class Talon {
 					0 /* unused */, 
 					0 /* unused */, 
 					CONFIGURATION_COMMAND_TIMEOUT_MS);
-	}
-	/*
-	 * Configure hardware limit switch to default behavior - NOT auto clear the sensor position when activated. 
-	 */
-	public void resetHardLimitSwitchClearsPositionAutomatically(Direction direction) {
-		setHardLimitSwitchClearsPositionAutomatically(direction, DEFAULT_LIMIT_SWITCH_CLEAR_POSITION);
 	}
 	/*
 	 * Configure whether quad encoder's index pin will automatically clear the encoder positions
@@ -228,7 +217,7 @@ public class Talon {
 	 *         RemoteTalonSRX - Another Talon (think follower mode + keep encoders sync'd together with one physical switch) 
 	 *         RemoteCANifier - This is a CAN connected limit switch
 	 */
-	public void configureHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource, LimitSwitchNormal limitSwitchMode) {
+	public void setHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource, LimitSwitchNormal limitSwitchMode) {
 		if (direction.isNegative()) {
 			srx.configReverseLimitSwitchSource(limitSwitchSource, limitSwitchMode, CONFIGURATION_COMMAND_TIMEOUT_MS);
 		} else {
@@ -240,20 +229,20 @@ public class Talon {
 	 * When PID is running with this profile, this is how much error it will accept before reacting (I think)
 	 * See getClosedLoopError(TalonPidLoopIndex) to see the current actual error.
 	 */
-	public void configureAllowableClosedLoopError(TalonProfileSlot profileSlot, int allowableClosedLoopError) {
+	public void setAllowableClosedLoopError(TalonProfileSlot profileSlot, int allowableClosedLoopError) {
 		srx.configAllowableClosedloopError(profileSlot.getProfileSlotIndex(), allowableClosedLoopError, CONFIGURATION_COMMAND_TIMEOUT_MS);
 	}
 	/*
 	 * Reset the allowable closed loop error for the indicated profile to default.  
 	 */
-	public void configureAllowableClosedLoopError(TalonProfileSlot profileSlot) {
-		configureAllowableClosedLoopError(profileSlot, DEFAULT_ALLOWABLE_CLOSED_LOOP_ERROR);
+	public void setAllowableClosedLoopError(TalonProfileSlot profileSlot) {
+		setAllowableClosedLoopError(profileSlot, DEFAULT_ALLOWABLE_CLOSED_LOOP_ERROR);
 	}
 	/*
 	 * Configure the limit switch source to one of (Deactivated, FeedbackConnector (physical switch), RemoteTalon, or RemoteCANifier), with default "normally open" logic levels.
 	 */
-	public void configureHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource) {
-		configureHardLimitSwitch(direction, limitSwitchSource, DEFAULT_LIMIT_SWITCH_MODE);
+	public void setHardLimitSwitch(Direction direction, LimitSwitchSource limitSwitchSource) {
+		setHardLimitSwitch(direction, limitSwitchSource, DEFAULT_LIMIT_SWITCH_MODE);
 	}
 	/*
 	 * Configure default behavior for the switch input.  By default, "hard" limit switch uses hardware but it can also use network and CAN bus (confusingly).  
@@ -261,8 +250,8 @@ public class Talon {
 	 * 2.  set to use the hardware limit switch pins on the MAG Encoder or SRX breakout board.
 	 * 3.  set to normally open
 	 */
-	public void configureHardLimitSwitch(Direction direction) {
-		configureHardLimitSwitch(direction, DEFAULT_LIMIT_SWITCH_SOURCE, DEFAULT_LIMIT_SWITCH_MODE);
+	public void setHardLimitSwitch(Direction direction) {
+		setHardLimitSwitch(direction, DEFAULT_LIMIT_SWITCH_SOURCE, DEFAULT_LIMIT_SWITCH_MODE);
 	}
 
 	/*
