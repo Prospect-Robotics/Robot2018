@@ -1,4 +1,4 @@
-package logging;
+package org.usfirst.frc2813.logging;
 
 import java.util.ArrayList;
 import java.util.Arrays;
