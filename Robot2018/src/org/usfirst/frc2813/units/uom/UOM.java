@@ -68,7 +68,7 @@ public abstract class UOM<T_UOM extends UOM, T_UV extends Value> {
 	@SuppressWarnings({ "unchecked" })
 	public static void dumpUnitsOfMeasure() {
 		@SuppressWarnings("unused")
-		UOM x = LengthUOM.CanonicalUOM;x = RateUOM.CanonicalUOM;x = TimeUOM.CanonicalUOM;
+		UOM x = LengthUOM.Micrometers;x = RateUOM.CentimetersPerDecisecond;x = TimeUOM.Microsecond;
 		System.out.println();
 		System.out.println("---------------------------------------------------------------------------------------------------------");
 		System.out.println("UNITS OF MEASURE REPORT:");
