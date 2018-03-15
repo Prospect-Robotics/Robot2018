@@ -23,7 +23,7 @@ public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 
 	// @Override
 	protected void initialize() {
-		Logger.info(String.format("Move %s at speed %s", direction, speed));
+		Logger.formatInfo("Move %s at speed %s", direction, speed);
 		Logger.debug("in initialize");
 			Robot.arm.moveInDirectionAtSpeed(direction, speed);
 	}
