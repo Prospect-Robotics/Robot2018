@@ -28,6 +28,9 @@ import org.usfirst.frc2813.units.values.Rate;
  *     the given direction
  */
 public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem {
+	static {
+		Logger.addMe();
+	}
 	// State information
 	protected final LengthUOM subsystemLengthUnits;
 	protected final LengthUOM sensorLengthUnits;
