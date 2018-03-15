@@ -206,6 +206,14 @@ public class AxisConfiguration {
 		return maximumReverseRate;
 	}
 	/*
+	 * If ControlRate or LimitRate are supported, return the a unit of measure representing 1% of maximum output 
+	 */
+	private final RateUOM percentageRateUOM;
+	public RateUOM getPercentageRateUOM() {
+		requireAny(ControlRate|LimitRate);
+		return percentageRateUOM;
+	}
+	/*
 	 * If ControlRate is supported, return the default rate. 
 	 */
 	private final Rate defaultRate;
@@ -361,7 +369,8 @@ public class AxisConfiguration {
 			Length forwardSoftLimit, // requireAll(Forward|ForwardSoftLimitSwitch)
 			Length reverseSoftLimit, // requireAll(Reverse|ReverseSoftLimitSwitch)
 			Rate defaultRate, // requireAll(ControlRate)
-			NeutralMode neutralMode // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
+			NeutralMode neutralMode, // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
+			RateUOM percentageRateUOM // require(ControlRate|LimitRate)
 			)
 	{
 		this.axisName = axisName;
@@ -391,6 +400,7 @@ public class AxisConfiguration {
 		this.reverseSoftLimit = reverseSoftLimit;
 		this.defaultRate = defaultRate;
 		this.neutralMode = neutralMode;
+		this.percentageRateUOM = percentageRateUOM;
 		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
@@ -487,6 +497,8 @@ public class AxisConfiguration {
 		checkParameter("reverseSoftLimit", reverseSoftLimit, 0, Reverse|ReverseSoftLimitSwitch);
 		checkParameter("defaultRate", defaultRate, 0, ControlRate);
 		checkParameter("neutralMode", neutralMode, ControlRate|ControlPosition, NeutralMode);
+		checkParameter("percentageRateUOM", percentageRateUOM, ControlRate|LimitRate, 0);
+		
 	}
 
 	public String toString() {
@@ -526,6 +538,7 @@ public class AxisConfiguration {
 		.append("nativeDisplayRateUOM.................." + describeUOM(nativeDisplayRateUOM) + "\n")
 		.append("nativeMotorRateUOM...................." + describeUOM(nativeMotorRateUOM) + "\n")
 		.append("nativeSensorRateUOM..................." + describeUOM(nativeSensorRateUOM) + "\n")
+		.append("percentageRateUOM....................." + describeUOM(percentageRateUOM) + "\n")
 		.append("\n")
 		.append("Rates:\n")
 		.append("\n")

@@ -48,9 +48,9 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 	public static final LengthUOM ElevatorSRXEncoderRevolution= new LengthUOM("revolution", "revolutions", "rev", INCHES_PER_ENCODER_REVOLUTION.getCanonicalValue());
 
 	// Units Of Rate for Elevator
-	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, "Elevator-pulses/100ms");
-	public static final RateUOM   ElevatorSRXEncoderRPM       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Minutes, "Elevator-RPMs");
-	public static final RateUOM   ElevatorSRXEncoderRPS       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Seconds, "Elevator-RPSs");
+	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, RateUOM.CanonicalRateUOMForMovement, "Elevator-pulses/100ms");
+	public static final RateUOM   ElevatorSRXEncoderRPM       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "Elevator-RPMs");
+	public static final RateUOM   ElevatorSRXEncoderRPS       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Seconds, RateUOM.CanonicalRateUOMForMovement, "Elevator-RPSs");
 
 	public static final Rate      ElevatorSRXMotorMaxRPM      = ElevatorSRXEncoderRPM.create(MAX_RPMS_UNLOADED_GEARED_DOWN);
 	public static final Rate      ElevatorSRXMotorMaxRPS      = ElevatorSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
@@ -58,7 +58,7 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 	private static final Length    maxDistancePerMinute           = ElevatorSRXMotorMaxRPM.getLength(ElevatorSRXMotorMaxRPM.getTimeUOM().getValue());
 	private static final Length    maxDistancePerSecond           = ElevatorSRXMotorMaxRPS.getLength(ElevatorSRXMotorMaxRPS.getTimeUOM().getValue());
 	private static final LengthUOM OneSecondDistanceAtOnePercent  = new LengthUOM("minute-distance","minute-distance","minute-distance",maxDistancePerMinute.getCanonicalValue()/100.0);
-	public static final RateUOM    ElevatorSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, "% Elevator");
+	public static final RateUOM    ElevatorSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "% Elevator");
 
 	public static void mathReport() {
 		System.out.println();
@@ -166,7 +166,8 @@ public class ElevatorAxisConfiguration extends AxisConfiguration {
 			LengthUOM.Inches.create(24),        // forwardSoftLimit
 			null,                               // reverseSoftLimit
 			RateUOM.InchesPerSecond.create(12), // defaultRate
-			com.ctre.phoenix.motorcontrol.NeutralMode.Brake // neutralMode
+			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
+			ElevatorSRXMotorPercentageRate      // percentageRate
 			);
 	}
 }
