@@ -65,7 +65,6 @@ public enum Direction{
 		this.canonicalDirection = canonicalDirection;
 	}
 	
-	@SuppressWarnings("hiding")
 	public enum Canonical{
 		/** Logical direction for going in a logically positive/forward/do direction **/
 		POSITIVE(1),
