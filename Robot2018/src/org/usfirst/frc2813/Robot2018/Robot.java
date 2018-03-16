@@ -123,12 +123,13 @@ public class Robot extends TimedRobot {
 	}
 
 	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
-	private long lastPositionReport = 0;
+	private long lastPositionReport = System.currentTimeMillis() - 2000;
 	private void dumpSubsystemStatusAtIntervals() {
-		if(System.currentTimeMillis() - lastPositionReport > 2000) {
+		if(System.currentTimeMillis() - lastPositionReport >= 2000) {
 			lastPositionReport = System.currentTimeMillis();
-			Logger.debug("[[PERIODIC]] %s", Robot.elevator.getDiagnostics());
-			Logger.debug("[[PERIODIC]] %s", Robot.arm.getDiagnostics());
+			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
+//			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
+//			Logger.info("[[PERIODIC]] " + Robot.intake.getDiagnostics());
 			;
 		}
 	}
