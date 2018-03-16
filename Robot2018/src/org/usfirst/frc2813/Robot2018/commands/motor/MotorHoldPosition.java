@@ -19,7 +19,7 @@ public class MotorHoldPosition extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.HOLDING_CURRENT_POSITION) {
+		if(motor.getState().getOperation() != MotorOperation.HOLDING_CURRENT_POSITION) {
 			Logger.info("Setting " + motor.getName() + " to hold position.");
 			motor.holdCurrentPosition();
 		} else {
