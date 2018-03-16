@@ -123,7 +123,7 @@ public class Robot extends TimedRobot {
 	}
 
 	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
-	private long lastPositionReport = System.currentTimeMillis();
+	private long lastPositionReport = 0;
 	private void dumpSubsystemStatusAtIntervals() {
 		if(System.currentTimeMillis() - lastPositionReport > 2000) {
 			lastPositionReport = System.currentTimeMillis();
