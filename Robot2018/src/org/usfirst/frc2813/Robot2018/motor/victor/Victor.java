@@ -9,40 +9,42 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Victor extends AbstractMotorController implements IMotorController {
-	private final VictorSPX spx;
+	private final WPI_VictorSPX spx;
+	private ControlMode lastControlMode;
+	private double lastControlModeValue;
 
-	public Victor(MotorConfiguration configuration, VictorSPX spx) {
+	public Victor(MotorConfiguration configuration, WPI_VictorSPX spx) {
 		super(configuration);
 		this.spx = spx;		
 	}
 
 	@Override
 	public Length readPosition() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Cannot read position on Victor");
 	}
 
 	@Override
 	public boolean readLimitSwitch(Direction switchDirection) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Cannot read limit switch on Victor");
 	}
 
 	@Override
 	public boolean supportsMotorInversion() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public boolean supportsSensorInversion() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	
+	
 	@Override
 	public void configure() {
 		final long SupportedFeatures = MotorConfiguration.Forward|MotorConfiguration.Reverse|MotorConfiguration.ControlRate|MotorConfiguration.ReadRate|MotorConfiguration.NeutralMode|MotorConfiguration.DefaultRate;
@@ -52,19 +54,35 @@ public class Victor extends AbstractMotorController implements IMotorController 
 		if (!configuration.hasAny(SupportedFeatures)) {
 			throw new IllegalArgumentException("You've selected one or more unsupported features: " + MotorConfiguration.listCapabilities(Errors, "", "; ", "."));
 		}
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Cannot resent Encoder on Victor");
 	}
-
-	@Override
+	//XXX Is this necessary for a WPI_VictorSPX?
 	protected boolean executeTransition(MotorState proposedState) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("No Transition Execution on Victor");
+		ControlMode newControlMode = ControlMode.Disabled;
+		double		newControlModeValue = 0;
+		switch(proposedState.getOperation()) {
+		case DISABLED:
+			newControlMode = ControlMode.Disabled;
+			newControlModeValue = 0;
+			break;
+		case HOLDING_CURRENT_POSITION:
+			throw new UnsupportedOperationException("Victor Does Not Hold Position");
+		case MOVING_TO_POSITION:
+			throw new UnsupportedOperationException("Victor Does Not Move to Position");
+		case MOVING:
+			//FIXME is this the correct math for WPI_VictorSPX?
+			newControlModeValue = toMotorUnits(proposedState.getRate()).getValue() * proposedState.getDirection().getMultiplierAsDouble();
+			break;
+		}
+		spx.set(newControlModeValue);
+		this.lastControlMode = newControlMode;
+		this.lastControlModeValue = newControlModeValue;
+		return true;
 	}
+
 }
