@@ -273,23 +273,6 @@ public class MotorConfiguration {
 		requireAll(Reverse|ControlPosition|LimitPosition);
 		return reverseLimit;
 	}
-	
-	/*
-	 * If Forward and ForwardHardLimitSwitch, return whether forward limit switch stops motor 
-	 */
-	private final Boolean forwardHardLimitStopsMotor;
-	public final boolean getForwardHardLimitStopsMotor() {
-		requireAll(Forward|ForwardHardLimitSwitch);
-		return forwardHardLimitStopsMotor;
-	}
-	/*
-	 * If Reverse and Reverse and ReverseHardLimitSwitch, return whether reverse hard limit switch stops motor 
-	 */
-	private final Boolean reverseHardLimitStopsMotor;
-	public final boolean getReverseHardLimitStopsMotor() {
-		requireAll(Reverse|ReverseHardLimitSwitch);
-		return reverseHardLimitStopsMotor;
-	}
 	/*
 	 * If Forward and ForwardHardLimitSwitch return forwardHardLimitSwitchResetsEncoder 
 	 */
@@ -371,10 +354,8 @@ public class MotorConfiguration {
 			Length forwardLimit, // requireAll(Forward|ControlPosition|LimitPosition)
 			Length reverseLimit, // requireAll(Reverse|ControlPosition|LimitPosition)
 			LimitSwitchNormal forwardHardLimitSwitchNormal, // requireAll(Forward|ForwardSoftLimitSwitch)
-			Boolean forwardHardLimitStopsMotor, // requireAll(Forward|ForwardHardLimitSwitch)
 			Boolean forwardHardLimitSwitchResetsEncoder, // requireAll(Forward|ForwardHardLimitSwitch)
 			LimitSwitchNormal reverseHardLimitSwitchNormal, // requireAll(Reverse|ReverseSoftLimitSwitch)
-			Boolean reverseHardLimitStopsMotor, // requireAll(Reverse|ReverseHardLimitSwitch)
 			Boolean reverseHardLimitSwitchResetsEncoder, // requireAll(Reverse|ReverseHardLimitSwitch)
 			Length forwardSoftLimit, // requireAll(Forward|ForwardSoftLimitSwitch)
 			Length reverseSoftLimit, // requireAll(Reverse|ReverseSoftLimitSwitch)
@@ -402,10 +383,8 @@ public class MotorConfiguration {
 		this.forwardLimit = forwardLimit;
 		this.reverseLimit = reverseLimit;
 		this.forwardHardLimitSwitchNormal = forwardHardLimitSwitchNormal;
-		this.forwardHardLimitStopsMotor = forwardHardLimitStopsMotor;
 		this.forwardHardLimitSwitchResetsEncoder = forwardHardLimitSwitchResetsEncoder;
 		this.reverseHardLimitSwitchNormal = reverseHardLimitSwitchNormal;
-		this.reverseHardLimitStopsMotor = reverseHardLimitStopsMotor;
 		this.reverseHardLimitSwitchResetsEncoder = reverseHardLimitSwitchResetsEncoder;
 		this.forwardSoftLimit = forwardSoftLimit;
 		this.reverseSoftLimit = reverseSoftLimit;
@@ -500,10 +479,8 @@ public class MotorConfiguration {
 		checkParameter("forwardLimit", forwardLimit, 0, Forward|ControlPosition|LimitPosition);
 		checkParameter("reverseLimit", reverseLimit, 0, Reverse|ControlPosition|LimitPosition);
 		checkParameter("forwardHardLimitSwitchNormal", forwardHardLimitSwitchNormal, 0, Forward|ForwardHardLimitSwitch);
-		checkParameter("forwardHardLimitStopsMotor", forwardHardLimitStopsMotor, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("forwardHardLimitSwitchResetsEncoder", forwardHardLimitSwitchResetsEncoder, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("reverseHardLimitSwitchNormal", reverseHardLimitSwitchNormal, 0, Reverse|ReverseHardLimitSwitch);
-		checkParameter("reverseHardLimitStopsMotor", reverseHardLimitStopsMotor, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("reverseHardLimitSwitchResetsEncoder", reverseHardLimitSwitchResetsEncoder, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("forwardSoftLimit", forwardSoftLimit, 0, Forward|ForwardSoftLimitSwitch);
 		checkParameter("reverseSoftLimit", reverseSoftLimit, 0, Reverse|ReverseSoftLimitSwitch);
@@ -576,10 +553,8 @@ public class MotorConfiguration {
 		.append("forwardSoftLimit......................" + describeValue(forwardSoftLimit, nativeMotorLengthUOM) + "\n")
 		.append("reverseSoftLimit......................" + describeValue(reverseSoftLimit, nativeMotorLengthUOM) + "\n")
 		.append("forwardHardLimitSwitchBehavior........" + forwardHardLimitSwitchNormal + "\n")
-		.append("forwardHardLimitStopsMotor............" + forwardHardLimitStopsMotor + "\n")
 		.append("forwardHardLimitSwitchResetsEncoder..." + forwardHardLimitSwitchResetsEncoder + "\n")
 		.append("reverseHardLimitSwitchBehavior........" + reverseHardLimitSwitchNormal + "\n")
-		.append("reverseHardLimitStopsMotor............" + reverseHardLimitStopsMotor + "\n")
 		.append("reverseHardLimitSwitchResetsEncoder..." + reverseHardLimitSwitchResetsEncoder + "\n")
 		.append("\n")
 		.append("Scaling:\n")

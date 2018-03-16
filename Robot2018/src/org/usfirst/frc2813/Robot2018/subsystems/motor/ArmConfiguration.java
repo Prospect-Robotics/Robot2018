@@ -170,10 +170,8 @@ public class ArmConfiguration extends MotorConfiguration{
 			ArmDegrees.create(180),        // forwardLimit (placeholder)
 			ArmDegrees.create(0),         // reverseLimit
 			null,                               // forwardHardLimitSwitchNormal
-			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
-			Boolean.TRUE,                       // reverseHardLimitStopsMotor
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
 			ArmDegrees.create(180),        // forwardSoftLimit
 			null,                               // reverseSoftLimit
