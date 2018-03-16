@@ -24,7 +24,7 @@ public class LengthUOM extends UOM<LengthUOM,Length> {
 	public static final LengthUOM Inches      = new LengthUOM("inch", "inches", "in", CanonicalLengthUOM, 25400);
 	public static final LengthUOM Feet        = new LengthUOM("foot", "feet", "ft", CanonicalLengthUOM, 304800);
 	public static final LengthUOM Yards       = new LengthUOM("yard", "yards", "y", CanonicalLengthUOM, 914400);
-	public static final LengthUOM Miles       = new LengthUOM("mile", "miles", "m", CanonicalLengthUOM, 1609340000);
+	public static final LengthUOM Miles       = new LengthUOM("mile", "miles", "mi", CanonicalLengthUOM, 1609340000);
 
 	// Talon SRX pulses have to be defined by the subsystem for with a specific scale based on the hardware.  The relationship between of pulses (4096/rotation) and the relationship of rotation to distance.
 	// SRX MAG encoder pulses have to be defined by the subsystem for a specific scale, based on the hardware.  The relationship between of pulses (4096/rotation) and the relationship of rotation to distance.
@@ -36,8 +36,8 @@ public class LengthUOM extends UOM<LengthUOM,Length> {
 		super(systemOfMeasurement, unitNameSingular, unitNamePlural, unitNameAbbreviation);
 	}
 	// Create a new unit of distance in space 
-	public LengthUOM(String unitNameSingular, String unitNamePlural, String unitNameAbbreviation, LengthUOM canonicalUOM, double canonicalUnitQuanity) {
-		super(unitNameSingular, unitNamePlural, unitNameAbbreviation, canonicalUOM, canonicalUnitQuanity);
+	public LengthUOM(String unitNameSingular, String unitNamePlural, String unitNameAbbreviation, LengthUOM canonicalUOM, double canonicalUnitQuantity) {
+		super(unitNameSingular, unitNamePlural, unitNameAbbreviation, canonicalUOM, canonicalUnitQuantity);
 	}
 	// Create a new value of this type
 	public Length create(double value) {
