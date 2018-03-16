@@ -11,6 +11,7 @@ class ElevatorTest  {
 //	@org.junit.jupiter.api.Test
 	void test() {
 		ElevatorAxisConfiguration.mathReport();
+//		ArmAxisConfiguration.mathReport();
 //		Elevator.axisConfiguration.dumpDescription();
 	}
 }
