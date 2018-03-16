@@ -19,7 +19,7 @@ public class SpinIntake extends Command {
     	this.direction=direction;
     	this.speed=1;
     	if (direction != Direction.IN && direction != Direction.OUT && direction != Direction.STOP) {
-    		throw new UnsupportedOperationException("Invalid Direction");
+    		throw new UnsupportedOperationException("Invalid Direction for Intake");
     	}
     }
 
