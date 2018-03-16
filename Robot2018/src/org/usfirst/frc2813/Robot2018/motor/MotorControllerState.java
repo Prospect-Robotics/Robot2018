@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018;
+package org.usfirst.frc2813.Robot2018.motor;
 
 /**
  * Class to represent the state of the Elevator state machine.

@@ -2,16 +2,16 @@
 
 package org.usfirst.frc2813.Robot2018.autonomous;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.util.logging.Logger;
-
-import org.usfirst.frc2813.Robot2018.Direction;
+import org.usfirst.frc2813.logging.Logger;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.values.Length;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
@@ -19,11 +19,9 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
  * account game data. Used exclusively by AutonomousCommandGroup
  */
 public class AutonomousCommandGroupGenerator {
-	Logger logger = Logger.getLogger(this.getClass().getSimpleName());
-
 	// Elevator position to place cubes - FIXME! not correct values
-	private static final double scaleHeight = 60;
-	private static final double switchHeight = 24;
+	private static final Length scaleHeight = LengthUOM.Inches.create(60);
+	private static final Length switchHeight = LengthUOM.Inches.create(24);
 
 	private int directionBias;  // used to share code between left/right
 	private static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
@@ -57,7 +55,7 @@ public class AutonomousCommandGroupGenerator {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(150);
 			autoCmdList.turnRight(90 * directionBias);
-			autoCmdList.raiseElevator(scaleHeight);
+			autoCmdList.elevatorMoveToPosition(scaleHeight);
 			autoCmdList.dropCube();
 			autoCmdList.lowerElevator();
 		}
@@ -67,7 +65,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnRight(45 * directionBias);
 			autoCmdList.driveForward(50); // diagonally across field
 			autoCmdList.turnLeft(45 * directionBias);
-			autoCmdList.raiseElevator(switchHeight);
+			autoCmdList.elevatorMoveToPosition(switchHeight);
 			autoCmdList.dropCube();
 			autoCmdList.lowerElevator();
 		}
@@ -80,7 +78,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnLeft(45 * directionBias);
 			autoCmdList.driveForward(40); // diagonally from start to far side of near switch
 			autoCmdList.turnRight(45);
-			autoCmdList.raiseElevator(0.5);
+			autoCmdList.elevatorMoveToPosition(LengthUOM.Inches.create(1)); 
 			autoCmdList.dropCube();
 			autoCmdList.lowerElevator();
 		}

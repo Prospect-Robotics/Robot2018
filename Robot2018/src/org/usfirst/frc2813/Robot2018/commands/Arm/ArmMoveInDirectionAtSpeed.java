@@ -1,28 +1,32 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
-import org.usfirst.frc2813.Robot2018.Direction;
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.values.Rate;
 
 /**
  * Move arm in given direction at given speed until interrupted.
  * Hold current position with PID when interrupted.
+ * Rate can be in any units you like.
  */
 public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 	private final Direction direction;
-	private final double speed;
+	private final Rate speed;
 
-	public ArmMoveInDirectionAtSpeed(Direction direction, double speed) {
+	public ArmMoveInDirectionAtSpeed(Direction direction, Rate speed) {
 		this.direction = direction;
 		this.speed = speed;
-		logger.info(String.format("Move %s at speed %s", direction, speed));
 		requires(Robot.arm);
 	}
 
 	// @Override
 	protected void initialize() {
-		logger.finer("in initialize");
-			Robot.arm.moveAtSpeedAndDirection(speed, direction);
+		Logger.printFormat(LogType.INFO, "Move %s at speed %s", direction, speed);
+		Logger.debug("in initialize");
+			Robot.arm.moveInDirectionAtSpeed(direction, speed);
 	}
 
 	//@Override
@@ -32,7 +36,7 @@ public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 
 	@Override
 	protected void interrupted() {
-		logger.finer("in interrupted");
+		Logger.debug("in interrupted");
 		Robot.arm.holdCurrentPosition();
 	}
 }

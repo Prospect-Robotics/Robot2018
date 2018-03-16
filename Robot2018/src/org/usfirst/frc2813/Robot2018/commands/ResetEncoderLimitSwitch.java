@@ -25,7 +25,7 @@ public class ResetEncoderLimitSwitch extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	if (talon.getSensorCollection().isRevLimitSwitchClosed()) {
-    		
+
     	}
     }
 

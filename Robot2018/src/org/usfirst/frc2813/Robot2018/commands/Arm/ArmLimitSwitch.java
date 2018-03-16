@@ -10,15 +10,13 @@
 
 
 package org.usfirst.frc2813.Robot2018.commands.Arm;
+import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.units.Direction;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.command.Command;
-
-import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.Robot;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /*
  * TODO: This class needs to be coded for the Talon SRX
