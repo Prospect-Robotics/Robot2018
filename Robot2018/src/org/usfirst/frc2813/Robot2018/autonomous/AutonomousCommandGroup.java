@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
@@ -9,6 +10,7 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToPosition;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
+import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
@@ -88,15 +90,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void dropCube() {
 		// TODO: should we delay between these?
 		// TODO: consider making this sequence a command
-		addSequential(new MotorMoveInDirection(Robot.intake, Direction.OUT));
+		addSequential(new SpinIntake(Direction.OUT));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
-		addSequential(new MotorDisable(Robot.intake));
+		addSequential(new SpinIntake(Direction.STOP));
 	}
 	public void grabCube() {
 		// TODO: should we delay between these? Change order?
 		// TODO: consider making this pair a command for arm
-		addSequential(new MotorMoveInDirection(Robot.intake, Direction.IN));
+		addSequential(new SpinIntake(Direction.IN));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));
+		addSequential(new SpinIntake(Direction.STOP));
 	}
 
 	public void sleep(double seconds) {

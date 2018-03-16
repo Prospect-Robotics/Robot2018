@@ -19,5 +19,8 @@ public class Intake extends GearheadsSubsystem {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
     }
+    public void stop() {
+    	spx.disable();
+    }
 }
 
