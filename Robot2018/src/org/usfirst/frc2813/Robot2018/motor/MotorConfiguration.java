@@ -271,7 +271,7 @@ public class MotorConfiguration {
 	private final Length reverseLimit;
 	public final Length getReverseLimit() {
 		requireAll(Reverse|ControlPosition|LimitPosition);
-		return forwardLimit;
+		return reverseLimit;
 	}
 	
 	/*
@@ -335,7 +335,7 @@ public class MotorConfiguration {
 	 * If Reverse and ReverseSoftLimitSwitch, return reverse soft limit 
 	 */
 	private final Length reverseSoftLimit;
-	public final Length getReverseSoftLimitEnabled() {
+	public final Length getReverseSoftLimit() {
 		requireAll(Reverse|ReverseSoftLimitSwitch);
 		return reverseSoftLimit;
 	}
@@ -511,6 +511,12 @@ public class MotorConfiguration {
 		checkParameter("neutralMode", neutralMode, ControlRate|ControlPosition, NeutralMode);
 		checkParameter("percentageRateUOM", percentageRateUOM, ControlRate|LimitRate, 0);
 		checkParameter("defaultCommandFactory", defaultCommandFactory, 0, 0); // no requirements
+		if(has(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue()) {
+			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
+		}
+		if(has(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()) {
+			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
+		}
 	}
 
 	public String toString() {

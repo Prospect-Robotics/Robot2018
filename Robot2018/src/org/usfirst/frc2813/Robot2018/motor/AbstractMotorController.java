@@ -235,21 +235,19 @@ public abstract class AbstractMotorController implements IMotorController {
 	// Returns true if we zeroed and are now holding position at zero
 	protected boolean autoZeroSensorPositionsIfNecessary() {
 		boolean resetEncoders = false;
-		if (configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
-			if(!readPosition().equals(configuration.getReverseLimit())) {
-				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
-			}
-			resetEncoders = true; 
-		}
-		if (configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
+		if (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) && configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
 			if(!readPosition().equals(configuration.getForwardLimit())) {
-				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
+				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardSoftLimit() + "."); 
+				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardSoftLimit()));
 			}
 			resetEncoders = true; 
 		}
-		if(resetEncoders) {
+		if (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) && configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
+			if(!readPosition().equals(configuration.getReverseLimit())) {
+				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getReverseSoftLimit() + "."); 
+				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseSoftLimit()));
+			}
+			resetEncoders = true; 
 		}
 		return resetEncoders;
 	}

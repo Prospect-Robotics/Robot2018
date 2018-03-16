@@ -114,7 +114,7 @@ public final class Motor extends GearheadsSubsystem {
 	}
 
 	public String getDiagnostics() {
-		return String.format("%s:%s @%s [%s]", this, getState(), readPosition(), controller.getDiagnostics());
+		return String.format("%s - [%s @ %s] [%s]", this, getState(), readPosition(), controller.getDiagnostics());
 	}
 	/* ----------------------------------------------------------------------------------------------
 	 * Subsystem API

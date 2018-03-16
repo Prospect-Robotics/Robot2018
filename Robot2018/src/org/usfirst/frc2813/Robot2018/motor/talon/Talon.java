@@ -280,14 +280,14 @@ public final class Talon extends AbstractMotorController {
 		// Set forward soft limit
 		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardSoftLimitSwitch)) {
 			srx.configForwardSoftLimitEnable(true, getTimeout());
-			srx.configForwardSoftLimitThreshold(configuration.getForwardLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
+			srx.configForwardSoftLimitThreshold(configuration.getForwardSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
 		} else {
 			srx.configForwardSoftLimitEnable(false, getTimeout());
 		}
 		// Set reverse soft limit
 		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseSoftLimitSwitch)) {
 			srx.configReverseSoftLimitEnable(true, getTimeout());
-			srx.configReverseSoftLimitThreshold(configuration.getReverseLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
+			srx.configReverseSoftLimitThreshold(configuration.getReverseSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
 		} else {
 			srx.configReverseSoftLimitEnable(false, getTimeout());
 		}
