@@ -70,7 +70,11 @@ public class MotorState {
 	}
 	
 	public String getDescription() {
-		return "MotorState[Op=" + operation + " Dir=" + direction + " Rate=" + rate + " Pos=" + position + "]";
+		return "MotorState[Op=" + operation 
+				+ (direction != null ? " Dir=" + direction : "")
+				+ (rate != null ? " Rate=" + rate : "")
+				+ (position != null ? " Pos=" + position : "")
+				+ "]";
 	}
 	
 	public String toString() {

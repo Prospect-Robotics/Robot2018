@@ -26,9 +26,9 @@ public class MotorMoveInDirection extends MotorCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getDirection() == direction) {
-			Logger.info("NOT setting " + motor + " to move " + direction + ", it's already doing that.");
+			Logger.info(this + " NOT setting " + motor + " to move " + direction + ", it's already doing that.");
 		} else {
-			Logger.info("Setting " + motor + " to move in the " + direction + " direction.");
+			Logger.info(this + " setting " + motor + " to move in the " + direction + " direction.");
 			motor.moveInDirectionAtDefaultSpeed(direction);
 		}
 	}
@@ -43,4 +43,8 @@ public class MotorMoveInDirection extends MotorCommand {
 		super.interrupted();
 		motor.holdCurrentPosition();
 	}
+
+    public String toString() {
+        return "MotorMoveInDirection(" + motor + ", " + direction + ")";
+    }
 }

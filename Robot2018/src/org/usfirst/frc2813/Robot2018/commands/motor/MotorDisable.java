@@ -18,10 +18,15 @@ public class MotorDisable extends MotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getState().getOperation() == MotorOperation.DISABLED) {
-			Logger.info("NOT setting " + motor.getName() + " to disable (neutral state), it's already disabled.");
+			Logger.info(this + " NOT setting " + motor + " to disable (neutral state), it's already disabled.");
 		} else {
-			Logger.info("Setting " + motor.getName() + " to disable (neutral state).");
+			Logger.info(this + " setting " + motor + " to disable (neutral state).");
 		}
 		motor.disable();
 	}
+
+    public String toString() {
+        return "MotorDisable(" + motor + ")";
+    }
+
 }

@@ -25,10 +25,14 @@ public class SolenoidSetState extends InstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(solenoid.getState() == state) {
-			Logger.info("NOT changing " + solenoid + " from " + solenoid.getState() + " to " + state + ", it's already " + state);
+			Logger.info(this + " NOT changing " + solenoid + " from " + solenoid.getState() + " to " + state + ", it's already " + state);
 		} else {
-			Logger.info("Changing " + solenoid + " from " + solenoid.getState() + " to " + state);
+			Logger.info(this + " changing " + solenoid + " from " + solenoid.getState() + " to " + state);
 			solenoid.setState(state);
 		}
 	}
+
+    public String toString() {
+        return "SolenoidSetState(" + solenoid + ", " + state + ")";
+    }
 }

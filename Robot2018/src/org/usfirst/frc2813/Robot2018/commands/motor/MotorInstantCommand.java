@@ -31,4 +31,8 @@ public abstract class MotorInstantCommand extends GearheadsInstantCommand {
 	protected void interrupted() {
 		Logger.debug("interrupted");
 	}
+    // @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + motor + ", ...)";
+    }
 }

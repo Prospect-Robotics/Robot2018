@@ -24,7 +24,11 @@ public class SolenoidToggleState extends InstantCommand {
 		super.initialize();
 		Direction oldState = solenoid.getState();
 		Direction newState = oldState.getInverse();
-		Logger.info("Toggling " + solenoid + " from " + oldState + " to " + newState);
+		Logger.info(this + " toggling " + solenoid + " from " + oldState + " to " + newState);
 		solenoid.setState(newState);
 	}
+
+    public String toString() {
+        return "SolenoidToggleState(" + solenoid + ")";
+    }
 }

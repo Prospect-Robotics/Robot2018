@@ -20,10 +20,10 @@ public class MotorHoldPosition extends MotorCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getState().getOperation() != MotorOperation.HOLDING_CURRENT_POSITION) {
-			Logger.info("Setting " + motor + " to hold position.");
+			Logger.info(this + " setting " + motor + " to hold position.");
 			motor.holdCurrentPosition();
 		} else {
-			Logger.info("Not setting " + motor + " to hold position, it's already doing that.");
+			Logger.info(this + " not setting " + motor + " to hold position, it's already doing that.");
 		}
 		setInterruptible(true);
 	}
@@ -32,4 +32,9 @@ public class MotorHoldPosition extends MotorCommand {
 	protected boolean isFinished() {
 		return false;
 	}
+
+    public String toString() {
+        return "MotorHoldPosition(" + motor + ")";
+    }
+
 }
