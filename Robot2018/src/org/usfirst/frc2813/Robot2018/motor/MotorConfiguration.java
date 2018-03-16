@@ -1,5 +1,9 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -332,6 +336,10 @@ public class MotorConfiguration {
 	public final ICommandFactory<Motor> getDefaultCommandFactory() {
 		return defaultCommandFactory;
 	}
+	private final List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
+	public final List<PIDConfiguration> getPIDConfigurations() {
+		return Collections.unmodifiableList(pidConfigurations);
+	}
 	/*
 	 * Get the native units for this axis
 	 */
@@ -362,7 +370,8 @@ public class MotorConfiguration {
 			Rate defaultRate, // requireAll(ControlRate)
 			NeutralMode neutralMode, // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
 			RateUOM percentageRateUOM, // require(ControlRate|LimitRate)
-			ICommandFactory<Motor> defaultCommandFactory // no requirements
+			ICommandFactory<Motor> defaultCommandFactory, // no requirements
+			List<PIDConfiguration> pidConfigurations
 			)
 	{
 		this.name = name;
@@ -392,6 +401,7 @@ public class MotorConfiguration {
 		this.neutralMode = neutralMode;
 		this.percentageRateUOM = percentageRateUOM;
 		this.defaultCommandFactory = defaultCommandFactory;
+		this.pidConfigurations.addAll(pidConfigurations);
 		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {

@@ -304,7 +304,7 @@ public final class Motor extends GearheadsSubsystem {
 		// Transition successful, save the state.
 		return true;
 	}
-	
+
 	/* ----------------------------------------------------------------------------------------------
 	 * Units Helpers
 	 * ---------------------------------------------------------------------------------------------- */

@@ -1,10 +1,13 @@
 package org.usfirst.frc2813.Robot2018.motor.talon;
 
+import java.util.Iterator;
+
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.MotorState;
+import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
@@ -297,8 +300,17 @@ public final class Talon extends AbstractMotorController {
 		} // else { srx.setNeutralMode(NeutralMode.Coast); }
 
 		// Configure the PID profiles
-  	    configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
-	    configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
+		Iterator<PIDConfiguration> pidProfiles = configuration.getPIDConfigurations().iterator();
+		while(pidProfiles.hasNext()) {
+			PIDConfiguration pidConfiguration = pidProfiles.next();
+	 	    configurePID(
+	 	    		TalonProfileSlot.get(pidConfiguration.getProfileIndex()),
+	 	    		pidConfiguration.getP(),
+	 	    		pidConfiguration.getI(),
+	 	    		pidConfiguration.getD(),
+	 	    		pidConfiguration.getF());
+	 	    Logger.info(this + " loaded : " + pidConfiguration);
+		}
 	}
 	public String toString() {
 		return configuration.getName() + "." + this.getClass().getSimpleName();  

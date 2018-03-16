@@ -1,10 +1,15 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
@@ -129,6 +134,14 @@ public class ElevatorConfiguration extends MotorConfiguration {
 		}
 */		
 	}
+	public static List<PIDConfiguration> createPidConfigurations() {
+		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
+		pidConfigurations.add(new PIDConfiguration("Holding", TalonProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.8, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.75, 0.01, 40.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", TalonProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", TalonProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
+		return Collections.unmodifiableList(pidConfigurations);
+	}
 
 	public ElevatorConfiguration() {
 		super(
@@ -196,7 +209,8 @@ public class ElevatorConfiguration extends MotorConfiguration {
 				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 
 				}
-			}
+			},
+			createPidConfigurations() // pidConfigurations
 			);
 	}
 }
