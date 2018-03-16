@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.UOM;
@@ -341,8 +342,8 @@ public class MotorConfiguration {
 		requireAny(ControlRate|ControlPosition);
 		return neutralMode;
 	}
-	private final IMotorCommandFactory defaultCommandFactory;
-	public final IMotorCommandFactory getDefaultCommandFactory() {
+	private final ICommandFactory<Motor> defaultCommandFactory;
+	public final ICommandFactory<Motor> getDefaultCommandFactory() {
 		return defaultCommandFactory;
 	}
 	/*
@@ -377,7 +378,7 @@ public class MotorConfiguration {
 			Rate defaultRate, // requireAll(ControlRate)
 			NeutralMode neutralMode, // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
 			RateUOM percentageRateUOM, // require(ControlRate|LimitRate)
-			IMotorCommandFactory defaultCommandFactory // no requirements
+			ICommandFactory<Motor> defaultCommandFactory // no requirements
 			)
 	{
 		this.name = name;

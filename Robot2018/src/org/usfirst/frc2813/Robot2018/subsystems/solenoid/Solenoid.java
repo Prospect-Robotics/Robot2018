@@ -43,8 +43,8 @@ public class Solenoid extends SubsystemBinary {
 
 	@Override
 	protected void initDefaultCommand() {
-		if(configuration.getDefaultCommand() != null) {
-			setDefaultCommand(configuration.getDefaultCommand());
+		if(configuration.getDefaultCommandFactory() != null) {
+			setDefaultCommand(configuration.getDefaultCommandFactory().createCommand(this));
 		}
 	}
 	

@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -171,8 +172,8 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ElevatorSRXMotorPercentageRate,      // percentageRate
-			new IMotorCommandFactory() { // defaultCommand 
-				public Command createMotorCommand(Motor m) { 
+			new ICommandFactory<Motor>() { // defaultCommand 
+				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 
 				}
 			}

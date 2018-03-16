@@ -2,6 +2,8 @@ package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidType;
+import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 /*
@@ -11,16 +13,16 @@ public class SolenoidConfiguration {
 	private final String name;
 	private final SolenoidLogic solenoidLogic;
 	private final SolenoidType solenoidType;
-	private final Command defaultCommand;
+	private final ICommandFactory<Solenoid> defaultCommandFactory;
 	
 	/*
 	 * Create a new configuration for a binary solenoid
 	 */
-	public SolenoidConfiguration(String name, SolenoidLogic solenoidLogic, SolenoidType solenoidType, Command defaultCommand) {
+	public SolenoidConfiguration(String name, SolenoidLogic solenoidLogic, SolenoidType solenoidType, ICommandFactory<Solenoid> defaultCommandFactory) {
 		this.name = name;
 		this.solenoidLogic = solenoidLogic;
 		this.solenoidType = solenoidType;
-		this.defaultCommand = defaultCommand;
+		this.defaultCommandFactory = defaultCommandFactory;
 	}
 	/*
 	 * What is the name
@@ -43,8 +45,8 @@ public class SolenoidConfiguration {
 	/*
 	 * Get the default command to run (may be null)
 	 */
-	public Command getDefaultCommand() {
-		return defaultCommand;
+	public ICommandFactory<Solenoid> getDefaultCommandFactory() {
+		return defaultCommandFactory;
 	}
 	/*
 	 * Get a description of the configuration
@@ -58,7 +60,7 @@ public class SolenoidConfiguration {
 		.append("Name.................................." + getName() + "\n")
 		.append("SolenoidType.........................." + getSolenoidType() + "\n")
 		.append("SolenoidLogic........................." + getSolenoidLogic() + "\n")
-		.append("DefaultCommand........................" + getDefaultCommand() + "\n")
+		.append("DefaultCommandFactory................." + getDefaultCommandFactory() + "\n")
 		.append("\n")
 		.append("----------------------------------------------------------------------------\n")
 		;

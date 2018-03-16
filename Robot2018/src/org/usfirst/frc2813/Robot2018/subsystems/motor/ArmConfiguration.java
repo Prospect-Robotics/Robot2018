@@ -3,6 +3,7 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -178,8 +179,8 @@ public class ArmConfiguration extends MotorConfiguration{
 			DEFAULT_SPEED_DEGREES_PER_SECOND, // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ArmSRXMotorPercentageRate,           // percentageRate
-			new IMotorCommandFactory() { // defaultCommand 
-				public Command createMotorCommand(Motor m) { 
+			new ICommandFactory<Motor>() { // defaultCommand 
+				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 
 				}
 			});

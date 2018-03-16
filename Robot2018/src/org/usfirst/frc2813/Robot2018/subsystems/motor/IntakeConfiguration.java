@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.TimeUOM;
@@ -141,8 +142,8 @@ public class IntakeConfiguration extends MotorConfiguration {
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			IntakeSPXMotorPercentageRate,      // percentageRate
-			new IMotorCommandFactory() { // defaultCommand 
-				public Command createMotorCommand(Motor m) { 
+			new ICommandFactory<Motor>() { // defaultCommand 
+				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 
 				}
 			});

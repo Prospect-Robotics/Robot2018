@@ -137,7 +137,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	public void initDefaultCommand() {
 		// Set to hold position by default
 		if(configuration.getDefaultCommandFactory() != null) {
-			setDefaultCommand(configuration.getDefaultCommandFactory().createMotorCommand(this));
+			setDefaultCommand(configuration.getDefaultCommandFactory().createCommand(this));
 		}
 	}
 
