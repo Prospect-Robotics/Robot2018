@@ -51,7 +51,7 @@ public final class Motor extends GearheadsSubsystem {
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	public Motor(MotorConfiguration configuration, VictorSPX victorSPX) {
+	public Motor(MotorConfiguration configuration, WPI_VictorSPX victorSPX) {
 		this.controller = new MotorUnitConversionAdapter(configuration, new Victor(configuration, victorSPX));
 		this.currentState = this.previousState = MotorState.createDisabled();
 		this.currentState = MotorState.createDisabled();
