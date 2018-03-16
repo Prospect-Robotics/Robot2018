@@ -107,8 +107,8 @@ public class OI {
 		spinIntakeIn.whileHeld(new MotorMoveInDirection(Robot.intake, Direction.IN));
 		spinIntakeIn.whenReleased(new MotorMoveInDirection(Robot.intake, Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
-		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.intake, Direction.UP));
-		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.intake, Direction.DOWN));
+		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
+		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleState(Robot.jaws));
 
 		joystick1 = new Joystick(1);
