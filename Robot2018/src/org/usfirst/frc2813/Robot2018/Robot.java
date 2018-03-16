@@ -41,6 +41,7 @@ public class Robot extends TimedRobot {
 	public static Motor intake;
 	public static Solenoid jaws;
 	public static UsbCamera camera;
+	public static Solenoid gearShifter;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -56,7 +57,7 @@ public class Robot extends TimedRobot {
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
 		intake = new Motor(new IntakeConfiguration(), RobotMap.intakeSpeedController);
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
-
+		
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be
 		// constructed yet. Thus, their requires() statements may grab null

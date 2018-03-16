@@ -4,7 +4,7 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
  * Class to represent the state of the Elevator state machine.
  * Glorified enumeration with the ability to describe itself.
  */
-public enum MotorControllerState {
+public enum MotorState {
 	// Zero velocity + brake mode, safe!
 	DISABLED,
 	// Hold the current position, resist movement

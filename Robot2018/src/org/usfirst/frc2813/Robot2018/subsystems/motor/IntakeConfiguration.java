@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.TimeUOM;
@@ -7,6 +8,8 @@ import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+
+import edu.wpi.first.wpilibj.command.Command;
 
 public class IntakeConfiguration extends MotorConfiguration {
 
@@ -137,7 +140,11 @@ public class IntakeConfiguration extends MotorConfiguration {
 			null,                               // reverseSoftLimit
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
-			IntakeSPXMotorPercentageRate      // percentageRate
-			);
+			IntakeSPXMotorPercentageRate,      // percentageRate
+			new IMotorCommandFactory() { // defaultCommand 
+				public Command createMotorCommand(Motor m) { 
+					return new MotorHoldPosition(m); 
+				}
+			});
 	}
 }

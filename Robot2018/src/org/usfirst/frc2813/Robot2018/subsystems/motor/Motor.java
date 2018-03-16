@@ -78,7 +78,7 @@ public final class Motor extends SubsystemPositionDirectionSpeed {
 		return motorController.readLimitSwitch(switchDirection);
 	}
 
-	protected MotorControllerState readMotorControllerState() {
+	protected MotorState readMotorControllerState() {
 		return motorController.getState();
 	}
 
@@ -136,7 +136,9 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	@Override
 	public void initDefaultCommand() {
 		// Set to hold position by default
-		setDefaultCommand(new MotorHoldPosition(this));
+		if(configuration.getDefaultCommandFactory() != null) {
+			setDefaultCommand(configuration.getDefaultCommandFactory().createMotorCommand(this));
+		}
 	}
 
 	@Override
@@ -193,7 +195,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	}
 
 	public void changeSpeed(Rate speed) {
-		if(state == MotorControllerState.MOVING) {
+		if(state == MotorState.MOVING) {
 			// Keep moving, call the official function
 			moveInDirectionAtSpeed(direction, speed);
 		} else {
@@ -209,7 +211,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	 * Returns the speed if we are moving, otherwise null
 	 */
 	public Rate getSpeed() {
-		if(state == MotorControllerState.MOVING) {
+		if(state == MotorState.MOVING) {
 			return speed;
 		} else {
 			return null;
@@ -219,7 +221,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	 * Returns the position if we are moving, otherwise null.
 	 */
 	public Length getPosition() {
-		if(state == MotorControllerState.SET_POSITION) {
+		if(state == MotorState.SET_POSITION) {
 			return position;
 		} else {
 			return null;
@@ -229,7 +231,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	 * Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
 	 */
 	public Direction getDirection() {
-		if(state == MotorControllerState.MOVING) {
+		if(state == MotorState.MOVING) {
 			return direction;
 		} else {
 			return null;

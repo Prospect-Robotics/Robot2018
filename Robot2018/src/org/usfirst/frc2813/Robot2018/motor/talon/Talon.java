@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.motor.talon;
 
-import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorState;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
@@ -61,7 +61,7 @@ public class Talon {
 	public static final NeutralMode DEFAULT_NEUTRAL_MODE = NeutralMode.Brake;
 
 	// Current state
-	private MotorControllerState state;
+	private MotorState state;
 	// Last control mode send to controller
 	private ControlMode lastControlMode = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	// Last arg sent for controlMode
@@ -86,14 +86,14 @@ public class Talon {
 	}
 	public void setSlotIndexForHoldPosition(TalonProfileSlot slotIndex) {
 		slotIndexForHoldPosition = slotIndex;
-		if((state == MotorControllerState.HOLDING_POSITION || state == MotorControllerState.SET_POSITION) && lastSlotIndex != slotIndex) {
+		if((state == MotorState.HOLDING_POSITION || state == MotorState.SET_POSITION) && lastSlotIndex != slotIndex) {
 			// TODO: Need to update state
 			Logger.info("TODO: Need to updateSate after slot index for holding is changed.");
 		}
 	}
 	public void setSlotIndexForMove(TalonProfileSlot slotIndex) {
 		slotIndexForMove = slotIndex;
-		if((state == MotorControllerState.MOVING || state == MotorControllerState.SET_POSITION) && lastSlotIndex != slotIndex) {
+		if((state == MotorState.MOVING || state == MotorState.SET_POSITION) && lastSlotIndex != slotIndex) {
 			// NB: SET_POSITION needs to use the profile for "moving" when it's got a large error and switch to the profile for holding when the error is small
 			// TODO: Need to update state
 			Logger.info("TODO: Need to updateSate after slot index for move changes while in moving or when high error in set_position state...");
@@ -134,7 +134,7 @@ public class Talon {
 		setNeutralMode(DEFAULT_NEUTRAL_MODE);
 		zeroSensorPositions();
 		// Start disabled
-		set(MotorControllerState.DISABLED, 0);
+		set(MotorState.DISABLED, 0);
 	}
 
 	public void setNeutralMode(NeutralMode neutralMode) {
@@ -143,13 +143,13 @@ public class Talon {
 	// Force zeroing
 	public void zeroSensorPositions() {
 		Logger.info("Disabling and zeroing sensor positions");
-		set(MotorControllerState.DISABLED, 0);
+		set(MotorState.DISABLED, 0);
 		// Zero out absolute encoder values for both PID slots
 		correctEncoderSensorPositions(TalonPID.Primary, 0);
 		correctEncoderSensorPositions(TalonPID.Auxilliary, 0);
 	}
 
-	public MotorControllerState getState() {
+	public MotorState getState() {
 		return state;
 	}
 
@@ -283,11 +283,11 @@ public class Talon {
 	 * All changes to state are done here, and recorded here.
 	 * Optionally reported to the log here.
 	 */
-	private void set(MotorControllerState newState, double arg) {
+	private void set(MotorState newState, double arg) {
 		/**
 		 * Figure out state variables from current operation:
 		 */
-		MotorControllerState oldState = this.state;
+		MotorState oldState = this.state;
 		ControlMode newControlMode = ControlMode.Disabled;
 		double newControlModeValue = arg;
 		// New PID/Slot are almost always maintain
@@ -369,7 +369,7 @@ public class Talon {
 	*/
 	public void setEncoderPosition(int encoderPosition) {
 		Logger.info("setEncoderPosition [new value =" + encoderPosition + "]");
-		set(MotorControllerState.DISABLED, 0);
+		set(MotorState.DISABLED, 0);
 		// Zero out absolute encoder values for both PID slots
 		correctEncoderSensorPositions(TalonPID.Primary, encoderPosition);
 		correctEncoderSensorPositions(TalonPID.Auxilliary, encoderPosition);
@@ -394,14 +394,14 @@ public class Talon {
 	 * [ACTION] Set to an absolute encoder position
 	 */
 	public void setPosition(int position) {
-		set(MotorControllerState.SET_POSITION, position);
+		set(MotorState.SET_POSITION, position);
 	}
 
 	/**
 	 * [ACTION] Hold the current position, resist movement
 	 */
 	public void holdCurrentPosition() {
-		set(MotorControllerState.HOLDING_POSITION, readPosition());
+		set(MotorState.HOLDING_POSITION, readPosition());
 		zeroEncodersIfNecessary();
 	}
 
@@ -418,22 +418,22 @@ public class Talon {
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
 			Logger.printFormat(LogType.INFO, "move %s [Direction (%f) x Speed (%f) -> Velocity %f]", direction, direction.getMultiplierAsDouble(), speed, speedParam);
-			set(MotorControllerState.MOVING, speedParam);
+			set(MotorState.MOVING, speedParam);
 		}
 	}
 	/**
 	 * Talon only uses the velocity
 	 */
 	public void setVelocity(double speed) {
-		if(state == MotorControllerState.MOVING) {
-			set(MotorControllerState.MOVING, speed);
+		if(state == MotorState.MOVING) {
+			set(MotorState.MOVING, speed);
 		}
 	}
 	/**
 	 * [ACTION] Stop output of the motor
 	 */
 	public void disable() {
-		set(MotorControllerState.DISABLED, 0);
+		set(MotorState.DISABLED, 0);
 	}
 	
 	public void dumpState() {

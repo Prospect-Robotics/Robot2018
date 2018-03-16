@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorState;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -26,9 +26,9 @@ public class MotorSetSpeed extends MotorInstantCommand {
 	// Called once when the command executes
 	protected void initialize() {
 		super.initialize();
-		if(motor.getMotorControllerState() == MotorControllerState.MOVING && motor.getSpeed() == speed) {
+		if(motor.getMotorControllerState() == MotorState.MOVING && motor.getSpeed() == speed) {
 			Logger.info("NOT telling " + motor.getName() + " to change speed to " + speed + ", it's already moving at that speed.");
-		} else if(motor.getMotorControllerState() != MotorControllerState.MOVING ) {
+		} else if(motor.getMotorControllerState() != MotorState.MOVING ) {
 			Logger.info("NOT telling " + motor.getName() + " to change speed to " + speed + ", it's NOT MOVING.");
 		} else {
 			Logger.info("Telling " + motor.getName() + " to change speed to " + speed + ".");

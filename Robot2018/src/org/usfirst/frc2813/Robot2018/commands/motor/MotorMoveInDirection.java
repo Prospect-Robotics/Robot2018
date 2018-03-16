@@ -4,7 +4,7 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorState;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -25,7 +25,7 @@ public class MotorMoveInDirection extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getMotorControllerState() == MotorControllerState.MOVING && motor.getDirection() == direction) {
+		if(motor.getMotorControllerState() == MotorState.MOVING && motor.getDirection() == direction) {
 			Logger.info("NOT setting " + motor.getName() + " to move in the " + direction + " direction, it's already doing that.");
 		} else {
 			Logger.info("Setting " + motor.getName() + " to move in the " + direction + " direction.");

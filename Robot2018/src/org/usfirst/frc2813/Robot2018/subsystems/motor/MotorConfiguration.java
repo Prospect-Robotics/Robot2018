@@ -10,6 +10,8 @@ import org.usfirst.frc2813.units.values.Value;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.wpilibj.command.Command;
+
 /*
  * This class is an immutable description of an axis as used by a motor, a subsystem's API, or a sensor.
  * The idea is to encapsulate everything about the axis so that the subsystem can completely initialize 
@@ -67,7 +69,7 @@ public class MotorConfiguration {
                 return "Unknown Capability " + capability;
         }
 	}
-
+	
 	/*
 	 * Get the name of the axis
 	 */
@@ -339,6 +341,10 @@ public class MotorConfiguration {
 		requireAny(ControlRate|ControlPosition);
 		return neutralMode;
 	}
+	private final IMotorCommandFactory defaultCommandFactory;
+	public final IMotorCommandFactory getDefaultCommandFactory() {
+		return defaultCommandFactory;
+	}
 	/*
 	 * Get the native units for this axis
 	 */
@@ -370,7 +376,8 @@ public class MotorConfiguration {
 			Length reverseSoftLimit, // requireAll(Reverse|ReverseSoftLimitSwitch)
 			Rate defaultRate, // requireAll(ControlRate)
 			NeutralMode neutralMode, // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
-			RateUOM percentageRateUOM // require(ControlRate|LimitRate)
+			RateUOM percentageRateUOM, // require(ControlRate|LimitRate)
+			IMotorCommandFactory defaultCommandFactory // no requirements
 			)
 	{
 		this.name = name;
@@ -401,6 +408,7 @@ public class MotorConfiguration {
 		this.defaultRate = defaultRate;
 		this.neutralMode = neutralMode;
 		this.percentageRateUOM = percentageRateUOM;
+		this.defaultCommandFactory = defaultCommandFactory;
 		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
@@ -498,7 +506,7 @@ public class MotorConfiguration {
 		checkParameter("defaultRate", defaultRate, 0, ControlRate);
 		checkParameter("neutralMode", neutralMode, ControlRate|ControlPosition, NeutralMode);
 		checkParameter("percentageRateUOM", percentageRateUOM, ControlRate|LimitRate, 0);
-		
+		checkParameter("defaultCommandFactory", defaultCommandFactory, 0, 0); // no requirements
 	}
 
 	public String toString() {
@@ -573,6 +581,7 @@ public class MotorConfiguration {
 		.append("Miscellaneous:\n")
 		.append("\n")
 		.append("neutralMode..........................." + neutralMode + "\n")
+		.append("defaultCommandFactory................." + defaultCommandFactory + "\n")
 		.append("----------------------------------------------------------------------------\n")
 		;
 		return buf.toString();

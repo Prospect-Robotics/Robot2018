@@ -46,8 +46,8 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	protected Rate oldSpeed;
 	protected Length position;
 	protected Length oldPosition;
-	protected MotorControllerState oldState;
-	protected MotorControllerState state;
+	protected MotorState oldState;
+	protected MotorState state;
 
 	/**
 	 * configure your motor controller and set your
@@ -73,7 +73,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		speed = getDefaultSpeed();
 		oldSpeed = RateUOM.InchesPerSecond.create(0);
 		oldDirection = Direction.NEUTRAL;
-		oldState = MotorControllerState.DISABLED;
+		oldState = MotorState.DISABLED;
 		state = readMotorControllerState();
 	}
 	// TODO: Replace with axisConfiguration
@@ -82,7 +82,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * Abstract method to read controller state
 	 * @return MotorControllerState
 	 */
-	protected abstract MotorControllerState readMotorControllerState();
+	protected abstract MotorState readMotorControllerState();
 	/*
 	 * Get the position
 	 */
@@ -119,11 +119,11 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	/*
 	 * Need to be able to retrieve what we believe is the state
 	 */
-	public MotorControllerState getMotorControllerState() {
+	public MotorState getMotorControllerState() {
 		return state;
 	}
 
-	protected boolean isStateTransitionAllowed(MotorControllerState oldState, MotorControllerState newState) {
+	protected boolean isStateTransitionAllowed(MotorState oldState, MotorState newState) {
 		// Validate the state transition before we do anything
 		switch(newState) {
 		case DISABLED:
@@ -158,7 +158,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		return true;
 	}
 
-	protected boolean executeTransition(MotorControllerState oldState, MotorControllerState newState) {
+	protected boolean executeTransition(MotorState oldState, MotorState newState) {
 		// Check that state change is actually changing something. If so, do it.
 		switch(newState) {
 		case DISABLED:
@@ -188,7 +188,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * with the old state in oldSpeed, oldPosition and oldDirection
 	 * @return true if state change occurred
 	 */
-	protected boolean changeState(MotorControllerState newState) {
+	protected boolean changeState(MotorState newState) {
 		Logger.formatDebug("Changing state: encoderFunctional: %s, " +
 								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
 								 "old direction: %s, new direction %s, old position: %s, new position %s",
@@ -226,7 +226,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 *  [ACTION] Disable the device. Required to handle run away bots
 	 */
 	public void disable() {
-		changeState(MotorControllerState.DISABLED);
+		changeState(MotorState.DISABLED);
 	}
 
 	/**
@@ -236,7 +236,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	public void moveInDirection(Direction newDirection) {
 		oldDirection = direction;
 		direction = newDirection;
-		changeState(MotorControllerState.MOVING);
+		changeState(MotorState.MOVING);
 	}
 
 	/**
@@ -249,7 +249,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		speed = newSpeed;
 		oldDirection = direction;
 		direction = newDirection;
-		changeState(MotorControllerState.MOVING);
+		changeState(MotorState.MOVING);
 		// TODO: Check rate is within limits from axisConfiguration
 	}
 
@@ -260,7 +260,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	public void moveToPosition(Length newPosition) {
 		oldPosition = position;
 		position = newPosition;
-		changeState(MotorControllerState.SET_POSITION);
+		changeState(MotorState.SET_POSITION);
 		// TODO: Check position is within limits from axisConfiguration
 	}
 
@@ -269,7 +269,7 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * stop moving - this is active as we often require pid to resist gravity
 	 */
 	public void holdCurrentPosition() {
-		changeState(MotorControllerState.HOLDING_POSITION);
+		changeState(MotorState.HOLDING_POSITION);
 	}
 	
 	public void dumpState() {

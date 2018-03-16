@@ -1,6 +1,8 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import java.util.Iterator;
+
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -12,6 +14,8 @@ import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Time;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+
+import edu.wpi.first.wpilibj.command.Command;
 
 public class ArmConfiguration extends MotorConfiguration{
 
@@ -173,8 +177,12 @@ public class ArmConfiguration extends MotorConfiguration{
 			null,                               // reverseSoftLimit
 			DEFAULT_SPEED_DEGREES_PER_SECOND, // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
-			ArmSRXMotorPercentageRate           // percentageRate
-			);
+			ArmSRXMotorPercentageRate,           // percentageRate
+			new IMotorCommandFactory() { // defaultCommand 
+				public Command createMotorCommand(Motor m) { 
+					return new MotorHoldPosition(m); 
+				}
+			});
 	}
 
 }
