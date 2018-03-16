@@ -101,9 +101,14 @@ public final class Talon extends AbstractMotorController {
 	
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
-		resetEncoderSensorPosition(TalonPID.Auxilliary, sensorPosition);
-		resetEncoderSensorPosition(TalonPID.Primary, sensorPosition);
-		return readPosition().equals(sensorPosition);
+		boolean result = true;
+		if(!resetEncoderSensorPosition(TalonPID.Auxilliary, sensorPosition)) {
+			result = false;
+		}
+		if(!resetEncoderSensorPosition(TalonPID.Primary, sensorPosition)) {
+			result = false;
+		}
+		return result;
 	}
 
 	protected boolean executeTransition(MotorState proposedState) {
@@ -145,23 +150,6 @@ public final class Talon extends AbstractMotorController {
 		srx.selectProfileSlot(newSlotIndex.getProfileSlotIndex(), newPIDIndex.getPIDIndex());
 		// Set the control mode
 		srx.set(newControlMode, newControlModeValue);
-		// NB: This log statement shows old and current values, so you can see transitions completely
-		Logger.info(""
-				+ "set Changes "
-				+ "[State (" + currentState.getOperation() + "-> " + proposedState.getOperation() + ") "
-				+ ", ControlMode (" + this.lastControlMode + "/" + this.lastControlModeValue + " -> " + newControlMode + "/" + newControlModeValue + ")"
-				+ ", SlotIndex (" + lastSlotIndex + " -> " + newSlotIndex + ")"
-				+ ", PIDIndex ("  + lastPIDIndex + " -> " + newPIDIndex + ")"
-				+ "]");
-		// NB: This log statement shows current values
-		Logger.info(""
-				+ "set "
-				+ "[State=" + proposedState.getOperation()
-				+ ", ControlMode=" + newControlMode
-				+ ", ControlModeValue=" + newControlModeValue
-				+ ", SlotIndex=" + newSlotIndex
-				+ ", PIDIndex=" + newPIDIndex
-				+ "]");
 		
 		this.lastControlMode = newControlMode;
 		this.lastControlModeValue = newControlModeValue;
@@ -199,14 +187,22 @@ public final class Talon extends AbstractMotorController {
 					getTimeout());
 	}
 	
-	private void resetEncoderSensorPosition(TalonPID pid, Length sensorPosition) {
+	private boolean resetEncoderSensorPosition(TalonPID pid, Length sensorPosition) {
 		if(pid.equals(TalonPID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
 			Logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
-			return;
+			return true;
 		}
 		// Select relative & reset
+		int rawValue = toSensorUnits(sensorPosition).getValueAsInt();
+		Logger.debug(this + " setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ").");
 		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, pid.getPIDIndex(), getTimeout());
-		srx.setSelectedSensorPosition(toSensorUnits(sensorPosition).getValueAsInt(), pid.getPIDIndex(), getTimeout());
+		srx.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
+		int readBack = srx.getSelectedSensorPosition(pid.getPIDIndex());
+		if(readBack != rawValue) {
+			Logger.error(this + " failed setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ") - got " + readBack + " instead.");
+			return false;
+		}
+		return true;
 	}
 	/*
 	 * Configure PID values

@@ -127,8 +127,9 @@ public class Robot extends TimedRobot {
 	private void dumpSubsystemStatusAtIntervals() {
 		if(System.currentTimeMillis() - lastPositionReport > 2000) {
 			lastPositionReport = System.currentTimeMillis();
-			Robot.elevator.dumpDiagnostics();
-			Robot.arm.dumpDiagnostics();
+			Logger.debug("[[PERIODIC]] %s", Robot.elevator.getDiagnostics());
+			Logger.debug("[[PERIODIC]] %s", Robot.arm.getDiagnostics());
+			;
 		}
 	}
 	/**

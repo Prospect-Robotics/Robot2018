@@ -237,7 +237,7 @@ public final class Motor extends GearheadsSubsystem {
 	// IMPORTANT: Do not call directly	
 	protected boolean executeTransition(MotorState proposedState) {
 		// Check that state change is actually changing something. If so, do it.
-		Logger.info(this + " entering " + proposedState + " state.");
+		Logger.info(this + " entering " + proposedState);
 		switch(proposedState.getOperation()) {
 		case DISABLED:
 			(new Throwable()).printStackTrace();
@@ -297,12 +297,14 @@ public final class Motor extends GearheadsSubsystem {
 			Logger.info(this + " - Translation Occurred [Motor: " + getState() + " Controller: " + getControllerState()); 
 		}
 		
-		Logger.info(this + " state transition complete.  old: " + getState() + " new: " + proposedState + ".");
+		Logger.debug(this + " state transition complete.  old: " + getState() + " status: " + proposedState + ".");
+		Logger.debug(this + "] " + getDiagnostics());
 		this.previousState = this.currentState;
 		this.currentState = proposedState;
 		// Transition successful, save the state.
 		return true;
 	}
+	
 	/* ----------------------------------------------------------------------------------------------
 	 * Units Helpers
 	 * ---------------------------------------------------------------------------------------------- */

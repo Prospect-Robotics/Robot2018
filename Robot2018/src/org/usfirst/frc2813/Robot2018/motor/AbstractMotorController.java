@@ -208,7 +208,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		// Transition successful, save the state.
 		this.previousState = this.currentState;
 		this.currentState = proposedState;
-		Logger.info(this + " state transition complete.  state=" + currentState + " old=" + previousState + ".");
+		Logger.info(this + " state transition complete.  old=" + previousState + " status=" + getDiagnostics());		
 		return true;
 	}
 	
