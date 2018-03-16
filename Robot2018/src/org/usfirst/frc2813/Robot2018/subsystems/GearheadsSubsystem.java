@@ -1,13 +1,15 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import java.util.logging.Logger;
+import org.usfirst.frc2813.logging.Logger;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * This class contains code common to all Subsystems 
+ * This class contains code common to all Subsystems
  */
 public abstract class GearheadsSubsystem extends Subsystem {
-	protected Logger logger = Logger.getLogger(this.getClass().getSimpleName());
+	static {
+		Logger.addMe();
+	}
 	public boolean encoderFunctional = true;
 }

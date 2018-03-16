@@ -1,9 +1,7 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
@@ -14,6 +12,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.Robot2018.subsystems.Jaws;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
@@ -29,7 +28,6 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  */
 public class Robot extends TimedRobot {
 	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
-    public static Logger logger;
 
 	public static AutonomousCommandGroup autonomousCommand;
 	public static AutonomousCommandGroupGenerator autoCmdGenerator;
@@ -48,10 +46,7 @@ public class Robot extends TimedRobot {
 	 */
 	//@Override
 	public void robotInit() {
-		logger = Logger.getLogger(this.getClass().getSimpleName());
-
-		logger.setLevel(Level.INFO);
-		logger.info("In robotInit");
+		Logger.info("In robotInit");
 
 		RobotMap.init();
 		driveTrain = new DriveTrain();
@@ -91,7 +86,7 @@ public class Robot extends TimedRobot {
 
 	//@Override
 	public void autonomousInit() {
-		logger.info("Autonomous Init");
+		Logger.info("Autonomous Init");
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
@@ -124,11 +119,21 @@ public class Robot extends TimedRobot {
 		new POST().start();
 	}
 
+	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
+	private long lastPositionReport = System.currentTimeMillis();
+	private void dumpSubsystemStatusAtIntervals() {
+		if(System.currentTimeMillis() - lastPositionReport > 750) {
+			lastPositionReport = System.currentTimeMillis();
+			Robot.elevator.dumpState();
+			Robot.arm.dumpState();
+		}
+	}
 	/**
 	 * This function is called periodically during operator control
 	 */
 	//@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		dumpSubsystemStatusAtIntervals();
 	}
 }

@@ -1,8 +1,11 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
-import org.usfirst.frc2813.Robot2018.Direction;
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.values.Rate;
 
 /**
  * Move elevator in given direction at given speed until interrupted.
@@ -10,19 +13,19 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
  */
 public class ElevatorMoveInDirectionAtSpeed extends GearheadsCommand {
 	private final Direction direction;
-	private final double speed;
+	private final Rate speed;
 
-	public ElevatorMoveInDirectionAtSpeed(Direction direction, double speed) {
+	public ElevatorMoveInDirectionAtSpeed(Direction direction, Rate speed) {
 		this.direction = direction;
 		this.speed = speed;
-		logger.info(String.format("Move %s at speed: %s", direction, speed));
+		Logger.printFormat(LogType.INFO, "Move %s at speed: %s", direction, speed);
 		requires(Robot.elevator);
 	}
 
 	// @Override
 	protected void initialize() {
-		logger.finer("in initialize");
-			Robot.elevator.moveAtSpeedAndDirection(speed, direction);
+		Logger.debug("in initialize");
+			Robot.elevator.moveInDirectionAtSpeed(direction, speed);
 	}
 
 	//@Override
@@ -32,7 +35,7 @@ public class ElevatorMoveInDirectionAtSpeed extends GearheadsCommand {
 
 	@Override
 	protected void interrupted() {
-		logger.finer("in interrupted");
+		Logger.debug("in interrupted");
 		Robot.elevator.holdCurrentPosition();
 	}
 }

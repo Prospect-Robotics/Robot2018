@@ -1,18 +1,19 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
-import edu.wpi.first.wpilibj.command.CommandGroup;
-import edu.wpi.first.wpilibj.command.TimedCommand;
-
-import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
+import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
+//import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
+import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveToPosition;
-import org.usfirst.frc2813.Robot2018.commands.Auto.PIDAutoDrive;
-import org.usfirst.frc2813.Robot2018.commands.Auto.AutoTurn;
-//import org.usfirst.frc2813.Robot2018.commands.Auto.AutoCurveDrive;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.values.Length;
+
+import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.command.TimedCommand;
 
 
 /**
@@ -27,7 +28,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private static final int BACKWARD = 1;
 	private double driveSpeed = 1;
 	private double turnSpeed = 0.25;
-	private double curveSpeed = 0.4;
+	//private double curveSpeed = 0.4;
 
 	public AutonomousCommandGroup() {
 		addSequential(new ResetEncoders());
@@ -74,12 +75,12 @@ public class AutonomousCommandGroup extends CommandGroup {
 	*/
 
 	//elevator commands - FIXME! these commands return before they
-	//reach the disired elevator position
-	public void raiseElevator(double position) {
+	//reach the desired elevator position
+	public void elevatorMoveToPosition(Length position) {
 		addSequential(new ElevatorMoveToPosition(position));
 	}
 	public void lowerElevator() {
-		addSequential(new ElevatorMoveToPosition(Robot.elevator.MIN_POSITION));
+		elevatorMoveToPosition(LengthUOM.Inches.create(0));
 	}
 
 	// arm control commands

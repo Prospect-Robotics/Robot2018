@@ -1,13 +1,20 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
-import org.usfirst.frc2813.Robot2018.Direction;
-import org.usfirst.frc2813.Robot2018.MotorControllerState;
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
+import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
+import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
+import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.uom.RateUOM;
+import org.usfirst.frc2813.units.values.Length;
+import org.usfirst.frc2813.units.values.Rate;
 
 /**
- * Subsystem baseclass for subsystems which move in two direction
+ * Subsystem base class for subsystems which move in two direction
  * over a range of positions.
  *
- * This subsytem can halt, move to an exact position or in a direction.
+ * This subsystem can halt, move to an exact position or in a direction.
  * Speed can be set separately.
  * 
  * The public interfaces are:
@@ -17,115 +24,158 @@ import org.usfirst.frc2813.Robot2018.MotorControllerState;
  *     holdPosition     - actively hold position with PID
  *     moveToPosition   - move to a position. This is normally a fire and forget
  *                        command done at the motor controller level.
- *     moveAtSpeedAndDirection - move in the given speed and direction
- *     moveInDirection  - move at the last set or default speed in the given direction
+ *     moveInDirectionAtSpeed - move in the given direction at a
+ *     given speed move  - at the last set or default speed in
+ *     the given direction
  */
 public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem {
-	protected Direction direction, oldDirection;
-	protected double speed, oldSpeed;
-	protected double position, oldPosition;
-	protected MotorControllerState state, oldState;
+	static {
+		Logger.addMe();
+	}
+	// State information
+	protected final LengthUOM subsystemLengthUnits;
+	protected final LengthUOM sensorLengthUnits;
+	protected final LengthUOM motorLengthUnits;
+	protected final RateUOM subsystemRateUnits;
+	protected final RateUOM sensorRateUnits;
+	protected final RateUOM motorRateUnits;
 
-	/**
-	 * GEOMETRY - define in terms of your motor controller
-	 * You must define these in your subsystem. You must choose units for
-	 * distance and speed and define default min and max.
-	 */
-	public double MAX_POSITION;
-	public double MIN_POSITION;
-	protected double PULSES_PER_UNIT_POSITION;
-	protected double PULSES_PER_UNIT_POSITION_PER_TIME;
-	public double DEFAULT_SPEED;
+	protected Direction direction;
+	protected Direction oldDirection;
+	protected Rate speed;
+	protected Rate oldSpeed;
+	protected Length position;
+	protected Length oldPosition;
+	protected MotorControllerState oldState;
+	protected MotorControllerState state;
 
 	/**
 	 * configure your motor controller and set your
 	 * geometry and state, then you MUST call initialize
+	 * TODO: Pass in axisConfiguration instead of units
 	 */
-	protected void initialize() {
+	protected SubsystemPositionDirectionSpeed(LengthUOM subsystemLengthUnits, LengthUOM sensorLengthUnits, LengthUOM motorLengthUnits, RateUOM subsystemRateUnits, RateUOM sensorRateUnits, RateUOM motorRateUnits) {
+		this.subsystemLengthUnits = subsystemLengthUnits;
+		this.sensorLengthUnits = sensorLengthUnits;
+		this.motorLengthUnits = motorLengthUnits;
+		this.subsystemRateUnits = subsystemRateUnits;
+		this.sensorRateUnits = sensorRateUnits;
+		this.motorRateUnits = motorRateUnits;
+	}
+
+	/*
+	 * Run initialization at the end of the subclass's constructor!
+	 */
+	protected void initialize() {		
 		// track state and change as required. Start in moving so initialize can halt
 		direction = Direction.NEUTRAL;
-		position = MIN_POSITION;
-		speed = DEFAULT_SPEED;
-		oldSpeed = 0;
+		position = getCurrentPositionInSubsystemUnits();
+		speed = getDefaultSpeed();
+		oldSpeed = RateUOM.InchesPerSecond.create(0);
 		oldDirection = Direction.NEUTRAL;
 		oldState = MotorControllerState.DISABLED;
 		state = readMotorControllerState();
 	}
-
-	/**
-	 * Map position from inches to controller ticks
-	 */
-	protected int positionToController(double pos) {
-		return (int)(pos / PULSES_PER_UNIT_POSITION);
-	}
-
-	/**
-	 * Map position from controller ticks to distance units
-	 */
-	protected double controllerToPosition(int ticks) {
-		return ticks * PULSES_PER_UNIT_POSITION;
-	}
-
-	/**
-	 * Map speed from speed units to controller ticks
-	 */
-	protected int speedToController(double speedParam) {
-		return (int)(speedParam / PULSES_PER_UNIT_POSITION_PER_TIME);
-	}
-
-	/**
-	 * Map speed from speed units to controller ticks
-	 */
-	protected double controllerToSpeed(int speedParam) {
-		return speedParam * PULSES_PER_UNIT_POSITION_PER_TIME;
-	}
-	
+	// TODO: Replace with axisConfiguration
+	protected abstract Rate getDefaultSpeed();
 	/**
 	 * Abstract method to read controller state
 	 * @return MotorControllerState
 	 */
 	protected abstract MotorControllerState readMotorControllerState();
-
-	/**
-	 * Abstract method to read controller position
-	 * @return position in controller units
+	/*
+	 * Get the position
 	 */
-	protected abstract int readControllerPosition();
+	protected abstract Length getCurrentPositionInSensorUnits();
 
-	/**
-	 * Abstract method to set controller position
-	 * @param positionParam
+	protected Length getTargetPositionInSubsystemUnits() {
+		return position.convertTo(subsystemLengthUnits);
+	}
+
+	protected Length getTargetPositionInSensorUnits() {
+		return toSensorUnits(position);
+	}
+	
+	/* Set the position 
 	 */
-	protected abstract void setControllerPosition(int positionParam);
-
+	protected abstract void setPosition(Length position);
 	/**
 	 * Abstract method to set controller speed and direction
 	 * @param speedParam
 	 */
-	protected abstract void setControllerSpeedAndDirection(int speedParam);
-
+	protected abstract void setControllerDirectionAndSpeed(Direction direction, Rate speedParam);
 	/**
 	 * Abstract method to halt the controller movement
 	 * NOTE: if a physical limit switch is set, it may
 	 * be wise to set the controller position
 	 */
 	protected abstract void disableController();
-
 	/**
 	 * Abstract method to halt the controller movement
 	 * NOTE: if a physical limit switch is set, it may
 	 * be wise to set the controller position
 	 */
 	protected abstract void holdControllerPosition();
-
-	/**
-	 * Read the current position in distance units
-	 * @return
+	/*
+	 * Need to be able to retrieve what we believe is the state
 	 */
-	public double readPosition() {
-		return controllerToPosition(readControllerPosition());
+	public MotorControllerState getMotorControllerState() {
+		return state;
 	}
 
+	protected boolean isStateTransitionAllowed(MotorControllerState oldState, MotorControllerState newState) {
+		// Validate the state transition before we do anything
+		switch(newState) {
+		case DISABLED:
+			if (oldState == newState) {
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", oldState, newState);
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		case HOLDING_POSITION:
+			if (oldState == newState) {
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", oldState, newState);
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		case MOVING:
+			if ((oldState == newState) && (oldSpeed == speed) && (oldDirection == direction)) {
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, newState);
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		case SET_POSITION:
+			if ((oldState == newState) && (oldPosition == position)) {
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, newState);
+				new Exception().printStackTrace();
+				return false;
+			}
+			break;
+		}
+		return true;
+	}
+
+	protected boolean executeTransition(MotorControllerState oldState, MotorControllerState newState) {
+		// Check that state change is actually changing something. If so, do it.
+		switch(newState) {
+		case DISABLED:
+			disableController();
+			break;
+		case HOLDING_POSITION:
+			holdControllerPosition();
+			break;
+		case MOVING:
+			setControllerDirectionAndSpeed(direction, speed);
+			break;
+		case SET_POSITION:
+			setPosition(position);
+			break;
+		}
+		return true;
+	}
 	/**
 	 * All device change come through here first.
 	 * Log request
@@ -138,55 +188,36 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * with the old state in oldSpeed, oldPosition and oldDirection
 	 * @return true if state change occurred
 	 */
-	protected void changeState(MotorControllerState newState) {
-		logger.fine(String.format("Changing state: encoderFunctional: %s, " +
+	protected boolean changeState(MotorControllerState newState) {
+		Logger.formatDebug("Changing state: encoderFunctional: %s, " +
 								 "old state: %s, new state: %s, old speed: %s, new speed: %s" +
 								 "old direction: %s, new direction %s, old position: %s, new position %s",
-				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position));
+				encoderFunctional, state, newState, oldSpeed, speed, oldDirection, direction, oldPosition, position);
 		if (!encoderFunctional) {
-			logger.warning("encoder not functional. Refusing action.");
-			return;	
+			disableController();
+			Logger.warning("encoder not functional. Refusing action.");
+			return false;	
+		}
+		
+		// Check that the state transition is legal before we do anything.
+		if(!isStateTransitionAllowed(state, newState)) {
+			return false;
 		}
 
-		oldState = state;
-		state = newState;
-		
-		// Check that state change is actually changing something. If so, do it.
-		switch(state) {
-		case DISABLED:
-			if (oldState == state) {
-				logger.warning("bug in code: Transitioning from disabled to disabled.");
-				return;
-			}
-			disableController();
-			break;
-		case HOLDING_POSITION:
-			if (oldState == state) {
-				logger.warning("bug in code: Transitioning from hold position to hold position.");
-				return;
-			}
-			holdControllerPosition();
-			break;
-		case MOVING:
-			if ((oldState == state) && (oldSpeed == speed) && (oldDirection == direction)) {
-				logger.warning("bug in code: Transitioning from disabled to disabled.");
-				return;
-			}
-			setControllerSpeedAndDirection(speedToController(speed));
-			break;
-		case SET_POSITION:
-			if ((oldState == state) && (oldPosition == position)) {
-				logger.warning("bug in code: Transitioning from disabled to disabled.");
-				return;
-			}
-		setControllerPosition(positionToController(position));
-			break;
+		// Execute the transition
+		if(!executeTransition(oldState, newState)) {
+			return false;
 		}
+
+		// Transition successful, save the state.
+		oldState = state;
 		oldPosition = position;
 		oldSpeed = speed;
 		oldDirection = direction;
+		state = newState;
+		return true;
 	}
-	
+
 	/*************************************************************
 	 *  And now for the public commands that can transition the subsystem
 	 */	
@@ -213,22 +244,24 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	 * @param newSpeed
 	 * @param newDirection
 	 */
-	public void moveAtSpeedAndDirection(double newSpeed, Direction newDirection) {
+	public void moveInDirectionAtSpeed(Direction newDirection, Rate newSpeed) {
 		oldSpeed = speed;
 		speed = newSpeed;
 		oldDirection = direction;
 		direction = newDirection;
 		changeState(MotorControllerState.MOVING);
+		// TODO: Check rate is within limits from axisConfiguration
 	}
 
 	/**
 	 *  [ACTION] Move to the absolutePosition
 	 * @param newDirection
 	 */
-	public void moveToPosition(double newPosition) {
+	public void moveToPosition(Length newPosition) {
 		oldPosition = position;
 		position = newPosition;
 		changeState(MotorControllerState.SET_POSITION);
+		// TODO: Check position is within limits from axisConfiguration
 	}
 
 	/**
@@ -238,4 +271,72 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 	public void holdCurrentPosition() {
 		changeState(MotorControllerState.HOLDING_POSITION);
 	}
+	
+	public void dumpState() {
+		/*Logger.debug*/
+		System.out.println(String.format("STATE: [encoderFunctional: %s, state: %s, speed: %s, direction: %s, position %s]",
+				encoderFunctional, state, speed, direction, position));
+	}
+	/*
+	 * Is the sensor phase reversed 
+	 */
+	public TalonSensorPhase getSensorPhase() {
+		return TalonSensorPhase.Normal;
+	}
+	
+	// Convert a length to sensor units
+	public final Length toSensorUnits(Length l) {
+		return l.convertTo(sensorLengthUnits);
+	}
+	// Convert a length to motor units	
+	public final Length toMotorUnits(Length l) {
+		return l.convertTo(motorLengthUnits);
+	}
+	
+	// Convert a length to display units	
+	public final Length toSubsystemUnits(Length l) {
+		return l.convertTo(subsystemLengthUnits);
+	}
+	
+	// Convert a length to sensor units
+	public final Rate toSensorUnits(Rate l) {
+		return l.convertTo(sensorRateUnits);
+	}
+	// Convert a length to motor units	
+	public final Rate toMotorUnits(Rate l) {
+		return l.convertTo(motorRateUnits);
+	}
+	// Convert a length to display units	
+	public final Rate toSubsystemUnits(Rate l) {
+		return l.convertTo(subsystemRateUnits);
+	}
+	// Wrap a sensor unit value in a Length 	
+	protected final Rate sensorUnitsToRate(double valueInSensorUnits) {
+		return sensorRateUnits.create(valueInSensorUnits);
+	}
+	// Wrap a motor unit value in a Length 	
+	protected final Rate motorUnitsToRate(double valueInMotorUnits) {
+		return motorRateUnits.create(valueInMotorUnits);
+	}
+	// Wrap a display unit value in a Length 	
+	protected final Rate subsystemUnitsToRate(double valueInSubsystemUnits) {
+		return subsystemRateUnits.create(valueInSubsystemUnits);
+	}
+	// Wrap a sensor unit value in a Length 	
+	protected final Length sensorUnitsToLength(double valueInSensorUnits) {
+		return sensorLengthUnits.create(valueInSensorUnits);
+	}
+	// Wrap a motor unit value in a Length 	
+	protected final Length motorUnitsToLength(double valueInMotorUnits) {
+		return motorLengthUnits.create(valueInMotorUnits);
+	}
+	// Wrap a display unit value in a Length 	
+	protected final Length subsystemUnitsToLength(double valueInSubsystemUnits) {
+		return subsystemLengthUnits.create(valueInSubsystemUnits);
+	}
+	// Get controller position in subsystem units
+	public final Length getCurrentPositionInSubsystemUnits() {
+		return toSubsystemUnits(getCurrentPositionInSensorUnits());
+	}
 }
+
