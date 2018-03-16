@@ -478,7 +478,7 @@ public class MotorConfiguration {
 		validateCapabilityDependency(SensorToDriveScale, ReadRate|ReadPosition, 0);
 		validateCapabilityDependency(ReadDirection, 0, SensorToDriveScale);
 		validateCapabilityDependency(ReadPosition, 0, SensorToDriveScale);
-		validateCapabilityDependency(ReadRate, 0, SensorToDriveScale);
+		validateCapabilityDependency(ReadRate, 0, 0);
 		validateCapabilityDependency(ReadRate, 0, ControlRate);
 		validateCapabilityDependency(NeutralMode, ControlRate|ControlPosition, 0);
 		// Now validate settings
