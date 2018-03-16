@@ -45,6 +45,13 @@ public class Victor extends AbstractMotorController implements IMotorController 
 
 	@Override
 	public void configure() {
+		final int SupportedFeatures = MotorConfiguration.Forward|MotorConfiguration.Reverse|MotorConfiguration.ControlRate|MotorConfiguration.ReadRate|MotorConfiguration.NeutralMode|MotorConfiguration.DefaultRate;
+		
+		int Errors = configuration.getCapabilities() & SupportedFeatures; 
+		
+		if (!configuration.hasAny(SupportedFeatures)) {
+			throw new IllegalArgumentException("You've selected one or more unsupported features: " + MotorConfiguration.listCapabilities(, "", "; ", suffix));
+		}
 		// TODO Auto-generated method stub
 		
 	}
