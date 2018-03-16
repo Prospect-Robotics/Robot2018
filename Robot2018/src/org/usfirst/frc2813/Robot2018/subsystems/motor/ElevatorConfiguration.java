@@ -200,7 +200,8 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			RANGE_MAX.subtract(SAFETY_MARGIN),        // forwardSoftLimit - set to 4" below the end of the physical range 
 // BEGIN WORKROUND
 //			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
-			RANGE_MIN.subtract(6), // Let us reach the limit switch even if calibration is off
+//			RANGE_MIN.subtract(6), // Let us reach the limit switch even if calibration is off // NB: THIS IS CORRECT
+			RANGE_MIN, // temporary because hard limit is disabled
 // END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
 			RateUOM.InchesPerSecond.create(5), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
