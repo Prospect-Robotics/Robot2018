@@ -133,7 +133,7 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	public ArmConfiguration() {
 		super(
-			"Arm Rotational Axis",
+			"Arm",
 			(0
 					|MotorConfiguration.ControlDirection
 					|MotorConfiguration.ControlPosition
