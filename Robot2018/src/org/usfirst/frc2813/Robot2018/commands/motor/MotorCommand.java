@@ -27,7 +27,6 @@ public abstract class MotorCommand extends GearheadsCommand {
 	// @Override
 	protected void initialize() {
 		Logger.debug("in initialize");
-		motor.disable();
 	}
 	
 	// @Override
