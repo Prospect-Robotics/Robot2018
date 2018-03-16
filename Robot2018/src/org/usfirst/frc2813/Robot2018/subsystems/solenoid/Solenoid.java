@@ -3,6 +3,7 @@ package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.subsystems.SubsystemBinary;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -17,20 +18,6 @@ public class Solenoid extends SubsystemBinary {
 		this.solenoid = solenoid;
 	}
 
-	/*
-	 * Get the current state
-	 */
-	public Direction getState() {
-		return getControllerState();
-	}
-
-	/**
-	 * Set the current state
-	 */
-	public void setState(Direction direction) {
-		setControllerState(direction);
-	}
-
 	@Override
 	protected Direction getControllerState() {
 		boolean state = solenoid.get();
@@ -39,12 +26,17 @@ public class Solenoid extends SubsystemBinary {
 		}
 		return state ? Direction.ON : Direction.OFF;
 	}
-	
+
 	@Override
 	protected void setControllerState(Direction direction) {
 		boolean state = direction.isPositive(); 
 		if (configuration.getSolenoidLogic() == SolenoidLogic.SolenoidLogicReversed) {
 			state = !state;
+		}
+		if(solenoid.get() == state) {
+			Logger.info(configuration.getName() + " told to set state to " + direction + ", but it already is.");
+		} else {
+			Logger.info(configuration.getName() + " changing state to " + direction + " [HW state " + state + "].");
 		}
 		solenoid.set(state);
 	}
