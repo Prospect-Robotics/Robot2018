@@ -12,7 +12,7 @@ import org.usfirst.frc2813.units.values.Rate;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-
+//XXX THIS CLASS MAY NOT BE NECESSARY
 public class Victor extends AbstractMotorController implements IMotorController {
 	private final WPI_VictorSPX spx;
 	private ControlMode lastControlMode;
@@ -47,7 +47,7 @@ public class Victor extends AbstractMotorController implements IMotorController 
 	
 	@Override
 	public void configure() {
-		final long SupportedFeatures = MotorConfiguration.Forward|MotorConfiguration.Reverse|MotorConfiguration.ControlRate|MotorConfiguration.ReadRate|MotorConfiguration.NeutralMode|MotorConfiguration.DefaultRate;
+		final long SupportedFeatures = MotorConfiguration.Forward|MotorConfiguration.Reverse|MotorConfiguration.ControlRate|MotorConfiguration.ReadRate|MotorConfiguration.NeutralMode|MotorConfiguration.DefaultRate|MotorConfiguration.Disconnected|MotorConfiguration.LimitRate;
 		
 		long Errors = configuration.getCapabilities() & SupportedFeatures; 
 		

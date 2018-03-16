@@ -6,6 +6,7 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
+import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -38,7 +39,7 @@ public class Robot extends TimedRobot {
 	public static DriveTrain driveTrain;
 	public static Motor elevator;
 	public static Motor arm;
-	public static Motor intake;
+	public static Intake intake;
 	public static Solenoid jaws;
 	public static UsbCamera camera;
 	public static Solenoid gearShifter;
@@ -55,7 +56,7 @@ public class Robot extends TimedRobot {
 		driveTrain = new DriveTrain();
 		elevator = new Motor(new ElevatorConfiguration(), RobotMap.srxElevator);
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
-		intake = new Motor(new IntakeConfiguration(), RobotMap.intakeSpeedController);
+		intake = new Intake();
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
 		
 		// OI must be constructed after subsystems. If the OI creates Commands

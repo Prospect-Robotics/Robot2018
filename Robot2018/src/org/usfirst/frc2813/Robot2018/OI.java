@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
+import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDrive;
@@ -100,12 +101,8 @@ public class OI {
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
 //		new JoystickButton(buttonPanel, 3).whenPressed(new MotorMoveToPosition(elevator.getConfiguration().getReverseLimit()));
-		spinIntakeOut = new JoystickButton(buttonPanel, 2);
-		spinIntakeOut.whileHeld(new MotorMoveInDirection(Robot.intake, Direction.OUT));
-		spinIntakeOut.whenReleased(new MotorMoveInDirection(Robot.intake, Direction.OUT));
-		spinIntakeIn = new JoystickButton(buttonPanel, 1);
-		spinIntakeIn.whileHeld(new MotorMoveInDirection(Robot.intake, Direction.IN));
-		spinIntakeIn.whenReleased(new MotorMoveInDirection(Robot.intake, Direction.IN));
+		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake(Direction.OUT));
+		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake(Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
 		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
