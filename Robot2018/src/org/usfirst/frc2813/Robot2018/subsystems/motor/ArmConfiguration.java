@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import java.util.Iterator;
-
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -16,57 +16,61 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 public class ArmConfiguration extends MotorConfiguration{
 
 	// Talon constants
-	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
+	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096.0;
 	
 	// Gearing constants
-	private static final double SENSOR_TO_DRIVE = (30/36)*100;
-	private static final double MOTOR_TO_DRIVE = (30/36)*100;
+	private static final double SENSOR_TO_DRIVE = (36.0/30.0)*100.0;
+	private static final double MOTOR_TO_DRIVE = (36.0/30.0)*100.0;
 	
 	// Motor constants
 	private static final double    MAX_RPMS_UNLOADED             = 18700;
-	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
-
-	// Software Settings
-	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0.0);
-	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(24.0); // TBD
-	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(12); // TBD
+	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED / MOTOR_TO_DRIVE;
 
 	// Hardware Inputs
 	private static final Length SHAFT_DIAMETER                = LengthUOM.Inches.create(0);
 	private static final Length CORD_DIAMETER                 = LengthUOM.Millimeters.create(0);
 	private static final Length ARM_LENGTH                 	  = LengthUOM.Inches.create(12);
 	private static final Length DRIVE_AXIS_DIAMETER           = SHAFT_DIAMETER.add(CORD_DIAMETER).add(ARM_LENGTH);	
-	private static final Length INCHES_PER_ENCODER_REVOLUTION = DRIVE_AXIS_DIAMETER.multiply(Math.PI);
+	private static final double PULSES_PER_DRIVE_REVOLUTION   = (PULSES_PER_ENCODER_REVOLUTION * SENSOR_TO_DRIVE);
+	private static final Length INCHES_PER_ENCODER_REVOLUTION = LengthUOM.Inches.create(DRIVE_AXIS_DIAMETER.multiply(Math.PI).getValue()/SENSOR_TO_DRIVE);
 
 	// Calculations
-	private static final double PULSE_PER_INCH                = PULSES_PER_ENCODER_REVOLUTION/INCHES_PER_ENCODER_REVOLUTION.getValue();
-	private static final Length INCHES_PER_PULSE              = LengthUOM.Inches.create(1.0/PULSE_PER_INCH);
+	private static final Length PULSE_PER_DEGREE              = LengthUOM.Inches.create(PULSES_PER_DRIVE_REVOLUTION).divide(LengthUOM.Inches.create(360));
+	private static final Length INCHES_PER_DEGREE             = LengthUOM.Inches.create(DRIVE_AXIS_DIAMETER.multiply(Math.PI).getCanonicalValue()/360);
+	private static final Length INCHES_PER_PULSE              = INCHES_PER_DEGREE.divide(PULSE_PER_DEGREE);
 	private static final Length PULSE_CANONICAL_LENGTH        = INCHES_PER_PULSE.convertToCanonicalUOM();
 
-	// Units Of Length for Elevator
-	public static final LengthUOM ElevatorSRXMotorPulses      = new LengthUOM("srxpulse", "srxpulses", "p", LengthUOM.CanonicalLengthUOM, PULSE_CANONICAL_LENGTH.getCanonicalValue());
-	public static final LengthUOM ElevatorSRXEncoderRevolution= new LengthUOM("revolution", "revolutions", "rev", LengthUOM.CanonicalLengthUOM, INCHES_PER_ENCODER_REVOLUTION.getCanonicalValue());
+	// Units Of Length for Arm
+	private static final LengthUOM ArmDegrees = new LengthUOM("degree", "degrees", "deg", LengthUOM.CanonicalLengthUOM, INCHES_PER_DEGREE.getCanonicalValue());
+	public static final LengthUOM ArmSRXMotorPulses      = new LengthUOM("srxpulse", "srxpulses", "p", LengthUOM.CanonicalLengthUOM, PULSE_CANONICAL_LENGTH.getCanonicalValue());
+	public static final LengthUOM ArmSRXEncoderRevolution= new LengthUOM("revolution", "revolutions", "rev", LengthUOM.CanonicalLengthUOM, INCHES_PER_ENCODER_REVOLUTION.getCanonicalValue());
+	
+	// Units Of Rate for Arm
+	public static final RateUOM   ArmSRXMotorPulseRate   = new RateUOM(ArmSRXMotorPulses, TimeUOM.Deciseconds, RateUOM.CanonicalRateUOMForMovement, "Arm-pulses/100ms");
+	public static final RateUOM   ArmSRXEncoderRPM       = new RateUOM(ArmSRXEncoderRevolution, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "Arm-RPMs");
+	public static final RateUOM   ArmSRXEncoderRPS       = new RateUOM(ArmSRXEncoderRevolution, TimeUOM.Seconds, RateUOM.CanonicalRateUOMForMovement, "Arm-RPSs");
+	public static final RateUOM   ArmDegreesPerSecond    = new RateUOM(ArmDegrees, TimeUOM.Seconds, RateUOM.CanonicalRateUOMForMovement, "Arm-DPSs");
 
-	// Units Of Rate for Elevator
-	public static final RateUOM   ElevatorSRXMotorPulseRate   = new RateUOM(ElevatorSRXMotorPulses, TimeUOM.Deciseconds, RateUOM.CanonicalRateUOMForMovement, "Elevator-pulses/100ms");
-	public static final RateUOM   ElevatorSRXEncoderRPM       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "Elevator-RPMs");
-	public static final RateUOM   ElevatorSRXEncoderRPS       = new RateUOM(ElevatorSRXEncoderRevolution, TimeUOM.Seconds, RateUOM.CanonicalRateUOMForMovement, "Elevator-RPSs");
+	// Software Settings
+	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0);
+	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(180); // TBD
+	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(180); // TBD
+	
+	public static final Rate      ArmSRXDriveMaxRPM      = ArmSRXEncoderRPM.create(MAX_RPMS_UNLOADED_GEARED_DOWN);
+	public static final Rate      ArmSRXMotorMaxRPS      = ArmSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
 
-	public static final Rate      ElevatorSRXMotorMaxRPM      = ElevatorSRXEncoderRPM.create(MAX_RPMS_UNLOADED_GEARED_DOWN);
-	public static final Rate      ElevatorSRXMotorMaxRPS      = ElevatorSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
-
-	private static final Length    maxDistancePerMinute           = ElevatorSRXMotorMaxRPM.getLength(ElevatorSRXMotorMaxRPM.getTimeUOM().getValue());
-	private static final Length    maxDistancePerSecond           = ElevatorSRXMotorMaxRPS.getLength(ElevatorSRXMotorMaxRPS.getTimeUOM().getValue());
+	private static final Length    maxDistancePerMinute           = ArmSRXDriveMaxRPM.getLength(ArmSRXDriveMaxRPM.getTimeUOM().getValue());
+	private static final Length    maxDistancePerSecond           = ArmSRXMotorMaxRPS.getLength(ArmSRXMotorMaxRPS.getTimeUOM().getValue());
 	private static final LengthUOM OneSecondDistanceAtOnePercent  = new LengthUOM("minute-distance", "minute-distance", "minute-distance", LengthUOM.CanonicalLengthUOM, maxDistancePerMinute.getCanonicalValue()/100.0);
-	public static final RateUOM    ElevatorSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "% Elevator");
+	public static final RateUOM    ArmSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "% Arm");
 
 	public static void mathReport() {
 		System.out.println();
 		System.out.println("[Software Settings]");
-		System.out.println("Range.............................{" + MINIMUM_POSITION_INCHES + ".." + MAXIMUM_POSITION_INCHES + "}");
-		System.out.println("Default Speed....................." + DEFAULT_SPEED_INCHES_PER_SECOND);
-		System.out.println("Default Speed (Encoder RPM)......." + DEFAULT_SPEED_INCHES_PER_SECOND.convertTo(ElevatorSRXEncoderRPM));
-		System.out.println("Default Speed (SRX)..............." + DEFAULT_SPEED_INCHES_PER_SECOND.convertTo(ElevatorSRXMotorPulseRate));
+		System.out.println("Range.............................{" + MINIMUM_POSITION_DEGREES + ".." + MAXIMUM_POSITION_DEGREES + "}");
+		System.out.println("Default Speed (Motor)............." + DEFAULT_SPEED_DEGREES_PER_SECOND);
+		System.out.println("Default Speed (Encoder)..........." + DEFAULT_SPEED_DEGREES_PER_SECOND.multiply(MOTOR_TO_DRIVE));
+		System.out.println("Default Speed (SRX)..............." + DEFAULT_SPEED_DEGREES_PER_SECOND.convertTo(ArmSRXMotorPulseRate));
 		System.out.println();
 		System.out.println("[Robot Measurements]");
 		System.out.println("SHAFT.............................d=" + SHAFT_DIAMETER + ", r=" + SHAFT_DIAMETER.divide(2) + ", c=" + SHAFT_DIAMETER.multiply(Math.PI));
@@ -74,61 +78,63 @@ public class ArmConfiguration extends MotorConfiguration{
 		System.out.println("DRIVE.............................d=" + DRIVE_AXIS_DIAMETER + ", r=" + DRIVE_AXIS_DIAMETER.divide(2) + ", c=" + DRIVE_AXIS_DIAMETER.multiply(Math.PI));
 		System.out.println();
 		System.out.println("[Units Of Measure]");
-		System.out.println("EncoderRevolution................." + ElevatorSRXEncoderRevolution.getValue() + " = " + ElevatorSRXEncoderRevolution.getValue().convertTo(LengthUOM.Inches));
-		System.out.println("Max Pulse/Decisecond.............." + ElevatorSRXMotorPulseRate.getValue() + " = " + ElevatorSRXMotorPulseRate.getCanonicalValue());
-		System.out.println("Max RPMs.........................." + ElevatorSRXMotorMaxRPM + " = " + ElevatorSRXMotorMaxRPM.convertTo(ElevatorSRXEncoderRPS) + " = " + ElevatorSRXMotorMaxRPM.convertTo(RateUOM.InchesPerSecond));
+		System.out.println("EncoderRevolution................." + ArmSRXEncoderRevolution.getValue() + " = " + ArmSRXEncoderRevolution.getValue().convertTo(LengthUOM.Inches));
+		System.out.println("Max Pulse/Decisecond.............." + ArmSRXMotorPulseRate.getValue() + " = " + ArmSRXMotorPulseRate.getCanonicalValue());
+		System.out.println("Max RPMs.........................." + ArmSRXDriveMaxRPM + " = " + ArmSRXDriveMaxRPM.convertTo(ArmSRXEncoderRPS) + " = " + ArmSRXDriveMaxRPM.convertTo(ArmSRXEncoderRPS).getValue() * DRIVE_AXIS_DIAMETER.multiply(Math.PI).getValue());
 		System.out.println();
 		System.out.println("[Calculations]");
-		System.out.println("Pulses/rev........................" + PULSES_PER_ENCODER_REVOLUTION);
-		System.out.println("Inches/rev........................" + INCHES_PER_ENCODER_REVOLUTION);
-		System.out.println("Pulses/inch......................." + PULSE_PER_INCH);
+		System.out.println("Pulses/encoder rev................" + PULSES_PER_ENCODER_REVOLUTION);
+		System.out.println("Pulses/drive rev.................." + PULSES_PER_DRIVE_REVOLUTION);
+		System.out.println("Inches/encoder rev................" + INCHES_PER_ENCODER_REVOLUTION);
+		System.out.println("Pulses/drive degree..............." + PULSE_PER_DEGREE);
+		System.out.println("Inches/drive degree..............." + INCHES_PER_DEGREE);
 		System.out.println("Pulse Length (Inches)............." + INCHES_PER_PULSE);
 		System.out.println("Pulse Length (Canonical).........." + PULSE_CANONICAL_LENGTH);
-		System.out.println("Distance in Second................" + ElevatorSRXMotorMaxRPM.getLength(TimeUOM.Seconds.create(1)).convertTo(LengthUOM.Feet));
-		System.out.println("Distance in Minute................" + ElevatorSRXMotorMaxRPM.getLength(TimeUOM.Minutes.create(1)).convertTo(LengthUOM.Feet));
- 		System.out.println("Elevator 100% Rate................" + ElevatorSRXMotorPercentageRate.create(100) + " = " + ElevatorSRXMotorPercentageRate.create(100).convertTo(RateUOM.FeetPerSecond));
- 		System.out.println("Elevator % Rate Table.............");
+		System.out.println("Distance in Second................" + ArmSRXDriveMaxRPM.getLength(TimeUOM.Seconds.create(1)).convertTo(LengthUOM.Inches)); //Wrong
+		System.out.println("Distance in Minute................" + ArmSRXDriveMaxRPM.getLength(TimeUOM.Minutes.create(1)).convertTo(LengthUOM.Inches)); //Wrong
+ 		System.out.println("Arm 100% Rate................" + ArmSRXMotorPercentageRate.create(100) + " = " + ArmSRXMotorPercentageRate.create(100).convertTo(RateUOM.FeetPerSecond));
+ 		System.out.println("Arm % Rate Table.............");
 		for(int q = 0; q <= 100; q++) {
-			Rate pct = ElevatorSRXMotorPercentageRate.create(q);
-			Rate pr = ElevatorSRXMotorPulseRate.create(pct.convertTo(ElevatorSRXMotorPulseRate).getValueAsInt());
-			Rate rpm = ElevatorSRXEncoderRPM.create(pct.convertTo(ElevatorSRXEncoderRPM).getValueAsInt());
+			Rate pct = ArmSRXMotorPercentageRate.create(q);
+			Rate pr = ArmSRXMotorPulseRate.create(pct.convertTo(ArmSRXMotorPulseRate).getValueAsInt());
+			Rate rpm = ArmSRXEncoderRPM.create(pct.convertTo(ArmSRXEncoderRPM).getValueAsInt());
 			Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
 			System.out.println("                                  " + pct + " = " + pr + " = " + rpm + " = " + ips);	
 		}
-/*		
+
 		System.out.println();
 		System.out.println("[Conversion Table]");
-		System.out.println("Elevator SRX Revolution..........." + ElevatorSRXMotorRevolution.getValue());
+		System.out.println("Arm SRX Revolution..........." + ArmSRXEncoderRevolution.getValue());
 
 		Iterator<UOM> i = UOM.allUnits.get(SystemOfMeasurement.Length).iterator();
 		while(i.hasNext()) {
-			System.out.println("                                  " + ElevatorSRXMotorRevolution.getValue().convertTo((LengthUOM)i.next()));
+			System.out.println("                                  " + ArmSRXEncoderRevolution.getValue().convertTo((LengthUOM)i.next()));
 		}
-		System.out.println("Elevator SRX Rate................." + ElevatorSRXMotorPulseRate);
+		System.out.println("Arm SRX Rate................." + ArmSRXMotorPulseRate);
 		i = UOM.allUnits.get(SystemOfMeasurement.Rate).iterator();
 		while(i.hasNext()) {
-			System.out.println("                                  " + ElevatorSRXMotorPulseRate.getValue().convertTo((RateUOM)i.next()));
+			System.out.println("                                  " + ArmSRXMotorPulseRate.getValue().convertTo((RateUOM)i.next()));
 		}
 		System.out.println();
 		System.out.println("[Reference Tables]");
 		for(int j = 0; j < 24; j++) {
 			System.out.println(String.format("%3d in/sec........................~%s %s", 
 					j, 
-					Math.round(RateUOM.InchesPerSecond.create(j).convertTo(ElevatorSRXRPM).getValue()), ElevatorSRXRPM.getUnitNameAbbreviation())
+					Math.round(RateUOM.InchesPerSecond.create(j).convertTo(ArmSRXEncoderRPM).getValue()), ArmSRXEncoderRPM.getUnitNameAbbreviation())
 			);
 		}
-*/		
+	
 	}
 
 	public ArmConfiguration() {
 		super(
-			"Arm",
+			"Arm Rotational Axis",
 			(0
 					|MotorConfiguration.ControlDirection
 					|MotorConfiguration.ControlPosition
 					|MotorConfiguration.ControlRate
 					|MotorConfiguration.Forward
-//					|AxisConfiguration.ForwardHardLimitSwitch
+//					|MotorConfiguration.ForwardHardLimitSwitch
 					|MotorConfiguration.ForwardSoftLimitSwitch
 					|MotorConfiguration.LimitPosition
 					|MotorConfiguration.LimitRate
@@ -138,36 +144,36 @@ public class ArmConfiguration extends MotorConfiguration{
 					|MotorConfiguration.ReadRate
 					|MotorConfiguration.Reverse
 					|MotorConfiguration.ReverseHardLimitSwitch
-//					|AxisConfiguration.ReverseSoftLimitSwitch
+//					|MotorConfiguration.ReverseSoftLimitSwitch
 					|MotorConfiguration.DefaultRate
 					|MotorConfiguration.NeutralMode
 					),
-			LengthUOM.Inches,                   // nativeDisplayLengthUOM
-			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM
+			ArmDegrees,                  	    // nativeDisplayLengthUOM
+			ArmSRXMotorPulses,                  // nativeMotorLengthUOM
 			Boolean.FALSE,                      // motorPhaseIsReversed
 			Boolean.FALSE,                      // sensorPhaseIsReversed
-			ElevatorSRXMotorPulses,   	        // nativeSensorLengthUOM
-			RateUOM.InchesPerSecond,            // nativeDisplayRateUOM
-			ElevatorSRXMotorPulseRate,          // nativeMotorRateUOM
-			ElevatorSRXMotorPulseRate,          // nativeSensorRateUOM
-			RateUOM.InchesPerSecond.create(0),  // minimumForwardRate
-			RateUOM.InchesPerSecond.create(12), // maximumForwardRate (placeholder)
-			RateUOM.InchesPerSecond.create(0),  // minimumReverseRate
-			RateUOM.InchesPerSecond.create(12), // maximumReverseRate (placeholder)
+			ArmSRXMotorPulses,   	            // nativeSensorLengthUOM
+			ArmDegreesPerSecond,            // nativeDisplayRateUOM
+			ArmSRXMotorPulseRate,               // nativeMotorRateUOM
+			ArmSRXMotorPulseRate,               // nativeSensorRateUOM
+			ArmDegreesPerSecond.create(0),  // minimumForwardRate
+			ArmDegreesPerSecond.create(30), // maximumForwardRate (placeholder)
+			ArmDegreesPerSecond.create(0),  // minimumReverseRate
+			ArmDegreesPerSecond.create(30), // maximumReverseRate (placeholder)
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
-			LengthUOM.Inches.create(24),        // forwardLimit (placeholder)
-			LengthUOM.Inches.create(0),         // reverseLimit
+			ArmDegrees.create(180),        // forwardLimit (placeholder)
+			ArmDegrees.create(0),         // reverseLimit
 			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       // reverseHardLimitStopsMotor
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
-			LengthUOM.Inches.create(24),        // forwardSoftLimit
+			ArmDegrees.create(180),        // forwardSoftLimit
 			null,                               // reverseSoftLimit
-			RateUOM.InchesPerSecond.create(12), // defaultRate
+			DEFAULT_SPEED_DEGREES_PER_SECOND, // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
-			ElevatorSRXMotorPercentageRate      // percentageRate
+			ArmSRXMotorPercentageRate           // percentageRate
 			);
 	}
 
