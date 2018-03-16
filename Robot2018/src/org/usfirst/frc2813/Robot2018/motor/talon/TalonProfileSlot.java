@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.motor;
+package org.usfirst.frc2813.Robot2018.motor.talon;
 
 /*
  * Talons support up to four configuration profiles for closed loop control (which includes all PID stuff: P Gain, I Gain, D Gain, Feed-Forward Gain, I Zone, and Ramp Rate)

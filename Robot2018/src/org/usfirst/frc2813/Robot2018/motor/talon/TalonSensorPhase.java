@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.motor;
+package org.usfirst.frc2813.Robot2018.motor.talon;
 
 public enum TalonSensorPhase {
 	Normal(false), Reversed(true);

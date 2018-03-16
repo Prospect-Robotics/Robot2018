@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.motor;
+package org.usfirst.frc2813.Robot2018.motor.talon;
 
 public enum TalonPID {
 	Primary(0), Auxilliary(1);

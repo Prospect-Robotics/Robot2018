@@ -6,10 +6,12 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
-import org.usfirst.frc2813.Robot2018.subsystems.Jaws;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.Arm;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.Intake;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.JawsConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.IntakeConfiguration;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -35,9 +37,9 @@ public class Robot extends TimedRobot {
 	public static OI oi;
 	public static DriveTrain driveTrain;
 	public static Motor elevator;
-	public static Arm arm;
-	public static Jaws jaws;
-	public static Intake intake;
+	public static Motor arm;
+	public static Motor intake;
+	public static Solenoid jaws;
 	public static UsbCamera camera;
 
 	/**
@@ -50,10 +52,10 @@ public class Robot extends TimedRobot {
 
 		RobotMap.init();
 		driveTrain = new DriveTrain();
-		elevator = new Motor();
-		arm = new Arm();
-		jaws = new Jaws();
-		intake = new Intake();
+		elevator = new Motor(new ElevatorConfiguration(), RobotMap.srxElevator);
+		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
+		intake = new Motor(new IntakeConfiguration(), RobotMap.intakeSpeedController);
+		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
 
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be

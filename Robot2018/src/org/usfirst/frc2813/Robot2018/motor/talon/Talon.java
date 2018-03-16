@@ -1,5 +1,6 @@
-package org.usfirst.frc2813.Robot2018.motor;
+package org.usfirst.frc2813.Robot2018.motor.talon;
 
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorControllerState;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 

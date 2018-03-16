@@ -2,8 +2,6 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import java.util.Iterator;
 
-
-import org.usfirst.frc2813.Robot2018.motor.axis.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -124,7 +122,7 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	public ArmConfiguration() {
 		super(
-			"Arm Rotational Axis",
+			"Arm",
 			(0
 					|MotorConfiguration.ControlDirection
 					|MotorConfiguration.ControlPosition

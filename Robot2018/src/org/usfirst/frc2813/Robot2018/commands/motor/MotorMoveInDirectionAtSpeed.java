@@ -1,10 +1,11 @@
-package org.usfirst.frc2813.Robot2018.commands.Motor;
+package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorControllerState;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -20,13 +21,20 @@ public class MotorMoveInDirectionAtSpeed extends MotorCommand {
 		super(motor, true);
 		this.direction = direction;
 		this.speed = speed;
-		Logger.printFormat(LogType.INFO, "Move %s at speed: %s", direction, speed);
+		if(this.direction.isNeutral()) {
+			throw new IllegalArgumentException("Use MotorHoldPosition or MotorDisable instead of passing a neutral direction to " + getClass().getSimpleName());
+		}
 	}
 
 	@Override
 	protected void initialize() {
 		super.initialize();
-		motor.moveInDirectionAtSpeed(direction, speed);
+		if(motor.getMotorControllerState() == MotorControllerState.MOVING && motor.getDirection() == direction && motor.getSpeed() == speed) {
+			Logger.info("NOT setting " + motor.getName() + " to move in the " + direction + " direction at " + speed + ", it's already doing that.");
+		} else {
+			Logger.info("Setting " + motor.getName() + " to move in the " + direction + " direction at " + speed + ".");
+			motor.moveInDirectionAtSpeed(direction, speed);
+		}
 	}
 
 	@Override

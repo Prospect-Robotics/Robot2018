@@ -2,7 +2,6 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import java.util.Iterator;
 
-import org.usfirst.frc2813.Robot2018.motor.axis.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -122,7 +121,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 
 	public ElevatorConfiguration() {
 		super(
-			"Elevator Vertical Axis",
+			"Elevator",
 			(0
 					|MotorConfiguration.ControlDirection
 					|MotorConfiguration.ControlPosition

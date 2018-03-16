@@ -1,36 +1,33 @@
-package org.usfirst.frc2813.Robot2018.commands.Motor;
+package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 
 /**
  * Disable elevator. Subsystem will quiesce.
  */
-public abstract class MotorCommand extends GearheadsCommand {
+public abstract class MotorInstantCommand extends GearheadsInstantCommand {
 	protected final Motor motor;
-	public MotorCommand(Motor motor, boolean requiresMotor) {
+	public MotorInstantCommand(Motor motor, boolean requiresMotor) {
 		this.motor = motor;
 		if(requiresMotor) {
 			requires(motor);
 		}
-		Logger.debug("constructed");
 	}
 
-	// @Override
+	@Override
 	protected void execute() {
-		Logger.debug("in execute");
+		Logger.debug("execute");
 	}
 	
-	// @Override
+	@Override
 	protected void initialize() {
-		Logger.debug("in initialize");
-		motor.disable();
+		Logger.debug("initialize");
 	}
 	
-	// @Override
+	@Override
 	protected void interrupted() {
 		Logger.debug("interrupted");
 	}

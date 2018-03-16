@@ -1,9 +1,10 @@
-package org.usfirst.frc2813.Robot2018.commands.Motor;
+package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorControllerState;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -16,12 +17,20 @@ public class MotorMoveInDirection extends MotorCommand {
 	public MotorMoveInDirection(Motor motor, Direction direction) {
 		super(motor, true);
 		this.direction = direction;
+		if(this.direction.isNeutral()) {
+			throw new IllegalArgumentException("Use MotorHoldPosition or MotorDisable instead of passing a neutral direction to " + getClass().getSimpleName());
+		}
 	}
 
 	@Override
 	protected void initialize() {
 		super.initialize();
-		motor.moveInDirection(direction);
+		if(motor.getMotorControllerState() == MotorControllerState.MOVING && motor.getDirection() == direction) {
+			Logger.info("NOT setting " + motor.getName() + " to move in the " + direction + " direction, it's already doing that.");
+		} else {
+			Logger.info("Setting " + motor.getName() + " to move in the " + direction + " direction.");
+			motor.moveInDirection(direction);
+		}
 	}
 
 	@Override

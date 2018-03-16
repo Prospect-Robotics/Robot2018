@@ -28,10 +28,10 @@ public class SpinIntake extends Command {
 	//@Override
 	protected void initialize() {
 		if (direction.isNeutral()) {
-			Robot.intake.halt();
+			Robot.intake.disable();
 		}
 		else {
-			Robot.intake.setDirection(direction);
+			Robot.intake.moveInDirection(direction);
 		}
 	}
 

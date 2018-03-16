@@ -2,83 +2,76 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.Motor.MotorHoldPosition;
-import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
-import org.usfirst.frc2813.Robot2018.motor.Talon;
-import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
-import org.usfirst.frc2813.Robot2018.motor.axis.MotorConfiguration;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.talon.Talon;
+import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 /**
- * Elevator subsystem. Moves up and down.
+ * Generalized motor subsystem.
+ * 
+ * The motor is given a name and a configuration.  Then you can use the
+ * capabilities described in the configuration.
+ *   
+ * General Motor commands are found in the org.usfirst.frc2813.Robot2018.commands.motor package 
  *
- * Elevator can halt, move to an exact position or in a direction.
- * Speed can be set separately.
- * position is in inches.
- * speed is in inches per second.
  */
-public class Motor extends SubsystemPositionDirectionSpeed {
+public final class Motor extends SubsystemPositionDirectionSpeed {
 
-	private Talon motorController;
-	public static final ElevatorConfiguration axisConfiguration = new ElevatorConfiguration();
+	private final Talon motorController;
+	private final MotorConfiguration configuration;
 
-	public Motor() {
+	public Motor(MotorConfiguration configuration, WPI_VictorSPX talonSRX) {
 		super(
-				axisConfiguration.getNativeDisplayLengthUOM(), 
-				axisConfiguration.getNativeSensorLengthUOM(), 
-				axisConfiguration.getNativeMotorLengthUOM(),
-				axisConfiguration.getNativeDisplayRateUOM(), 
-				axisConfiguration.getNativeSensorRateUOM(), 
-				axisConfiguration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
+				configuration.getNativeDisplayLengthUOM(), 
+				configuration.getNativeSensorLengthUOM(), 
+				configuration.getNativeMotorLengthUOM(),
+				configuration.getNativeDisplayRateUOM(), 
+				configuration.getNativeSensorRateUOM(), 
+				configuration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
 				);
-		motorController = new Talon(RobotMap.srxElevator);
-		// Set forward hard limits
-		if(axisConfiguration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardHardLimitSwitch)) {
-			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.FeedbackConnector, axisConfiguration.getForwardHardLimitSwitchNormal());
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, axisConfiguration.getForwardHardLimitSwitchResetsEncoder());
-		} else {
-			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
-		}
-		// Set reverse hard limits
-		if(axisConfiguration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseHardLimitSwitch)) {
-			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.FeedbackConnector, axisConfiguration.getReverseHardLimitSwitchNormal());
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, axisConfiguration.getReverseHardLimitSwitchResetsEncoder());
-		} else {
-			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
-		}
-		// Set forward soft limit
-		if(axisConfiguration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardSoftLimitSwitch)) {
-			motorController.setSoftLimitSwitch(Direction.FORWARD, true, axisConfiguration.getForwardLimit().convertTo(axisConfiguration.getNativeSensorLengthUOM()).getValueAsInt());
-		} else {
-			motorController.setSoftLimitSwitch(Direction.FORWARD, false);
-		}
-		// Set reverse soft limit
-		if(axisConfiguration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseSoftLimitSwitch)) {
-			motorController.setSoftLimitSwitch(Direction.REVERSE, true, axisConfiguration.getReverseLimit().convertTo(axisConfiguration.getNativeSensorLengthUOM()).getValueAsInt());
-		} else {
-			motorController.setSoftLimitSwitch(Direction.REVERSE, false);
-		}
-		if(axisConfiguration.hasAny(MotorConfiguration.NeutralMode)) {
-			motorController.setNeutralMode(axisConfiguration.getNeutralMode());
-		}
-// HW BUG WORKAROUND
-motorController.setHardLimitSwitch(Direction.UP, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true);
+		this.configuration = configuration;
+		this.motorController = null; // TODO
+		configure();
+	}
 
-		// Configure the PID profiles
-  	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
-	    motorController.configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
-	    initialize();
+	public Motor(MotorConfiguration configuration, VictorSPX talonSRX) {
+		super(
+				configuration.getNativeDisplayLengthUOM(), 
+				configuration.getNativeSensorLengthUOM(), 
+				configuration.getNativeMotorLengthUOM(),
+				configuration.getNativeDisplayRateUOM(), 
+				configuration.getNativeSensorRateUOM(), 
+				configuration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
+				);
+		this.configuration = configuration;
+		this.motorController = null; // TODO
+		configure();
+	}
+	
+	public Motor(MotorConfiguration configuration, TalonSRX talonSRX) {
+		super(
+				configuration.getNativeDisplayLengthUOM(), 
+				configuration.getNativeSensorLengthUOM(), 
+				configuration.getNativeMotorLengthUOM(),
+				configuration.getNativeDisplayRateUOM(), 
+				configuration.getNativeSensorRateUOM(), 
+				configuration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
+				);
+		this.configuration = configuration;
+		this.motorController = new Talon(talonSRX);
+		configure();
 	}
 	protected Rate getDefaultSpeed() {
-		return axisConfiguration.getDefaultRate();
+		return configuration.getDefaultRate();
 	}
 	
 	public boolean readLimitSwitch(Direction switchDirection) {
@@ -89,7 +82,48 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 		return motorController.getState();
 	}
 
+	protected void configure() {
+		// Set forward hard limits
+		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardHardLimitSwitch)) {
+			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.FeedbackConnector, configuration.getForwardHardLimitSwitchNormal());
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
+		} else {
+			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
+		}
+		// Set reverse hard limits
+		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseHardLimitSwitch)) {
+			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.FeedbackConnector, configuration.getReverseHardLimitSwitchNormal());
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
+		} else {
+			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
+			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
+		}
+		// Set forward soft limit
+		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardSoftLimitSwitch)) {
+			motorController.setSoftLimitSwitch(Direction.FORWARD, true, configuration.getForwardLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
+		} else {
+			motorController.setSoftLimitSwitch(Direction.FORWARD, false);
+		}
+		// Set reverse soft limit
+		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseSoftLimitSwitch)) {
+			motorController.setSoftLimitSwitch(Direction.REVERSE, true, configuration.getReverseLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
+		} else {
+			motorController.setSoftLimitSwitch(Direction.REVERSE, false);
+		}
+		if(configuration.hasAny(MotorConfiguration.NeutralMode)) {
+			motorController.setNeutralMode(configuration.getNeutralMode());
+		}
+// HW BUG WORKAROUND
+motorController.setHardLimitSwitch(Direction.UP, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true);
 
+		// Configure the PID profiles
+  	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
+	    motorController.configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
+	    initialize();
+	}
+	
 	protected void disableController() {
 		motorController.disable();
 	}
@@ -130,7 +164,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	@Override
 	protected Length getCurrentPositionInSensorUnits() {
 		int rawPosition = motorController.readPosition();
-		Length scaledPosition = sensorUnitsToLength(rawPosition * axisConfiguration.getSensorToDriveScalingFactor());
+		Length scaledPosition = sensorUnitsToLength(rawPosition * configuration.getSensorToDriveScalingFactor());
 		System.out.println("POSITION [RAW=" + rawPosition + " SCALED=" + scaledPosition + " SUBSYSTEM=" + toSubsystemUnits(scaledPosition) + "]");
 		// NB: Talon supports sensor inversion, so we won't need to do it here.
 		return scaledPosition;
@@ -141,7 +175,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	 */
 	protected void setControllerDirectionAndSpeed(Direction direction, Rate speedParam) {
 		Rate sensorRate = toSensorUnits(speedParam);
-		Rate scaledRate = toSensorUnits(sensorRate.multiply(axisConfiguration.getSensorToDriveScalingFactor()));
+		Rate scaledRate = toSensorUnits(sensorRate.multiply(configuration.getSensorToDriveScalingFactor()));
 		System.out.println("SET RATE [DIR=" + direction + " SPEED=" + speedParam + " SENSOR_U=" + sensorRate + " SCALED=" + scaledRate + "]");
 		motorController.move(direction, scaledRate.getValueAsInt());
 	}
@@ -152,9 +186,53 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	@Override
 	protected void setPosition(Length position) {
 		Length sensorPosition = toSensorUnits(position);
-		Length scaledPosition = sensorPosition.multiply(axisConfiguration.getSensorToDriveScalingFactor());
+		Length scaledPosition = sensorPosition.multiply(configuration.getSensorToDriveScalingFactor());
 		System.out.println("SET POS [POS=" + position + " SENSOR_U=" + sensorPosition + " SCALED=" + scaledPosition);
 		// NB: Talon supports motor inversion, so we won't need to do it here.		
 		motorController.setPosition(scaledPosition.getValueAsInt());
+	}
+
+	public void changeSpeed(Rate speed) {
+		if(state == MotorControllerState.MOVING) {
+			// Keep moving, call the official function
+			moveInDirectionAtSpeed(direction, speed);
+		} else {
+			// Make a note of the speed (may or may not get used)
+			speed = speed;
+			oldSpeed = speed; 
+		}
+	}
+	public String toString() {
+		return configuration.getName();
+	}
+	/*
+	 * Returns the speed if we are moving, otherwise null
+	 */
+	public Rate getSpeed() {
+		if(state == MotorControllerState.MOVING) {
+			return speed;
+		} else {
+			return null;
+		}
+	}
+	/*
+	 * Returns the position if we are moving, otherwise null.
+	 */
+	public Length getPosition() {
+		if(state == MotorControllerState.SET_POSITION) {
+			return position;
+		} else {
+			return null;
+		}
+	}
+	/*
+	 * Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
+	 */
+	public Direction getDirection() {
+		if(state == MotorControllerState.MOVING) {
+			return direction;
+		} else {
+			return null;
+		}
 	}
 }

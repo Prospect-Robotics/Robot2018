@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.motor.axis;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -19,7 +19,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 public class MotorConfiguration {
 	
 	// Common state
-	private final String axisName;
+	private final String name;
 	// Capabilities
 	private final int capabilities;
 	
@@ -71,8 +71,8 @@ public class MotorConfiguration {
 	/*
 	 * Get the name of the axis
 	 */
-	public String getAxisName() {
-		return axisName;
+	public String getName() {
+		return name;
 	}
 
 	/*
@@ -343,7 +343,7 @@ public class MotorConfiguration {
 	 * Get the native units for this axis
 	 */
 	public MotorConfiguration(
-			String axisName,
+			String name,
 			int capabilities,
 			LengthUOM nativeDisplayLengthUOM, // requireAny(ReadPosition|ControlPosition);
 			LengthUOM nativeMotorLengthUOM, // requireAny(ControlPosition|ControlDirection)
@@ -373,7 +373,7 @@ public class MotorConfiguration {
 			RateUOM percentageRateUOM // require(ControlRate|LimitRate)
 			)
 	{
-		this.axisName = axisName;
+		this.name = name;
 		this.capabilities = capabilities;
 		this.nativeMotorLengthUOM = nativeMotorLengthUOM;
 		this.sensorPhaseIsReversed = sensorPhaseIsReversed;
@@ -502,7 +502,7 @@ public class MotorConfiguration {
 	}
 
 	public String toString() {
-		return axisName;
+		return name;
 	}
 
 	public void dumpDescription() {
@@ -521,9 +521,9 @@ public class MotorConfiguration {
 		StringBuffer buf = new StringBuffer();
 		buf
 		.append("----------------------------------------------------------------------------\n")
-		.append("                             Axis Configuration                             \n")
+		.append("                            Motor Configuration                             \n")
 		.append("----------------------------------------------------------------------------\n")
-		.append("Axis Name............................." + getAxisName() + "\n")
+		.append("Name.................................." + getName() + "\n")
 		.append("\n")
 		.append("Capabilities.........................." + listCapabilities(capabilities, "", "\n                                      ", "") + "\n")
 		.append("\n")

@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
-import org.usfirst.frc2813.Robot2018.motor.axis.MotorConfiguration;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.TimeUOM;
@@ -93,7 +92,7 @@ public class IntakeConfiguration extends MotorConfiguration {
 
 	public IntakeConfiguration() {
 		super(
-			"Intake Vertical Axis",
+			"Intake",
 			(0
 					|MotorConfiguration.ControlDirection
 //					|MotorConfiguration.ControlPosition
