@@ -3,8 +3,8 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -168,7 +168,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
 			ArmDegrees.create(180),        // forwardLimit (placeholder)
 			ArmDegrees.create(0),         // reverseLimit
-			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
+			null,                               // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal

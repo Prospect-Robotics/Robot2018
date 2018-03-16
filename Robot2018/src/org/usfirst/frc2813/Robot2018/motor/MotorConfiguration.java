@@ -1,6 +1,7 @@
-package org.usfirst.frc2813.Robot2018.subsystems.motor;
+package org.usfirst.frc2813.Robot2018.motor;
 
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.UOM;
@@ -471,7 +472,7 @@ public class MotorConfiguration {
 		validateCapabilityDependency(ReverseHardLimitSwitch, 0, Reverse|ControlDirection);
 		validateCapabilityDependency(ReverseSoftLimitSwitch, 0, Reverse|ControlDirection);
 		validateCapabilityDependency(ControlPosition, 0, SensorToDriveScale|ReadPosition);
-		validateCapabilityDependency(ControlRate, 0, SensorToDriveScale|ReadRate);
+		validateCapabilityDependency(ControlRate, 0, ReadRate);
 		validateCapabilityDependency(LimitPosition, 0, ControlPosition|ReadPosition);
 		validateCapabilityDependency(LimitRate, 0, ControlRate|ReadRate);
 		validateCapabilityDependency(SensorToDriveScale, ReadRate|ReadPosition, 0);
@@ -496,7 +497,7 @@ public class MotorConfiguration {
 		checkParameter("sensorToDriveScalingFactor", sensorToDriveScalingFactor, SensorToDriveScale, 0);
 		checkParameter("forwardLimit", forwardLimit, 0, Forward|ControlPosition|LimitPosition);
 		checkParameter("reverseLimit", reverseLimit, 0, Reverse|ControlPosition|LimitPosition);
-		checkParameter("forwardHardLimitSwitchNormal", forwardHardLimitSwitchNormal, 0, Forward|ForwardSoftLimitSwitch);
+		checkParameter("forwardHardLimitSwitchNormal", forwardHardLimitSwitchNormal, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("forwardHardLimitStopsMotor", forwardHardLimitStopsMotor, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("forwardHardLimitSwitchResetsEncoder", forwardHardLimitSwitchResetsEncoder, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("reverseHardLimitSwitchNormal", reverseHardLimitSwitchNormal, 0, Reverse|ReverseHardLimitSwitch);

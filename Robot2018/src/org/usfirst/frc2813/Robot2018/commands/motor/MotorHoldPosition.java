@@ -3,8 +3,8 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorState;
 
 /**
  * Maintain elevator position. Elevator does this actively with
@@ -19,7 +19,7 @@ public class MotorHoldPosition extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(!motor.getMotorControllerState().equals(MotorState.HOLDING_POSITION)) {
+		if(motor.getState().getOperation() == MotorOperation.HOLDING_CURRENT_POSITION) {
 			Logger.info("Setting " + motor.getName() + " to hold position.");
 			motor.holdCurrentPosition();
 		} else {

@@ -4,7 +4,9 @@ import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
+import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -15,6 +17,7 @@ import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Time;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -132,7 +135,13 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|MotorConfiguration.ControlPosition
 					|MotorConfiguration.ControlRate
 					|MotorConfiguration.Forward
-//					|AxisConfiguration.ForwardHardLimitSwitch
+// BEGIN WORKAROUND FOR SWITCHED HARDWARE CONNECTION
+/*
+//					|MotorConfiguration.ForwardHardLimitSwitch
+					|MotorConfiguration.ForwardSoftLimitSwitch
+*/					
+					|MotorConfiguration.ForwardHardLimitSwitch
+// END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
 					|MotorConfiguration.ForwardSoftLimitSwitch
 					|MotorConfiguration.LimitPosition
 					|MotorConfiguration.LimitRate
@@ -161,12 +170,22 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
 			LengthUOM.Inches.create(24),        // forwardLimit (placeholder)
 			LengthUOM.Inches.create(0),         // reverseLimit
+// BEGIN WORKAROUND FOR SWITCHED HARDWARE CONNECTION
+/*			
 			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       // reverseHardLimitStopsMotor
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
+*/
+			LimitSwitchNormal.NormallyOpen,     // forwardHardLimitSwitchNormal
+			Boolean.FALSE,                      // forwardHardLimitStopsMotor
+			Boolean.TRUE,                       // forwardHardLimitSwitchResetsEncoder
+			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
+			Boolean.FALSE,                      // reverseHardLimitStopsMotor
+			Boolean.FALSE,                      // reverseHardLimitSwitchResetsEncoder
+// END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
 			LengthUOM.Inches.create(24),        // forwardSoftLimit
 			null,                               // reverseSoftLimit
 			RateUOM.InchesPerSecond.create(12), // defaultRate

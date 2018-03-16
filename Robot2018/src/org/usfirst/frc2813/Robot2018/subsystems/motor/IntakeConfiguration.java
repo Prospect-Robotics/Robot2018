@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;

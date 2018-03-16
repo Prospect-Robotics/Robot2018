@@ -3,8 +3,8 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
+import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.MotorState;
 import org.usfirst.frc2813.units.values.Length;
 
 /**
@@ -22,7 +22,7 @@ public class MotorMoveToPosition extends MotorInstantCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getMotorControllerState() == MotorState.SET_POSITION && motor.getPosition() == position) {
+		if(motor.getState().getOperation() == MotorOperation.MOVING_TO_POSITION && motor.getPosition() == position) {
 			Logger.info("NOT telling " + motor.getName() + " to move to " + position + ", it's already doing that.");
 		} else {
 			Logger.info("Telling " + motor.getName() + " to move to " + position + ".");

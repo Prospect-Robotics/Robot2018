@@ -4,9 +4,8 @@ import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
-import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
-import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
-import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorTesting;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
@@ -86,7 +85,7 @@ public class OI {
 		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
 		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
-		
+
 		new JoystickButton(buttonPanel, 10).toggleWhenActive(new MotorTesting(Robot.elevator));
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
@@ -102,11 +101,11 @@ public class OI {
 
 //		new JoystickButton(buttonPanel, 3).whenPressed(new MotorMoveToPosition(elevator.getConfiguration().getReverseLimit()));
 		spinIntakeOut = new JoystickButton(buttonPanel, 2);
-		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
-		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
+		spinIntakeOut.whileHeld(new MotorMoveInDirection(Robot.intake, Direction.OUT));
+		spinIntakeOut.whenReleased(new MotorMoveInDirection(Robot.intake, Direction.OUT));
 		spinIntakeIn = new JoystickButton(buttonPanel, 1);
-		spinIntakeIn.whileHeld(new SpinIntake(Direction.IN));
-		spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
+		spinIntakeIn.whileHeld(new MotorMoveInDirection(Robot.intake, Direction.IN));
+		spinIntakeIn.whenReleased(new MotorMoveInDirection(Robot.intake, Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.intake, Direction.UP));
 		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.intake, Direction.DOWN));

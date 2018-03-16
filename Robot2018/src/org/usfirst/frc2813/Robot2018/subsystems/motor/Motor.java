@@ -3,9 +3,20 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.IMotorController;
+import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
+import org.usfirst.frc2813.Robot2018.motor.MotorState;
+import org.usfirst.frc2813.Robot2018.motor.MotorUnitConversionAdapter;
 import org.usfirst.frc2813.Robot2018.motor.talon.Talon;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
+import org.usfirst.frc2813.Robot2018.motor.talon.TalonSensorPhase;
+import org.usfirst.frc2813.Robot2018.motor.victor.Victor;
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -24,217 +35,273 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  * General Motor commands are found in the org.usfirst.frc2813.Robot2018.commands.motor package 
  *
  */
-public final class Motor extends SubsystemPositionDirectionSpeed {
-
-	private final Talon motorController;
-	private final MotorConfiguration configuration;
-
-	public Motor(MotorConfiguration configuration, WPI_VictorSPX talonSRX) {
-		super(
-				configuration.getNativeDisplayLengthUOM(), 
-				configuration.getNativeSensorLengthUOM(), 
-				configuration.getNativeMotorLengthUOM(),
-				configuration.getNativeDisplayRateUOM(), 
-				configuration.getNativeSensorRateUOM(), 
-				configuration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
-				);
-		this.configuration = configuration;
-		this.motorController = null; // TODO
-		configure();
-	}
-
-	public Motor(MotorConfiguration configuration, VictorSPX talonSRX) {
-		super(
-				configuration.getNativeDisplayLengthUOM(), 
-				configuration.getNativeSensorLengthUOM(), 
-				configuration.getNativeMotorLengthUOM(),
-				configuration.getNativeDisplayRateUOM(), 
-				configuration.getNativeSensorRateUOM(), 
-				configuration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
-				);
-		this.configuration = configuration;
-		this.motorController = null; // TODO
-		configure();
+public final class Motor extends GearheadsSubsystem {
+	static {
+		Logger.addMe();
 	}
 	
+	/* ----------------------------------------------------------------------------------------------
+	 * Configuration
+	 * ---------------------------------------------------------------------------------------------- */
+	
+	private final IMotorController controller;
+
+	/* ----------------------------------------------------------------------------------------------
+	 * Constructors
+	 * ---------------------------------------------------------------------------------------------- */
+	
+	public Motor(MotorConfiguration configuration, VictorSPX victorSPX) {
+		this.controller = new MotorUnitConversionAdapter(configuration, new Victor(configuration, victorSPX));
+		configure();
+	}
+
 	public Motor(MotorConfiguration configuration, TalonSRX talonSRX) {
-		super(
-				configuration.getNativeDisplayLengthUOM(), 
-				configuration.getNativeSensorLengthUOM(), 
-				configuration.getNativeMotorLengthUOM(),
-				configuration.getNativeDisplayRateUOM(), 
-				configuration.getNativeSensorRateUOM(), 
-				configuration.getNativeMotorRateUOM() // NB: Should be passing up AxisConfiguration
-				);
-		this.configuration = configuration;
-		this.motorController = new Talon(talonSRX);
+		this.controller = new MotorUnitConversionAdapter(configuration, new Talon(configuration, talonSRX));
 		configure();
 	}
-	protected Rate getDefaultSpeed() {
-		return configuration.getDefaultRate();
+
+	/* ----------------------------------------------------------------------------------------------
+	 * Public API - State Inspection
+	 * ---------------------------------------------------------------------------------------------- */
+
+	public MotorConfiguration getConfiguration() {
+		return controller.getConfiguration();
 	}
-	
+	// 
+	public MotorState getState() {
+		return controller.getState();
+	}
+	public MotorState getPreviousState() {
+		return controller.getState();
+	}
+	// What is the state of the limit switch (if applicable)
 	public boolean readLimitSwitch(Direction switchDirection) {
-		return motorController.readLimitSwitch(switchDirection);
+		return controller.readLimitSwitch(switchDirection);
 	}
-
-	protected MotorState readMotorControllerState() {
-		return motorController.getState();
+	// Returns the speed if we are moving, otherwise null
+	public final Rate getSpeed() {
+		return getState().getRate();
 	}
-
-	protected void configure() {
-		// Set forward hard limits
-		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardHardLimitSwitch)) {
-			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.FeedbackConnector, configuration.getForwardHardLimitSwitchNormal());
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
-		} else {
-			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
-		}
-		// Set reverse hard limits
-		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseHardLimitSwitch)) {
-			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.FeedbackConnector, configuration.getReverseHardLimitSwitchNormal());
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
-		} else {
-			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled);
-			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
-		}
-		// Set forward soft limit
-		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardSoftLimitSwitch)) {
-			motorController.setSoftLimitSwitch(Direction.FORWARD, true, configuration.getForwardLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
-		} else {
-			motorController.setSoftLimitSwitch(Direction.FORWARD, false);
-		}
-		// Set reverse soft limit
-		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseSoftLimitSwitch)) {
-			motorController.setSoftLimitSwitch(Direction.REVERSE, true, configuration.getReverseLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
-		} else {
-			motorController.setSoftLimitSwitch(Direction.REVERSE, false);
-		}
-		if(configuration.hasAny(MotorConfiguration.NeutralMode)) {
-			motorController.setNeutralMode(configuration.getNeutralMode());
-		}
-// HW BUG WORKAROUND
-motorController.setHardLimitSwitch(Direction.UP, LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true);
-
-		// Configure the PID profiles
-  	    motorController.configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
-	    motorController.configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
-	    initialize();
+	// Returns the position if we are moving, otherwise null.
+	public final Length getPosition() {
+		return getState().getPosition();
 	}
-	
-	protected void disableController() {
-		motorController.disable();
+	// Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
+	public final Direction getDirection() {
+		return getState().getDirection();
 	}
-
-	protected void holdControllerPosition() {
-		motorController.holdCurrentPosition();
+	// What's my name?
+	public final String toString() {
+		return getConfiguration().getName();
 	}
-
-	// initializes elevator in static position
-	@Override
-	public void initDefaultCommand() {
-		// Set to hold position by default
-		if(configuration.getDefaultCommandFactory() != null) {
-			setDefaultCommand(configuration.getDefaultCommandFactory().createCommand(this));
-		}
-	}
-
-	@Override
-	public void periodic() {}
-	
-	/// Dump debug output
+	/*
+	 * Dump our state
+	 */
 	public void dumpState() {
-		getCurrentPositionInSensorUnits();
-		//super.dumpState();
-		//motorController.dumpState();
-		
+		Logger.info(String.format("%s: %s", this, getState()));
 	}
-	// Just testing
-	public void encoderRelativePositionTestingMode() {
-		disable();
-		motorController.setEncoderPosition(0);
-		disable();
+
+	/* ----------------------------------------------------------------------------------------------
+	 * Subsystem API
+	 * ---------------------------------------------------------------------------------------------- */
+
+	// Load default command, if configured
+	public final void initDefaultCommand() {
+		// Set to hold position by default
+		if(getConfiguration().getDefaultCommandFactory() != null) {
+			setDefaultCommand(getConfiguration().getDefaultCommandFactory().createCommand(this));
+		}
+	}
+
+	// Periodic
+	public final void periodic() {
+		super.periodic();
+	}
+
+	/* ----------------------------------------------------------------------------------------------
+	 * Public API - Action Commands
+	 * ---------------------------------------------------------------------------------------------- */
+	
+	/*
+	 * [ACTION] Change speed while moving.  If we are not moving, has no effect
+	 * NB: This is a wrapper around moveInDirecectionAtSpeed, for convenience
+	 * ability to alter speed but not direction AND if we aren't moving be able
+	 * to call it safely without initiating any movement.
+	 */
+	public final void changeSpeed(Rate newSpeed) {
+		if(newSpeed.getValue() < 0) {
+			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
+		}
+		if(getState().getOperation() == MotorOperation.MOVING) {
+			// Keep moving, call the official function
+			moveInDirectionAtSpeed(getState().getDirection(), newSpeed);
+		} else {
+			Logger.info(getConfiguration().getName() + " was asked to change speed to " + newSpeed + ", but we aren't moving so we won't do it.");
+		}
+	}
+
+	/*
+	 *  [ACTION] Do whatever we are testing today...
+	 */
+	public final void encoderRelativePositionTestingMode() {
 		dumpState();
 	}
-
-	/*
-	 * Get the current position from the motor controller
-	 * NOTE: This is the only place we should be reading the sensor and doing scaling 
+	/**
+	 *  [ACTION] Disable the device. Required to handle run away bots
 	 */
-	@Override
-	protected Length getCurrentPositionInSensorUnits() {
-		int rawPosition = motorController.readPosition();
-		Length scaledPosition = sensorUnitsToLength(rawPosition * configuration.getSensorToDriveScalingFactor());
-		System.out.println("POSITION [RAW=" + rawPosition + " SCALED=" + scaledPosition + " SUBSYSTEM=" + toSubsystemUnits(scaledPosition) + "]");
-		// NB: Talon supports sensor inversion, so we won't need to do it here.
-		return scaledPosition;
-	}
-	/*
-	 * Tell the motor controller a new position.  
-	 * NOTE: This is the ONLY place we should be doing rate conversions and scaling  
-	 */
-	protected void setControllerDirectionAndSpeed(Direction direction, Rate speedParam) {
-		Rate sensorRate = toSensorUnits(speedParam);
-		Rate scaledRate = toSensorUnits(sensorRate.multiply(configuration.getSensorToDriveScalingFactor()));
-		System.out.println("SET RATE [DIR=" + direction + " SPEED=" + speedParam + " SENSOR_U=" + sensorRate + " SCALED=" + scaledRate + "]");
-		motorController.move(direction, scaledRate.getValueAsInt());
-	}
-	/*
-	 * Tell the motor controller a new position.  
-	 * NOTE: This is the ONLY place we should be doing conversions and scaling 
-	 */
-	@Override
-	protected void setPosition(Length position) {
-		Length sensorPosition = toSensorUnits(position);
-		Length scaledPosition = sensorPosition.multiply(configuration.getSensorToDriveScalingFactor());
-		System.out.println("SET POS [POS=" + position + " SENSOR_U=" + sensorPosition + " SCALED=" + scaledPosition);
-		// NB: Talon supports motor inversion, so we won't need to do it here.		
-		motorController.setPosition(scaledPosition.getValueAsInt());
+	public void disable() {
+		changeState(MotorState.createDisabled());
 	}
 
-	public void changeSpeed(Rate speed) {
-		if(state == MotorState.MOVING) {
-			// Keep moving, call the official function
-			moveInDirectionAtSpeed(direction, speed);
-		} else {
-			// Make a note of the speed (may or may not get used)
-			speed = speed;
-			oldSpeed = speed; 
-		}
-	}
-	public String toString() {
-		return configuration.getName();
-	}
-	/*
-	 * Returns the speed if we are moving, otherwise null
+	/**
+	 *  [ACTION] Move in direction at speed
+	 * @param newSpeed
+	 * @param newDirection
 	 */
-	public Rate getSpeed() {
-		if(state == MotorState.MOVING) {
-			return speed;
-		} else {
-			return null;
+	public void moveInDirectionAtSpeed(Direction direction, Rate rate) {
+		if(rate.getValue() < 0) {
+			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
 		}
+		changeState(MotorState.createMoving(direction, rate));
 	}
-	/*
-	 * Returns the position if we are moving, otherwise null.
+
+	/**
+	 *  [ACTION] Move in direction at speed
+	 * @param newSpeed
+	 * @param newDirection
 	 */
-	public Length getPosition() {
-		if(state == MotorState.SET_POSITION) {
-			return position;
-		} else {
-			return null;
-		}
+	public void moveInDirectionAtDefaultSpeed(Direction direction) {
+		changeState(MotorState.createMoving(direction, getConfiguration().getDefaultRate()));
 	}
-	/*
-	 * Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
+
+	/**
+	 *  [ACTION] Move to the absolutePosition
 	 */
-	public Direction getDirection() {
-		if(state == MotorState.MOVING) {
-			return direction;
-		} else {
-			return null;
+	public void moveToPosition(Length position) {
+		changeState(MotorState.createMovingToPosition(position));
+	}
+
+	/**
+	 * [ACTION] Fight to hold the current position
+	 */
+	public void holdCurrentPosition() {
+		changeState(MotorState.createHoldingPosition());
+	}
+	
+	// 
+	// Get controller position in subsystem units
+	public final Length readPosition() {
+		return toSubsystemUnits(controller.readPosition());
+	}
+
+	/* ----------------------------------------------------------------------------------------------
+	 * Implementation
+	 * ---------------------------------------------------------------------------------------------- */
+
+	// Configure the motor as specified in our configuration
+	protected void configure() {
+		controller.configure();
+	}
+
+	// Guards for state transitions, called by changeState
+	// IMPORTANT: Do not call directly	
+	protected boolean isStateTransitionAllowed(MotorState proposedState) {
+		if (proposedState.equals(getState())) {
+			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", getState(), proposedState);
+			new Exception().printStackTrace();
+			return false;
 		}
+		return true;
+	}
+	// Execute for state transitions, called by changeState.  
+	// IMPORTANT: Do not call directly	
+	protected boolean executeTransition(MotorState proposedState) {
+		// Check that state change is actually changing something. If so, do it.
+		Logger.info(this + " entering " + proposedState + " state.");
+		switch(proposedState.getOperation()) {
+		case DISABLED:
+			controller.disable();
+			break;
+		case HOLDING_CURRENT_POSITION:
+			controller.holdCurrentPosition();
+			break;
+		case MOVING:
+			controller.move(proposedState.getDirection(), proposedState.getRate());
+			break;
+		case MOVING_TO_POSITION:
+			controller.moveToPosition(proposedState.getPosition());
+			break;
+		}
+		return true;
+	}
+	/**
+	 * All device change come through here first.
+	 * Log request
+	 * Validate the actual actually changes something
+	 * make the change
+	 * flush old state so we do not get confused next time
+	 * 
+	 * @param newState
+	 * NOTE: state variables other than the state enum are already updated,
+	 * with the old state in oldSpeed, oldPosition and oldDirection
+	 * @return true if state change occurred
+	 */
+	protected boolean changeState(MotorState proposedState) {
+		Logger.formatDebug("%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getState(), proposedState);
+		if (!encoderFunctional) {
+			controller.disable();
+			Logger.warning("encoder not functional. Refusing action.");
+			return false;	
+		}
+		
+		// Check that the state transition is legal before we do anything.
+		if(!isStateTransitionAllowed(proposedState)) {
+			Logger.warning("%s state transition aborted.", this);
+			return false;
+		}
+
+		// Execute the transition
+		if(!executeTransition(proposedState)) {
+			Logger.warning("%s state transition failed.", this);
+			return false;
+		}
+
+		// Check the result
+		if(!getState().equals(proposedState)) {
+			Logger.warning("%s state transition may have failed.  Expected %s but got %s.", this, proposedState, getState());
+			return false;
+		}
+		
+		Logger.info("%s state transition complete.  old: %s new: %s.", this, getState(), getPreviousState());
+		// Transition successful, save the state.
+		return true;
+	}
+	/* ----------------------------------------------------------------------------------------------
+	 * Units Helpers
+	 * ---------------------------------------------------------------------------------------------- */
+	
+	// Convert a length to sensor units
+	protected Length toSensorUnits(Length l) {
+		return l.convertTo(getConfiguration().getNativeSensorLengthUOM());
+	}
+	// Convert a length to motor units	
+	protected Length toMotorUnits(Length l) {
+		return l.convertTo(getConfiguration().getNativeMotorLengthUOM());
+	}	
+	// Convert a length to display units	
+	protected Length toSubsystemUnits(Length l) {
+		return l.convertTo(getConfiguration().getNativeDisplayLengthUOM());
+	}
+	// Convert a length to sensor units
+	protected Rate toSensorUnits(Rate l) {
+		return l.convertTo(getConfiguration().getNativeSensorRateUOM());
+	}
+	// Convert a length to motor units	
+	protected Rate toMotorUnits(Rate l) {
+		return l.convertTo(getConfiguration().getNativeMotorRateUOM());
+	}
+	// Convert a length to display units	
+	protected Rate toSubsystemUnits(Rate l) {
+		return l.convertTo(getConfiguration().getNativeDisplayRateUOM());
 	}
 }

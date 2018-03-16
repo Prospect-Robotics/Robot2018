@@ -1,16 +1,16 @@
-package org.usfirst.frc2813.Robot2018.subsystems.motor;
+package org.usfirst.frc2813.Robot2018.motor;
 
 /**
  * Class to represent the state of the Elevator state machine.
  * Glorified enumeration with the ability to describe itself.
  */
-public enum MotorState {
+public enum MotorOperation {
 	// Zero velocity + brake mode, safe!
 	DISABLED,
 	// Hold the current position, resist movement
-	HOLDING_POSITION,
+	HOLDING_CURRENT_POSITION,
 	// Moving to a position, or holding a set position
-	SET_POSITION,
+	MOVING_TO_POSITION,
 	// Moving at a velocity/speed/etc
 	MOVING;
 	public boolean isDisabled() {
@@ -18,7 +18,7 @@ public enum MotorState {
 	}
 
 	public boolean isHoldingCurrentPosition() {
-		return this == HOLDING_POSITION;
+		return this == HOLDING_CURRENT_POSITION;
 	}
 	
 	public boolean isIdle() {
@@ -26,7 +26,7 @@ public enum MotorState {
 	}
 
 	public boolean isMovingToPosition() {
-		return this == SET_POSITION;
+		return this == MOVING_TO_POSITION;
 	}
 
 	public boolean isMoving() {
