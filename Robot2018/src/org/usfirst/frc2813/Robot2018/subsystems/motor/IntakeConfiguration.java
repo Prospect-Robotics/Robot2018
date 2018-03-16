@@ -110,35 +110,36 @@ public class IntakeConfiguration extends MotorConfiguration {
 //					|MotorConfiguration.SensorToDriveScale
 					|MotorConfiguration.ReadDirection
 //					|MotorConfiguration.ReadPosition
-					|MotorConfiguration.ReadRate
+//					|MotorConfiguration.ReadRate
 					|MotorConfiguration.Reverse
 //					|MotorConfiguration.ReverseHardLimitSwitch
 //					|MotorConfiguration.ReverseSoftLimitSwitch
 					|MotorConfiguration.DefaultRate
 					|MotorConfiguration.NeutralMode
+					|MotorConfiguration.Disconnected // NB: WARNING THIS TOTALLY DISABLES IT!!
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			IntakeSPXMotorPulses,             // nativeMotorLengthUOM
 			Boolean.FALSE,                      // motorPhaseIsReversed
-			Boolean.FALSE,                      // sensorPhaseIsReversed
-			IntakeSPXMotorPulses,   	        // nativeSensorLengthUOM
+			null,                      // sensorPhaseIsReversed
+			null,   	        // nativeSensorLengthUOM
 			RateUOM.InchesPerSecond,            // nativeDisplayRateUOM
 			IntakeSPXMotorPulseRate,          // nativeMotorRateUOM
-			IntakeSPXMotorPulseRate,          // nativeSensorRateUOM
+			null,          // nativeSensorRateUOM
 			RateUOM.InchesPerSecond.create(0),  // minimumForwardRate
 			RateUOM.InchesPerSecond.create(12), // maximumForwardRate (placeholder)
 			RateUOM.InchesPerSecond.create(0),  // minimumReverseRate
 			RateUOM.InchesPerSecond.create(12), // maximumReverseRate (placeholder)
-			1.0,							       // sensorToDriveScale (per JT - output 1:1 on Intake)
-			LengthUOM.Inches.create(24),        // forwardLimit (placeholder)
-			LengthUOM.Inches.create(0),         // reverseLimit
-			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
+			null,							       // sensorToDriveScale (per JT - output 1:1 on Intake)
+			null,        // forwardLimit (placeholder)
+			null,         // reverseLimit
+			null,         // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			null,						       // reverseHardLimitSwitchNormal
-			Boolean.TRUE,                       // reverseHardLimitStopsMotor
-			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
-			LengthUOM.Inches.create(24),        // forwardSoftLimit
+			null,                       // reverseHardLimitStopsMotor
+			null,                       // reverseHardLimitSwitchResetsEncoder
+			null,        // forwardSoftLimit
 			null,                               // reverseSoftLimit
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
