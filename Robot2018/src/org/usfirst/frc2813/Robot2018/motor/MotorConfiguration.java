@@ -406,7 +406,7 @@ public class MotorConfiguration {
 		}
 		validateConfiguration();
 	}
-	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
+	public static String listCapabilities(long capabilities, String prefix, String separator, String suffix) {
 		StringBuffer buf = new StringBuffer();
 		boolean wroteAtLeastOne = false; 
 		for(int i = 0; i <= MAX_CAPABILITY; i++) {
