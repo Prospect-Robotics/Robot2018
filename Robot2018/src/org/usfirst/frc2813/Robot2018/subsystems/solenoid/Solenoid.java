@@ -16,6 +16,7 @@ public class Solenoid extends SubsystemBinary {
 	public Solenoid(SolenoidConfiguration configuration, edu.wpi.first.wpilibj.Solenoid solenoid) {
 		this.configuration = configuration;
 		this.solenoid = solenoid;
+		initialize();
 	}
 
 	@Override

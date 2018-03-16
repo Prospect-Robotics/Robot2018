@@ -14,7 +14,7 @@ public abstract class SubsystemBinary extends GearheadsSubsystem {
      * geometry and state. Override and call super. Note that
      * to change any of the defaults set here, call super first!
      */
-	public SubsystemBinary() {
+	public void initialize() {
         state = getControllerState();
 	}
 
