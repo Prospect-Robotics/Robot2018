@@ -125,10 +125,10 @@ public class Robot extends TimedRobot {
 	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
 	private long lastPositionReport = System.currentTimeMillis();
 	private void dumpSubsystemStatusAtIntervals() {
-		if(System.currentTimeMillis() - lastPositionReport > 750) {
+		if(System.currentTimeMillis() - lastPositionReport > 2000) {
 			lastPositionReport = System.currentTimeMillis();
-			Robot.elevator.dumpState();
-			Robot.arm.dumpState();
+			Robot.elevator.dumpDiagnostics();
+			Robot.arm.dumpDiagnostics();
 		}
 	}
 	/**
@@ -138,5 +138,9 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		dumpSubsystemStatusAtIntervals();
+	}
+
+	public void robotPeriodic() {
+		// Complain no more!
 	}
 }

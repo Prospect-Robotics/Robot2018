@@ -121,12 +121,16 @@ public abstract class AbstractMotorController implements IMotorController {
 			Logger.info("Could not change state to disabled.  No resetting sensor position.");
 			return false;
 		}
-		resetEncoderSensorPositionImpl(position);
+		if(!resetEncoderSensorPositionImpl(position)) {
+			Logger.error("Failed to read back the sensor position we set.  Leaving motor disabled.  Expected " + position + " but got " + readPosition());
+			return false;
+		}
 		if(previousState.getOperation().isHoldingCurrentPosition()) {
 			Logger.info("Returning to hold position mode from hardware limit switch software reset of sensor.");
 			changeState(MotorState.createHoldingPosition());
 		} else {
 			Logger.info("Leaving motor disabled after reached hardware limit switch while not in holding position mode.");
+			return false;
 		}
 		return true;
 	}
@@ -191,20 +195,20 @@ public abstract class AbstractMotorController implements IMotorController {
 		
 		// Check that the state transition is legal before we do anything.
 		if(!isStateTransitionAllowed(proposedState)) {
-			Logger.warning("%s state transition disallowed.", this);
+			Logger.formatWarning("%s state transition disallowed.", this);
 			return false;
 		}
 
 		// Execute the transition
 		if(!executeTransition(proposedState)) {
-			Logger.warning("%s state transition failed.", this);
+			Logger.formatWarning("%s state transition failed.", this);
 			return false;
 		}
 		
 		// Transition successful, save the state.
 		this.previousState = this.currentState;
 		this.currentState = proposedState;
-		Logger.info("%s state transition complete.  state=%s old=%s.", this, currentState, previousState);
+		Logger.info(this + " state transition complete.  state=" + currentState + " old=" + previousState + ".");
 		return true;
 	}
 	
@@ -212,8 +216,20 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Dump state information
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorController#dumpState()
 	 */
-	public void dumpState() {
-		Logger.info(this + " State = " + currentState);
+	public void dumpDiagnostics() {
+		Logger.info(getDiagnostics());
+	}
+	
+	public String getDiagnostics() {
+		return this + " " + getState() + 
+		(configuration.has(MotorConfiguration.Disconnected)
+				? " <<<< DISCONNECTED BY CONFIGURATION >>>>" 
+				: (
+					" @ " + readPosition() 
+					+ (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) ? " [RLimit=" + readLimitSwitch(Direction.FORWARD) + "]" : "")
+					+ (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) ? " [RLimit=" + readLimitSwitch(Direction.REVERSE) + "]" : "")
+				)
+		);
 	}
 
 	// Returns true if we zeroed and are now holding position at zero
@@ -222,7 +238,6 @@ public abstract class AbstractMotorController implements IMotorController {
 		if (configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
 			if(!readPosition().equals(configuration.getReverseLimit())) {
 				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
-				changeState(MotorState.createDisabled());
 				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
 			}
 			resetEncoders = true; 
@@ -230,7 +245,6 @@ public abstract class AbstractMotorController implements IMotorController {
 		if (configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
 			if(!readPosition().equals(configuration.getForwardLimit())) {
 				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
-				changeState(MotorState.createDisabled());
 				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
 			}
 			resetEncoders = true; 
@@ -273,6 +287,6 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Interface To Subclasses
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	protected abstract void resetEncoderSensorPositionImpl(Length sensorPosition);
+	protected abstract boolean resetEncoderSensorPositionImpl(Length sensorPosition);
 	protected abstract boolean executeTransition(MotorState proposedState);
 }

@@ -50,9 +50,9 @@ public class Victor extends AbstractMotorController implements IMotorController 
 	}
 
 	@Override
-	protected void resetEncoderSensorPositionImpl(Length sensorPosition) {
+	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		// TODO Auto-generated method stub
-		
+		return false;
 	}
 
 	@Override

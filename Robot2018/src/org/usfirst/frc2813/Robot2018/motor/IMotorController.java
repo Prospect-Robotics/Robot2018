@@ -26,7 +26,8 @@ public interface IMotorController {
 	public boolean supportsSensorInversion();
 	
 	// Debugging
-	public void dumpState();
+	public void dumpDiagnostics();
+	public String getDiagnostics();
 	
 	// Actions
 	

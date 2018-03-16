@@ -35,7 +35,7 @@ public final class Talon extends AbstractMotorController {
 	private TalonProfileSlot lastSlotIndex            = TalonProfileSlot.HoldingPosition;
 	private TalonPID         lastPIDIndex             = TalonPID.Primary;
 	// last control mode parameter
-	protected ControlMode lastControlMode = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
+	protected ControlMode    lastControlMode          = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	private double           lastControlModeValue     = 0;
 
 	/* ----------------------------------------------------------------------------------------------
@@ -100,9 +100,10 @@ public final class Talon extends AbstractMotorController {
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	@Override
-	protected void resetEncoderSensorPositionImpl(Length sensorPosition) {
-		resetEncoderSensorPosition(TalonPID.Primary, sensorPosition);
+	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		resetEncoderSensorPosition(TalonPID.Auxilliary, sensorPosition);
+		resetEncoderSensorPosition(TalonPID.Primary, sensorPosition);
+		return readPosition().equals(sensorPosition);
 	}
 
 	protected boolean executeTransition(MotorState proposedState) {
@@ -124,7 +125,7 @@ public final class Talon extends AbstractMotorController {
 			newControlMode = ControlMode.Position;
 			newSlotIndex   = PROFILE_SLOT_FOR_HOLD_POSITION;
 			newPIDIndex    = PID_INDEX_FOR_HOLD_POSITION;
-			newControlModeValue = 0;
+			newControlModeValue = readPosition().getValue();
 			break;
 		case MOVING_TO_POSITION:
 			newControlMode = ControlMode.Position;
@@ -168,7 +169,6 @@ public final class Talon extends AbstractMotorController {
 		this.lastPIDIndex = newPIDIndex;
 		return true;
 	}
-			
 
 	/* ----------------------------------------------------------------------------------------------
 	 * Internal Helper Functions - Motor Specific
@@ -226,28 +226,15 @@ public final class Talon extends AbstractMotorController {
 		// I'm not sure if someone has to call selectProfileSlot to reload the values or if it's automatically looking at the right ones (guessing the latter)
 	}
 	
-	/*
-	 * Diagnostics 
-	 */
-	public void dumpState() {
-		super.dumpState();
-		Logger.info(""
-				+ "[" + this + " Talon Settings] = "
-				+ "[State=" + currentState.getOperation()
-				+ ", ControlMode=" + lastControlMode
+	public String getDiagnotics() {
+		return super.getDiagnostics()
+				+ (configuration.has(MotorConfiguration.Disconnected) ? "" :
+				  " [ControlMode=" + lastControlMode
 				+ ", ControlModeValue=" + lastControlModeValue
 				+ ", SlotIndex=" + lastSlotIndex
 				+ ", PIDIndex=" + lastPIDIndex
 				+ "]");
-		Logger.info(""
-				+ "[" + this + " HW Readings] = "
-				+ "[LimitF=" + readLimitSwitch(Direction.POSITIVE)
-				+ ", LimitR=" + readLimitSwitch(Direction.NEGATIVE)
-				+ ", PWMPos=" + srx.getSensorCollection().getPulseWidthPosition()
-				+ ", QuadPos=" + srx.getSensorCollection().getQuadraturePosition()
-				+ "]");
 	}
-
 	
 	@Override
 	public void configure() {
@@ -316,5 +303,8 @@ public final class Talon extends AbstractMotorController {
 		// Configure the PID profiles
   	    configurePID(TalonProfileSlot.HoldingPosition, 0.8, 0.0, 0.0);
 	    configurePID(TalonProfileSlot.Moving, 0.75, 0.01, 40.0);
+	}
+	public String toString() {
+		return configuration.getName() + "." + this.getClass().getSimpleName();  
 	}
 }

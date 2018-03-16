@@ -1,7 +1,9 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.omg.PortableServer.ServantRetentionPolicyOperations;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.Robot2018.commands.ResetEncoderLimitSwitch;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
@@ -42,18 +44,24 @@ public final class Motor extends GearheadsSubsystem {
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	private final IMotorController controller;
-
+	private MotorState currentState;
+	private MotorState previousState;
+	
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	public Motor(MotorConfiguration configuration, VictorSPX victorSPX) {
 		this.controller = new MotorUnitConversionAdapter(configuration, new Victor(configuration, victorSPX));
-		configure();
+		this.currentState = this.previousState = MotorState.createDisabled();
+		this.currentState = MotorState.createDisabled();
+		this.previousState = MotorState.createDisabled();
 	}
 
 	public Motor(MotorConfiguration configuration, TalonSRX talonSRX) {
 		this.controller = new MotorUnitConversionAdapter(configuration, new Talon(configuration, talonSRX));
+		this.currentState = MotorState.createDisabled();
+		this.previousState = MotorState.createDisabled();
 		configure();
 	}
 
@@ -66,9 +74,16 @@ public final class Motor extends GearheadsSubsystem {
 	}
 	// 
 	public MotorState getState() {
-		return controller.getState();
+		return currentState;
 	}
 	public MotorState getPreviousState() {
+		return previousState;
+	}
+	// 
+	public MotorState getControllerState() {
+		return controller.getState();
+	}
+	public MotorState getControllerPreviousState() {
 		return controller.getState();
 	}
 	// What is the state of the limit switch (if applicable)
@@ -94,10 +109,13 @@ public final class Motor extends GearheadsSubsystem {
 	/*
 	 * Dump our state
 	 */
-	public void dumpState() {
-		Logger.info(String.format("%s: %s", this, getState()));
+	public void dumpDiagnostics() {
+		Logger.info(getDiagnostics());
 	}
 
+	public String getDiagnostics() {
+		return String.format("%s: [Motor State: %s Controller State: %s Controller Diagnostics: %s]", this, getState(), getControllerState(), controller.getDiagnostics());
+	}
 	/* ----------------------------------------------------------------------------------------------
 	 * Subsystem API
 	 * ---------------------------------------------------------------------------------------------- */
@@ -141,7 +159,8 @@ public final class Motor extends GearheadsSubsystem {
 	 *  [ACTION] Do whatever we are testing today...
 	 */
 	public final void encoderRelativePositionTestingMode() {
-		dumpState();
+		controller.resetEncoderSensorPosition(getConfiguration().getNativeSensorLengthUOM().create(0));
+		dumpDiagnostics();
 	}
 	/**
 	 *  [ACTION] Disable the device. Required to handle run away bots
@@ -207,7 +226,7 @@ public final class Motor extends GearheadsSubsystem {
 	// Guards for state transitions, called by changeState
 	// IMPORTANT: Do not call directly	
 	protected boolean isStateTransitionAllowed(MotorState proposedState) {
-		if (proposedState.equals(getState())) {
+		if (proposedState.equals(getState()) && proposedState.getOperation() != MotorOperation.DISABLED) {
 			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", getState(), proposedState);
 			new Exception().printStackTrace();
 			return false;
@@ -221,6 +240,7 @@ public final class Motor extends GearheadsSubsystem {
 		Logger.info(this + " entering " + proposedState + " state.");
 		switch(proposedState.getOperation()) {
 		case DISABLED:
+			(new Throwable()).printStackTrace();
 			controller.disable();
 			break;
 		case HOLDING_CURRENT_POSITION:
@@ -262,23 +282,24 @@ public final class Motor extends GearheadsSubsystem {
 		
 		// Check that the state transition is legal before we do anything.
 		if(!isStateTransitionAllowed(proposedState)) {
-			Logger.warning("%s state transition aborted.", this);
+			Logger.warning(this + " state transition aborted.");
 			return false;
 		}
 
 		// Execute the transition
 		if(!executeTransition(proposedState)) {
-			Logger.warning("%s state transition failed.", this);
+			Logger.warning(this + " state transition failed.");
 			return false;
 		}
 
-		// Check the result
-		if(!getState().equals(proposedState)) {
-			Logger.warning("%s state transition may have failed.  Expected %s but got %s.", this, proposedState, getState());
-			return false;
+		// See if there was any translation and report on the alterations (units typically)
+		if(!getControllerState().equals(proposedState)) {
+			Logger.info(this + " - Translation Occurred [Motor: " + getState() + " Controller: " + getControllerState()); 
 		}
 		
-		Logger.info("%s state transition complete.  old: %s new: %s.", this, getState(), getPreviousState());
+		Logger.info(this + " state transition complete.  old: " + getState() + " new: " + proposedState + ".");
+		this.previousState = this.currentState;
+		this.currentState = proposedState;
 		// Transition successful, save the state.
 		return true;
 	}

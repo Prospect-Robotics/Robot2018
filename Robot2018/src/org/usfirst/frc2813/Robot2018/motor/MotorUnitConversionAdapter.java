@@ -131,8 +131,13 @@ public final class MotorUnitConversionAdapter implements IMotorController {
 	}
 
 	@Override
-	public void dumpState() {
-		controller.dumpState();
+	public void dumpDiagnostics() {
+		controller.dumpDiagnostics();
+	}
+
+	@Override
+	public String getDiagnostics() {
+		return controller.getDiagnostics();
 	}
 
 	@Override
