@@ -22,19 +22,19 @@ public class Victor extends AbstractMotorController implements IMotorController 
 	@Override
 	public Length readPosition() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Cannot read position on Victor");
 	}
 
 	@Override
 	public boolean readLimitSwitch(Direction switchDirection) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("Cannot read limit switch on Victor");
 	}
 
 	@Override
 	public boolean supportsMotorInversion() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -59,12 +59,12 @@ public class Victor extends AbstractMotorController implements IMotorController 
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("Cannot resent Encoder on Victor");
 	}
 
 	@Override
 	protected boolean executeTransition(MotorState proposedState) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("No Transition Execution on Victor");
 	}
 }
