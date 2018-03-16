@@ -36,10 +36,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  *
  */
 public final class Motor extends GearheadsSubsystem {
-	static {
-		Logger.addMe();
-	}
-	
+
 	/* ----------------------------------------------------------------------------------------------
 	 * Configuration
 	 * ---------------------------------------------------------------------------------------------- */
@@ -200,6 +197,10 @@ public final class Motor extends GearheadsSubsystem {
 
 	// Configure the motor as specified in our configuration
 	protected void configure() {
+		if(getConfiguration().has(MotorConfiguration.Disconnected)) {
+			Logger.error("" + this + " has it's motor configured to disconnected.  Not configuring anything.");
+			return;
+		}
 		controller.configure();
 	}
 
@@ -251,6 +252,11 @@ public final class Motor extends GearheadsSubsystem {
 		if (!encoderFunctional) {
 			controller.disable();
 			Logger.warning("encoder not functional. Refusing action.");
+			return false;	
+		}
+		if(getConfiguration().has(MotorConfiguration.Disconnected)) {
+			controller.disable();
+			Logger.warning("Motor configuration says it's disconnected. Refusing action.");
 			return false;	
 		}
 		
