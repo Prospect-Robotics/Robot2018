@@ -86,7 +86,7 @@ public class OI {
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
 		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
 
-		new JoystickButton(buttonPanel, 10).toggleWhenActive(new MotorTesting(Robot.elevator));
+		new JoystickButton(buttonPanel, 10).whenPressed(new MotorTesting(Robot.elevator));
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
