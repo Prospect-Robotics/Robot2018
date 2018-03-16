@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
 import org.usfirst.frc2813.units.Direction;
@@ -415,7 +416,7 @@ public class Talon {
 			holdCurrentPosition();
 		} else {
 			double speedParam = speed * direction.getMultiplierAsDouble();
-			Logger.formatInfo("move %s [Direction (%f) x Speed (%f) -> Velocity %f]", direction, direction.getMultiplierAsDouble(), speed, speedParam);
+			Logger.printFormat(LogType.INFO, "move %s [Direction (%f) x Speed (%f) -> Velocity %f]", direction, direction.getMultiplierAsDouble(), speed, speedParam);
 			set(MotorControllerState.MOVING, speedParam);
 		}
 	}
