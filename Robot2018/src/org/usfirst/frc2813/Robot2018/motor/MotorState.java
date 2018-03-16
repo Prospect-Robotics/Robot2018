@@ -38,7 +38,7 @@ public class MotorState {
 	}
 	
 	public static MotorState createHoldingPosition() {
-		return DISABLED;
+		return HOLDING_POSITION;
 	}
 	
 	public static MotorState createMovingToPosition(Length position) {
