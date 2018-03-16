@@ -401,7 +401,9 @@ public class MotorConfiguration {
 		this.neutralMode = neutralMode;
 		this.percentageRateUOM = percentageRateUOM;
 		this.defaultCommandFactory = defaultCommandFactory;
-		this.pidConfigurations.addAll(pidConfigurations);
+		if(pidConfigurations != null) {
+			this.pidConfigurations.addAll(pidConfigurations);
+		}
 		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
@@ -498,11 +500,11 @@ public class MotorConfiguration {
 		checkParameter("neutralMode", neutralMode, ControlRate|ControlPosition, NeutralMode);
 		checkParameter("percentageRateUOM", percentageRateUOM, ControlRate|LimitRate, 0);
 		checkParameter("defaultCommandFactory", defaultCommandFactory, 0, 0); // no requirements
-		if(has(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue()) {
+		if(has(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue() && !has(ForwardHardLimitSwitch)) {
 			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
 		}
-		if(has(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()) {
-			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
+		if(has(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()&& !has(ReverseHardLimitSwitch)) {
+			throw new IllegalArgumentException("reverseSoftLimit " + reverseSoftLimit + " exceeds reverseLimit " + reverseLimit + ".  Soft limits must be within physical range of motion.");
 		}
 	}
 
