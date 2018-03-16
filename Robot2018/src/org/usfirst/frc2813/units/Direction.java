@@ -27,9 +27,9 @@ public enum Direction{
 	REVERSE(Canonical.NEGATIVE),
 	
 	/** Alias for NEGATIVE */
-	IN(Canonical.NEGATIVE), // TODO: This should probably be reversed.
+	IN(Canonical.NEGATIVE),
 	/** Alias for POSITIVE */
-	OUT(Canonical.POSITIVE), // TODO: This should probably be reversed.
+	OUT(Canonical.POSITIVE),
 
 	/** Alias for POSITIVE */
 	CLOCKWISE(Canonical.POSITIVE),
