@@ -52,7 +52,7 @@ public class MotorConfiguration {
 	public static final int Disconnected                        = 1 <<  31;
 
 	public static final int MAX_CAPABILITY = 31;
-	
+
 	public static String getCapabilityName(int capability) {
         switch(capability) {
         case ControlDirection       : return "ControlDirection";
@@ -89,7 +89,7 @@ public class MotorConfiguration {
 	 * Find out if a capability is supported
 	 */
 	public boolean has(long capability) {
-		return (this.capabilities & capability) != 0;
+		return hasAll(capability);
 	}
 	
 	/*
