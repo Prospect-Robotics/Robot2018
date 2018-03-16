@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 //import static org.junit.jupiter.api.Assertions.*;
 //import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 class ElevatorTest  {
 //	@org.junit.jupiter.api.Test
 	void test() {
-		ElevatorAxisConfiguration.mathReport();
+		ElevatorConfiguration.mathReport();
 //		ArmAxisConfiguration.mathReport();
 //		Elevator.axisConfiguration.dumpDescription();
 	}

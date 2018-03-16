@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.Arm.ArmHoldPosition;

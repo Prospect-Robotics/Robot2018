@@ -16,7 +16,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
  * itself and handle all conversions, scaling, formatting, limits, validation, etc... automatically with
  * the minimal amount of data specified.
  */
-public class AxisConfiguration {
+public class MotorConfiguration {
 	
 	// Common state
 	private final String axisName;
@@ -342,7 +342,7 @@ public class AxisConfiguration {
 	/*
 	 * Get the native units for this axis
 	 */
-	public AxisConfiguration(
+	public MotorConfiguration(
 			String axisName,
 			int capabilities,
 			LengthUOM nativeDisplayLengthUOM, // requireAny(ReadPosition|ControlPosition);

@@ -1,11 +1,12 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorHoldPosition;
+import org.usfirst.frc2813.Robot2018.commands.Motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.Talon;
 import org.usfirst.frc2813.Robot2018.motor.TalonProfileSlot;
-import org.usfirst.frc2813.Robot2018.motor.axis.AxisConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.axis.MotorConfiguration;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
@@ -21,12 +22,12 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
  * position is in inches.
  * speed is in inches per second.
  */
-public class Elevator extends SubsystemPositionDirectionSpeed {
+public class Motor extends SubsystemPositionDirectionSpeed {
 
 	private Talon motorController;
-	public static final ElevatorAxisConfiguration axisConfiguration = new ElevatorAxisConfiguration();
+	public static final ElevatorConfiguration axisConfiguration = new ElevatorConfiguration();
 
-	public Elevator() {
+	public Motor() {
 		super(
 				axisConfiguration.getNativeDisplayLengthUOM(), 
 				axisConfiguration.getNativeSensorLengthUOM(), 
@@ -37,7 +38,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 				);
 		motorController = new Talon(RobotMap.srxElevator);
 		// Set forward hard limits
-		if(axisConfiguration.hasAll(AxisConfiguration.Forward|AxisConfiguration.LimitPosition|AxisConfiguration.ForwardHardLimitSwitch)) {
+		if(axisConfiguration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardHardLimitSwitch)) {
 			motorController.setHardLimitSwitch(Direction.FORWARD, LimitSwitchSource.FeedbackConnector, axisConfiguration.getForwardHardLimitSwitchNormal());
 			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, axisConfiguration.getForwardHardLimitSwitchResetsEncoder());
 		} else {
@@ -45,7 +46,7 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
 		}
 		// Set reverse hard limits
-		if(axisConfiguration.hasAll(AxisConfiguration.Reverse|AxisConfiguration.LimitPosition|AxisConfiguration.ReverseHardLimitSwitch)) {
+		if(axisConfiguration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseHardLimitSwitch)) {
 			motorController.setHardLimitSwitch(Direction.REVERSE, LimitSwitchSource.FeedbackConnector, axisConfiguration.getReverseHardLimitSwitchNormal());
 			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, axisConfiguration.getReverseHardLimitSwitchResetsEncoder());
 		} else {
@@ -53,18 +54,18 @@ public class Elevator extends SubsystemPositionDirectionSpeed {
 			motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		}
 		// Set forward soft limit
-		if(axisConfiguration.hasAll(AxisConfiguration.Forward|AxisConfiguration.LimitPosition|AxisConfiguration.ForwardSoftLimitSwitch)) {
+		if(axisConfiguration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardSoftLimitSwitch)) {
 			motorController.setSoftLimitSwitch(Direction.FORWARD, true, axisConfiguration.getForwardLimit().convertTo(axisConfiguration.getNativeSensorLengthUOM()).getValueAsInt());
 		} else {
 			motorController.setSoftLimitSwitch(Direction.FORWARD, false);
 		}
 		// Set reverse soft limit
-		if(axisConfiguration.hasAll(AxisConfiguration.Reverse|AxisConfiguration.LimitPosition|AxisConfiguration.ReverseSoftLimitSwitch)) {
+		if(axisConfiguration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseSoftLimitSwitch)) {
 			motorController.setSoftLimitSwitch(Direction.REVERSE, true, axisConfiguration.getReverseLimit().convertTo(axisConfiguration.getNativeSensorLengthUOM()).getValueAsInt());
 		} else {
 			motorController.setSoftLimitSwitch(Direction.REVERSE, false);
 		}
-		if(axisConfiguration.hasAny(AxisConfiguration.NeutralMode)) {
+		if(axisConfiguration.hasAny(MotorConfiguration.NeutralMode)) {
 			motorController.setNeutralMode(axisConfiguration.getNeutralMode());
 		}
 // HW BUG WORKAROUND
@@ -101,7 +102,7 @@ motorController.setHardLimitSwitchClearsPositionAutomatically(Direction.UP, true
 	@Override
 	public void initDefaultCommand() {
 		// Set to hold position by default
-		setDefaultCommand(new ElevatorHoldPosition());
+		setDefaultCommand(new MotorHoldPosition(this));
 	}
 
 	@Override

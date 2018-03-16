@@ -1,5 +1,6 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 

@@ -1,20 +1,21 @@
-package org.usfirst.frc2813.Robot2018.commands.Elevator;
+package org.usfirst.frc2813.Robot2018.commands.Motor;
 
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 
 /**
  * Disable elevator. Subsystem will quiesce.
  */
-public class ElevatorDisable extends GearheadsInstantCommand {
-	public ElevatorDisable() {
-		requires(Robot.elevator);
+public class MotorDisable extends MotorInstantCommand {
+	public MotorDisable(Motor motor) {
+		super(motor, true);
 	}
 
-	// @Override
+	@Override
 	protected void initialize() {
-		Logger.debug("in execute");
-		Robot.elevator.disable();
+		super.initialize();
+		motor.disable();
 	}
 }

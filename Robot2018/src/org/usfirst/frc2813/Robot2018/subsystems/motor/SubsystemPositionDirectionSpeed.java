@@ -1,9 +1,10 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;

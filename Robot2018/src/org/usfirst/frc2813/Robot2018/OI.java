@@ -9,8 +9,8 @@ import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
 import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorTesting;
+import org.usfirst.frc2813.Robot2018.commands.Motor.MotorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.Motor.MotorTesting;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 
@@ -87,16 +87,16 @@ public class OI {
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
 		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
 		
-		new JoystickButton(buttonPanel, 10).toggleWhenActive(new ElevatorTesting());
+		new JoystickButton(buttonPanel, 10).toggleWhenActive(new MotorTesting(Robot.elevator));
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
-		elevatorUp.whileHeld(new ElevatorMoveInDirection(Direction.UP));
+		elevatorUp.whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
 		//elevatorDown.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
 		elevatorDown = new JoystickButton(buttonPanel, 4);
 		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-		elevatorDown.whileHeld(new ElevatorMoveInDirection(Direction.DOWN));
+		elevatorDown.whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
 		//elevatorUp.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 

@@ -1,9 +1,9 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import java.util.Iterator;
 
 
-import org.usfirst.frc2813.Robot2018.motor.axis.AxisConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.axis.MotorConfiguration;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -15,7 +15,7 @@ import org.usfirst.frc2813.units.values.Time;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 
-public class ArmAxisConfiguration extends AxisConfiguration{
+public class ArmConfiguration extends MotorConfiguration{
 
 	// Talon constants
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
@@ -122,27 +122,27 @@ public class ArmAxisConfiguration extends AxisConfiguration{
 */		
 	}
 
-	public ArmAxisConfiguration() {
+	public ArmConfiguration() {
 		super(
 			"Arm Rotational Axis",
 			(0
-					|AxisConfiguration.ControlDirection
-					|AxisConfiguration.ControlPosition
-					|AxisConfiguration.ControlRate
-					|AxisConfiguration.Forward
+					|MotorConfiguration.ControlDirection
+					|MotorConfiguration.ControlPosition
+					|MotorConfiguration.ControlRate
+					|MotorConfiguration.Forward
 //					|AxisConfiguration.ForwardHardLimitSwitch
-					|AxisConfiguration.ForwardSoftLimitSwitch
-					|AxisConfiguration.LimitPosition
-					|AxisConfiguration.LimitRate
-					|AxisConfiguration.SensorToDriveScale
-					|AxisConfiguration.ReadDirection
-					|AxisConfiguration.ReadPosition
-					|AxisConfiguration.ReadRate
-					|AxisConfiguration.Reverse
-					|AxisConfiguration.ReverseHardLimitSwitch
+					|MotorConfiguration.ForwardSoftLimitSwitch
+					|MotorConfiguration.LimitPosition
+					|MotorConfiguration.LimitRate
+					|MotorConfiguration.SensorToDriveScale
+					|MotorConfiguration.ReadDirection
+					|MotorConfiguration.ReadPosition
+					|MotorConfiguration.ReadRate
+					|MotorConfiguration.Reverse
+					|MotorConfiguration.ReverseHardLimitSwitch
 //					|AxisConfiguration.ReverseSoftLimitSwitch
-					|AxisConfiguration.DefaultRate
-					|AxisConfiguration.NeutralMode
+					|MotorConfiguration.DefaultRate
+					|MotorConfiguration.NeutralMode
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM

@@ -1,24 +1,17 @@
-package org.usfirst.frc2813.Robot2018.commands.Elevator;
+package org.usfirst.frc2813.Robot2018.commands.Motor;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 
-/**
- * Disable elevator. Subsystem will quiesce.
- */
-public class ElevatorTesting extends GearheadsCommand {
-	public ElevatorTesting() {
-		requires(Robot.elevator);
+public class MotorTesting extends MotorInstantCommand {
+	public MotorTesting(Motor motor) {
+		super(motor, true);
 	}
 	
-	protected void execute() {
-	}
-	// @Override
+	@Override
 	protected void initialize() {
+		super.initialize();
 		Robot.elevator.encoderRelativePositionTestingMode();
-	}
-	
-	protected boolean isFinished() {
-		return false;
 	}
 }

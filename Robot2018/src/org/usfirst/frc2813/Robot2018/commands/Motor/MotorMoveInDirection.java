@@ -1,36 +1,37 @@
-package org.usfirst.frc2813.Robot2018.commands.Elevator;
+package org.usfirst.frc2813.Robot2018.commands.Motor;
 
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.Direction;
 
 /**
  * Move elevator in given direction until interrupted.
  * Hold current position with PID when interrupted.
  */
-public class ElevatorMoveInDirection extends GearheadsCommand {
+public class MotorMoveInDirection extends MotorCommand {
 	private final Direction direction;
 
-	public ElevatorMoveInDirection(Direction direction) {
+	public MotorMoveInDirection(Motor motor, Direction direction) {
+		super(motor, true);
 		this.direction = direction;
-		requires(Robot.elevator);
 	}
 
-	// @Override
+	@Override
 	protected void initialize() {
-		Logger.debug("in initialize");
-		Robot.elevator.moveInDirection(direction);
+		super.initialize();
+		motor.moveInDirection(direction);
 	}
 
-	//@Override
+	@Override
 	protected boolean isFinished() {
 		return false;  // run until interrupted, even if subsystem stops
 	}
 
 	@Override
 	protected void interrupted() {
-		Logger.debug("in interrupted");
-		Robot.elevator.holdCurrentPosition();
+		super.interrupted();
+		motor.holdCurrentPosition();
 	}
 }
