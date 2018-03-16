@@ -21,7 +21,7 @@ public class JawsConfiguration extends SolenoidConfiguration {
 				"Jaws", 
 				SolenoidLogic.SolenoidLogicNormal, 
 				SolenoidType.SingleSolenoid, 
-				null /* defaultCommand */
+				null /* defaultCommandFactory */
 				);
 	}
 
