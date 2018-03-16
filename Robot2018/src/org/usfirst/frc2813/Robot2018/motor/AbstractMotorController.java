@@ -139,10 +139,10 @@ public abstract class AbstractMotorController implements IMotorController {
 	// IMPORTANT: Do not call directly	
 	protected boolean isStateTransitionAllowed(MotorState proposedState) {
 		// Validate the state transition before we do anything
-		if (currentState.equals(proposedState)) {
-			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", currentState, proposedState);
-			new Exception().printStackTrace();
-			return false;
+		if (currentState.equals(proposedState) && proposedState.getOperation() != MotorOperation.DISABLED) {
+			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s to %s.", currentState, proposedState);
+//			new Exception().printStackTrace();
+			return true;
 		}
 		switch(proposedState.getOperation()) {
 		case DISABLED:

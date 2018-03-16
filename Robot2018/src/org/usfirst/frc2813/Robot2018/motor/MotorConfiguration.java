@@ -45,6 +45,7 @@ public class MotorConfiguration {
 	public static final int ReverseSoftLimitSwitch              = 1 <<  14;
 	public static final int DefaultRate                         = 1 <<  15;
 	public static final int NeutralMode                         = 1 <<  16;
+	public static final int Disconnected                        = 1 <<  31;
 
 	public static final int MAX_CAPABILITY = 31;
 	
@@ -67,6 +68,7 @@ public class MotorConfiguration {
         case ReverseSoftLimitSwitch : return "ReverseSoftLimitSwitch";
         case DefaultRate            : return "DefaultRate";
         case NeutralMode            : return "NeutralMode";
+        case Disconnected           : return "Disconnected";
         default:
                 return "Unknown Capability " + capability;
         }
@@ -472,22 +474,22 @@ public class MotorConfiguration {
 		validateCapabilityDependency(ReverseHardLimitSwitch, 0, Reverse|ControlDirection);
 		validateCapabilityDependency(ReverseSoftLimitSwitch, 0, Reverse|ControlDirection);
 		validateCapabilityDependency(ControlPosition, 0, SensorToDriveScale|ReadPosition);
-		validateCapabilityDependency(ControlRate, 0, ReadRate);
+		validateCapabilityDependency(ControlRate, 0, 0); // maybe open loop control
 		validateCapabilityDependency(LimitPosition, 0, ControlPosition|ReadPosition);
-		validateCapabilityDependency(LimitRate, 0, ControlRate|ReadRate);
+		validateCapabilityDependency(LimitRate, 0, ControlRate);
 		validateCapabilityDependency(SensorToDriveScale, ReadRate|ReadPosition, 0);
-		validateCapabilityDependency(ReadDirection, 0, SensorToDriveScale);
+		validateCapabilityDependency(ReadDirection, 0, 0);
 		validateCapabilityDependency(ReadPosition, 0, SensorToDriveScale);
 		validateCapabilityDependency(ReadRate, 0, 0);
 		validateCapabilityDependency(ReadRate, 0, ControlRate);
 		validateCapabilityDependency(NeutralMode, ControlRate|ControlPosition, 0);
 		// Now validate settings
-		checkParameter("nativeDisplayLengthUOM", nativeDisplayLengthUOM, ReadPosition, 0);
+		checkParameter("nativeDisplayLengthUOM", nativeDisplayLengthUOM, 0, 0);
 		checkParameter("nativeMotorLengthUOM", nativeMotorLengthUOM, ControlPosition|ControlDirection, 0);  
 		checkParameter("motorPhaseIsReversed", motorPhaseIsReversed, ControlRate|ControlPosition|ControlDirection, 0);
 		checkParameter("sensorPhaseIsReversed", sensorPhaseIsReversed, ReadRate|ReadPosition, 0);
 		checkParameter("nativeSensorLengthUOM", nativeSensorLengthUOM, ReadPosition, 0);
-		checkParameter("nativeDisplayRateUOM", nativeDisplayRateUOM, ReadRate, 0);
+		checkParameter("nativeDisplayRateUOM", nativeDisplayRateUOM, 0, 0);
 		checkParameter("nativeMotorRateUOM", nativeMotorRateUOM, ControlRate, 0);
 		checkParameter("nativeSensorRateUOM", nativeSensorRateUOM, ReadRate, 0);
 		checkParameter("minimumForwardRate", minimumForwardRate, 0, Forward|ControlRate|LimitRate);
