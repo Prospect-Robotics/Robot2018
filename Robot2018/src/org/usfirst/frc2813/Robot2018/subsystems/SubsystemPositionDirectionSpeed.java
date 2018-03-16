@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerState;
 import org.usfirst.frc2813.Robot2018.motor.TalonSensorPhase;
@@ -127,28 +128,28 @@ public abstract class SubsystemPositionDirectionSpeed extends GearheadsSubsystem
 		switch(newState) {
 		case DISABLED:
 			if (oldState == newState) {
-				Logger.formatWarning("bug in code: Transitioning from %s state to %s state.", oldState, newState);
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", oldState, newState);
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case HOLDING_POSITION:
 			if (oldState == newState) {
-				Logger.formatWarning("bug in code: Transitioning from %s state to %s state.", oldState, newState);
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", oldState, newState);
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case MOVING:
 			if ((oldState == newState) && (oldSpeed == speed) && (oldDirection == direction)) {
-				Logger.formatWarning("bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, newState);
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state, with no change in direction or speed.", oldState, newState);
 				new Exception().printStackTrace();
 				return false;
 			}
 			break;
 		case SET_POSITION:
 			if ((oldState == newState) && (oldPosition == position)) {
-				Logger.formatWarning("bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, newState);
+				Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state, with no change in position.", oldState, newState);
 				new Exception().printStackTrace();
 				return false;
 			}

@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Elevator;
 
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
@@ -17,7 +18,7 @@ public class ElevatorMoveInDirectionAtSpeed extends GearheadsCommand {
 	public ElevatorMoveInDirectionAtSpeed(Direction direction, Rate speed) {
 		this.direction = direction;
 		this.speed = speed;
-		Logger.formatInfo("Move %s at speed: %s", direction, speed);
+		Logger.printFormat(LogType.INFO, "Move %s at speed: %s", direction, speed);
 		requires(Robot.elevator);
 	}
 

@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.Arm;
 
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
@@ -23,7 +24,7 @@ public class ArmMoveInDirectionAtSpeed extends GearheadsCommand {
 
 	// @Override
 	protected void initialize() {
-		Logger.formatInfo("Move %s at speed %s", direction, speed);
+		Logger.printFormat(LogType.INFO, "Move %s at speed %s", direction, speed);
 		Logger.debug("in initialize");
 			Robot.arm.moveInDirectionAtSpeed(direction, speed);
 	}
