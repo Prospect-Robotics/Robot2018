@@ -95,8 +95,8 @@ public class MotorConfiguration {
 	/*
 	 * Find out if a capability is supported
 	 */
-	public long getCapabilities(long capabilities) {
-		return (this.capabilities & capabilities);
+	public long getCapabilities() {
+		return this.capabilities;
 	}
 	
 	/*
