@@ -114,7 +114,7 @@ public final class Motor extends GearheadsSubsystem {
 	}
 
 	public String getDiagnostics() {
-		return String.format("%s: [Motor State: %s Controller State: %s Controller Diagnostics: %s]", this, getState(), getControllerState(), controller.getDiagnostics());
+		return String.format("%s - [%s @ %s] [%s]", this, getState(), readPosition(), controller.getDiagnostics());
 	}
 	/* ----------------------------------------------------------------------------------------------
 	 * Subsystem API
@@ -304,7 +304,7 @@ public final class Motor extends GearheadsSubsystem {
 		// Transition successful, save the state.
 		return true;
 	}
-	
+
 	/* ----------------------------------------------------------------------------------------------
 	 * Units Helpers
 	 * ---------------------------------------------------------------------------------------------- */

@@ -1,5 +1,9 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -271,24 +275,7 @@ public class MotorConfiguration {
 	private final Length reverseLimit;
 	public final Length getReverseLimit() {
 		requireAll(Reverse|ControlPosition|LimitPosition);
-		return forwardLimit;
-	}
-	
-	/*
-	 * If Forward and ForwardHardLimitSwitch, return whether forward limit switch stops motor 
-	 */
-	private final Boolean forwardHardLimitStopsMotor;
-	public final boolean getForwardHardLimitStopsMotor() {
-		requireAll(Forward|ForwardHardLimitSwitch);
-		return forwardHardLimitStopsMotor;
-	}
-	/*
-	 * If Reverse and Reverse and ReverseHardLimitSwitch, return whether reverse hard limit switch stops motor 
-	 */
-	private final Boolean reverseHardLimitStopsMotor;
-	public final boolean getReverseHardLimitStopsMotor() {
-		requireAll(Reverse|ReverseHardLimitSwitch);
-		return reverseHardLimitStopsMotor;
+		return reverseLimit;
 	}
 	/*
 	 * If Forward and ForwardHardLimitSwitch return forwardHardLimitSwitchResetsEncoder 
@@ -335,7 +322,7 @@ public class MotorConfiguration {
 	 * If Reverse and ReverseSoftLimitSwitch, return reverse soft limit 
 	 */
 	private final Length reverseSoftLimit;
-	public final Length getReverseSoftLimitEnabled() {
+	public final Length getReverseSoftLimit() {
 		requireAll(Reverse|ReverseSoftLimitSwitch);
 		return reverseSoftLimit;
 	}
@@ -348,6 +335,10 @@ public class MotorConfiguration {
 	private final ICommandFactory<Motor> defaultCommandFactory;
 	public final ICommandFactory<Motor> getDefaultCommandFactory() {
 		return defaultCommandFactory;
+	}
+	private final List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
+	public final List<PIDConfiguration> getPIDConfigurations() {
+		return Collections.unmodifiableList(pidConfigurations);
 	}
 	/*
 	 * Get the native units for this axis
@@ -371,17 +362,16 @@ public class MotorConfiguration {
 			Length forwardLimit, // requireAll(Forward|ControlPosition|LimitPosition)
 			Length reverseLimit, // requireAll(Reverse|ControlPosition|LimitPosition)
 			LimitSwitchNormal forwardHardLimitSwitchNormal, // requireAll(Forward|ForwardSoftLimitSwitch)
-			Boolean forwardHardLimitStopsMotor, // requireAll(Forward|ForwardHardLimitSwitch)
 			Boolean forwardHardLimitSwitchResetsEncoder, // requireAll(Forward|ForwardHardLimitSwitch)
 			LimitSwitchNormal reverseHardLimitSwitchNormal, // requireAll(Reverse|ReverseSoftLimitSwitch)
-			Boolean reverseHardLimitStopsMotor, // requireAll(Reverse|ReverseHardLimitSwitch)
 			Boolean reverseHardLimitSwitchResetsEncoder, // requireAll(Reverse|ReverseHardLimitSwitch)
 			Length forwardSoftLimit, // requireAll(Forward|ForwardSoftLimitSwitch)
 			Length reverseSoftLimit, // requireAll(Reverse|ReverseSoftLimitSwitch)
 			Rate defaultRate, // requireAll(ControlRate)
 			NeutralMode neutralMode, // requireAll(NeutralMode), requireAny(ControlRate|ControlPosition)
 			RateUOM percentageRateUOM, // require(ControlRate|LimitRate)
-			ICommandFactory<Motor> defaultCommandFactory // no requirements
+			ICommandFactory<Motor> defaultCommandFactory, // no requirements
+			List<PIDConfiguration> pidConfigurations
 			)
 	{
 		this.name = name;
@@ -402,10 +392,8 @@ public class MotorConfiguration {
 		this.forwardLimit = forwardLimit;
 		this.reverseLimit = reverseLimit;
 		this.forwardHardLimitSwitchNormal = forwardHardLimitSwitchNormal;
-		this.forwardHardLimitStopsMotor = forwardHardLimitStopsMotor;
 		this.forwardHardLimitSwitchResetsEncoder = forwardHardLimitSwitchResetsEncoder;
 		this.reverseHardLimitSwitchNormal = reverseHardLimitSwitchNormal;
-		this.reverseHardLimitStopsMotor = reverseHardLimitStopsMotor;
 		this.reverseHardLimitSwitchResetsEncoder = reverseHardLimitSwitchResetsEncoder;
 		this.forwardSoftLimit = forwardSoftLimit;
 		this.reverseSoftLimit = reverseSoftLimit;
@@ -413,6 +401,7 @@ public class MotorConfiguration {
 		this.neutralMode = neutralMode;
 		this.percentageRateUOM = percentageRateUOM;
 		this.defaultCommandFactory = defaultCommandFactory;
+		this.pidConfigurations.addAll(pidConfigurations);
 		validateConfiguration();
 	}
 	public static String listCapabilities(int capabilities, String prefix, String separator, String suffix) {
@@ -500,10 +489,8 @@ public class MotorConfiguration {
 		checkParameter("forwardLimit", forwardLimit, 0, Forward|ControlPosition|LimitPosition);
 		checkParameter("reverseLimit", reverseLimit, 0, Reverse|ControlPosition|LimitPosition);
 		checkParameter("forwardHardLimitSwitchNormal", forwardHardLimitSwitchNormal, 0, Forward|ForwardHardLimitSwitch);
-		checkParameter("forwardHardLimitStopsMotor", forwardHardLimitStopsMotor, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("forwardHardLimitSwitchResetsEncoder", forwardHardLimitSwitchResetsEncoder, 0, Forward|ForwardHardLimitSwitch);
 		checkParameter("reverseHardLimitSwitchNormal", reverseHardLimitSwitchNormal, 0, Reverse|ReverseHardLimitSwitch);
-		checkParameter("reverseHardLimitStopsMotor", reverseHardLimitStopsMotor, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("reverseHardLimitSwitchResetsEncoder", reverseHardLimitSwitchResetsEncoder, 0, Reverse|ReverseHardLimitSwitch);
 		checkParameter("forwardSoftLimit", forwardSoftLimit, 0, Forward|ForwardSoftLimitSwitch);
 		checkParameter("reverseSoftLimit", reverseSoftLimit, 0, Reverse|ReverseSoftLimitSwitch);
@@ -511,6 +498,12 @@ public class MotorConfiguration {
 		checkParameter("neutralMode", neutralMode, ControlRate|ControlPosition, NeutralMode);
 		checkParameter("percentageRateUOM", percentageRateUOM, ControlRate|LimitRate, 0);
 		checkParameter("defaultCommandFactory", defaultCommandFactory, 0, 0); // no requirements
+		if(has(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue()) {
+			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
+		}
+		if(has(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()) {
+			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
+		}
 	}
 
 	public String toString() {
@@ -570,10 +563,8 @@ public class MotorConfiguration {
 		.append("forwardSoftLimit......................" + describeValue(forwardSoftLimit, nativeMotorLengthUOM) + "\n")
 		.append("reverseSoftLimit......................" + describeValue(reverseSoftLimit, nativeMotorLengthUOM) + "\n")
 		.append("forwardHardLimitSwitchBehavior........" + forwardHardLimitSwitchNormal + "\n")
-		.append("forwardHardLimitStopsMotor............" + forwardHardLimitStopsMotor + "\n")
 		.append("forwardHardLimitSwitchResetsEncoder..." + forwardHardLimitSwitchResetsEncoder + "\n")
 		.append("reverseHardLimitSwitchBehavior........" + reverseHardLimitSwitchNormal + "\n")
-		.append("reverseHardLimitStopsMotor............" + reverseHardLimitStopsMotor + "\n")
 		.append("reverseHardLimitSwitchResetsEncoder..." + reverseHardLimitSwitchResetsEncoder + "\n")
 		.append("\n")
 		.append("Scaling:\n")

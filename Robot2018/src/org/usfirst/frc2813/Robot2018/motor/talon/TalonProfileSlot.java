@@ -43,4 +43,19 @@ public enum TalonProfileSlot {
 	public boolean equals(TalonProfileSlot other) {
 		return other.canonicalProfileSlot == this.canonicalProfileSlot;
 	}
+	
+	public static TalonProfileSlot get(int index) {
+		switch(index) {
+		case 0:
+			return ProfileSlot0;
+		case 1:
+			return ProfileSlot1;
+		case 2:
+			return ProfileSlot2;
+		case 3:
+			return ProfileSlot3;
+		default:
+			throw new IllegalArgumentException("Invalid index: " + index);
+		}
+	}
 }

@@ -1,10 +1,15 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
@@ -26,6 +31,9 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	// Talon constants
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
 	
+	private static final Length RANGE_MIN = LengthUOM.Inches.create(-6);
+	private static final Length SAFETY_MARGIN = LengthUOM.Inches.create(4);
+	private static final Length RANGE_MAX = LengthUOM.Inches.create(42);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
 	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
@@ -41,7 +49,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 
 	// Hardware Inputs
 	private static final Length SHAFT_DIAMETER                = LengthUOM.Inches.create(1.25);
-	private static final Length CORD_DIAMETER                 = LengthUOM.Millimeters.create(4);
+	private static final Length CORD_DIAMETER                 = LengthUOM.Millimeters.create(3); 
 	private static final Length DRIVE_AXIS_DIAMETER           = SHAFT_DIAMETER.add(CORD_DIAMETER);	
 	private static final Length INCHES_PER_ENCODER_REVOLUTION = DRIVE_AXIS_DIAMETER.multiply(Math.PI);
 
@@ -126,6 +134,14 @@ public class ElevatorConfiguration extends MotorConfiguration {
 		}
 */		
 	}
+	public static List<PIDConfiguration> createPidConfigurations() {
+		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
+		pidConfigurations.add(new PIDConfiguration("Holding", TalonProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.8, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.75, 0.01, 40.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", TalonProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", TalonProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
+		return Collections.unmodifiableList(pidConfigurations);
+	}
 
 	public ElevatorConfiguration() {
 		super(
@@ -136,11 +152,8 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|MotorConfiguration.ControlRate
 					|MotorConfiguration.Forward
 // BEGIN WORKAROUND FOR SWITCHED HARDWARE CONNECTION
-/*
-//					|MotorConfiguration.ForwardHardLimitSwitch
-					|MotorConfiguration.ForwardSoftLimitSwitch
-*/					
-					|MotorConfiguration.ForwardHardLimitSwitch
+					|MotorConfiguration.ReverseSoftLimitSwitch // NB: In production we want to use hardwarew limit switch, not software and drive to -1,000,000 or whatever... make sure we hit it and reset!
+//					|MotorConfiguration.ReverseHardLimitSwitch
 // END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
 					|MotorConfiguration.ForwardSoftLimitSwitch
 					|MotorConfiguration.LimitPosition
@@ -150,8 +163,6 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|MotorConfiguration.ReadPosition
 					|MotorConfiguration.ReadRate
 					|MotorConfiguration.Reverse
-					|MotorConfiguration.ReverseHardLimitSwitch
-//					|AxisConfiguration.ReverseSoftLimitSwitch
 					|MotorConfiguration.DefaultRate
 					|MotorConfiguration.NeutralMode
 					),
@@ -168,34 +179,39 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			RateUOM.InchesPerSecond.create(0),  // minimumReverseRate
 			RateUOM.InchesPerSecond.create(12), // maximumReverseRate (placeholder)
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
-			LengthUOM.Inches.create(24),        // forwardLimit (placeholder)
-			LengthUOM.Inches.create(0),         // reverseLimit
+			RANGE_MAX,                          // forwardLimit (placeholder)
+			RANGE_MIN,                          // reverseLimit
 // BEGIN WORKAROUND FOR SWITCHED HARDWARE CONNECTION
-/*			
+/*
+ *  	// NB: This is the correct value when hardware limit is fixed
 			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       // reverseHardLimitStopsMotor
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
+		// NB: This is the workaround to leave switch alive, but not doing any behaviors
 */
-			LimitSwitchNormal.NormallyOpen,     // forwardHardLimitSwitchNormal
-			Boolean.FALSE,                      // forwardHardLimitStopsMotor
-			Boolean.TRUE,                       // forwardHardLimitSwitchResetsEncoder
-			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
-			Boolean.FALSE,                      // reverseHardLimitStopsMotor
-			Boolean.FALSE,                      // reverseHardLimitSwitchResetsEncoder
+			null,     // forwardHardLimitSwitchNormal
+			null,                              // forwardHardLimitSwitchResetsEncoder
+			null,     // reverseHardLimitSwitchNormal
+			null,                              // reverseHardLimitSwitchResetsEncoder
 // END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
-			LengthUOM.Inches.create(24),        // forwardSoftLimit
-			null,                               // reverseSoftLimit
-			RateUOM.InchesPerSecond.create(12), // defaultRate
+			RANGE_MAX.subtract(SAFETY_MARGIN),        // forwardSoftLimit - set to 4" below the end of the physical range 
+// BEGIN WORKROUND
+//			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
+			RANGE_MIN.subtract(6), // Let us reach the limit switch even if calibration is off
+// END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
+			RateUOM.InchesPerSecond.create(5), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ElevatorSRXMotorPercentageRate,      // percentageRate
 			new ICommandFactory<Motor>() { // defaultCommand 
 				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 
 				}
-			}
+			},
+			createPidConfigurations() // pidConfigurations
 			);
 	}
 }
+

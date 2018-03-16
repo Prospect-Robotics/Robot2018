@@ -134,10 +134,8 @@ public class IntakeConfiguration extends MotorConfiguration {
 			null,        // forwardLimit (placeholder)
 			null,         // reverseLimit
 			null,         // forwardHardLimitSwitchNormal
-			null,                               // forwardHardLimitStopsMotor
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			null,						       // reverseHardLimitSwitchNormal
-			null,                       // reverseHardLimitStopsMotor
 			null,                       // reverseHardLimitSwitchResetsEncoder
 			null,        // forwardSoftLimit
 			null,                               // reverseSoftLimit
@@ -148,6 +146,8 @@ public class IntakeConfiguration extends MotorConfiguration {
 				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 
 				}
-			});
+			},
+			null // pidConfigurations
+			);
 	}
 }
