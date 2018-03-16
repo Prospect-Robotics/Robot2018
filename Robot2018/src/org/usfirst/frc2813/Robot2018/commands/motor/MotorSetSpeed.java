@@ -27,11 +27,11 @@ public class MotorSetSpeed extends MotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getSpeed() == speed) {
-			Logger.info("NOT telling " + motor.getName() + " to change speed to " + speed + ", it's already moving at that speed.");
+			Logger.info("NOT telling " + motor + " to change speed to " + speed + ", it's already moving at that speed.");
 		} else if(motor.getState().getOperation() != MotorOperation.MOVING ) {
-			Logger.info("NOT telling " + motor.getName() + " to change speed to " + speed + ", it's NOT MOVING.");
+			Logger.info("NOT telling " + motor + " to change speed to " + speed + ", it's NOT MOVING.");
 		} else {
-			Logger.info("Telling " + motor.getName() + " to change speed to " + speed + ".");
+			Logger.info("Telling " + motor + " to change speed to " + speed + ".");
 			motor.changeSpeed(speed);
 		}
 		

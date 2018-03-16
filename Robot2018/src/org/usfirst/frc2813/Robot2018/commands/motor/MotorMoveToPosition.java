@@ -23,9 +23,9 @@ public class MotorMoveToPosition extends MotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getState().getOperation() == MotorOperation.MOVING_TO_POSITION && motor.getPosition() == position) {
-			Logger.info("NOT telling " + motor.getName() + " to move to " + position + ", it's already doing that.");
+			Logger.info("NOT telling " + motor + " to move to " + position + ", it's already doing that.");
 		} else {
-			Logger.info("Telling " + motor.getName() + " to move to " + position + ".");
+			Logger.info("Telling " + motor + " to move to " + position + ".");
 			motor.moveToPosition(position);
 		}
 	}

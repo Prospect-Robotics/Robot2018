@@ -30,9 +30,9 @@ public class MotorMoveInDirectionAtSpeed extends MotorCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getDirection() == direction && motor.getSpeed() == speed) {
-			Logger.info("NOT setting " + motor.getName() + " to move in the " + direction + " direction at " + speed + ", it's already doing that.");
+			Logger.info("NOT setting " + motor + " to move in the " + direction + " direction at " + speed + ", it's already doing that.");
 		} else {
-			Logger.info("Setting " + motor.getName() + " to move in the " + direction + " direction at " + speed + ".");
+			Logger.info("Setting " + motor + " to move in the " + direction + " direction at " + speed + ".");
 			motor.moveInDirectionAtSpeed(direction, speed);
 		}
 	}
