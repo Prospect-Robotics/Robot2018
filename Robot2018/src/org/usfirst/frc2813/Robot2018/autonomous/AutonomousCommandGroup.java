@@ -88,8 +88,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	// arm control commands
 	public void dropCube() {
-		// TODO: should we delay between these?
-		// TODO: consider making this sequence a command
+		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
+	}
+	public void shootCube() {
 		addSequential(new SpinIntake(Direction.OUT));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
 		addSequential(new SpinIntake(Direction.STOP));
@@ -99,6 +100,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		// TODO: consider making this pair a command for arm
 		addSequential(new SpinIntake(Direction.IN));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));
+		sleep(0.2);
 		addSequential(new SpinIntake(Direction.STOP));
 	}
 
