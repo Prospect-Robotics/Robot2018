@@ -103,6 +103,21 @@ public class Logger {
 		print(severity, formatted);
 	}
 
+	public static void printLabelled(LogType severity,String title,Object...objects) {
+		String finalPrint = title+": ";
+		for(int i=0;i<objects.length;i++) {
+			finalPrint+=objects[i];
+			if(i%2==0) {
+				finalPrint+=":";
+			}
+			else {
+				finalPrint+=i+1==objects.length?"":", ";
+			}
+		}
+		print(severity,finalPrint);
+	}
+	
+	
 	/**
 	 * <p>
 	 * Add yourself to {@link Logger}'s list of known classes
@@ -119,11 +134,16 @@ public class Logger {
 	}
 
 	private static String simplifyPackage(String longName) {
-		String[] segments = longName.split("\\.");
-		if (segments.length < 2) {
-			return longName;
-		} else {
-			return segments[segments.length - 1];
+		if(longName.contains("org.usfirst.2813.Robot2813")) {
+			return longName.replace("org.usfirst.2813.Robot2813","");
+		}
+		else {
+			String[] segments = longName.split("\\.");
+			if (segments.length < 2) {
+				return longName;
+			} else {
+				return segments[segments.length - 1];
+			}
 		}
 	}
 
