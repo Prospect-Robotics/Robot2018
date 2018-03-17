@@ -29,8 +29,6 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
-	private static final int FORWARD = 1;
-	private static final int BACKWARD = -1;
 	private double driveSpeed = 1;
 	private double turnSpeed = 0.25;
 	//private double curveSpeed = 0.4;

@@ -85,7 +85,7 @@ public class AutonomousCommandGroupGenerator {
 			directionBias = (position == Direction.LEFT) ? 1 : -1;
 
 			Logger.info("Autonomous: robot in center position");
-			autoCmdList.driveForward(LengthUOM.Inches.create(6)); // enough to turn
+			autoCmdList.driveForward(LengthUOM.Inches.create(8)); // enough to turn
 			autoCmdList.turnLeft(45 * directionBias);
 			autoCmdList.driveForward(LengthUOM.Feet.create(6)); // diagonally from start to far side of near switch
 			autoCmdList.turnRight(45);
