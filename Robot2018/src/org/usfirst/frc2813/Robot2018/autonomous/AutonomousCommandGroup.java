@@ -12,6 +12,7 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToPosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForPosition;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
@@ -39,8 +40,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private static final Length armPositionHigh = LengthUOM.Inches.create(20);
 
 	public AutonomousCommandGroup() {
+		Logger.info("Autonomous: adding reset commands");
 		addSequential(new ResetEncoders());
 		addSequential(new ResetGyro());
+		Logger.info("Autonomous: reset commands added");
 	}
 
 	// track state
