@@ -95,7 +95,10 @@ public final class Talon extends AbstractMotorController {
 	
 	@Override
 	public final Length readPosition() {
-		return configuration.getNativeSensorLengthUOM().create(srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex()));
+		int raw = srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex());
+		Length length = configuration.getNativeSensorLengthUOM().create(raw); 
+//		Logger.info("readPosition " + raw + " --> " + length);
+		return length;
 	}
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -294,10 +297,14 @@ public final class Talon extends AbstractMotorController {
 		} else {
 			srx.configReverseSoftLimitEnable(false, getTimeout());
 		}
+		srx.setSensorPhase(configuration.getSensorPhaseIsReversed());
+		srx.setInverted(configuration.getMotorPhaseIsReversed());
 		// Set neutral mode, if specified - otherwise leave it with pre-configured value
 		if(configuration.hasAny(MotorConfiguration.NeutralMode)) {
 			srx.setNeutralMode(configuration.getNeutralMode());
-		} // else { srx.setNeutralMode(NeutralMode.Coast); }
+		} else { 
+			srx.setNeutralMode(NeutralMode.EEPROMSetting); 
+		}
 
 		// Configure the PID profiles
 		Iterator<PIDConfiguration> pidProfiles = configuration.getPIDConfigurations().iterator();
