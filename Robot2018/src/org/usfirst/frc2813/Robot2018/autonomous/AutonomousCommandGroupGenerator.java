@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * account game data. Used exclusively by AutonomousCommandGroup
  */
 public class AutonomousCommandGroupGenerator {
-	// Elevator position to place cubes - FIXME! not correct values
+	AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
+	public enum Target { SWITCH, SCALE; }
+
 	private static final Length scaleHeight = LengthUOM.Inches.create(60);
 	private static final Length switchHeight = LengthUOM.Inches.create(24);
 
@@ -37,8 +39,6 @@ public class AutonomousCommandGroupGenerator {
 	 * sequence to run. Called by AutonomousCommandGroup
 	 */
 	public AutonomousCommandGroupGenerator() {
-		
-		AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
 		// Read our location on the field
 		Direction position = positionSelector.getSelected();
 
@@ -50,15 +50,17 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.driveForward(LengthUOM.Feet.create(5));
 			return;
 		}
-		autoCmdList.elevatorMoveToPosition(switchHeight); 
+		
+		// These return immediately and can happen while we drive
+		autoCmdList.elevatorMoveToPosition(switchHeight); // min needed and max safe during drive
+		autoCmdList.raiseArm();
 
 		if (position == RobotMap.gameData.getScale()) {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(LengthUOM.Feet.create(24));
-			autoCmdList.turnRight(90 * directionBias);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
-			autoCmdList.dropCube();
-			autoCmdList.lowerElevator();
+			autoCmdList.turnRight(90 * directionBias);
+			deliverCubeRoutine(Target.SCALE);
 		}
 		else if (position != Direction.CENTER) {
 			// from far side we cross over between switch and scale and place block on scale
@@ -67,12 +69,9 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.driveForward(LengthUOM.Feet.create(15));
 			autoCmdList.turnLeft(90 * directionBias);
 			autoCmdList.driveForward(LengthUOM.Feet.create(8));
-			autoCmdList.turnLeft(90 * directionBias);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
-			autoCmdList.driveForward(LengthUOM.Feet.create(2));
-			autoCmdList.dropCube();
-			autoCmdList.driveBackward(LengthUOM.Feet.create(2));
-			autoCmdList.lowerElevator();
+			autoCmdList.turnLeft(90 * directionBias);
+			deliverCubeRoutine(Target.SCALE);
 		}
 		else {
 			// We are in the center start position
@@ -84,9 +83,19 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.driveForward(LengthUOM.Feet.create(6)); // diagonally from start to far side of near switch
 			autoCmdList.turnRight(45);
 			autoCmdList.elevatorMoveToPosition(switchHeight); 
-			autoCmdList.driveForward(LengthUOM.Feet.create(2));
-			autoCmdList.dropCube();
-			autoCmdList.driveBackward(LengthUOM.Feet.create(2));
+			deliverCubeRoutine(Target.SWITCH);
+		}
+	}
+	
+	private void deliverCubeRoutine(Target target) {
+		autoCmdList.driveForward(LengthUOM.Feet.create(2));
+		if (target == Target.SCALE) {
+			// FIXME! wait for elevator to reach height here!
+		}
+		autoCmdList.dropCube();
+		autoCmdList.driveBackward(LengthUOM.Feet.create(2));
+		if (target == Target.SWITCH) {
+			autoCmdList.elevatorMoveToPosition(switchHeight);
 		}
 	}
 }

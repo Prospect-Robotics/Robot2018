@@ -33,6 +33,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private double turnSpeed = 0.25;
 	//private double curveSpeed = 0.4;
 
+	// FIXME! what until type? What values should these be?
+	private static final Length armPositionLevel = LengthUOM.Inches.create(12);
+	private static final Length armPositionHigh = LengthUOM.Inches.create(20);
+
 	public AutonomousCommandGroup() {
 		addSequential(new ResetEncoders());
 		addSequential(new ResetGyro());
@@ -85,10 +89,23 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void lowerElevator() {
 		elevatorMoveToPosition(LengthUOM.Inches.create(0));
 	}
+	public void armMoveToPosition(Length position) {
+		addSequential(new MotorMoveToPosition(Robot.arm, position));
+	}
 
 	// arm control commands
+	public void levelArm() {
+		addSequential(new MotorMoveToPosition(Robot.arm, armPositionLevel));
+	}
+	public void raiseArm() {
+		addSequential(new MotorMoveToPosition(Robot.arm, armPositionHigh));
+	}
+	private void openJaws() {
+		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));		
+	}
 	public void dropCube() {
-		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
+		openJaws();
+		levelArm();
 	}
 	public void shootCube() {
 		addSequential(new SpinIntake("SpinIntake DOWN", Direction.OUT));
