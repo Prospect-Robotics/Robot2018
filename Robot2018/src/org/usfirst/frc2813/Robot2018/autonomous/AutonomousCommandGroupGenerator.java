@@ -94,7 +94,7 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.driveForward(LengthUOM.Feet.create(2));
 		autoCmdList.dropCube();
 		autoCmdList.driveBackward(LengthUOM.Feet.create(2));
-		if (target == Target.SWITCH) {
+		if (target == Target.SCALE) {
 			autoCmdList.elevatorMoveToPosition(switchHeight);
 		}
 	}
