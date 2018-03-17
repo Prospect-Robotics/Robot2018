@@ -59,6 +59,9 @@ public class Robot extends TimedRobot {
 		intake = new Intake();
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
 		
+		autonomousCommand = new AutonomousCommandGroup();
+		autoCmdGenerator = new AutonomousCommandGroupGenerator();
+		
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be
 		// constructed yet. Thus, their requires() statements may grab null
@@ -91,8 +94,6 @@ public class Robot extends TimedRobot {
 	//@Override
 	public void autonomousInit() {
 		Logger.info("Autonomous Init");
-		autonomousCommand = new AutonomousCommandGroup();
-		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
 		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
 		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);

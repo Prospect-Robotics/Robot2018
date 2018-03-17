@@ -4,6 +4,7 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
@@ -26,6 +27,7 @@ public class AutonomousCommandGroupGenerator {
 	private int directionBias;  // used to share code between left/right
 	private static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
 	static {
+		Logger.info("Autonomous Position Selector Creation");
 		positionSelector.addDefault("LEFT", Direction.LEFT);
 		positionSelector.addObject("CENTER", Direction.CENTER);
 		positionSelector.addObject("RIGHT", Direction.RIGHT);
