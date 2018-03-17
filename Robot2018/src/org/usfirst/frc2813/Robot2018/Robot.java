@@ -132,7 +132,6 @@ public class Robot extends TimedRobot {
 			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
 			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
 //			Logger.info("[[PERIODIC]] " + Robot.intake.getDiagnostics());
-			;
 		}
 	}
 	/**
