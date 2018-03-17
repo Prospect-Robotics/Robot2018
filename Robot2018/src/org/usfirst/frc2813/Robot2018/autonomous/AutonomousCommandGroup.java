@@ -55,11 +55,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
 	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS")
 	 */
+	private void drive(Length distance, Direction direction) {
+		double motorSpeed = direction == Direction.FORWARD ? driveSpeed : -driveSpeed;
+		addSequential(new PIDAutoDrive(motorSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
+	}
 	public void driveForward(Length distance) {
-		addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
+		drive(distance, Direction.FORWARD);
 	}
 	public void driveBackward(Length distance) {
-		driveForward(distance.getUOM().create(distance.getValue() * -1));
+		drive(distance, Direction.BACKWARD);
 	}
 
 	public void turnLeft(double angle) {
