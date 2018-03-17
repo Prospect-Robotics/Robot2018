@@ -268,7 +268,7 @@ public final class Motor extends GearheadsSubsystem {
 	 * @return true if state change occurred
 	 */
 	protected boolean changeState(MotorState proposedState) {
-		Logger.formatDebug("%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getState(), proposedState);
+		Logger.printFormat(LogType.DEBUG, "%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getState(), proposedState);
 		if (!encoderFunctional) {
 			controller.disable();
 			Logger.warning("encoder not functional. Refusing action.");
@@ -294,7 +294,7 @@ public final class Motor extends GearheadsSubsystem {
 
 		// See if there was any translation and report on the alterations (units typically)
 		if(!getControllerState().equals(proposedState)) {
-			Logger.info(this + " - Translation Occurred [Motor: " + getState() + " Controller: " + getControllerState()); 
+			Logger.info(this + " - Translation Occurred [Target: " + proposedState + " Controller: " + getControllerState()); 
 		}
 		
 		Logger.debug(this + " state transition complete.  old: " + getState() + " status: " + proposedState + ".");

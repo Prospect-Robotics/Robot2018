@@ -10,13 +10,15 @@ import edu.wpi.first.wpilibj.command.Command;
  * Spin the intake IN or OUT
  */
 public class SpinIntake extends Command {
-	private Direction direction;
+	private final String name;
+	private final Direction direction;
 	private double speed;
-    public SpinIntake(Direction direction) {
+    public SpinIntake(String name, Direction direction) {
+    	this.name = name;
+    	this.direction = direction;
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.intake);
-    	this.direction=direction;
     	this.speed=1;
     	if (direction != Direction.IN && direction != Direction.OUT && direction != Direction.STOP) {
     		throw new UnsupportedOperationException("Invalid Direction for Intake");
@@ -42,12 +44,18 @@ public class SpinIntake extends Command {
     // Called once after isFinished returns true
     protected void end() {
     	//Set the speed to 0 when button is released.
-    	Logger.info("SpinIntake End");
+    	Logger.info("SpinIntake end.");
     	Robot.intake.spx.disable();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	Logger.info("SpinIntake interrupted.");
+    	Robot.intake.spx.disable();
+    }
+    
+    public String toString() {
+    	return name;
     }
 }

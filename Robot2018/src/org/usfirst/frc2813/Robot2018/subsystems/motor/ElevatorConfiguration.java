@@ -33,7 +33,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	
 	private static final Length RANGE_MIN = LengthUOM.Inches.create(-6);
 	private static final Length SAFETY_MARGIN = LengthUOM.Inches.create(4);
-	private static final Length RANGE_MAX = LengthUOM.Inches.create(42);
+	private static final Length RANGE_MAX = LengthUOM.Inches.create(85);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
 	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
@@ -151,10 +151,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|MotorConfiguration.ControlPosition
 					|MotorConfiguration.ControlRate
 					|MotorConfiguration.Forward
-// BEGIN WORKAROUND FOR SWITCHED HARDWARE CONNECTION
-					|MotorConfiguration.ReverseSoftLimitSwitch // NB: In production we want to use hardwarew limit switch, not software and drive to -1,000,000 or whatever... make sure we hit it and reset!
-//					|MotorConfiguration.ReverseHardLimitSwitch
-// END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
+					|MotorConfiguration.ReverseHardLimitSwitch
 					|MotorConfiguration.ForwardSoftLimitSwitch
 					|MotorConfiguration.LimitPosition
 					|MotorConfiguration.LimitRate
@@ -181,29 +178,13 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
 			RANGE_MAX,                          // forwardLimit (placeholder)
 			RANGE_MIN,                          // reverseLimit
-// BEGIN WORKAROUND FOR SWITCHED HARDWARE CONNECTION
-/*
- *  	// NB: This is the correct value when hardware limit is fixed
-			LimitSwitchNormal.Disabled,         // forwardHardLimitSwitchNormal
-			null,                               // forwardHardLimitStopsMotor
+			null,                               // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
-			Boolean.TRUE,                       // reverseHardLimitStopsMotor
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
-		// NB: This is the workaround to leave switch alive, but not doing any behaviors
-*/
-			null,     // forwardHardLimitSwitchNormal
-			null,                              // forwardHardLimitSwitchResetsEncoder
-			null,     // reverseHardLimitSwitchNormal
-			null,                              // reverseHardLimitSwitchResetsEncoder
-// END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
 			RANGE_MAX.subtract(SAFETY_MARGIN),        // forwardSoftLimit - set to 4" below the end of the physical range 
-// BEGIN WORKROUND
-//			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
-//			RANGE_MIN.subtract(6), // Let us reach the limit switch even if calibration is off // NB: THIS IS CORRECT
-			RANGE_MIN, // temporary because hard limit is disabled
-// END WORKAROUND FOR SWITCHED HARDWARE CONNECTION
-			RateUOM.InchesPerSecond.create(5), // defaultRate
+			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
+			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ElevatorSRXMotorPercentageRate,      // percentageRate
 			new ICommandFactory<Motor>() { // defaultCommand 

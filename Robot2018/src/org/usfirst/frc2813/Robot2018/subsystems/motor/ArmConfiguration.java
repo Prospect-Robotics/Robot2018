@@ -30,11 +30,11 @@ public class ArmConfiguration extends MotorConfiguration{
 	
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = (36.0/30.0)*100.0;
-	private static final double MOTOR_TO_DRIVE = (36.0/30.0)*100.0;
+//	private static final double MOTOR_TO_DRIVE = (36.0/30.0)*100.0;
 	
 	// Motor constants
 	private static final double    MAX_RPMS_UNLOADED             = 18700;
-	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED / MOTOR_TO_DRIVE;
+	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED / SENSOR_TO_DRIVE;
 
 	// Hardware Inputs
 	private static final Length SHAFT_DIAMETER                = LengthUOM.Inches.create(0);
@@ -63,9 +63,10 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	// Software Settings
 	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0);
-	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(180); // TBD
-	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(180); // TBD
-	
+	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(162); // TBD
+//	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(180); // TBD
+	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(90); // TBD
+
 	public static final Rate      ArmSRXDriveMaxRPM      = ArmSRXEncoderRPM.create(MAX_RPMS_UNLOADED_GEARED_DOWN);
 	public static final Rate      ArmSRXMotorMaxRPS      = ArmSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
 
@@ -79,7 +80,7 @@ public class ArmConfiguration extends MotorConfiguration{
 		System.out.println("[Software Settings]");
 		System.out.println("Range.............................{" + MINIMUM_POSITION_DEGREES + ".." + MAXIMUM_POSITION_DEGREES + "}");
 		System.out.println("Default Speed (Motor)............." + DEFAULT_SPEED_DEGREES_PER_SECOND);
-		System.out.println("Default Speed (Encoder)..........." + DEFAULT_SPEED_DEGREES_PER_SECOND.multiply(MOTOR_TO_DRIVE));
+//		System.out.println("Default Speed (Encoder)..........." + DEFAULT_SPEED_DEGREES_PER_SECOND.multiply(MOTOR_TO_DRIVE));
 		System.out.println("Default Speed (SRX)..............." + DEFAULT_SPEED_DEGREES_PER_SECOND.convertTo(ArmSRXMotorPulseRate));
 		System.out.println();
 		System.out.println("[Robot Measurements]");
@@ -138,8 +139,8 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	public static List<PIDConfiguration> createPidConfigurations() {
 		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
-		pidConfigurations.add(new PIDConfiguration("Holding", TalonProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.8, 0.0, 0.0, 0.0));
-		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.75, 0.01, 40.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Holding", TalonProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.015, 0.0, 0.01, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.02, 0.0, 0.01, 20.0));
 		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", TalonProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", TalonProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		return Collections.unmodifiableList(pidConfigurations);
@@ -153,7 +154,6 @@ public class ArmConfiguration extends MotorConfiguration{
 					|MotorConfiguration.ControlPosition
 					|MotorConfiguration.ControlRate
 					|MotorConfiguration.Forward
-//					|MotorConfiguration.ForwardHardLimitSwitch
 					|MotorConfiguration.ForwardSoftLimitSwitch
 					|MotorConfiguration.LimitPosition
 					|MotorConfiguration.LimitRate
@@ -163,31 +163,30 @@ public class ArmConfiguration extends MotorConfiguration{
 					|MotorConfiguration.ReadRate
 					|MotorConfiguration.Reverse
 					|MotorConfiguration.ReverseHardLimitSwitch
-//					|MotorConfiguration.ReverseSoftLimitSwitch
 					|MotorConfiguration.DefaultRate
 					|MotorConfiguration.NeutralMode
 //					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
 					),
-			ArmDegrees,                  	    // nativeDisplayLengthUOM
-			ArmSRXMotorPulses,                  // nativeMotorLengthUOM
-			Boolean.FALSE,                      // motorPhaseIsReversed
-			Boolean.FALSE,                      // sensorPhaseIsReversed
-			ArmSRXMotorPulses,   	            // nativeSensorLengthUOM
-			ArmDegreesPerSecond,            // nativeDisplayRateUOM
-			ArmSRXMotorPulseRate,               // nativeMotorRateUOM
-			ArmSRXMotorPulseRate,               // nativeSensorRateUOM
-			ArmDegreesPerSecond.create(0),  // minimumForwardRate
-			ArmDegreesPerSecond.create(30), // maximumForwardRate (placeholder)
-			ArmDegreesPerSecond.create(0),  // minimumReverseRate
-			ArmDegreesPerSecond.create(30), // maximumReverseRate (placeholder)
-			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
-			ArmDegrees.create(180),        // forwardLimit (placeholder)
-			ArmDegrees.create(0),         // reverseLimit
-			null,                               // forwardHardLimitSwitchNormal
-			null,                               // forwardHardLimitSwitchResetsEncoder
-			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
-			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
-			ArmDegrees.create(180),        // forwardSoftLimit
+			ArmDegrees,                  	    	// nativeDisplayLengthUOM
+			ArmSRXMotorPulses,                  	// nativeMotorLengthUOM
+			Boolean.FALSE,                      	// motorPhaseIsReversed
+			Boolean.TRUE,                       	// sensorPhaseIsReversed
+			ArmSRXMotorPulses,   	            	// nativeSensorLengthUOM
+			ArmDegreesPerSecond,                	// nativeDisplayRateUOM
+			ArmSRXMotorPulseRate,               	// nativeMotorRateUOM
+			ArmSRXMotorPulseRate,               	// nativeSensorRateUOM
+			ArmDegreesPerSecond.create(0),  		// minimumForwardRate
+			ArmDegreesPerSecond.create(30), 		// maximumForwardRate (placeholder)
+			ArmDegreesPerSecond.create(0),  		// minimumReverseRate
+			ArmDegreesPerSecond.create(30), 		// maximumReverseRate (placeholder)
+			Double.valueOf(SENSOR_TO_DRIVE),    	// sensorToDriveScale (per JT - output 1:1 on Elevator)
+			ArmDegrees.create(180),        			// forwardLimit (placeholder)
+			ArmDegrees.create(0),         			// reverseLimit
+			null,                               	// forwardHardLimitSwitchNormal
+			null,                               	// forwardHardLimitSwitchResetsEncoder
+			LimitSwitchNormal.NormallyOpen,     	// reverseHardLimitSwitchNormal
+			Boolean.TRUE,                       	// reverseHardLimitSwitchResetsEncoder
+			ArmDegrees.create(180),        			// forwardSoftLimit
 			null,                               // reverseSoftLimit
 			DEFAULT_SPEED_DEGREES_PER_SECOND, // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode

@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonPID;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
+import org.usfirst.frc2813.logging.LogLevel;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -191,17 +192,17 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Optionally reported to the log here.
 	 */
 	protected final boolean changeState(MotorState proposedState) {
-		Logger.formatDebug("%s Changing state from %s to %s.", this, currentState, proposedState);
+		Logger.printFormat(LogType.DEBUG, "%s Changing state from %s to %s.", this, currentState, proposedState);
 		
 		// Check that the state transition is legal before we do anything.
 		if(!isStateTransitionAllowed(proposedState)) {
-			Logger.formatWarning("%s state transition disallowed.", this);
+			Logger.printFormat(LogType.WARNING, "%s state transition disallowed.", this);
 			return false;
 		}
 
 		// Execute the transition
 		if(!executeTransition(proposedState)) {
-			Logger.formatWarning("%s state transition failed.", this);
+			Logger.printFormat(LogType.WARNING, "%s state transition failed.", this);
 			return false;
 		}
 		
@@ -235,20 +236,24 @@ public abstract class AbstractMotorController implements IMotorController {
 	// Returns true if we zeroed and are now holding position at zero
 	protected boolean autoZeroSensorPositionsIfNecessary() {
 		boolean resetEncoders = false;
+/*
+NB: This is doing strange things.  
+
 		if (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) && configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
 			if(!readPosition().equals(configuration.getForwardLimit())) {
-				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardSoftLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardSoftLimit()));
+				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
+				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
 			}
 			resetEncoders = true; 
 		}
 		if (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) && configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
 			if(!readPosition().equals(configuration.getReverseLimit())) {
-				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getReverseSoftLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseSoftLimit()));
+				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getReverseLimit() + "."); 
+				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
 			}
 			resetEncoders = true; 
 		}
+*/		
 		return resetEncoders;
 	}
 

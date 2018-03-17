@@ -12,6 +12,7 @@ public class MotorTesting extends MotorInstantCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		Robot.elevator.encoderRelativePositionTestingMode();
+		Robot.arm.encoderRelativePositionTestingMode();
+//		Robot.elevator.encoderRelativePositionTestingMode();
 	}
 }

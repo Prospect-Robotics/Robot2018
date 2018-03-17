@@ -47,11 +47,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
 	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
 	 */
-	public void driveForward(double distance) {
-		addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance));
+	public void driveForward(Length distance) {
+		addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
 	}
-	public void driveBackward(double distance) {
-		addSequential(new PIDAutoDrive(BACKWARD*driveSpeed, distance));
+	public void driveBackward(Length distance) {
+		addSequential(new PIDAutoDrive(BACKWARD*driveSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
 	}
 
 	public void turnLeft(double angle) {
@@ -88,18 +88,20 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	// arm control commands
 	public void dropCube() {
-		// TODO: should we delay between these?
-		// TODO: consider making this sequence a command
-		addSequential(new SpinIntake(Direction.OUT));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
-		addSequential(new SpinIntake(Direction.STOP));
+	}
+	public void shootCube() {
+		addSequential(new SpinIntake("SpinIntake DOWN", Direction.OUT));
+		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
+		addSequential(new SpinIntake("SpinIntake UP", Direction.STOP));
 	}
 	public void grabCube() {
 		// TODO: should we delay between these? Change order?
 		// TODO: consider making this pair a command for arm
-		addSequential(new SpinIntake(Direction.IN));
+		addSequential(new SpinIntake("SpinIntake(IN)", Direction.IN));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));
-		addSequential(new SpinIntake(Direction.STOP));
+		sleep(0.2);
+		addSequential(new SpinIntake("SpinIntake(STOP)", Direction.STOP));
 	}
 
 	public void sleep(double seconds) {

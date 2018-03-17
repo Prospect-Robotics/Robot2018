@@ -101,8 +101,8 @@ public class OI {
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
 //		new JoystickButton(buttonPanel, 3).whenPressed(new MotorMoveToPosition(elevator.getConfiguration().getReverseLimit()));
-		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake(Direction.OUT));
-		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake(Direction.IN));
+		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake("SpinIntake Out", Direction.OUT));
+		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake("SpinIntake In", Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
 		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
