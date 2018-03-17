@@ -268,7 +268,7 @@ public final class Motor extends GearheadsSubsystem {
 	 * @return true if state change occurred
 	 */
 	protected boolean changeState(MotorState proposedState) {
-		Logger.formatDebug("%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getState(), proposedState);
+		Logger.printFormat(LogType.DEBUG, "%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getState(), proposedState);
 		if (!encoderFunctional) {
 			controller.disable();
 			Logger.warning("encoder not functional. Refusing action.");

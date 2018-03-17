@@ -3,6 +3,9 @@ package org.usfirst.frc2813.logging;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
+import org.usfirst.frc2813.Robot2018.motor.MotorState;
+
 /**
  * 
  * @author Adrian Guerra
@@ -178,65 +181,4 @@ public class Logger {
 	public static void error(Object... objects) {
 		print(LogType.ERROR, objects);
 	}
-
-	/**
-	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
-	 * {@link LogType} of {@link LogType#ALWAYS ALWAYS}
-	 * 
-	 * @param format
-	 * @param objects
-	 * @see #printFormat(Logtype,String, Object...)
-	 */
-	public static void formatAlways(String format, Object... objects) {
-		printFormat(LogType.ALWAYS,format, objects);
-	}
-
-	/**
-	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
-	 * {@link LogType} of {@link LogType#DEBUG DEBUG}
-	 * 
-	 * @param format
-	 * @param objects
-	 * @see #printFormat(Logtype,String, Object...)
-	 */
-	public static void formatDebug(String format, Object... objects) {
-		printFormat(LogType.DEBUG,format, objects);
-	}
-
-	/**
-	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
-	 * {@link LogType} of {@link LogType#INFO INFO}
-	 * 
-	 * @param format
-	 * @param objects
-	 * @see #printFormat(Logtype,String, Object...)
-	 */
-	public static void formatInfo(String format, Object... objects) {
-		printFormat(LogType.INFO,format, objects);
-	}
-
-	/**
-	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
-	 * {@link LogType} of {@link LogType#WARNING WARNING}
-	 * 
-	 * @param format
-	 * @param objects
-	 * @see #printFormat(Logtype,String, Object...)
-	 */
-	public static void formatWarning(String format, Object... objects) {
-		printFormat(LogType.WARNING,format, objects);
-	}
-
-	/**
-	 * Version of {@link #printFormat(Logtype,String, Object...)} with a
-	 * {@link LogType} of {@link LogType#ERROR ERROR}
-	 * 
-	 * @param format
-	 * @param objects
-	 * @see #printFormat(Logtype,String, Object...)
-	 */
-	public static void formatError(String format, Object... objects) {
-		printFormat(LogType.ERROR,format, objects);
-	}
-
 }

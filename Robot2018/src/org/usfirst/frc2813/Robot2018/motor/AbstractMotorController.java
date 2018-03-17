@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonPID;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
+import org.usfirst.frc2813.logging.LogLevel;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -191,17 +192,17 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Optionally reported to the log here.
 	 */
 	protected final boolean changeState(MotorState proposedState) {
-		Logger.formatDebug("%s Changing state from %s to %s.", this, currentState, proposedState);
+		Logger.printFormat(LogType.DEBUG, "%s Changing state from %s to %s.", this, currentState, proposedState);
 		
 		// Check that the state transition is legal before we do anything.
 		if(!isStateTransitionAllowed(proposedState)) {
-			Logger.formatWarning("%s state transition disallowed.", this);
+			Logger.printFormat(LogType.WARNING, "%s state transition disallowed.", this);
 			return false;
 		}
 
 		// Execute the transition
 		if(!executeTransition(proposedState)) {
-			Logger.formatWarning("%s state transition failed.", this);
+			Logger.printFormat(LogType.WARNING, "%s state transition failed.", this);
 			return false;
 		}
 		
