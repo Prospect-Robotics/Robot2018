@@ -10,6 +10,8 @@
 
 
 package org.usfirst.frc2813.Robot2018.commands;
+import org.usfirst.frc2813.logging.Logger;
+
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
@@ -20,16 +22,22 @@ public class ToggleSolenoidGeneral extends InstantCommand {
 	/**
 	 * Switch the position of the intake pistons
 	 */
-	Solenoid input;
-	
+	private final Solenoid solenoid;
+
     public ToggleSolenoidGeneral(Solenoid solenoid) {
-    	super();
-    	input = solenoid;
+    	this.solenoid = solenoid;
     }
 
-    // Called just before this Command runs the first time
-    //@Override
-    protected void initialize() {
-    	input.set(!input.get());//.get is true if open, false if closed
+	//@Override
+	protected void initialize() {
+		super.initialize();
+        boolean old = solenoid.get();
+        Logger.info(this + " toggling " + solenoid + " from " + old + " to " + !old);
+        solenoid.set(!old);
+	}
+
+    public String toString() {
+        return "ToggleSolenoidGeneral(" + solenoid + ")";
     }
 }
+

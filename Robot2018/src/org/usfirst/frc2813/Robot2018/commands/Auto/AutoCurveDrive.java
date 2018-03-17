@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.Auto;
+package org.usfirst.frc2813.Robot2018.commands.auto;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;

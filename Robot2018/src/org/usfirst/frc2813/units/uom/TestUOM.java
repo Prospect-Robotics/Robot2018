@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.units.uom;
 
-import org.usfirst.frc2813.Robot2018.subsystems.ElevatorAxisConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 
 //import static org.junit.jupiter.api.Assertions.*;
 //import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class TestUOM {
 		try
 		{
 			@SuppressWarnings("unused")
-			LengthUOM x = ElevatorAxisConfiguration.ElevatorSRXEncoderRevolution; // Make sure Elevator's units are included.
+			LengthUOM x = ElevatorConfiguration.ElevatorSRXEncoderRevolution; // Make sure Elevator's units are included.
 			UOM.dumpUnitsOfMeasure();
 		} catch(Throwable t) {
 			t.printStackTrace();

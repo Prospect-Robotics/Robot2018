@@ -2,15 +2,15 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
+import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
-import org.usfirst.frc2813.Robot2018.commands.Arm.ArmMoveInDirection;
-import org.usfirst.frc2813.Robot2018.commands.Arm.SetJaws;
-import org.usfirst.frc2813.Robot2018.commands.Arm.SpinIntake;
-import org.usfirst.frc2813.Robot2018.commands.DriveTrain.OIDrive;
-import org.usfirst.frc2813.Robot2018.commands.DriveTrain.ResetEncoders;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorMoveInDirection;
-import org.usfirst.frc2813.Robot2018.commands.Elevator.ElevatorTesting;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorTesting;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleState;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 
@@ -86,31 +86,27 @@ public class OI {
 		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
 		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
-		
-		new JoystickButton(buttonPanel, 10).toggleWhenActive(new ElevatorTesting());
+
+		new JoystickButton(buttonPanel, 10).whenPressed(new MotorTesting(Robot.elevator));
 
 		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
 		elevatorUp = new JoystickButton(buttonPanel, 5);
-		elevatorUp.whileHeld(new ElevatorMoveInDirection(Direction.UP));
+		elevatorUp.whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
 		//elevatorDown.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
 		elevatorDown = new JoystickButton(buttonPanel, 4);
 		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-		elevatorDown.whileHeld(new ElevatorMoveInDirection(Direction.DOWN));
+		elevatorDown.whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
 		//elevatorUp.whenReleased(new ElevatorSetSpeed(0));
 		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
 
-//		new JoystickButton(buttonPanel, 3).whenPressed(new ElevatorMoveToPosition(Robot.elevator.getSensorAxisConfiguration().getReverseLimit()));
-		spinIntakeOut = new JoystickButton(buttonPanel, 2);
-		spinIntakeOut.whileHeld(new SpinIntake(Direction.OUT));
-		spinIntakeOut.whenReleased(new SpinIntake(Direction.OUT));
-		spinIntakeIn = new JoystickButton(buttonPanel, 1);
-		spinIntakeIn.whileHeld(new SpinIntake(Direction.IN));
-		spinIntakeIn.whenReleased(new SpinIntake(Direction.IN));
+//		new JoystickButton(buttonPanel, 3).whenPressed(new MotorMoveToPosition(elevator.getConfiguration().getReverseLimit()));
+		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake("SpinIntake Out", Direction.OUT));
+		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake("SpinIntake In", Direction.IN));
 		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
-		new JoystickButton(buttonPanel, 11).whileHeld(new ArmMoveInDirection(Direction.UP));
-		new JoystickButton(buttonPanel, 12).whileHeld(new ArmMoveInDirection(Direction.DOWN));
-		new JoystickButton(buttonPanel, 9).whenPressed(new SetJaws(Direction.OPEN));
+		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
+		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
+		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleState(Robot.jaws));
 
 		joystick1 = new Joystick(1);
 		joystick2 = new Joystick(2);

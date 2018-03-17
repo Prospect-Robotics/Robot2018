@@ -9,7 +9,7 @@ import java.util.Arrays;
  *
  */
 public class Logger {
-	private static LogLevel loggingLevel = LogLevel.ISSUE;
+	private static LogLevel loggingLevel = LogLevel.INFO;
 	private static ArrayList<String> knownClasses = new ArrayList<String>();
 
 	public static void setLoggingLevel(LogLevel level) {
@@ -71,8 +71,13 @@ public class Logger {
 			} else {
 				finalPrint += Arrays.deepToString(objects);
 			}
+            if (finalPrint.length() == 0) {
+                System.out.println("We got an empty trace string that we're about to print to the console. That's a bug.");
+                (new Throwable()).printStackTrace();
+                return;
+            }
+            System.out.println(finalPrint);
 		}
-		System.out.println(finalPrint);
 	}
 
 	/**

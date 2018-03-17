@@ -5,11 +5,14 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
-import org.usfirst.frc2813.Robot2018.subsystems.Arm;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
-import org.usfirst.frc2813.Robot2018.subsystems.Elevator;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
-import org.usfirst.frc2813.Robot2018.subsystems.Jaws;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.JawsConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.IntakeConfiguration;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -34,11 +37,12 @@ public class Robot extends TimedRobot {
 
 	public static OI oi;
 	public static DriveTrain driveTrain;
-	public static Elevator elevator;
-	public static Arm arm;
-	public static Jaws jaws;
+	public static Motor elevator;
+	public static Motor arm;
 	public static Intake intake;
+	public static Solenoid jaws;
 	public static UsbCamera camera;
+	public static Solenoid gearShifter;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -50,11 +54,11 @@ public class Robot extends TimedRobot {
 
 		RobotMap.init();
 		driveTrain = new DriveTrain();
-		elevator = new Elevator();
-		arm = new Arm();
-		jaws = new Jaws();
+		elevator = new Motor(new ElevatorConfiguration(), RobotMap.srxElevator);
+		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
 		intake = new Intake();
-
+		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
+		
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be
 		// constructed yet. Thus, their requires() statements may grab null
@@ -120,12 +124,14 @@ public class Robot extends TimedRobot {
 	}
 
 	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
-	private long lastPositionReport = System.currentTimeMillis();
+	private long DISPLAY_INTERVAL = 750;
+	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
 	private void dumpSubsystemStatusAtIntervals() {
-		if(System.currentTimeMillis() - lastPositionReport > 750) {
+		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
 			lastPositionReport = System.currentTimeMillis();
-			Robot.elevator.dumpState();
-			Robot.arm.dumpState();
+			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
+			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
+//			Logger.info("[[PERIODIC]] " + Robot.intake.getDiagnostics());
 		}
 	}
 	/**
@@ -135,5 +141,9 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		dumpSubsystemStatusAtIntervals();
+	}
+
+	public void robotPeriodic() {
+		// Complain no more!
 	}
 }

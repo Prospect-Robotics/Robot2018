@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.DriveTrain;
+package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 

@@ -14,9 +14,8 @@ public abstract class SubsystemBinary extends GearheadsSubsystem {
      * geometry and state. Override and call super. Note that
      * to change any of the defaults set here, call super first!
      */
-	public SubsystemBinary() {
-		// track state and change as required. Start in moving so initialize can halt
-        state = Direction.NEGATIVE;
+	public void initialize() {
+        state = getControllerState();
 	}
 
 	/**
@@ -40,4 +39,11 @@ public abstract class SubsystemBinary extends GearheadsSubsystem {
 		state = direction;
 		setControllerState(direction);
 	}
+	/*
+	 * Get the current state
+	 */
+	public Direction getState() {
+		return getControllerState();
+	}
+	
 }

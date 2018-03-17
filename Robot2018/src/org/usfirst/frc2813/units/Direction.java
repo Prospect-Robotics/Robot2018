@@ -27,9 +27,9 @@ public enum Direction{
 	REVERSE(Canonical.NEGATIVE),
 	
 	/** Alias for NEGATIVE */
-	IN(Canonical.NEGATIVE), // TODO: This should probably be reversed.
+	IN(Canonical.NEGATIVE),
 	/** Alias for POSITIVE */
-	OUT(Canonical.POSITIVE), // TODO: This should probably be reversed.
+	OUT(Canonical.POSITIVE),
 
 	/** Alias for POSITIVE */
 	CLOCKWISE(Canonical.POSITIVE),
@@ -51,13 +51,18 @@ public enum Direction{
 	/** Alias for NEGATIVE */
 	CLOSE(Canonical.NEGATIVE),
 
-	/** Alias for NEUTRAL */
-	CENTER(Canonical.NEUTRAL),
-	/** Alias for NEUTRAL */
-	STOP(Canonical.NEUTRAL),
+	/* Alias for POSITIVE */
 	ON(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	OFF(Canonical.NEGATIVE),
+
+	/* Alias for POSITIVE */
+	STOP(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	GO(Canonical.NEGATIVE),
+	
 	/** Alias for NEUTRAL */
-	OFF(Canonical.NEUTRAL);
+	CENTER(Canonical.NEUTRAL);
 	
 	
 	Canonical canonicalDirection;
@@ -115,5 +120,57 @@ public enum Direction{
 	 */
 	public boolean equals(Direction other) {
 		return other.canonicalDirection == this.canonicalDirection;
+	}
+	/*
+	 * If we know which value is the preferred logical inverse i.e. up -> down, return it.
+	 * Some cases are ambiguous but the idea is clearer debug messages and behaving logically.  
+	 * Otherwise returns the canonical value for the inverse.
+	 * Neutral directions always return themselves.
+	 */
+	public Direction getInverse() {
+		// No logical inverses for neutral
+		if(canonicalDirection == Canonical.NEUTRAL) {
+			return this;
+		}
+		
+		// NB: Default case of POSITIVE and NEGATIVE handled by fallthrough case
+		switch(this) {
+		case FORWARD:
+			return REVERSE;
+		case BACKWARD:
+			return FORWARD;
+		case REVERSE:
+			return FORWARD;
+		case IN:
+			return OUT;
+		case OUT:
+			return IN;
+		case CLOCKWISE:
+			return COUNTERCLOCKWISE;
+		case COUNTERCLOCKWISE:
+			return CLOCKWISE;
+		case UP:
+			return DOWN;
+		case DOWN:
+			return UP;
+		case RIGHT:
+			return LEFT;
+		case LEFT:
+			return RIGHT;
+		case ON:
+			return OFF;
+		case OFF:
+			return ON;
+		case STOP:
+			return GO;
+		case GO:
+			return STOP;
+		default:
+			if(canonicalDirection == Canonical.POSITIVE) {
+				return NEGATIVE;
+			} else {
+				return POSITIVE;
+			}
+		}
 	}
 }
