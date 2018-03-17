@@ -33,7 +33,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	
 	private static final Length RANGE_MIN = LengthUOM.Inches.create(-6);
 	private static final Length SAFETY_MARGIN = LengthUOM.Inches.create(4);
-	private static final Length RANGE_MAX = LengthUOM.Inches.create(42);
+	private static final Length RANGE_MAX = LengthUOM.Inches.create(85);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
 	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
@@ -184,7 +184,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
 			RANGE_MAX.subtract(SAFETY_MARGIN),        // forwardSoftLimit - set to 4" below the end of the physical range 
 			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
-			RateUOM.InchesPerSecond.create(5), // defaultRate
+			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ElevatorSRXMotorPercentageRate,      // percentageRate
 			new ICommandFactory<Motor>() { // defaultCommand 
