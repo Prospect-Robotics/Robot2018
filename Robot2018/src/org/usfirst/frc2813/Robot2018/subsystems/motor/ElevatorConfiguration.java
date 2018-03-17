@@ -137,7 +137,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	public static List<PIDConfiguration> createPidConfigurations() {
 		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
 		pidConfigurations.add(new PIDConfiguration("Holding", TalonProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.8, 0.0, 0.0, 0.0));
-		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.75, 0.01, 40.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.45, 0.011, 45.0, 0.0)); 
 		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", TalonProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", TalonProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		return Collections.unmodifiableList(pidConfigurations);
