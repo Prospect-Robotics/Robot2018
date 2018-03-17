@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
@@ -36,40 +37,43 @@ public final class MotorUnitConversionAdapter implements IMotorController {
 	@Override
 	public boolean moveToPosition(Length position) {
 		Length sensorPosition = toSensorUnits(position);
-		Length scaledPosition = sensorPosition.multiply(configuration.getSensorToDriveScalingFactor());
+		Length scaledPosition = sensorPosition.divide(configuration.getSensorToDriveScalingFactor());
 		if(configuration.getMotorPhaseIsReversed() && !supportsMotorInversion()) {
 			scaledPosition = scaledPosition.multiply(-1);
 		}
 		if(configuration.getSensorPhaseIsReversed() && !supportsSensorInversion()) {
 			scaledPosition = scaledPosition.multiply(-1);
 		}
+//		Logger.info("moveToPosition(" + position + ") scaled to " + scaledPosition + ".");
 		return controller.moveToPosition(scaledPosition);
 	}
 
 	@Override
 	public boolean resetEncoderSensorPosition(Length position) {
 		Length sensorPosition = toSensorUnits(position);
-		Length scaledPosition = sensorPosition.multiply(configuration.getSensorToDriveScalingFactor());
+		Length scaledPosition = sensorPosition.divide(configuration.getSensorToDriveScalingFactor());
 		if(configuration.getMotorPhaseIsReversed() && !supportsMotorInversion()) {
 			scaledPosition = scaledPosition.multiply(-1);
 		}
 		if(configuration.getSensorPhaseIsReversed() && !supportsSensorInversion()) {
 			scaledPosition = scaledPosition.multiply(-1);
 		}
+//		Logger.info("resetEncoderSensorPosition(" + position + ") scaled to " + scaledPosition + ".");
 		return controller.resetEncoderSensorPosition(scaledPosition);
 	}
 
 	@Override
 	public boolean moveADistance(Length distance) {
-		Length sensorPosition = toSensorUnits(distance);
-		Length scaledPosition = sensorPosition.multiply(configuration.getSensorToDriveScalingFactor());
+		Length sensorDistance = toSensorUnits(distance);
+		Length scaledDistance = sensorDistance.divide(configuration.getSensorToDriveScalingFactor());
 		if(configuration.getMotorPhaseIsReversed() && !supportsMotorInversion()) {
-			scaledPosition = scaledPosition.multiply(-1);
+			scaledDistance = scaledDistance.multiply(-1);
 		}
 		if(configuration.getSensorPhaseIsReversed() && !supportsSensorInversion()) {
-			scaledPosition = scaledPosition.multiply(-1);
+			scaledDistance = scaledDistance.multiply(-1);
 		}
-		return controller.moveADistance(distance);
+//		Logger.info("moveADistance(" + distance + ") scaled to " + scaledDistance + ".");
+		return controller.moveADistance(scaledDistance);
 	}
 
 	@Override
@@ -82,6 +86,7 @@ public final class MotorUnitConversionAdapter implements IMotorController {
 		if(configuration.getSensorPhaseIsReversed() && !supportsSensorInversion()) {
 			scaledPosition = scaledPosition.multiply(-1);
 		}
+//		Logger.info("readPosition() scaled from " + sensorPosition + " to " + scaledPosition + ".");
 		return toSubsystemUnits(scaledPosition);
 	}
 
