@@ -117,7 +117,7 @@ public class RobotMap {
 		/*
 		 * Elevator subsystem
 		 */
-		srxElevator = new TalonSRX(10);		// CAN bus slot 10
+		srxElevator = new TalonSRX(10);		// CAN bus slot 10 (Talon is on the Starboard side)
 
 		//  TODO:  Add better comments about port numbering
 		//  In the 2018 robot, we have motor controllers mounted on each side of the robot (Port and Starboard)
@@ -129,6 +129,16 @@ public class RobotMap {
 		// elevator carriage, so both controllers are on the same side of the robot (ports 5 and 6)
 		// Note:  all of the VictorSPX controllers are under CAN bus control, so we use 1-based addressing, reserving
 		// port 0 on the CAN bus for new controllers / uninitialized controllers
+		/*
+		 * A note on Following:
+		 * The elevator is controlled by one TalonSRX motor controller with four VictorSPX motor controllers following.
+		 * Typically, when you have motors on opposite sides of the robot, the motor on the far side will need to spin
+		 * in the opposite direction of the motor on the close side.
+		 * We have had issues getting both following and setInverted to work.  Rather than trying to debug this, the
+		 * ROBOT HAS BEEN WIRED SO THAT THE MOTORS ON THE PORT SIDE ARE OPPOSITE OF THE MOTORS ON THE STARBOARD SIDE.
+		 * Therefore, we don't need to setInverted on the far side motors, but need to be very careful to ensure
+		 * that the physical wiring is correct! 
+		 */
 		elevatorSpeedControllerPort = new VictorSPX(3);
 		elevatorSpeedControllerPort.set(ControlMode.Follower, srxElevator.getDeviceID());
 		elevatorSpeedControllerPort.setInverted(false);	// Motors on the Port side spin forward
