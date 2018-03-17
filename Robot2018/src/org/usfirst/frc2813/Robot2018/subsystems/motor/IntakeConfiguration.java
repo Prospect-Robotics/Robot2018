@@ -12,7 +12,10 @@ import org.usfirst.frc2813.units.values.Rate;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 
 import edu.wpi.first.wpilibj.command.Command;
-
+/**
+ * This class not used - switched back to WPI subsystem and command
+ *
+ */
 public class IntakeConfiguration extends MotorConfiguration {
 
 	// Victor constants
