@@ -3,6 +3,9 @@ package org.usfirst.frc2813.logging;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
+import org.usfirst.frc2813.Robot2018.motor.MotorState;
+
 /**
  * 
  * @author Adrian Guerra
