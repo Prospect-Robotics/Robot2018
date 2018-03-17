@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.logging.Logger;
+import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
@@ -28,7 +29,13 @@ public class MotorWaitForPosition extends MotorCommand {
 
 	@Override
 	protected boolean isFinished() {
-		return motor.getState().getOperation() != MotorOperation.MOVING_TO_POSITION;
+		if (motor.getState().getOperation() != MotorOperation.MOVING_TO_POSITION) {
+			return true;
+		}
+		if (motor.getState().getDirection() == Direction.UP) {
+			return motor.readPosition().getValue() > motor.getPosition().getValue();
+		}
+		return motor.readPosition().getValue() < motor.getPosition().getValue();
 	}
 
     public String toString() {

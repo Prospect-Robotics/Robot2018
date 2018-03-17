@@ -140,14 +140,14 @@ public class RobotMap {
 		 * that the physical wiring is correct! 
 		 */
 		elevatorSpeedControllerPort = new VictorSPX(3);
-		elevatorSpeedControllerPort.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerPort.follow(srxElevator);
 		elevatorSpeedControllerPort.setInverted(false);	// Motors on the Port side spin forward
 		elevatorSpeedControllerStarboard = new VictorSPX(9);
-		elevatorSpeedControllerStarboard.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerStarboard.follow(srxElevator);
 		elevatorSpeedControllerStarboard.setInverted(false);	// Motors on the Starboard side spin backward
 
 		elevatorSpeedControllerPortFollow = new VictorSPX(4);
-		elevatorSpeedControllerPortFollow.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerPortFollow.follow(srxElevator);
 		elevatorSpeedControllerPortFollow.setInverted(false);
 
 		/*
