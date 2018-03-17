@@ -294,7 +294,7 @@ public final class Motor extends GearheadsSubsystem {
 
 		// See if there was any translation and report on the alterations (units typically)
 		if(!getControllerState().equals(proposedState)) {
-			Logger.info(this + " - Translation Occurred [Motor: " + getState() + " Controller: " + getControllerState()); 
+			Logger.info(this + " - Translation Occurred [Target: " + proposedState + " Controller: " + getControllerState()); 
 		}
 		
 		Logger.debug(this + " state transition complete.  old: " + getState() + " status: " + proposedState + ".");
