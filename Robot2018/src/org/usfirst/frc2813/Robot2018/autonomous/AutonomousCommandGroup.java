@@ -27,8 +27,8 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
-	private static final int FORWARD = -1;
-	private static final int BACKWARD = 1;
+	private static final int FORWARD = 1;
+	private static final int BACKWARD = -1;
 	private double driveSpeed = 1;
 	private double turnSpeed = 0.25;
 	//private double curveSpeed = 0.4;
@@ -42,16 +42,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void setDriveSpeed(double speed) { driveSpeed=speed; }
 	public void setTurnSpeed(double speed) { turnSpeed=speed; }
 
-	/*
+	/**
 	 * A note on Encoders and the sign of distance:
 	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
-	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
+	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS")
 	 */
 	public void driveForward(Length distance) {
 		addSequential(new PIDAutoDrive(FORWARD*driveSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
 	}
 	public void driveBackward(Length distance) {
-		addSequential(new PIDAutoDrive(BACKWARD*driveSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
+		driveForward(distance.getUOM().create(distance.getValue() * -1));
 	}
 
 	public void turnLeft(double angle) {
@@ -96,8 +96,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 		addSequential(new SpinIntake("SpinIntake UP", Direction.STOP));
 	}
 	public void grabCube() {
-		// TODO: should we delay between these? Change order?
-		// TODO: consider making this pair a command for arm
 		addSequential(new SpinIntake("SpinIntake(IN)", Direction.IN));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));
 		sleep(0.2);
