@@ -124,9 +124,10 @@ public class Robot extends TimedRobot {
 	}
 
 	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
-	private long lastPositionReport = System.currentTimeMillis() - 2000;
+	private long DISPLAY_INTERVAL = 750;
+	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
 	private void dumpSubsystemStatusAtIntervals() {
-		if(System.currentTimeMillis() - lastPositionReport >= 2000) {
+		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
 			lastPositionReport = System.currentTimeMillis();
 			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
 			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
