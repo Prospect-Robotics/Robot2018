@@ -130,14 +130,14 @@ public class RobotMap {
 		// Note:  all of the VictorSPX controllers are under CAN bus control, so we use 1-based addressing, reserving
 		// port 0 on the CAN bus for new controllers / uninitialized controllers
 		elevatorSpeedControllerPort = new VictorSPX(3);
-		elevatorSpeedControllerPort.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerPort.follow(srxElevator);
 		elevatorSpeedControllerPort.setInverted(false);	// Motors on the Port side spin forward
 		elevatorSpeedControllerStarboard = new VictorSPX(9);
-		elevatorSpeedControllerStarboard.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerStarboard.follow(srxElevator);
 		elevatorSpeedControllerStarboard.setInverted(false);	// Motors on the Starboard side spin backward
 
 		elevatorSpeedControllerPortFollow = new VictorSPX(4);
-		elevatorSpeedControllerPortFollow.set(ControlMode.Follower, srxElevator.getDeviceID());
+		elevatorSpeedControllerPortFollow.follow(srxElevator);
 		elevatorSpeedControllerPortFollow.setInverted(false);
 
 		/*
