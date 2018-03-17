@@ -9,6 +9,7 @@ import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToPosition;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForPosition;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.units.Direction;
@@ -91,6 +92,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 	public void armMoveToPosition(Length position) {
 		addSequential(new MotorMoveToPosition(Robot.arm, position));
+	}
+	public void waitForElevator() {
+		addSequential(new MotorWaitForPosition(Robot.elevator));
 	}
 
 	// arm control commands

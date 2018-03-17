@@ -89,7 +89,7 @@ public class AutonomousCommandGroupGenerator {
 	
 	private void deliverCubeRoutine(Target target) {
 		if (target == Target.SCALE) {
-			// FIXME! wait for elevator to reach height here!
+			autoCmdList.waitForElevator();
 		}
 		autoCmdList.driveForward(LengthUOM.Feet.create(2));
 		autoCmdList.dropCube();
