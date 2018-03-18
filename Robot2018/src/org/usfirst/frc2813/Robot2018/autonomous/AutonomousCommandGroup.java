@@ -27,9 +27,9 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
-	private final double driveSpeed = 1;
-	private final double turnSpeed = 0.25;
-	private final double curveSpeed = 0.4;
+	private double driveSpeed = 1;
+	private double turnSpeed = 0.25;
+	private double curveSpeed = 0.4;
 
 	// FIXME! what until type? What values should these be?
 	private static final Length armPositionLevel = LengthUOM.Inches.create(12);
@@ -45,6 +45,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	// track state
 	public void setDriveSpeed(double speed) { driveSpeed=speed; }
 	public void setTurnSpeed(double speed) { turnSpeed=speed; }
+	public void setCurveSpeed(double speed) { curveSpeed=speed; }
 
 	/**
 	 * A note on Encoders and the sign of distance:
