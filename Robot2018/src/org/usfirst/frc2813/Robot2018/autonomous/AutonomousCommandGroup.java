@@ -8,8 +8,8 @@ import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToPosition;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForPosition;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPosition;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.logging.Logger;
@@ -90,24 +90,25 @@ public class AutonomousCommandGroup extends CommandGroup {
 	//elevator commands - FIXME! these commands return before they
 	//reach the desired elevator position
 	public void elevatorMoveToPosition(Length position) {
-		addSequential(new MotorMoveToPosition(Robot.elevator, position));
+		addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position));
 	}
 	public void lowerElevator() {
 		elevatorMoveToPosition(LengthUOM.Inches.create(0));
 	}
 	public void armMoveToPosition(Length position) {
-		addSequential(new MotorMoveToPosition(Robot.arm, position));
+		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, position));
 	}
 	public void waitForElevator() {
-		addSequential(new MotorWaitForPosition(Robot.elevator));
+		// Wait for Elevator to reach it's destiniation to within +/- one inch.
+		addSequential(new MotorWaitForTargetPosition(Robot.elevator, LengthUOM.Inches.create(1)));
 	}
 
 	// arm control commands
 	public void levelArm() {
-		addSequential(new MotorMoveToPosition(Robot.arm, armPositionLevel));
+		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armPositionLevel));
 	}
 	public void raiseArm() {
-		addSequential(new MotorMoveToPosition(Robot.arm, armPositionHigh));
+		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armPositionHigh));
 	}
 	private void openJaws() {
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));		

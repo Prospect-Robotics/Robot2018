@@ -24,35 +24,13 @@ import edu.wpi.first.wpilibj.command.Command;
  * itself and handle all conversions, scaling, formatting, limits, validation, etc... automatically with
  * the minimal amount of data specified.
  */
-public class MotorConfiguration {
+public class MotorConfiguration implements IMotorConfiguration {
 	
 	// Common state
 	private final String name;
 	// Capabilities
 	private final int capabilities;
 	
-	//     Capabilities
-	public static final int ControlDirection                    = 1 <<   0;
-	public static final int ControlPosition                     = 1 <<   1;
-	public static final int ControlRate                         = 1 <<   2;
-	public static final int Forward                             = 1 <<   3;
-	public static final int ForwardHardLimitSwitch              = 1 <<   4;
-	public static final int ForwardSoftLimitSwitch              = 1 <<   5;
-	public static final int LimitPosition                       = 1 <<   6;
-	public static final int LimitRate                           = 1 <<   7;
-	public static final int SensorToDriveScale                  = 1 <<   8;
-	public static final int ReadDirection                       = 1 <<   9;
-	public static final int ReadPosition                        = 1 <<  10;
-	public static final int ReadRate                            = 1 <<  11;
-	public static final int Reverse                             = 1 <<  12;
-	public static final int ReverseHardLimitSwitch              = 1 <<  13;
-	public static final int ReverseSoftLimitSwitch              = 1 <<  14;
-	public static final int DefaultRate                         = 1 <<  15;
-	public static final int NeutralMode                         = 1 <<  16;
-	public static final int Disconnected                        = 1 <<  31;
-
-	public static final int MAX_CAPABILITY = 31;
-
 	public static String getCapabilityName(int capability) {
         switch(capability) {
         case ControlDirection       : return "ControlDirection";
@@ -81,6 +59,10 @@ public class MotorConfiguration {
 	/*
 	 * Get the name of the axis
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getName()
+	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -88,6 +70,10 @@ public class MotorConfiguration {
 	/*
 	 * Find out if a capability is supported
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#has(long)
+	 */
+	@Override
 	public boolean has(long capability) {
 		return hasAll(capability);
 	}
@@ -95,6 +81,10 @@ public class MotorConfiguration {
 	/*
 	 * Find out if a capability is supported
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getCapabilities()
+	 */
+	@Override
 	public long getCapabilities() {
 		return this.capabilities;
 	}
@@ -102,12 +92,20 @@ public class MotorConfiguration {
 	/*
 	 * Find out if all capabilities are supported
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#hasAll(long)
+	 */
+	@Override
 	public boolean hasAll(long capabilities) {
 		return (this.capabilities & capabilities) == capabilities;
 	}
 	/*
 	 * Find out if any capabilities are supported
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#hasAny(long)
+	 */
+	@Override
 	public boolean hasAny(long capabilities) {
 		return (this.capabilities & capabilities) != 0;
 	}
@@ -115,6 +113,10 @@ public class MotorConfiguration {
 	/*
 	 * Assert that a capability is supported
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#requireAll(long)
+	 */
+	@Override
 	public void requireAll(long capabilities) {
 		if(!hasAll(capabilities)) {
 			// TODO: Add friendly string representations?
@@ -125,6 +127,10 @@ public class MotorConfiguration {
 	/*
 	 * Assert that a capability is supported
 	 */
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#requireAny(long)
+	 */
+	@Override
 	public void requireAny(long capabilities) {
 		if(!hasAny(capabilities)) {
 			// TODO: Add friendly string representations?
@@ -136,6 +142,10 @@ public class MotorConfiguration {
 	 * If ControlPosition or ControlDirection is supported, return the native units of measure for motor position/distance
 	 */
 	private final LengthUOM nativeMotorLengthUOM;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNativeMotorLengthUOM()
+	 */
+	@Override
 	public final LengthUOM getNativeMotorLengthUOM() {
 		requireAny(ControlPosition|ControlDirection);
 		return nativeMotorLengthUOM;
@@ -145,6 +155,10 @@ public class MotorConfiguration {
 	 * If ReadPosition is supported, return the native units of measure for sensor position/distance
 	 */
 	private final LengthUOM nativeSensorLengthUOM;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNativeSensorLengthUOM()
+	 */
+	@Override
 	public final LengthUOM getNativeSensorLengthUOM() {
 		requireAll(ReadPosition);
 		return nativeSensorLengthUOM;
@@ -154,6 +168,10 @@ public class MotorConfiguration {
 	 * If SensorToMotorScale is supported, return the scaling factor to convert from motor to sensor position/rate
 	 */
 	private final Double sensorToDriveScalingFactor;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getSensorToDriveScalingFactor()
+	 */
+	@Override
 	public final double getSensorToDriveScalingFactor() {
 		requireAll(SensorToDriveScale);
 		return sensorToDriveScalingFactor;
@@ -163,6 +181,10 @@ public class MotorConfiguration {
 	 * If ReadRate is supported, return the native display units for user interaction
 	 */
 	private final RateUOM nativeDisplayRateUOM;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNativeDisplayRateUOM()
+	 */
+	@Override
 	public final RateUOM getNativeDisplayRateUOM() {
 		requireAll(ReadRate);
 		return nativeDisplayRateUOM;
@@ -171,6 +193,10 @@ public class MotorConfiguration {
 	 * If ControlRate, return the motor native units for control
 	 */
 	private final RateUOM nativeMotorRateUOM; 
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNativeMotorRateUOM()
+	 */
+	@Override
 	public final RateUOM getNativeMotorRateUOM() {
 		requireAny(ControlRate);
 		return nativeMotorRateUOM;
@@ -179,6 +205,10 @@ public class MotorConfiguration {
 	 * If ReadRate is supported, return the native sensor units 
 	 */
 	private final RateUOM nativeSensorRateUOM;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNativeSensorRateUOM()
+	 */
+	@Override
 	public final RateUOM getNativeSensorRateUOM() {
 		requireAll(ReadRate);
 		return nativeSensorRateUOM;
@@ -187,6 +217,10 @@ public class MotorConfiguration {
 	 * If Forward and ControlRate and LimitRate are supported, return the minimum forward rate allowed 
 	 */
 	private final Rate minimumForwardRate;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getMinimumForwardRate()
+	 */
+	@Override
 	public final Rate getMinimumForwardRate() {
 		requireAll(Forward|ControlRate|LimitRate);
 		return minimumForwardRate;
@@ -195,6 +229,10 @@ public class MotorConfiguration {
 	 * If Forward and ControlRate and LimitRate are supported, return the maximum forward rate allowed 
 	 */
 	private final Rate maximumForwardRate;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getMaximumForwardRate()
+	 */
+	@Override
 	public final Rate getMaximumForwardRate() {
 		requireAll(Forward|ControlRate|LimitRate);
 		return maximumForwardRate;
@@ -203,6 +241,10 @@ public class MotorConfiguration {
 	 * If Reverse and ControlRate and LimitRate are supported, return the minimum reverse rate allowed. 
 	 */
 	private final Rate minimumReverseRate; 
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getMinimumReverseRate()
+	 */
+	@Override
 	public Rate getMinimumReverseRate() {
 		requireAll(Reverse|ControlRate|LimitRate);
 		return minimumReverseRate;
@@ -211,6 +253,10 @@ public class MotorConfiguration {
 	 * If Reverse and ControlRate and LimitRate are supported, return the minimum reverse rate allowed. 
 	 */
 	private final Rate maximumReverseRate;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getMaximumReverseRate()
+	 */
+	@Override
 	public Rate getMaximumReverseRate() {
 		requireAll(Reverse|ControlRate|LimitRate);
 		return maximumReverseRate;
@@ -219,6 +265,10 @@ public class MotorConfiguration {
 	 * If ControlRate or LimitRate are supported, return the a unit of measure representing 1% of maximum output 
 	 */
 	private final RateUOM percentageRateUOM;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getPercentageRateUOM()
+	 */
+	@Override
 	public RateUOM getPercentageRateUOM() {
 		requireAny(ControlRate|LimitRate);
 		return percentageRateUOM;
@@ -227,6 +277,10 @@ public class MotorConfiguration {
 	 * If ControlRate is supported, return the default rate. 
 	 */
 	private final Rate defaultRate;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getDefaultRate()
+	 */
+	@Override
 	public Rate getDefaultRate() {
 		requireAll(ControlRate);
 		return defaultRate;
@@ -236,6 +290,10 @@ public class MotorConfiguration {
 	 * If ReadRate or ReadPosition are supported, return whether the sensor is reversed
 	 */
 	private final Boolean sensorPhaseIsReversed;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getSensorPhaseIsReversed()
+	 */
+	@Override
 	public final boolean getSensorPhaseIsReversed() {
 		// NB: do not require Reverse, motor could be reversed even when we don't use reverse
 		requireAny(ReadRate|ReadPosition);
@@ -245,6 +303,10 @@ public class MotorConfiguration {
 	 * If ControlRate or ControlPosition are supported, return whether the motor is reversed
 	 */	
 	private final Boolean motorPhaseIsReversed;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getMotorPhaseIsReversed()
+	 */
+	@Override
 	public final boolean getMotorPhaseIsReversed() {
 		// NB: do not require Reverse, motor could be reversed even when we don't use reverse
 		requireAny(ControlRate|ControlPosition|ControlDirection);
@@ -255,6 +317,10 @@ public class MotorConfiguration {
 	 * If ReadPosition is supported, return the native display units for length/position
 	 */
 	private final LengthUOM nativeDisplayLengthUOM;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNativeDisplayLengthUOM()
+	 */
+	@Override
 	public final LengthUOM getNativeDisplayLengthUOM() {
 		requireAny(ReadPosition);
 		return nativeDisplayLengthUOM;
@@ -264,6 +330,10 @@ public class MotorConfiguration {
 	 * If Forward and ControlPosition and LimitPosition, return the forward limit
 	 */
 	private final Length forwardLimit;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getForwardLimit()
+	 */
+	@Override
 	public final Length getForwardLimit() {
 		requireAll(Forward|ControlPosition|LimitPosition);
 		return forwardLimit;
@@ -273,6 +343,10 @@ public class MotorConfiguration {
 	 * If Reverse and ControlPosition and LimitPosition, return the forward limit
 	 */
 	private final Length reverseLimit;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getReverseLimit()
+	 */
+	@Override
 	public final Length getReverseLimit() {
 		requireAll(Reverse|ControlPosition|LimitPosition);
 		return reverseLimit;
@@ -281,6 +355,10 @@ public class MotorConfiguration {
 	 * If Forward and ForwardHardLimitSwitch return forwardHardLimitSwitchResetsEncoder 
 	 */
 	private final Boolean forwardHardLimitSwitchResetsEncoder;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getForwardHardLimitSwitchResetsEncoder()
+	 */
+	@Override
 	public final boolean getForwardHardLimitSwitchResetsEncoder() {
 		requireAll(Forward|ForwardHardLimitSwitch);
 		return forwardHardLimitSwitchResetsEncoder;
@@ -289,6 +367,10 @@ public class MotorConfiguration {
 	 * If Reverse and Reverse and ReverseHardLimitSwitch return reverseHardLimitSwitchResetsEncoder, 
 	 */
 	private final Boolean reverseHardLimitSwitchResetsEncoder;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getReverseHardLimitSwitchResetsEncoder()
+	 */
+	@Override
 	public final boolean getReverseHardLimitSwitchResetsEncoder() {
 		requireAll(Reverse|ReverseHardLimitSwitch);
 		return reverseHardLimitSwitchResetsEncoder;
@@ -298,6 +380,10 @@ public class MotorConfiguration {
 	 * If Forward and ForwardHardLimitSwitch, return the behavior for forward hard limit switch
 	 */
 	private final LimitSwitchNormal forwardHardLimitSwitchNormal;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getForwardHardLimitSwitchNormal()
+	 */
+	@Override
 	public final LimitSwitchNormal getForwardHardLimitSwitchNormal() {
 		requireAll(Forward|ForwardHardLimitSwitch);
 		return forwardHardLimitSwitchNormal;
@@ -306,6 +392,10 @@ public class MotorConfiguration {
 	 * If Reverse and ReverseHardLimitSwitch, return the behavior for forward hard limit switch
 	 */
 	private final LimitSwitchNormal reverseHardLimitSwitchNormal;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getReverseHardLimitSwitchNormal()
+	 */
+	@Override
 	public final LimitSwitchNormal getReverseHardLimitSwitchNormal() {
 		requireAll(Reverse|ReverseHardLimitSwitch);
 		return reverseHardLimitSwitchNormal;
@@ -314,6 +404,10 @@ public class MotorConfiguration {
 	 * If Forward and ForwardSoftLimitSwitch, return forward soft limit 
 	 */
 	private final Length forwardSoftLimit;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getForwardSoftLimit()
+	 */
+	@Override
 	public final Length getForwardSoftLimit() {
 		requireAll(Forward|ForwardSoftLimitSwitch);
 		return forwardSoftLimit;
@@ -322,21 +416,37 @@ public class MotorConfiguration {
 	 * If Reverse and ReverseSoftLimitSwitch, return reverse soft limit 
 	 */
 	private final Length reverseSoftLimit;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getReverseSoftLimit()
+	 */
+	@Override
 	public final Length getReverseSoftLimit() {
 		requireAll(Reverse|ReverseSoftLimitSwitch);
 		return reverseSoftLimit;
 	}
 	private final com.ctre.phoenix.motorcontrol.NeutralMode neutralMode;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getNeutralMode()
+	 */
+	@Override
 	public final NeutralMode getNeutralMode() {
 		requireAll(NeutralMode);
 		requireAny(ControlRate|ControlPosition);
 		return neutralMode;
 	}
 	private final ICommandFactory<Motor> defaultCommandFactory;
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getDefaultCommandFactory()
+	 */
+	@Override
 	public final ICommandFactory<Motor> getDefaultCommandFactory() {
 		return defaultCommandFactory;
 	}
 	private final List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getPIDConfigurations()
+	 */
+	@Override
 	public final List<PIDConfiguration> getPIDConfigurations() {
 		return Collections.unmodifiableList(pidConfigurations);
 	}
@@ -456,6 +566,10 @@ public class MotorConfiguration {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#validateConfiguration()
+	 */
+	@Override
 	public void validateConfiguration() {
 		validateCapabilityDependency(Forward, ControlDirection|ReadDirection, 0);
 		validateCapabilityDependency(Reverse, ControlDirection|ReadDirection, 0);
@@ -508,10 +622,18 @@ public class MotorConfiguration {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#toString()
+	 */
+	@Override
 	public String toString() {
 		return name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#dumpDescription()
+	 */
+	@Override
 	public void dumpDescription() {
 		System.out.println(getDescription());
 	}
@@ -524,6 +646,10 @@ public class MotorConfiguration {
 	private String describeValue(Value value, UOM alt) {
 		return (value != null ? (value + " (" + value.convertTo(alt) + ")") : null);
 	}
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getDescription()
+	 */
+	@Override
 	public String getDescription() {
 		StringBuffer buf = new StringBuffer();
 		buf

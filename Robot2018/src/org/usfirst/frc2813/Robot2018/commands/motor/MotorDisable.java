@@ -3,11 +3,11 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
-import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
+import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 
 /**
- * Disable elevator. Subsystem will quiesce.
+ * Disable motor. Subsystem will quiesce.
  */
 public class MotorDisable extends MotorInstantCommand {
 	public MotorDisable(Motor motor) {
@@ -26,7 +26,7 @@ public class MotorDisable extends MotorInstantCommand {
 	}
 
     public String toString() {
-        return "MotorDisable(" + motor + ")";
+        return getClass().getSimpleName() + "(" + motor + ")";
     }
 
 }
