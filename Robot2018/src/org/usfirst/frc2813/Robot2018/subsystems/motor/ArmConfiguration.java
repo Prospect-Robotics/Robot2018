@@ -71,7 +71,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	public static final Rate      ArmSRXMotorMaxRPS      = ArmSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
 
 	private static final Length    maxDistancePerMinute           = ArmSRXDriveMaxRPM.getLength(ArmSRXDriveMaxRPM.getTimeUOM().getValue());
-	private static final Length    maxDistancePerSecond           = ArmSRXMotorMaxRPS.getLength(ArmSRXMotorMaxRPS.getTimeUOM().getValue());
+//	private static final Length    maxDistancePerSecond           = ArmSRXMotorMaxRPS.getLength(ArmSRXMotorMaxRPS.getTimeUOM().getValue());
 	private static final LengthUOM OneSecondDistanceAtOnePercent  = new LengthUOM("minute-distance", "minute-distance", "minute-distance", LengthUOM.CanonicalLengthUOM, maxDistancePerMinute.getCanonicalValue()/100.0);
 	public static final RateUOM    ArmSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "% Arm");
 
@@ -117,6 +117,7 @@ public class ArmConfiguration extends MotorConfiguration{
 		System.out.println("[Conversion Table]");
 		System.out.println("Arm SRX Revolution..........." + ArmSRXEncoderRevolution.getValue());
 
+		@SuppressWarnings("rawtypes")
 		Iterator<UOM> i = UOM.allUnits.get(SystemOfMeasurement.Length).iterator();
 		while(i.hasNext()) {
 			System.out.println("                                  " + ArmSRXEncoderRevolution.getValue().convertTo((LengthUOM)i.next()));

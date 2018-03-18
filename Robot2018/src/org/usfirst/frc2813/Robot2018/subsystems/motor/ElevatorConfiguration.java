@@ -65,7 +65,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	public static final Rate      ElevatorSRXMotorMaxRPS      = ElevatorSRXEncoderRPS.create(MAX_RPMS_UNLOADED_GEARED_DOWN / 60);
 
 	private static final Length    maxDistancePerMinute           = ElevatorSRXMotorMaxRPM.getLength(ElevatorSRXMotorMaxRPM.getTimeUOM().getValue());
-	private static final Length    maxDistancePerSecond           = ElevatorSRXMotorMaxRPS.getLength(ElevatorSRXMotorMaxRPS.getTimeUOM().getValue());
+//	private static final Length    maxDistancePerSecond           = ElevatorSRXMotorMaxRPS.getLength(ElevatorSRXMotorMaxRPS.getTimeUOM().getValue());
 	private static final LengthUOM OneSecondDistanceAtOnePercent  = new LengthUOM("minute-distance", "minute-distance", "minute-distance", LengthUOM.CanonicalLengthUOM, maxDistancePerMinute.getCanonicalValue()/100.0);
 	public static final RateUOM    ElevatorSRXMotorPercentageRate = new RateUOM(OneSecondDistanceAtOnePercent, TimeUOM.Minutes, RateUOM.CanonicalRateUOMForMovement, "% Elevator");
 
