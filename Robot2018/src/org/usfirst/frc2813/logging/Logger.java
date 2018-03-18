@@ -3,6 +3,8 @@ package org.usfirst.frc2813.logging;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * 
  * @author Adrian Guerra
@@ -52,8 +54,6 @@ public class Logger {
 		if (loggingLevel.showTrace) {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			System.out.println(Arrays.toString(trace));// TODO remove getStackTrace() from trace
-			// TODO remove 'org.usfirst.frc2813.Robot2018' from trace print to help
-			// readability
 		} else {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			for (int i = trace.length - 1; i > 0; i--) {
@@ -76,7 +76,7 @@ public class Logger {
                 (new Throwable()).printStackTrace();
                 return;
             }
-            System.out.println(finalPrint);
+            severity.level.print(finalPrint);
 		}
 	}
 
