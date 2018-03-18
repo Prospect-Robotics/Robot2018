@@ -25,14 +25,6 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length switchHeight = LengthUOM.Inches.create(24);
 
 	private int directionBias;  // used to share code between left/right
-	private static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
-	static {
-		Logger.info("Autonomous Position Selector Creation");
-		positionSelector.addDefault("LEFT", Direction.LEFT);
-		positionSelector.addObject("CENTER", Direction.CENTER);
-		positionSelector.addObject("RIGHT", Direction.RIGHT);
-		SmartDashboard.putData("Which position is the robot in?", positionSelector);
-	}
 
 	/**
 	 * Code to be run during the Autonomous 15 second period.
@@ -42,7 +34,7 @@ public class AutonomousCommandGroupGenerator {
 	 */
 	public AutonomousCommandGroupGenerator() {
 		// Read our location on the field
-		Direction position = positionSelector.getSelected();
+		Direction position = Robot.positionSelector.getSelected();
 
 		 // allows left->right and right->left to share code
 		directionBias = (position == Direction.LEFT) ? 1 : -1;

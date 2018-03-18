@@ -12,6 +12,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.JawsConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.logging.Logger;
+import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -20,6 +21,8 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -34,6 +37,7 @@ public class Robot extends TimedRobot {
 	public static AutonomousCommandGroup autonomousCommand;
 	public static AutonomousCommandGroupGenerator autoCmdGenerator;
 
+	public static SendableChooser<Direction> positionSelector;
 	public static OI oi;
 	public static DriveTrain driveTrain;
 	public static Motor elevator;
@@ -57,9 +61,8 @@ public class Robot extends TimedRobot {
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
 		intake = new Intake();
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
-		
-		autonomousCommand = new AutonomousCommandGroup();
-		autoCmdGenerator = new AutonomousCommandGroupGenerator();
+		positionSelector = RobotMap.positionSelector;
+		SmartDashboard.putData("Which position is the robot in?", positionSelector);
 		
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be
@@ -93,6 +96,9 @@ public class Robot extends TimedRobot {
 	//@Override
 	public void autonomousInit() {
 		Logger.info("Autonomous Init");
+		
+		autonomousCommand = new AutonomousCommandGroup();
+		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
 		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
 		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);

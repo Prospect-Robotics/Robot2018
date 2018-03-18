@@ -2,6 +2,9 @@
 
 package org.usfirst.frc2813.Robot2018;
 
+import org.usfirst.frc2813.logging.Logger;
+import org.usfirst.frc2813.units.Direction;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -14,6 +17,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
@@ -22,8 +27,22 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * floating around.
  */
 public class RobotMap {
-	// Read the state of the field pieces
+	/**
+	 *  This is the FIRST interface to read the state of the field pieces.
+	 */
 	public static GameData gameData;
+
+	/**
+	 *  This is the sendable choose we use to read the robot start position from
+	 *  the drive station.
+	 */
+	public static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
+	static {
+		Logger.info("Autonomous Position Selector Creation");
+		positionSelector.addDefault("LEFT", Direction.LEFT);
+		positionSelector.addObject("CENTER", Direction.CENTER);
+		positionSelector.addObject("RIGHT", Direction.RIGHT);
+	}
 
 	/*
 	 *  Drive Train Subsystem
