@@ -62,6 +62,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	public VictorSPX(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX spx) {
 		super(configuration);
 		this.spx = spx;
+		initialize();
 	}
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -150,6 +151,13 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toMotorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+			break;
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			newControlMode = ControlMode.Velocity;
+			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
+			newPIDIndex    = PID_INDEX_FOR_MOVE;
+			newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+		default:
 			break;
 		}
 		

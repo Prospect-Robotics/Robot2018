@@ -61,6 +61,7 @@ public class Robot extends TimedRobot {
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
 		intake = new Intake();
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
+
 		positionSelector = RobotMap.positionSelector;
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
 		

@@ -23,8 +23,8 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
 
-	protected IMotorState currentState = MotorStateFactory.createDisabled(this);
-	protected IMotorState previousState = MotorStateFactory.createDisabled(this);
+	protected IMotorState currentState;
+	protected IMotorState previousState;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
@@ -32,6 +32,11 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	protected AbstractMotorController(IMotorConfiguration configuration) {
 		this.configuration = configuration;
+	}
+	
+	protected void initialize() {
+		 currentState = MotorStateFactory.createDisabled(this);
+		 previousState = MotorStateFactory.createDisabled(this);
 	}
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -112,9 +117,13 @@ public abstract class AbstractMotorController implements IMotorController {
 	}
 	
 	@Override
-	public final boolean moveToRelativePosition(Direction direction, Length relativeDistance) {
-		// TODO - open loop move
-		return false;
+	public final boolean moveToRelativePosition(Direction targetDirection, Length targetRelativeDistance) {
+		return changeState(MotorStateFactory.createMovingToRelativePosition(this, targetDirection, targetRelativeDistance)); 
+	}
+
+	@Override
+	public boolean calibrateSensorInDirection(Direction targetDirection) {
+		return changeState(MotorStateFactory.createCalibrateSensorInDirection(this, targetDirection)); 
 	}
 
 	@Override
@@ -144,7 +153,7 @@ public abstract class AbstractMotorController implements IMotorController {
 
 	// Guards for state transitions, called by changeState
 	// IMPORTANT: Do not call directly	
-	protected boolean isStateTransitionAllowed(MotorState proposedState) {
+	protected boolean isStateTransitionAllowed(IMotorState proposedState) {
 		// Validate the state transition before we do anything
 		if (currentState.equals(proposedState) && proposedState.getOperation() != MotorOperation.DISABLED) {
 			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s to %s.", currentState, proposedState);
@@ -181,11 +190,31 @@ public abstract class AbstractMotorController implements IMotorController {
 				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
 			}
 			break;
+		case MOVING_TO_RELATIVE_POSITION:
+			if(!configuration.hasAll(IMotorConfiguration.ControlPosition)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
+			}
+			if(proposedState.getTargetDirection().isPositive() && !configuration.hasAll(IMotorConfiguration.Forward)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.Forward + " capability.  Refusing request for " + proposedState + ".");
+			}
+			if(proposedState.getTargetDirection().isNegative() && !configuration.hasAll(IMotorConfiguration.Reverse)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.Reverse + " capability.  Refusing request for " + proposedState + ".");
+			}
+			break;
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			if(!configuration.hasAll(IMotorConfiguration.ReadPosition)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ReadPosition + " capability.  Refusing request for " + proposedState + ".");
+			}
+			if(!configuration.hasAny(
+					proposedState.getTargetDirection().isPositive() 
+					? IMotorConfiguration.LocalForwardHardLimitSwitch|IMotorConfiguration.RemoteForwardHardLimitSwitch
+					: IMotorConfiguration.LocalReverseHardLimitSwitch|IMotorConfiguration.RemoteReverseHardLimitSwitch))
+			{
+				throw new UnsupportedOperationException(this + " does not have either a local or remote hard limit switch in the " + proposedState.getTargetDirection() + " direction.  Refusing request for " + proposedState + ".");
+			}
 		default:
 			break;
-		
 		}
-
 		return true;
 	}
 
@@ -193,24 +222,24 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * All changes to state are done here, and recorded here.
 	 * Optionally reported to the log here.
 	 */
-	protected final boolean changeState(MotorState proposedState) {
-		Logger.printFormat(LogType.DEBUG, "%s Changing state from %s to %s.", this, currentState, proposedState);
+	protected final boolean changeState(IMotorState motorState) {
+		Logger.printFormat(LogType.DEBUG, "%s Changing state from %s to %s.", this, currentState, motorState);
 		
 		// Check that the state transition is legal before we do anything.
-		if(!isStateTransitionAllowed(proposedState)) {
+		if(!isStateTransitionAllowed(motorState)) {
 			Logger.printFormat(LogType.WARNING, "%s state transition disallowed.", this);
 			return false;
 		}
 
 		// Execute the transition
-		if(!executeTransition(proposedState)) {
+		if(!executeTransition(motorState)) {
 			Logger.printFormat(LogType.WARNING, "%s state transition failed.", this);
 			return false;
 		}
 		
 		// Transition successful, save the state.
 		this.previousState = this.currentState;
-		this.currentState = proposedState;
+		this.currentState = motorState;
 		Logger.info(this + " transition complete: " + getDiagnostics());		
 		return true;
 	}
@@ -233,30 +262,6 @@ public abstract class AbstractMotorController implements IMotorController {
 					+ (configuration.has(IMotorConfiguration.LocalForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
 				)
 		);
-	}
-
-	// Returns true if we zeroed and are now holding position at zero
-	protected boolean autoZeroSensorPositionsIfNecessary() {
-		boolean resetEncoders = false;
-/*
-NB: This is doing strange things.  
-
-		if (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) && configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
-			if(!readPosition().equals(configuration.getForwardLimit())) {
-				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
-			}
-			resetEncoders = true; 
-		}
-		if (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) && configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
-			if(!readPosition().equals(configuration.getReverseLimit())) {
-				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getReverseLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
-			}
-			resetEncoders = true; 
-		}
-*/		
-		return resetEncoders;
 	}
 
 	@Override
@@ -317,5 +322,36 @@ NB: This is doing strange things.
 	
 	public String toString() {
 		return getName();
+	}
+
+	// Returns true if we zeroed and are now holding position at zero
+	protected boolean autoZeroSensorPositionsIfNecessary() {
+		boolean resetEncoders = false;
+/*
+NB: This is doing strange things.  
+
+		if (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) && configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
+			if(!readPosition().equals(configuration.getForwardLimit())) {
+				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
+				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
+			}
+			resetEncoders = true; 
+		}
+		if (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) && configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
+			if(!readPosition().equals(configuration.getReverseLimit())) {
+				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getReverseLimit() + "."); 
+				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
+			}
+			resetEncoders = true; 
+		}
+*/		
+		return resetEncoders;
+	}
+	/*
+	 * We will change behavior as we reach our target...
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#periodic()
+	 */
+	public void periodic() {
+		// ...
 	}
 }

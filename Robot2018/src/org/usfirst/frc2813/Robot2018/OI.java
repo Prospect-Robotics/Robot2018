@@ -53,13 +53,7 @@ public class OI {
 	// until it is finished as determined by it's isFinished method.
 	// button.whenReleased(new ExampleCommand());
 
-	public JoystickButton trigger;
 	public Joystick joystick1, joystick2, buttonPanel;
-	public JoystickButton spinIntakeIn, spinIntakeOut,
-	bottomElevatorToLimitSwitch, elevatorUp, elevatorDown, elevatorRatchet,
-	shiftGears, climbingBar,
-	armUpToLimitSwitch, armDownToLimitSwitch,
-	armMoveUp, armMoveDown, armSolenoid;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 
 	public OI() {
@@ -82,50 +76,26 @@ public class OI {
 		 */
 		buttonPanel = new Joystick(0);
 
-		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
+		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake("SpinIntake In", Direction.IN));
+		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake("SpinIntake Out", Direction.OUT));
+		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
+		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
 		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
-
+		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
+		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleState(Robot.jaws));
 		new JoystickButton(buttonPanel, 10).whenPressed(new MotorTesting(Robot.elevator));
-
-		//elevatorDown.whenPressed(new PrintButtonStatus(true, false));
-		elevatorUp = new JoystickButton(buttonPanel, 5);
-		elevatorUp.whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
-		//elevatorDown.whenReleased(new ElevatorSetSpeed(0));
-		//elevatorDown.whenReleased(new PrintButtonStatus(false, false));
-		elevatorDown = new JoystickButton(buttonPanel, 4);
-		//elevatorUp.whenPressed(new PrintButtonStatus(true, true));
-		elevatorDown.whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
-		//elevatorUp.whenReleased(new ElevatorSetSpeed(0));
-		//elevatorUp.whenReleased(new PrintButtonStatus(false, true));
-
-//		new JoystickButton(buttonPanel, 3).whenPressed(new MotorMoveToPosition(elevator.getConfiguration().getReverseLimit()));
-		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake("SpinIntake Out", Direction.OUT));
-		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake("SpinIntake In", Direction.IN));
-		//new JoystickButton(buttonPanel, 9).whenPressed(new ArmLimitSwitch(true));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
 		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
-		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleState(Robot.jaws));
 
 		joystick1 = new Joystick(1);
 		joystick2 = new Joystick(2);
 
-		new JoystickButton(joystick1, 1).whileHeld(new ResetEncoders());//the trigger on most joysticks
-
-		Compressor compressor = new Compressor();
-		LiveWindow.add(compressor);
-		new RoboRIOUserButton().whenPressed(new ToggleCompressor(compressor));
+		LiveWindow.add(RobotMap.compressor);
+		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
 		SmartDashboard.putData("OIDrive", new OIDrive());
-		//SmartDashboard.putData("ToggleRelay0", new ShiftGears());
-		//SmartDashboard.putData("ToggleRelay1", new ToggleRelay1());
-		//SmartDashboard.putData("ToggleRelay2", new ToggleRelay2());
-		//SmartDashboard.putData("SpinIntakeIn", new SpinIntake(true));
-		//SmartDashboard.putData("SpinIntakeOut", new SpinIntake(false));
-//		SmartDashboard.putData("BottomElevator", new ElevatorMoveToPosition(Robot.elevator.getSensorAxisConfiguration().getReverseLimit()));
-		//SmartDashboard.putData("MoveElevatorUp", new MoveElevator(true));
-		//SmartDashboard.putData("MoveElevatorDown", new MoveElevator(false));
 
 		driveStyleChooser = new SendableChooser<>();
 		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);

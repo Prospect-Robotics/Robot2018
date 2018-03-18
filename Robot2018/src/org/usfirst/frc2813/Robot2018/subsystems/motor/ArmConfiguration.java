@@ -53,7 +53,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	 * 
 	 * Since there are 2*pi*r length, and r is RADIUS_DRIVE_AXIS_TO_ARM_END, so the arc length of a full revolution is RADIUS_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI).
 	 */
-	private static final Length ARC_LENGTH_PER_REVOLUTION_IN_INCHES = LengthUOM.Inches.create(LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI).getValue()/SENSOR_TO_DRIVE);
+	private static final Length ARC_LENGTH_PER_DRIVE_REVOLUTION_IN_INCHES = LengthUOM.Inches.create(LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI).getValue());
 	/*
 	 * We know it takes PULSES_PER_DRIVE_REVOLUTION pulses for a complete revolution, so we can divide by 360 to get pulses per degree.
 	 */
@@ -61,7 +61,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	/*
 	 * We also know the arc length of one revolution, so we can divide by 360 to get the arc length per degree 
 	 */
-	private static final Length DRIVE_INCHES_PER_ONE_DEGREE = ARC_LENGTH_PER_REVOLUTION_IN_INCHES.divide(360);
+	private static final Length DRIVE_INCHES_PER_ONE_DEGREE = ARC_LENGTH_PER_DRIVE_REVOLUTION_IN_INCHES.divide(360);
 	/*
 	 * Now we can define a length unit representing one degree.
 	 */
@@ -69,7 +69,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	/*
 	 * Now let's figure out a length of drive inches per pulse 
 	 */
-	private static final Length DRIVE_INCHES_PER_PULSE = ARC_LENGTH_PER_REVOLUTION_IN_INCHES.divide(PULSES_PER_DRIVE_REVOLUTION);
+	private static final Length DRIVE_INCHES_PER_PULSE = ARC_LENGTH_PER_DRIVE_REVOLUTION_IN_INCHES.divide(PULSES_PER_DRIVE_REVOLUTION);
 	/*
 	 * Here's a unit of measure that represents SRX motor pulse lengths 
 	 */
@@ -87,7 +87,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	 * 
 	 * Start with a unit of length for one revolution
 	 */
-	public static final LengthUOM  ArmSRXEncoderRevolution = new LengthUOM("revolution", "revolutions", "rev", LengthUOM.CanonicalLengthUOM, ARC_LENGTH_PER_REVOLUTION_IN_INCHES.getCanonicalValue());
+	public static final LengthUOM  ArmSRXEncoderRevolution = new LengthUOM("revolution", "revolutions", "rev", LengthUOM.CanonicalLengthUOM, ARC_LENGTH_PER_DRIVE_REVOLUTION_IN_INCHES.getCanonicalValue());
 	/*
 	 * Now create a unit representing one revolution per minute.
 	 */
@@ -208,7 +208,7 @@ public class ArmConfiguration extends MotorConfiguration{
 		System.out.println("[Calculations]");
 		System.out.println("Pulses/encoder rev................" + PULSES_PER_ENCODER_REVOLUTION);
 		System.out.println("Pulses/drive rev.................." + PULSES_PER_DRIVE_REVOLUTION);
-		System.out.println("Inches/encoder rev................" + ARC_LENGTH_PER_REVOLUTION_IN_INCHES);
+		System.out.println("Inches/encoder rev................" + DRIVE_INCHES_PER_PULSE.multiply(PULSES_PER_ENCODER_REVOLUTION));
 		System.out.println("Pulses/drive degree..............." + PULSES_PER_ONE_DEGREE);
 		System.out.println("Inches/drive degree..............." + DRIVE_INCHES_PER_ONE_DEGREE);
 		System.out.println("Pulse Length (Inches)............." + DRIVE_INCHES_PER_PULSE);

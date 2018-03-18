@@ -51,6 +51,11 @@ public final class MotorControllerUnitConversionAdapter implements IMotorControl
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		return controller.resetEncoderSensorPosition(toSensorUnitsScalePhase(position));
 	}
+	
+	@Override
+	public boolean calibrateSensorInDirection(Direction directio) {
+		return controller.calibrateSensorInDirection(directio);
+	}
 
 	@Override
 	public boolean moveToRelativePosition(Direction direction, Length relativeDistance) {
@@ -274,5 +279,10 @@ public final class MotorControllerUnitConversionAdapter implements IMotorControl
 	
 	private final Rate fromSensorUnitsScalePhase(Rate v) {
 		return fromSensorUnitsScale(v).multiply(phaseAdjustment());
+	}
+
+	@Override
+	public void periodic() {
+		controller.periodic();
 	}
 }
