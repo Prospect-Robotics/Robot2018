@@ -260,7 +260,7 @@ public class MotorState implements IMotorState {
 		}
 		Rate convertedCurrentRate = motor.getCurrentRate().convertTo(uom);
 		Rate convertedTargetRate  = targetRate.convertTo(uom); 
-		return uom.create(convertedCurrentRate.getValue() - convertedCurrentRate.getValue());
+		return uom.create(convertedCurrentRate.getValue() - convertedTargetRate.getValue());
 	}
 
 	@Override
