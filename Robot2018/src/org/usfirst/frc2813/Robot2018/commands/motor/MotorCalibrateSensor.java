@@ -5,7 +5,6 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
-import org.usfirst.frc2813.units.values.Length;
 
 /**
  * Move motor to an absolute position. Motor controller does 

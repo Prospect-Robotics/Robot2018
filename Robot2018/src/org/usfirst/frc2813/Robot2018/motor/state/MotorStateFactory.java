@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.motor.state;
 
-import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;

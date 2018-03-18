@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.logging.LogLevel;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
