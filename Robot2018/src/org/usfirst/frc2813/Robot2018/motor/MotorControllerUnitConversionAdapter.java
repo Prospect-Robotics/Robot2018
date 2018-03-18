@@ -267,6 +267,7 @@ public final class MotorControllerUnitConversionAdapter implements IMotorControl
 		return fromSensorUnitsScale(v).multiply(phaseAdjustment());
 	}
 	
+	@SuppressWarnings("unused")
 	private final Rate toSensorUnitsScalePhase(Rate v) {
 		return toSensorUnitsScale(v).multiply(phaseAdjustment());
 	}
