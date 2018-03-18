@@ -80,7 +80,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.driveForward(LengthUOM.Inches.create(8)); // enough to turn
 			autoCmdList.turnLeft(45 * directionBias);
 			autoCmdList.driveForward(LengthUOM.Feet.create(6)); // diagonally from start to far side of near switch
-			autoCmdList.turnRight(45);
+			autoCmdList.turnRight(45 * directionBias);
 			autoCmdList.elevatorMoveToPosition(switchHeight); 
 			deliverCubeRoutine(Target.SWITCH);
 		}
