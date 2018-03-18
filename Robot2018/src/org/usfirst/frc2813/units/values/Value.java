@@ -195,4 +195,8 @@ public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 	public T_UV divide(double value) {
 		return create(this.uom, this.value / value);
 	}
+	
+	public T_UV getAbsoluteValue() {
+		return create(this.uom, Math.abs(this.value));
+	}
 }
