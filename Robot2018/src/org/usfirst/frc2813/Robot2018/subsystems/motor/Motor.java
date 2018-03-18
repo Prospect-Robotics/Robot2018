@@ -170,6 +170,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	// Periodic
 	public final void periodic() {
 		super.periodic();
+		controller.periodic();
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -213,6 +214,11 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
 		}
 		return changeState(MotorStateFactory.createMovingInDirectionAtRate(this, direction, rate));
+	}
+
+	@Override
+	public boolean calibrateSensorInDirection(Direction targetDirection) {
+		return changeState(MotorStateFactory.createCalibrateSensorInDirection(this, targetDirection));
 	}
 
 	@Override

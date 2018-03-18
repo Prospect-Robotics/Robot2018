@@ -3,8 +3,6 @@ package org.usfirst.frc2813.logging;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import edu.wpi.first.wpilibj.DriverStation;
-
 /**
  * 
  * @author Adrian Guerra

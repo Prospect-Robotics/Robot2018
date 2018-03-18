@@ -152,6 +152,13 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toMotorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			break;
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			newControlMode = ControlMode.Velocity;
+			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
+			newPIDIndex    = PID_INDEX_FOR_MOVE;
+			newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+		default:
+			break;
 		}
 		
 		// Select the profile to use for the control loop (this is almost certainly going to be closed loop)

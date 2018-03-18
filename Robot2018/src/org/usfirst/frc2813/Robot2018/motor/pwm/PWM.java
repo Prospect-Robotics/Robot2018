@@ -98,6 +98,8 @@ public class PWM extends AbstractMotorController implements IMotor {
 			// NB: Assumes that the rate equates to a percentage.  This may not work at all.
 			newSetting = proposedState.getTargetRate().convertTo(configuration.getNativeSensorRateUOM()).getValue();
 			break;
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			throw new UnsupportedOperationException("PWM controllers do not support calibrating sensors.  There are no sensors.");
 		}
 		if(newSetting < -1 || newSetting > 1) {
 			// return false;
@@ -111,5 +113,4 @@ public class PWM extends AbstractMotorController implements IMotor {
 	public Rate getCurrentRate() {
 		return configuration.getNativeSensorRateUOM().create(speedController.get());
 	}
-
 }

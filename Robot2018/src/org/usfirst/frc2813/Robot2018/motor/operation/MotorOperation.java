@@ -14,7 +14,9 @@ public enum MotorOperation implements IMotorOperation {
 	// Moving at a velocity/speed/etc
 	MOVING_IN_DIRECTION_AT_RATE,
 	// Moving a relative distance in a direction
-	MOVING_TO_RELATIVE_POSITION
+	MOVING_TO_RELATIVE_POSITION,
+	// Calibrating sensor in a direction
+	CALIBRATING_SENSOR_IN_DIRECTION
 	;
 	/* (non-Javadoc)
 	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isDisabled()
@@ -83,5 +85,11 @@ public enum MotorOperation implements IMotorOperation {
 	@Override
 	public boolean isMovingInDirectionAtRate() {
 		return this == MOVING_IN_DIRECTION_AT_RATE;
+	}
+
+	@Override
+	public boolean isCalibratingSensorInDirection() {
+		// TODO Auto-generated method stub
+		return this == CALIBRATING_SENSOR_IN_DIRECTION;
 	}
 }
