@@ -1,5 +1,3 @@
-// AutonomousCommand - a class to run autonomous mode
-
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;

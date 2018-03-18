@@ -47,14 +47,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void setTurnSpeed(double speed) { turnSpeed=speed; }
 	public void setCurveSpeed(double speed) { curveSpeed=speed; }
 
-	/**
-	 * A note on Encoders and the sign of distance:
-	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
-	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS")
-	 */
 	private void drive(Length distance, Direction direction) {
-		double motorSpeed = direction == Direction.FORWARD ? driveSpeed : -driveSpeed;
-		addSequential(new PIDAutoDrive(motorSpeed, distance.convertTo(LengthUOM.Inches).getValue()));
+		double speed = direction == Direction.FORWARD ? driveSpeed : -driveSpeed;
+		addSequential(new PIDAutoDrive(speed, distance.convertTo(LengthUOM.Inches).getValue()));
 	}
 	public void driveForward(Length distance) {
 		drive(distance, Direction.FORWARD);
@@ -70,24 +65,37 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void turnRight(double angle) { turnLeft(-angle); } // right turn is a negative left turn
 	public void turnRight() { turnLeft(-90); }
 
-	/*
-	 * We do not currently use curve drive in autonomous
-	 * */
-	public void curveCounterForward(double angle, double radius) {
-		addSequential(new AutoCurveDrive(-curveSpeed , -angle, radius));
+	private void curve(Direction direction, double angle, double radius, boolean clockwise) {
+		double speed = curveSpeed;
+		if (direction == Direction.BACKWARD) {
+			speed = -speed;
+			angle = -angle;
+		}
+		if (!clockwise) {
+			radius = -radius;
+			angle = -angle;
+		}
+		addSequential(new AutoCurveDrive(speed, angle, radius));		
 	}
 	public void curveClockForward(double angle, double radius) {
-		addSequential(new AutoCurveDrive(curveSpeed, angle, -radius));
+		curve(Direction.FORWARD, angle, radius, true);
 	}
-	public void curveCounterBackward(double angle, double radius) {
-		addSequential(new AutoCurveDrive(curveSpeed, -angle, radius));
+	public void curveCounterForward(double angle, double radius) {
+		curve(Direction.FORWARD, angle, radius, false);
 	}
 	public void curveClockBackward(double angle, double radius) {
-		addSequential(new AutoCurveDrive(-curveSpeed, angle, -radius));
+		curve(Direction.BACKWARD, angle, radius, true);
+	}
+	public void curveCounterBackward(double angle, double radius) {
+		curve(Direction.BACKWARD, angle, radius, false);
 	}
 
-	//elevator commands - FIXME! these commands return before they
-	//reach the desired elevator position
+	/**
+	 * elevator commands. Note that the move commands are instant commands.
+	 * Follow up with with waitForElevator if you're not sure the elevator
+	 * has arrived.
+	 * @param position
+	 */
 	public void elevatorMoveToPosition(Length position) {
 		addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position));
 	}
