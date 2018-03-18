@@ -14,7 +14,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 //XXX THIS CLASS MAY NOT BE NECESSARY
 public class Victor extends AbstractMotorController implements IMotor {
 	private final WPI_VictorSPX spx;
+	@SuppressWarnings("unused")
 	private ControlMode lastControlMode;
+	@SuppressWarnings("unused")
 	private double lastControlModeValue;
 
 	public Victor(IMotorConfiguration configuration, WPI_VictorSPX spx) {
