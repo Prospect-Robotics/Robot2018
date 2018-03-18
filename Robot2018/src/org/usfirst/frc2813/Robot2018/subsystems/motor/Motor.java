@@ -5,6 +5,8 @@ import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerUnitConversionAdapter;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
+import org.usfirst.frc2813.Robot2018.motor.pwm.PWM;
+import org.usfirst.frc2813.Robot2018.motor.pwm.PWMWithEncoder;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonSRX;
@@ -15,6 +17,9 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
+
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PWMSpeedController;
 
 /**
  * Generalized motor subsystem.
@@ -68,6 +73,20 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX talonSRX) {
 		this.controller = new MotorControllerUnitConversionAdapter(configuration, new TalonSRX(configuration, talonSRX));
+		this.currentState = MotorStateFactory.createDisabled(this);
+		this.previousState = MotorStateFactory.createDisabled(this);
+		configure();
+	}
+
+	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController) {
+		this.controller = new MotorControllerUnitConversionAdapter(configuration, new PWM(configuration, speedController));
+		this.currentState = MotorStateFactory.createDisabled(this);
+		this.previousState = MotorStateFactory.createDisabled(this);
+		configure();
+	}
+
+	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController, Encoder sensor) {
+		this.controller = new MotorControllerUnitConversionAdapter(configuration, new PWMWithEncoder(configuration, speedController, sensor));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();

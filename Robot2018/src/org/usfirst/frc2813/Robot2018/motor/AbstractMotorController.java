@@ -314,4 +314,8 @@ NB: This is doing strange things.
 	
 	protected abstract boolean resetEncoderSensorPositionImpl(Length sensorPosition);
 	protected abstract boolean executeTransition(IMotorState proposedState);
+	
+	public String toString() {
+		return getName();
+	}
 }
