@@ -26,7 +26,6 @@ public class Rate extends Value<RateUOM,Rate> {
 	 */
 	public Length getLength(Time time) {
 		// Convert time to same units
-		Rate   rate = this;
 		Time   convertedTime = time.convertTo(getTimeUOM());
 		Length distance      = getLengthUOM().create((/*rate*/getCanonicalValue() * /*time*/convertedTime.getCanonicalValue()) / getLengthUOM().getCanonicalUnitQuantity());
 //		System.out.println(this + " x " + time + " = " + distance);
@@ -38,8 +37,7 @@ public class Rate extends Value<RateUOM,Rate> {
 	public Time getTime(Length length) {
 		// Convert length to same units
 		Length convertedLength = length.convertTo(getUOM().getLengthUOM());
-		Rate   rate = this;
-		Time   time = getTimeUOM().create(convertedLength.getCanonicalValue()/rate.getCanonicalValue()/getTimeUOM().getCanonicalUnitQuantity());
+		Time   time = getTimeUOM().create(convertedLength.getCanonicalValue()/getCanonicalValue()/getTimeUOM().getCanonicalUnitQuantity());
 //		System.out.println(length + " / " + rate + " = " + time);
 		return time;
 	}
