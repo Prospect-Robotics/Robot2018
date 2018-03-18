@@ -9,7 +9,7 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
-import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
+import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.SystemOfMeasurement;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -20,6 +20,7 @@ import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -140,10 +141,10 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	public static List<PIDConfiguration> createPidConfigurations() {
 		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
-		pidConfigurations.add(new PIDConfiguration("Holding", TalonProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.015, 0.0, 0.01, 0.0));
-		pidConfigurations.add(new PIDConfiguration("Moving", TalonProfileSlot.Moving.getProfileSlotIndex(), 0.02, 0.0, 0.01, 20.0));
-		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", TalonProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
-		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", TalonProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Holding", PIDProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.015, 0.0, 0.01, 0.0));
+		pidConfigurations.add(new PIDConfiguration("Moving", PIDProfileSlot.Moving.getProfileSlotIndex(), 0.02, 0.0, 0.01, 20.0));
+		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", PIDProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", PIDProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		return Collections.unmodifiableList(pidConfigurations);
 	}
 
@@ -163,7 +164,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.ReadPosition
 					|IMotorConfiguration.ReadRate
 					|IMotorConfiguration.Reverse
-					|IMotorConfiguration.ReverseHardLimitSwitch
+					|IMotorConfiguration.LocalReverseHardLimitSwitch
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
 //					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
@@ -192,6 +193,10 @@ public class ArmConfiguration extends MotorConfiguration{
 			DEFAULT_SPEED_DEGREES_PER_SECOND, // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ArmSRXMotorPercentageRate,           // percentageRate
+			null, // remoteForwardHardLimitSwitchSource
+			null, // remoteForwardHardLimitSwitchDeviceId
+			null, // remoteReverseHardLimitSwitchSource
+			null, // remoteReverseHardLimitSwitchDeviceId
 			new ICommandFactory<Motor>() { // defaultCommand 
 				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 

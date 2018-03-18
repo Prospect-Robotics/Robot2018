@@ -3,8 +3,10 @@ package org.usfirst.frc2813.Robot2018.motor.talon;
 import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
+import org.usfirst.frc2813.Robot2018.motor.PID;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.logging.Logger;
@@ -18,22 +20,22 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 /**
  * A wrapper class to handle an SRX Talon motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
  * if you need a translation layer.  
  */
-public final class Talon extends AbstractMotorController {
-	private final TalonSRX srx;
+public final class TalonSRX extends AbstractMotorController {
+	private final com.ctre.phoenix.motorcontrol.can.TalonSRX srx;
 	
 	/* ----------------------------------------------------------------------------------------------
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	// Last arg sent for controlMode
-	private TalonProfileSlot lastSlot                 = TalonProfileSlot.HoldingPosition;
-	private TalonPID         lastPID                  = TalonPID.Primary;
+	private PIDProfileSlot lastSlot                 = PIDProfileSlot.HoldingPosition;
+	private PID         lastPID                  = PID.Primary;
 	// last control mode parameter
 	protected ControlMode    lastControlMode          = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	private double           lastControlModeValue     = 0;
@@ -49,19 +51,19 @@ public final class Talon extends AbstractMotorController {
 	// During operation, we use 0ms timeout to avoid stalling on transient bus
 	public static final int RUNNING_CONFIGURATION_COMMAND_TIMEOUT_MS = 0;
 	// We will use separate profiles for holding and moving
-	public static final TalonProfileSlot PROFILE_SLOT_FOR_HOLD_POSITION = TalonProfileSlot.HoldingPosition;
+	public static final PIDProfileSlot PROFILE_SLOT_FOR_HOLD_POSITION = PIDProfileSlot.HoldingPosition;
 	// We will use separate profiles for holding and moving
-	public static final TalonProfileSlot PROFILE_SLOT_FOR_MOVE          = TalonProfileSlot.Moving;
+	public static final PIDProfileSlot PROFILE_SLOT_FOR_MOVE          = PIDProfileSlot.Moving;
 	// We will use the primary PID loop, not the aux
-	public static final TalonPID PID_INDEX_FOR_HOLD_POSITION            = TalonPID.Primary;
+	public static final PID PID_INDEX_FOR_HOLD_POSITION            = PID.Primary;
 	// We will use the primary PID loop, not the aux
-	public static final TalonPID PID_INDEX_FOR_MOVE                     = TalonPID.Primary;
+	public static final PID PID_INDEX_FOR_MOVE                     = PID.Primary;
 	
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	public Talon(IMotorConfiguration configuration, TalonSRX srx) {
+	public TalonSRX(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX srx) {
 		super(configuration);
 		this.srx = srx;
 	}
@@ -105,10 +107,10 @@ public final class Talon extends AbstractMotorController {
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		boolean result = true;
-		if(!resetEncoderSensorPosition(TalonPID.Auxilliary, sensorPosition)) {
+		if(!resetEncoderSensorPosition(PID.Auxilliary, sensorPosition)) {
 			result = false;
 		}
-		if(!resetEncoderSensorPosition(TalonPID.Primary, sensorPosition)) {
+		if(!resetEncoderSensorPosition(PID.Primary, sensorPosition)) {
 			result = false;
 		}
 		return result;
@@ -116,8 +118,8 @@ public final class Talon extends AbstractMotorController {
 
 	protected boolean executeTransition(IMotorState proposedState) {
 		// New PID/Slot are almost always maintain
-		TalonProfileSlot newSlotIndex        = lastSlot;
-		TalonPID         newPIDIndex         = lastPID;
+		PIDProfileSlot newSlotIndex        = lastSlot;
+		PID         newPIDIndex         = lastPID;
 		ControlMode      newControlMode      = ControlMode.Disabled;
 		double           newControlModeValue = 0;
 
@@ -196,8 +198,8 @@ public final class Talon extends AbstractMotorController {
 					getTimeout());
 	}
 	
-	private boolean resetEncoderSensorPosition(TalonPID pid, Length sensorPosition) {
-		if(pid.equals(TalonPID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
+	private boolean resetEncoderSensorPosition(PID pid, Length sensorPosition) {
+		if(pid.equals(PID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
 			Logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
 			return true;
 		}
@@ -217,14 +219,14 @@ public final class Talon extends AbstractMotorController {
 	 * Configure PID values
 	 */
 	@SuppressWarnings("unused")
-	private void configurePID(TalonProfileSlot profileSlot, double p, double i, double d) {
+	private void configurePID(PIDProfileSlot profileSlot, double p, double i, double d) {
 		configurePID(profileSlot, p, i, d, 0);
 	}
 	
 	/*
 	 * Configure PID values
 	 */
-	public void configurePID(TalonProfileSlot profileSlot, double p, double i, double d, double f) {
+	public void configurePID(PIDProfileSlot profileSlot, double p, double i, double d, double f) {
 		srx.config_kF(profileSlot.getProfileSlotIndex(), f, getTimeout());
 		srx.config_kP(profileSlot.getProfileSlotIndex(), p, getTimeout());
 		srx.config_kI(profileSlot.getProfileSlotIndex(), i, getTimeout());
@@ -256,37 +258,54 @@ public final class Talon extends AbstractMotorController {
 //		correctRelativeEncodersFromAbsolute();
 		
 		// Reset PID controllers
-		configurePID(TalonProfileSlot.ProfileSlot0, 0, 0, 0, 0);
-		configurePID(TalonProfileSlot.ProfileSlot1, 0, 0, 0, 0);
-		configurePID(TalonProfileSlot.ProfileSlot2, 0, 0, 0, 0);
-		configurePID(TalonProfileSlot.ProfileSlot3, 0, 0, 0, 0);
+		configurePID(PIDProfileSlot.ProfileSlot0, 0, 0, 0, 0);
+		configurePID(PIDProfileSlot.ProfileSlot1, 0, 0, 0, 0);
+		configurePID(PIDProfileSlot.ProfileSlot2, 0, 0, 0, 0);
+		configurePID(PIDProfileSlot.ProfileSlot3, 0, 0, 0, 0);
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
 		 */
-		srx.configAllowableClosedloopError(TalonProfileSlot.ProfileSlot0.getProfileSlotIndex(), 0, getTimeout());
-		srx.configAllowableClosedloopError(TalonProfileSlot.ProfileSlot1.getProfileSlotIndex(), 0, getTimeout());
-		srx.configAllowableClosedloopError(TalonProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0, getTimeout());
-		srx.configAllowableClosedloopError(TalonProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0, getTimeout());
+		srx.configAllowableClosedloopError(PIDProfileSlot.ProfileSlot0.getProfileSlotIndex(), 0, getTimeout());
+		srx.configAllowableClosedloopError(PIDProfileSlot.ProfileSlot1.getProfileSlotIndex(), 0, getTimeout());
+		srx.configAllowableClosedloopError(PIDProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0, getTimeout());
+		srx.configAllowableClosedloopError(PIDProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0, getTimeout());
 		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
 		srx.configSetParameter(ParamEnum.eClearPositionOnQuadIdx, 0 /* disabled */, 0 /* unused */, 0 /* unused */, getTimeout());
 		
-		// Set forward hard limits
-		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardHardLimitSwitch)) {
+		// Set local forward hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
+		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.LocalForwardHardLimitSwitch)) {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, configuration.getForwardHardLimitSwitchNormal(), getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
 		} else {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
 		}
-		// Set reverse hard limits
-		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseHardLimitSwitch)) {
+		// Set local reverse hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
+		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.LocalReverseHardLimitSwitch)) {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, configuration.getReverseHardLimitSwitchNormal(), getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
 		} else {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		}
+		// Set remote forward hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
+		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteForwardHardLimitSwitch)) {
+			srx.configForwardLimitSwitchSource(configuration.getRemoteForwardHardLimitSwitchSource(), configuration.getForwardHardLimitSwitchNormal(), configuration.getRemoteForwardHardLimitSwitchDeviceId(), getTimeout());
+			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
+		} else {
+			srx.configForwardLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
+			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
+		}
+		// Set remote reverse hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
+		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteReverseHardLimitSwitch)) {
+			srx.configReverseLimitSwitchSource(configuration.getRemoteReverseHardLimitSwitchSource(), configuration.getReverseHardLimitSwitchNormal(), configuration.getRemoteReverseHardLimitSwitchDeviceId(), getTimeout());
+			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
+		} else {
+			srx.configReverseLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
+			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
+		}
+		
 		// Set forward soft limit
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch)) {
 			srx.configForwardSoftLimitEnable(true, getTimeout());
@@ -315,7 +334,7 @@ public final class Talon extends AbstractMotorController {
 		while(pidProfiles.hasNext()) {
 			PIDConfiguration pidConfiguration = pidProfiles.next();
 	 	    configurePID(
-	 	    		TalonProfileSlot.get(pidConfiguration.getProfileIndex()),
+	 	    		PIDProfileSlot.get(pidConfiguration.getProfileIndex()),
 	 	    		pidConfiguration.getP(),
 	 	    		pidConfiguration.getI(),
 	 	    		pidConfiguration.getD(),

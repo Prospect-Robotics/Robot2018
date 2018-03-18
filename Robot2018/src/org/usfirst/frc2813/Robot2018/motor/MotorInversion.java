@@ -1,11 +1,11 @@
-package org.usfirst.frc2813.Robot2018.motor.talon;
+package org.usfirst.frc2813.Robot2018.motor;
 
-public enum TalonMotorInversion {
+public enum MotorInversion {
 	Normal(false), Inverted(true);
 	
 	public final boolean isInverted;
 	
-	TalonMotorInversion(boolean isInverted) {
+	MotorInversion(boolean isInverted) {
 		this.isInverted = isInverted;	
 	}
 	

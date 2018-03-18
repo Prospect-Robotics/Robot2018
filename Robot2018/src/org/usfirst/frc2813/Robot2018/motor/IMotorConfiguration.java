@@ -11,6 +11,7 @@ import org.usfirst.frc2813.units.values.Rate;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 public interface IMotorConfiguration {
 
@@ -19,7 +20,7 @@ public interface IMotorConfiguration {
 	int ControlPosition = 1 << 1;
 	int ControlRate = 1 << 2;
 	int Forward = 1 << 3;
-	int ForwardHardLimitSwitch = 1 << 4;
+	int LocalForwardHardLimitSwitch = 1 << 4;
 	int ForwardSoftLimitSwitch = 1 << 5;
 	int LimitPosition = 1 << 6;
 	int LimitRate = 1 << 7;
@@ -28,10 +29,12 @@ public interface IMotorConfiguration {
 	int ReadPosition = 1 << 10;
 	int ReadRate = 1 << 11;
 	int Reverse = 1 << 12;
-	int ReverseHardLimitSwitch = 1 << 13;
+	int LocalReverseHardLimitSwitch = 1 << 13;
 	int ReverseSoftLimitSwitch = 1 << 14;
 	int DefaultRate = 1 << 15;
 	int NeutralMode = 1 << 16;
+	int RemoteForwardHardLimitSwitch = 1 << 17;
+	int RemoteReverseHardLimitSwitch = 1 << 18;
 	int Disconnected = 1 << 31;
 	int MAX_CAPABILITY = 31;
 
@@ -129,5 +132,13 @@ public interface IMotorConfiguration {
 	void dumpDescription();
 
 	String getDescription();
+
+	RemoteLimitSwitchSource getRemoteReverseHardLimitSwitchSource();
+
+	RemoteLimitSwitchSource getRemoteForwardHardLimitSwitchSource();
+
+	int getRemoteReverseHardLimitSwitchDeviceId();
+
+	int getRemoteForwardHardLimitSwitchDeviceId();
 
 }

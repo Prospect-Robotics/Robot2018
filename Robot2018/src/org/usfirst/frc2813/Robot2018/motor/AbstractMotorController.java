@@ -229,8 +229,8 @@ public abstract class AbstractMotorController implements IMotorController {
 				? " <<<< DISCONNECTED BY CONFIGURATION >>>>" 
 				: (
 					" @ " + getCurrentPosition() 
-					+ (configuration.has(IMotorConfiguration.ReverseHardLimitSwitch) ? " [RLimit=" + getCurrentLimitSwitchStatus(Direction.REVERSE) + "]" : "")
-					+ (configuration.has(IMotorConfiguration.ForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
+					+ (configuration.has(IMotorConfiguration.LocalReverseHardLimitSwitch) ? " [RLimit=" + getCurrentLimitSwitchStatus(Direction.REVERSE) + "]" : "")
+					+ (configuration.has(IMotorConfiguration.LocalForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
 				)
 		);
 	}

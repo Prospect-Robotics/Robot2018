@@ -141,6 +141,10 @@ public class IntakeConfiguration extends MotorConfiguration {
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			IntakeSPXMotorPercentageRate,      // percentageRate
+			null, // remoteForwardHardLimitSwitchSource
+			null, // remoteForwardHardLimitSwitchDeviceId
+			null, // remoteReverseHardLimitSwitchSource
+			null, // remoteReverseHardLimitSwitchDeviceId
 			new ICommandFactory<Motor>() { // defaultCommand 
 				public Command createCommand(Motor m) { 
 					return new MotorHoldPosition(m); 

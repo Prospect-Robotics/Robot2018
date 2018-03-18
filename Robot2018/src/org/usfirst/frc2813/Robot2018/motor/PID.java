@@ -1,11 +1,11 @@
-package org.usfirst.frc2813.Robot2018.motor.talon;
+package org.usfirst.frc2813.Robot2018.motor;
 
-public enum TalonPID {
+public enum PID {
 	Primary(0), Auxilliary(1);
 	
 	public final int pidIndex;
 	
-	private TalonPID(int pidIndex) {
+	private PID(int pidIndex) {
 		this.pidIndex = pidIndex;
 	}
 	
@@ -13,7 +13,7 @@ public enum TalonPID {
 		return pidIndex;
 	}
 	
-	public boolean equals(TalonPID other) {
+	public boolean equals(PID other) {
 		return other.pidIndex == this.pidIndex;
 	}
 }

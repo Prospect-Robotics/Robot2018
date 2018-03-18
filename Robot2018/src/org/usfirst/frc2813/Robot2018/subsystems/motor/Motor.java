@@ -7,17 +7,14 @@ import org.usfirst.frc2813.Robot2018.motor.MotorControllerUnitConversionAdapter;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
-import org.usfirst.frc2813.Robot2018.motor.talon.Talon;
-import org.usfirst.frc2813.Robot2018.motor.victor.Victor;
+import org.usfirst.frc2813.Robot2018.motor.talon.TalonSRX;
+import org.usfirst.frc2813.Robot2018.motor.victor.VictorSPX;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 /**
  * Generalized motor subsystem.
@@ -61,16 +58,16 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	public Motor(IMotorConfiguration configuration, WPI_VictorSPX victorSPX) {
-		this.controller = new MotorControllerUnitConversionAdapter(configuration, new Victor(configuration, victorSPX));
+	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX victorSPX) {
+		this.controller = new MotorControllerUnitConversionAdapter(configuration, new VictorSPX(configuration, victorSPX));
 		this.currentState = this.previousState = MotorStateFactory.createDisabled(this);
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
 	}
 
-	public Motor(IMotorConfiguration configuration, TalonSRX talonSRX) {
-		this.controller = new MotorControllerUnitConversionAdapter(configuration, new Talon(configuration, talonSRX));
+	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX talonSRX) {
+		this.controller = new MotorControllerUnitConversionAdapter(configuration, new TalonSRX(configuration, talonSRX));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
