@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
 /**
@@ -18,10 +19,10 @@ public class MotorHoldPosition extends MotorCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() != MotorOperation.HOLDING_CURRENT_POSITION) {
-			Logger.info(this + " setting " + motor + " to hold position.");
+			Logger.printFormat(LogType.INFO,"%s setting %s to hold position",this,motor);
 			motor.holdCurrentPosition();
 		} else {
-			Logger.info(this + " not setting " + motor + " to hold position, it's already doing that.");
+			Logger.printFormat(LogType.INFO,"%s not setting %s to hold position, it's already doing that",this,motor);
 		}
 		setInterruptible(true);
 	}

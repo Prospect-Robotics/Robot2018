@@ -3,6 +3,7 @@
 package org.usfirst.frc2813.Robot2018.commands.solenoid;
 
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
@@ -24,9 +25,9 @@ public class SolenoidSetState extends InstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(solenoid.getState() == state) {
-			Logger.info(this + " NOT changing " + solenoid + " from " + solenoid.getState() + " to " + state + ", it's already " + state);
+			Logger.printFormat(LogType.INFO,"%1$s NOT changing %2$s from %3$s to %4$s, it's already %4$s",this,solenoid,solenoid.getState(),state);
 		} else {
-			Logger.info(this + " changing " + solenoid + " from " + solenoid.getState() + " to " + state);
+			Logger.printFormat(LogType.INFO,"%s changing %s from %s to %s",this,solenoid,solenoid.getState(),state);
 			solenoid.setState(state);
 		}
 	}

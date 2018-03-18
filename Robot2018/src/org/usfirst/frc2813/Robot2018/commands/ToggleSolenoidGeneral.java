@@ -10,6 +10,7 @@
 
 
 package org.usfirst.frc2813.Robot2018.commands;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
 import edu.wpi.first.wpilibj.Solenoid;
@@ -32,7 +33,7 @@ public class ToggleSolenoidGeneral extends InstantCommand {
 	protected void initialize() {
 		super.initialize();
         boolean old = solenoid.get();
-        Logger.info(this + " toggling " + solenoid + " from " + old + " to " + !old);
+        Logger.printFormat(LogType.INFO,"%s toggling %s from %b to %b",this,solenoid,old,!old);
         solenoid.set(!old);
 	}
 

@@ -2,6 +2,8 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogLevel;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -24,11 +26,11 @@ public class MotorSetTargetRate extends MotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetSpeed() == targetRate) {
-			Logger.info(this + " NOT telling " + motor + " to change target rate to " + targetRate + ", it's already moving at that speed.");
+			Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's already moving at that speed.",this,motor,targetRate);
 		} else if(motor.getTargetState().getOperation() != MotorOperation.MOVING_IN_DIRECTION_AT_RATE ) {
-			Logger.info(this + " NOT telling " + motor + " to change target rate to " + targetRate + ", it's NOT MOVING.");
+			Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's NOT MOVING.",this,motor,targetRate);
 		} else {
-			Logger.info(this + " telling " + motor + " to change target rate to " + targetRate + ".");
+			Logger.printFormat(LogType.INFO,"%s telling %s to change target rate to %s.",this,motor,targetRate);
 			motor.setTargetRate(targetRate);
 		}		
 	}

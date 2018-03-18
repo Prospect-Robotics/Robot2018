@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.values.Length;
 
@@ -20,9 +21,9 @@ public class MotorWaitForTargetPosition extends MotorCommand {
 		super.initialize();
 		// NB: If the motor is moving to a position (relative or absolute)
 		if(!isFinished()) {
-			Logger.info(this + " waiting for " + motor + " to reach " + motor.getTargetState().getTargetAbsolutePosition() + ".");
+			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s.",this,motor,motor.getTargetState().getTargetAbsolutePosition());
 		} else {
-			Logger.info(this + " waiting pointlessly for " + motor + " to reach position, it's already done that.");
+			Logger.printFormat(LogType.INFO,"%s waiting pointlessly for %s to reach position, it's already done that.",this,motor);
 		}
 		setInterruptible(true);
 	}

@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Rate;
@@ -27,9 +28,9 @@ public class MotorMoveInDirectionAtRate extends MotorCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetDirection() == direction && motor.getTargetSpeed() == rate) {
-			Logger.info(this + " NOT setting " + motor + " to move in the " + direction + " direction at " + rate + ", it's already doing that.");
+			Logger.printFormat(LogType.INFO,"%s NOT setting %s to move in the %s direction at %s, it's already doing that.",this,motor,direction,rate);
 		} else {
-			Logger.info(this + " setting " + motor + " to move in the " + direction + " direction at " + rate + ".");
+			Logger.printFormat(LogType.INFO,"%s setting %s to move in the %s direction at %s.",this,motor,direction,rate);
 			motor.moveInDirectionAtRate(direction, rate);
 		}
 	}

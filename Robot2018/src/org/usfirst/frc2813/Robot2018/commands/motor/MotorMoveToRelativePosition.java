@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
@@ -22,7 +23,7 @@ public class MotorMoveToRelativePosition extends MotorInstantCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		Logger.info(this + " telling " + motor + " to move " + direction + " by " + relativeDistance + ".");
+		Logger.printFormat(LogType.INFO,"%s telling %s to move %s by %s.",this,motor,direction,relativeDistance);
 		motor.moveToRelativePosition(direction, relativeDistance);
 	}
 

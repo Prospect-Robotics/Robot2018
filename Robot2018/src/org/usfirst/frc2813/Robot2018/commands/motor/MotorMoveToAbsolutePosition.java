@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.values.Length;
 
@@ -22,9 +23,9 @@ public class MotorMoveToAbsolutePosition extends MotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && motor.getTargetPosition() == position) {
-			Logger.info(this + " NOT telling " + motor + " to move to " + position + ", it's already doing that.");
+			Logger.printFormat(LogType.INFO,"%s NOT telling %s to move to %s, it's already doing that.",this,motor,position);
 		} else {
-			Logger.info(this + " telling " + motor + " to move to " + position + ".");
+			Logger.printFormat(LogType.INFO,"%s telling %s to move to %s.",this,motor,position);
 			motor.moveToAbsolutePosition(position);
 		}
 	}

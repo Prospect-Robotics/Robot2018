@@ -1,6 +1,8 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.logging.LogLevel;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
@@ -27,7 +29,7 @@ public class SpinIntake extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Logger.info("SpinIntake Set to Move" + direction + "at speed " + (direction == Direction.IN ? -1 : 1));
+    	Logger.printFormat(LogType.INFO,"SpinIntake Set to Move %s at speed %s",direction,(direction == Direction.IN ? -1 : 1));
     }
 
     // Called repeatedly when this Command is scheduled to run

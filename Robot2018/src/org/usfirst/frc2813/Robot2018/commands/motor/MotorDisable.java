@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
 /**
@@ -16,9 +17,9 @@ public class MotorDisable extends MotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() == MotorOperation.DISABLED) {
-			Logger.info(this + " NOT setting " + motor + " to disable (neutral state), it's already disabled.");
+			Logger.printFormat(LogType.INFO,"%s NOT SETTING %s to disable (neutral state), it's already disabled.", this, motor);
 		} else {
-			Logger.info(this + " setting " + motor + " to disable (neutral state).");
+			Logger.printFormat(LogType.INFO,"%s setting %s to disable (neutral state).",this,motor);
 		}
 		motor.disable();
 	}
