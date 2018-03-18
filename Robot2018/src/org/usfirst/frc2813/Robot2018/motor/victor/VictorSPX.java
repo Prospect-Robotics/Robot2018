@@ -62,6 +62,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	public VictorSPX(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX spx) {
 		super(configuration);
 		this.spx = spx;
+		initialize();
 	}
 	
 	/* ----------------------------------------------------------------------------------------------

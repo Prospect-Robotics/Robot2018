@@ -23,8 +23,8 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
 
-	protected IMotorState currentState = MotorStateFactory.createDisabled(this);
-	protected IMotorState previousState = MotorStateFactory.createDisabled(this);
+	protected IMotorState currentState;
+	protected IMotorState previousState;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
@@ -32,6 +32,11 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	protected AbstractMotorController(IMotorConfiguration configuration) {
 		this.configuration = configuration;
+	}
+	
+	protected void initialize() {
+		 currentState = MotorStateFactory.createDisabled(this);
+		 previousState = MotorStateFactory.createDisabled(this);
 	}
 	
 	/* ----------------------------------------------------------------------------------------------

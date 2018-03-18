@@ -66,6 +66,7 @@ public final class TalonSRX extends AbstractMotorController {
 	public TalonSRX(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX srx) {
 		super(configuration);
 		this.srx = srx;
+		initialize();
 	}
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -94,7 +95,7 @@ public final class TalonSRX extends AbstractMotorController {
 	
 	@Override
 	public final Length getCurrentPosition() {
-		int raw = srx.getSelectedSensorPosition(lastPID.getPIDIndex());
+		int raw = srx.getSelectedSensorPosition(PID.Primary.getPIDIndex());
 		Length length = configuration.getNativeSensorLengthUOM().create(raw); 
 //		Logger.info("readPosition " + raw + " --> " + length);
 		return length;

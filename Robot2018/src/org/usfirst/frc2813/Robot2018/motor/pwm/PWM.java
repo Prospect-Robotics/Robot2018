@@ -46,6 +46,7 @@ public class PWM extends AbstractMotorController implements IMotor {
 		if (!configuration.hasAny(SUPPORTED_CAPABILITIES)) {
 			throw new IllegalArgumentException(this + ": You haven't configured any supported features for this motor.");
 		}
+		initialize();
 	}
 
 	@Override
