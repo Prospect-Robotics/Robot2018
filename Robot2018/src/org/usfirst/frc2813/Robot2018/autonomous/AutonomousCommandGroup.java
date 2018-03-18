@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.auto.AutoCurveDrive;
 import org.usfirst.frc2813.Robot2018.commands.auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
@@ -26,9 +27,9 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
-	private double driveSpeed = 1;
-	private double turnSpeed = 0.25;
-	//private double curveSpeed = 0.4;
+	private final double driveSpeed = 1;
+	private final double turnSpeed = 0.25;
+	private final double curveSpeed = 0.4;
 
 	// FIXME! what until type? What values should these be?
 	private static final Length armPositionLevel = LengthUOM.Inches.create(12);
@@ -70,8 +71,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	/*
 	 * We do not currently use curve drive in autonomous
+	 * */
 	public void curveCounterForward(double angle, double radius) {
-		addSequential(new AutoCurveDrive(-curveSpeed, -angle, radius));
+		addSequential(new AutoCurveDrive(-curveSpeed , -angle, radius));
 	}
 	public void curveClockForward(double angle, double radius) {
 		addSequential(new AutoCurveDrive(curveSpeed, angle, -radius));
@@ -82,7 +84,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void curveClockBackward(double angle, double radius) {
 		addSequential(new AutoCurveDrive(-curveSpeed, angle, -radius));
 	}
-	*/
 
 	//elevator commands - FIXME! these commands return before they
 	//reach the desired elevator position
