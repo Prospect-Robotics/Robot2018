@@ -74,37 +74,38 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	}
 	//TODO Clean up driveTrain.arcadeDrive below
-	
+
 	/**
 	 * arcadeDrive for use in OI
 	 * @param joystick1
 	 * @param joystickIgnored
 	 */
 	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
-		// double z = joystick1.getX() + joystick1.getTwist();
-		// double x = joystick1.getY();
-		// Please note: Grady had added this some time ago and it wasn't working.  I just fixed it.  Jack may yell at us for changing it.
-		//gearShift.set(Math.abs(joystick1.getY()) > .7);		//  If >70% speed, shift into high gear; if <=70% speed, shift into low gear
-		
 		/*
 		 *  The arcadeDrive call parameters are (signed) speed and (signed) turn value [-1, 1]
-		 *  Pushing the joystick forward to drive forward increases the joystick's Y parameter.  Even though the arcadeDrive calls this field "xSpeed", it comes from the Y axis of the joystick
-		 *  Pushing the joystick left and right changes the joystick's X parameter.  Even though the arcadeDrive calls this field "zRotation", it comes from the X axis of the joystick.
+		 *  Pushing the joystick forward to drive forward decreases the joystick's Y parameter.  
+		 *  Even though the arcadeDrive calls this field "xSpeed", it comes from the Y axis of the joystick
+		 *  Pushing the joystick left and right changes the joystick's X parameter.  
+		 *  Even though the arcadeDrive calls this field "zRotation", it comes from the X axis of the joystick.
 		 */
 		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX() * Math.abs(joystick1.getX()), false);
 		
 	}
+
+	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
+		/*
+		 * WPI library expects forward to be negative to match the way Joystick values work on Windows.
+		 * When we want to go forward, we reverse the sign to match at this place.  
+		 */
+		robotDrive.arcadeDrive(- forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if
+																// omitted, the argument defaults to true)
+	}
+
 	// Put methods for controlling this subsystem
 	// here. Call these from Commands.
 
 	public void tankDrive(Joystick joystick1, Joystick joystick2) {// defines tankDrive
-		robotDrive.tankDrive(-joystick1.getY() * Math.abs(joystick1.getY()),
-				-joystick2.getY() * Math.abs(joystick2.getY()));
-	}
-
-	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
-		robotDrive.arcadeDrive(forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if
-																// omitted, the argument defaults to true)
+		robotDrive.tankDrive(-joystick1.getY() * Math.abs(joystick1.getY()), -joystick2.getY() * Math.abs(joystick2.getY()));
 	}
 
 	public void curvatureDrive(double forwardSpeed, double turnRadius) {

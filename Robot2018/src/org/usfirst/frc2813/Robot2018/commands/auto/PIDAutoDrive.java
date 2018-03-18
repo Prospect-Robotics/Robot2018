@@ -142,6 +142,9 @@ public class PIDAutoDrive extends GearheadsCommand {
 		double decel = calcThrottleDecelerate(rawDistance);
 		double potentialThrottle = Math.min(steadyState, decel);
 		double newThrottle = Math.min(potentialThrottle, accel);
+		/*
+		 * Here we are preserving the sign of the original input
+		 */
 		if (this.forwardSpeed <0) {
 			newThrottle *= -1;
 		}
