@@ -91,9 +91,8 @@ public class OI {
 		joystick1 = new Joystick(1);
 		joystick2 = new Joystick(2);
 
-		Compressor compressor = new Compressor();
-		LiveWindow.add(compressor);
-		new RoboRIOUserButton().whenPressed(new ToggleCompressor(compressor));
+		LiveWindow.add(RobotMap.compressor);
+		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
 		SmartDashboard.putData("OIDrive", new OIDrive());
