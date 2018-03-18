@@ -9,10 +9,7 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 import edu.wpi.first.wpilibj.PWMSpeedController;
-import edu.wpi.first.wpilibj.Victor;
 
 public class PWM extends AbstractMotorController implements IMotor {
 	private final PWMSpeedController speedController;

@@ -9,13 +9,9 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
-import org.usfirst.frc2813.units.values.Time;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSpeedController;
-import edu.wpi.first.wpilibj.Victor;
 
 public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 	private final PWMSpeedController speedController;

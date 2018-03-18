@@ -20,7 +20,6 @@ import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 import edu.wpi.first.wpilibj.command.Command;
 
