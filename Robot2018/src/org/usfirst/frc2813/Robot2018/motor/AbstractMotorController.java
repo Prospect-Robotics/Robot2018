@@ -186,6 +186,10 @@ public abstract class AbstractMotorController implements IMotorController {
 			}
 			break;
 		case MOVING_TO_ABSOLUTE_POSITION:
+			if(!configuration.hasAll(IMotorConfiguration.ControlPosition)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
+			}
+			break;
 		case MOVING_TO_RELATIVE_POSITION:
 			if(!configuration.hasAll(IMotorConfiguration.ControlPosition)) {
 				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
