@@ -41,7 +41,13 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 		| IMotorConfiguration.LimitRate
 		| IMotorConfiguration.Disconnected
 		;
-	
+	// We will use separate profiles for holding and moving
+	public static final int PROFILE_SLOT_FOR_HOLD_POSITION = 0;
+	// We will use separate profiles for holding and moving
+	public static final int PROFILE_SLOT_FOR_MOVE          = 1;
+	private int lastSlot = PROFILE_SLOT_FOR_HOLD_POSITION;
+
+
 	public PWMWithEncoder(IMotorConfiguration configuration, PWMSpeedController sp, Encoder encoder) {
 		super(configuration);
 		this.speedController = sp;
@@ -102,11 +108,14 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 
 	protected boolean executeTransition(IMotorState proposedState) {
 		double		newSetting = 0;
+
+		int newSlot = PROFILE_SLOT_FOR_MOVE;
 		switch(proposedState.getOperation()) {
 		case DISABLED:
 			newSetting = 0;
 			break;
 		case HOLDING_CURRENT_POSITION:
+			newSlot = PROFILE_SLOT_FOR_HOLD_POSITION;
 			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
 		case MOVING_TO_ABSOLUTE_POSITION:
 			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
@@ -127,12 +136,22 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 			throw new IllegalArgumentException("PWM value must be between -1.0 and 1.0");
 		}
 		speedController.set(newSetting);
+		lastSlot = newSlot;
+		return true;
+	}
+
+	protected boolean isUsingPIDSlotIndexForHolding() {
+		return lastSlot == PROFILE_SLOT_FOR_HOLD_POSITION;
+	}
+	
+	protected boolean updatePIDSlotIndex(boolean holding) {
+		this.lastSlot = holding ? PROFILE_SLOT_FOR_HOLD_POSITION : PROFILE_SLOT_FOR_MOVE;
 		return true;
 	}
 
 	@Override
 	public Rate getCurrentRate() {
-		return configuration.getNativeSensorRateUOM().create(speedController.get());
+		// TODO Auto-generated method stub
+		return null;
 	}
-
 }

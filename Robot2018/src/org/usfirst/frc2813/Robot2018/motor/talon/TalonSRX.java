@@ -350,6 +350,7 @@ public final class TalonSRX extends AbstractMotorController {
 	 	    Logger.info(this + " loaded : " + pidConfiguration);
 		}
 	}
+
 	public String toString() {
 		return configuration.getName() + "." + this.getClass().getSimpleName();  
 	}
@@ -357,5 +358,18 @@ public final class TalonSRX extends AbstractMotorController {
 	@Override
 	public Rate getCurrentRate() {
 		return configuration.getNativeSensorRateUOM().create(srx.getSelectedSensorVelocity(lastPID.getPIDIndex()));
+	}
+	protected boolean isUsingPIDSlotIndexForHolding() {
+		return lastSlot != null && lastSlot.equals(PROFILE_SLOT_FOR_HOLD_POSITION);
+	}
+	
+	protected boolean updatePIDSlotIndex(boolean holding) {
+		if(null == lastPID || null == lastSlot) {
+			return false;
+		}
+		PIDProfileSlot newSlot = holding ? PROFILE_SLOT_FOR_HOLD_POSITION : PROFILE_SLOT_FOR_MOVE;	
+		srx.selectProfileSlot(newSlot.getProfileSlotIndex(), lastPID.getPIDIndex());
+		this.lastSlot = newSlot;
+		return true;
 	}
 }

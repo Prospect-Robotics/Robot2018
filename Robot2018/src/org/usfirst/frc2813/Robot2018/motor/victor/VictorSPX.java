@@ -337,4 +337,17 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	public Rate getCurrentRate() {
 		return configuration.getNativeSensorRateUOM().create(spx.getSelectedSensorVelocity(lastPID.getPIDIndex()));
 	}
+	protected boolean isUsingPIDSlotIndexForHolding() {
+		return lastSlot != null && lastSlot.equals(PROFILE_SLOT_FOR_HOLD_POSITION);
+	}
+	
+	protected boolean updatePIDSlotIndex(boolean holding) {
+		if(null == lastPID || null == lastSlot) {
+			return false;
+		}
+		PIDProfileSlot newSlot = holding ? PROFILE_SLOT_FOR_HOLD_POSITION : PROFILE_SLOT_FOR_MOVE;	
+		spx.selectProfileSlot(newSlot.getProfileSlotIndex(), lastPID.getPIDIndex());
+		this.lastSlot = newSlot;
+		return true;
+	}
 }
