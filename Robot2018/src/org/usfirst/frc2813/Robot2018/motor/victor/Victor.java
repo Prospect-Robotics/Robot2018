@@ -24,7 +24,7 @@ public class Victor extends AbstractMotorController implements IMotorController 
 	}
 
 	@Override
-	public Length readPosition() {
+	public Length getCurrentPosition() {
 		throw new UnsupportedOperationException("Cannot read position on Victor");
 	}
 

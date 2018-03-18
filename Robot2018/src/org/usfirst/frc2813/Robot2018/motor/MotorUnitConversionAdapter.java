@@ -25,13 +25,13 @@ public final class MotorUnitConversionAdapter implements IMotorController {
 	}
 
 	@Override
-	public MotorState getState() {
-		return controller.getState();
+	public MotorState getTargetState() {
+		return controller.getTargetState();
 	}
 
 	@Override
-	public MotorState getPreviousState() {
-		return controller.getPreviousState();
+	public MotorState getPreviousTargetState() {
+		return controller.getPreviousTargetState();
 	}
 
 	@Override
@@ -77,8 +77,8 @@ public final class MotorUnitConversionAdapter implements IMotorController {
 	}
 
 	@Override
-	public Length readPosition() {
-		Length sensorPosition = controller.readPosition();
+	public Length getCurrentPosition() {
+		Length sensorPosition = controller.getCurrentPosition();
 		Length scaledPosition = sensorPosition.multiply(configuration.getSensorToDriveScalingFactor());
 		if(configuration.getMotorPhaseIsReversed() && !supportsMotorInversion()) {
 			scaledPosition = scaledPosition.multiply(-1);

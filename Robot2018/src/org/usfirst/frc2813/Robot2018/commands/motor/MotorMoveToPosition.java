@@ -22,7 +22,7 @@ public class MotorMoveToPosition extends MotorInstantCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.MOVING_TO_POSITION && motor.getPosition() == position) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_TO_POSITION && motor.getTargetPosition() == position) {
 			Logger.info(this + " NOT telling " + motor + " to move to " + position + ", it's already doing that.");
 		} else {
 			Logger.info(this + " telling " + motor + " to move to " + position + ".");

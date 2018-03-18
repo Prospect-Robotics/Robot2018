@@ -46,12 +46,12 @@ public abstract class AbstractMotorController implements IMotorController {
 	public abstract void configure();
 
 	@Override
-	public MotorState getState() {
+	public MotorState getTargetState() {
 		return currentState;
 	}
 
 	@Override
-	public MotorState getPreviousState() {
+	public MotorState getPreviousTargetState() {
 		return previousState;
 	}	
 
@@ -123,7 +123,7 @@ public abstract class AbstractMotorController implements IMotorController {
 			return false;
 		}
 		if(!resetEncoderSensorPositionImpl(position)) {
-			Logger.error("Failed to read back the sensor position we set.  Leaving motor disabled.  Expected " + position + " but got " + readPosition());
+			Logger.error("Failed to read back the sensor position we set.  Leaving motor disabled.  Expected " + position + " but got " + getCurrentPosition());
 			return false;
 		}
 		if(previousState.getOperation().isHoldingCurrentPosition()) {
@@ -222,11 +222,11 @@ public abstract class AbstractMotorController implements IMotorController {
 	}
 	
 	public String getDiagnostics() {
-		return this + " " + getState() + 
+		return this + " " + getTargetState() + 
 		(configuration.has(MotorConfiguration.Disconnected)
 				? " <<<< DISCONNECTED BY CONFIGURATION >>>>" 
 				: (
-					" @ " + readPosition() 
+					" @ " + getCurrentPosition() 
 					+ (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) ? " [RLimit=" + readLimitSwitch(Direction.REVERSE) + "]" : "")
 					+ (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) ? " [FLimit=" + readLimitSwitch(Direction.FORWARD) + "]" : "")
 				)

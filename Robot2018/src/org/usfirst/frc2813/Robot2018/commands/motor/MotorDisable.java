@@ -17,7 +17,7 @@ public class MotorDisable extends MotorInstantCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.DISABLED) {
+		if(motor.getTargetState().getOperation() == MotorOperation.DISABLED) {
 			Logger.info(this + " NOT setting " + motor + " to disable (neutral state), it's already disabled.");
 		} else {
 			Logger.info(this + " setting " + motor + " to disable (neutral state).");

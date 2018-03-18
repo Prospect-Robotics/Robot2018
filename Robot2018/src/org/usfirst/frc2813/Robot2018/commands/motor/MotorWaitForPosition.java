@@ -18,7 +18,7 @@ public class MotorWaitForPosition extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() != MotorOperation.MOVING_TO_POSITION) {
+		if(motor.getTargetState().getOperation() != MotorOperation.MOVING_TO_POSITION) {
 			Logger.info(this + " waiting for " + motor + " to reach position.");
 			motor.holdCurrentPosition();
 		} else {
@@ -29,13 +29,13 @@ public class MotorWaitForPosition extends MotorCommand {
 
 	@Override
 	protected boolean isFinished() {
-		if (motor.getState().getOperation() != MotorOperation.MOVING_TO_POSITION) {
+		if (motor.getTargetState().getOperation() != MotorOperation.MOVING_TO_POSITION) {
 			return true;
 		}
-		if (motor.getState().getDirection() == Direction.UP) {
-			return motor.readPosition().getValue() > motor.getPosition().getValue();
+		if (motor.getTargetState().getDirection() == Direction.UP) {
+			return motor.getCurrentPosition().getValue() > motor.getTargetPosition().getValue();
 		}
-		return motor.readPosition().getValue() < motor.getPosition().getValue();
+		return motor.getCurrentPosition().getValue() < motor.getTargetPosition().getValue();
 	}
 
     public String toString() {
