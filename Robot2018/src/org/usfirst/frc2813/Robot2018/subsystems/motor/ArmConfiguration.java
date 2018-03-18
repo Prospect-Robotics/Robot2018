@@ -64,7 +64,7 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	// Software Settings
 	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0);
-	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(162); // TBD
+	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(130); // TBD
 //	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(180); // TBD
 	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(90); // TBD
 
