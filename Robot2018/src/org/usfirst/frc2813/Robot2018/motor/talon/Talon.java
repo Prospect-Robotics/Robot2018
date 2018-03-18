@@ -141,6 +141,12 @@ public final class Talon extends AbstractMotorController {
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
 			break;
+		case MOVING_TO_RELATIVE_POSITION:
+			newControlMode = ControlMode.Position;
+			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
+			newPIDIndex    = PID_INDEX_FOR_MOVE;
+			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
+			break;
 		case MOVING_IN_DIRECTION_AT_RATE:
 			newControlMode = ControlMode.Velocity;
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
@@ -210,6 +216,7 @@ public final class Talon extends AbstractMotorController {
 	/*
 	 * Configure PID values
 	 */
+	@SuppressWarnings("unused")
 	private void configurePID(TalonProfileSlot profileSlot, double p, double i, double d) {
 		configurePID(profileSlot, p, i, d, 0);
 	}
