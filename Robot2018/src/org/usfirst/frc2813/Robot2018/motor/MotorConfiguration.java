@@ -72,17 +72,6 @@ public class MotorConfiguration implements IMotorConfiguration {
 	 * Find out if a capability is supported
 	 */
 	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#has(long)
-	 */
-	@Override
-	public boolean has(long capability) {
-		return hasAll(capability);
-	}
-	
-	/*
-	 * Find out if a capability is supported
-	 */
-	/* (non-Javadoc)
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getCapabilities()
 	 */
 	@Override
@@ -592,7 +581,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 
 	private void validateCapabilityDependency(int capability, int requireAny, int requireAll) {
 		
-		if(has(capability) && !hasAll(requireAll)) {
+		if(hasAll(capability) && !hasAll(requireAll)) {
 			for(int i = 0; i <= MAX_CAPABILITY; i++) {
 				int c = (1 << i);
 				if((requireAll & c) != 0 && (capabilities & c) == 0) {
@@ -601,7 +590,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 			}
 		}
 		
-		if(has(capability) && requireAny != 0 && !hasAny(requireAny)) {
+		if(hasAll(capability) && requireAny != 0 && !hasAny(requireAny)) {
 			throw new IllegalArgumentException("The " + getCapabilityName(capability) + " capability requires at least one of:\n" + listCapabilitiesCSV(requireAny));
 		}
 	}
@@ -667,10 +656,10 @@ public class MotorConfiguration implements IMotorConfiguration {
 		checkParameter("remoteForwardHardLimitSwitchDeviceId", remoteForwardHardLimitSwitchDeviceId, 0, RemoteForwardHardLimitSwitch); // no requirements
 		checkParameter("remoteReverseHardLimitSwitchSource", remoteReverseHardLimitSwitchSource, 0, RemoteReverseHardLimitSwitch); // no requirements
 		checkParameter("remoteReverseHardLimitSwitchDeviceId", remoteReverseHardLimitSwitchDeviceId, 0, RemoteReverseHardLimitSwitch); // no requirements
-		if(has(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue() && !has(LocalForwardHardLimitSwitch)) {
+		if(hasAll(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue() && !hasAll(LocalForwardHardLimitSwitch)) {
 			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
 		}
-		if(has(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()&& !has(LocalReverseHardLimitSwitch)) {
+		if(hasAll(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()&& !hasAll(LocalReverseHardLimitSwitch)) {
 			throw new IllegalArgumentException("reverseSoftLimit " + reverseSoftLimit + " exceeds reverseLimit " + reverseLimit + ".  Soft limits must be within physical range of motion.");
 		}
 	}

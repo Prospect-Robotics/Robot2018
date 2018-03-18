@@ -114,7 +114,7 @@ public class MotorState implements IMotorState {
 		return getDescription();
 	}
 	private boolean nullSafeEquals(Object a, Object b) {
-		if(a == null && b == null) {
+		if(a == b) {
 			return true;
 		}
 		if(a == null || b == null) {
@@ -130,7 +130,7 @@ public class MotorState implements IMotorState {
 		if(null == other) {
 			return false;
 		}
-		return nullSafeEquals(other.operation, this.operation)
+		return nullSafeEquals(other.operation, operation)
 				&& nullSafeEquals(other.targetDirection, targetDirection)
 				&& nullSafeEquals(other.targetAbsolutePosition, targetAbsolutePosition)
 				&& nullSafeEquals(other.targetRelativeDistance, targetRelativeDistance)

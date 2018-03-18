@@ -2,11 +2,11 @@ package org.usfirst.frc2813.Robot2018.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
-import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
@@ -112,7 +112,6 @@ public abstract class AbstractMotorController implements IMotorController {
 	public final boolean holdCurrentPosition() {
 		if(!changeState(MotorStateFactory.createHoldingPosition(this))) 
 			return false;
-		autoZeroSensorPositionsIfNecessary();
 		return true;
 	}
 	
@@ -128,21 +127,79 @@ public abstract class AbstractMotorController implements IMotorController {
 
 	@Override
 	public final boolean resetEncoderSensorPosition(Length position) {
+		if(getCurrentPosition().equals(position)) {
+//			Logger.error("BUG: " + this + " got resetEncoderSensorPosition(" + position + ") when it's already correct.");
+//			(new Throwable()).printStackTrace();
+			return true;
+		}
+		Direction directionOfTravel; 
 		Logger.info("resetEncoderSensorPosition to " + position + ".");
+		IMotorState stateBeforeResettingEncoders = getTargetState();
+		Length positionBeforeResettingEncoders = getCurrentPosition();
 		if(!changeState(MotorStateFactory.createDisabled(this))) {
 			Logger.info("Could not change state to disabled.  No resetting sensor position.");
 			return false;
 		}
 		if(!resetEncoderSensorPositionImpl(position)) {
-			Logger.error("Failed to read back the sensor position we set.  Leaving motor disabled.  Expected " + position + " but got " + getCurrentPosition());
+			Logger.error("Failed to reset encoders.  Leaving motor disabled.  Expected " + position + " but got " + getCurrentPosition());
 			return false;
 		}
-		if(previousState.getOperation().isHoldingCurrentPosition()) {
-			Logger.info("Returning to hold position mode from hardware limit switch software reset of sensor.");
+		switch(stateBeforeResettingEncoders.getOperation()) {
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of manual calibrating sensor operation.");
 			changeState(MotorStateFactory.createHoldingPosition(this));
-		} else {
-			Logger.info("Leaving motor disabled after reached hardware limit switch while not in holding position mode.");
-			return false;
+			break;
+		case DISABLED:
+			// Stay disabled, no further change required.
+			break;
+		case HOLDING_CURRENT_POSITION:
+			Logger.info("resetEncoderSensorPosition(" + position + ") is returning to holding operation after completion of auto-calibrating sensor operation.");
+			changeState(MotorStateFactory.createHoldingPosition(this));
+			break;
+		case MOVING_IN_DIRECTION_AT_RATE:
+			directionOfTravel = stateBeforeResettingEncoders.getTargetDirection();
+			if(getCurrentLimitSwitchStatus(directionOfTravel)) {
+				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of auto-calibrating sensor operation.");
+				changeState(MotorStateFactory.createHoldingPosition(this));
+			} else {
+				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning back to moving away from the hardware limit after completion of auto-calibrating operation.");
+				changeState(stateBeforeResettingEncoders);
+			}
+			
+			break;
+		case MOVING_TO_ABSOLUTE_POSITION:
+			directionOfTravel = stateBeforeResettingEncoders.getTargetAbsolutePosition().getValue() > getCurrentPosition().getValue() ? Direction.FORWARD : Direction.REVERSE; 
+			if(getCurrentLimitSwitchStatus(directionOfTravel)) {
+				Logger.error("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the absolute position is beyond the hardware limit.");
+				changeState(MotorStateFactory.createHoldingPosition(this));
+			} else {
+				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning back to move to absolute position after completion of auto-calibrating sensor operation.");
+				changeState(MotorStateFactory.createMovingToAbsolutePosition(this, stateBeforeResettingEncoders.getTargetAbsolutePosition()));
+			}
+			break;
+		case MOVING_TO_RELATIVE_POSITION:
+			directionOfTravel = stateBeforeResettingEncoders.getTargetAbsolutePosition().getValue() > getCurrentPosition().getValue() ? Direction.FORWARD : Direction.REVERSE;
+			Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to an adjusted relative position.");
+			// NB: 
+			Length adjustedRelativePosition = stateBeforeResettingEncoders.getTargetRelativeDistance().add(positionBeforeResettingEncoders.subtract(position));
+// DEBUGGING
+			IMotorState relative = MotorStateFactory.createMovingToRelativePosition(this, stateBeforeResettingEncoders.getTargetDirection(), adjustedRelativePosition);
+			IMotorState absolute = MotorStateFactory.createMovingToAbsolutePosition(this, stateBeforeResettingEncoders.getTargetAbsolutePosition());
+			if(!relative.equals(absolute)) {
+				Logger.error("Relative and absolute commands calculated did not match!");
+			}
+// DEBUGGING
+			if(getCurrentLimitSwitchStatus(directionOfTravel)) {
+				Logger.error("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the relative position was beyond the hardware limit.");
+				changeState(MotorStateFactory.createHoldingPosition(this));
+			} else {
+				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning back to move to an adjusted relative position after completion of auto-calibrating sensor operation: " + relative);
+				changeState(relative);			
+			}
+			break;
+		default:
+			throw new IllegalStateException("Encountered an operation we don't recognize in resetEncoderSensorPosition: " + stateBeforeResettingEncoders.getOperation());
+			
 		}
 		return true;
 	}
@@ -254,12 +311,12 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	public String getDiagnostics() {
 		return this + " " + getTargetState() + 
-		(configuration.has(IMotorConfiguration.Disconnected)
+		(configuration.hasAll(IMotorConfiguration.Disconnected)
 				? " <<<< DISCONNECTED BY CONFIGURATION >>>>" 
 				: (
 					" @ " + getCurrentPosition() 
-					+ (configuration.has(IMotorConfiguration.LocalReverseHardLimitSwitch) ? " [RLimit=" + getCurrentLimitSwitchStatus(Direction.REVERSE) + "]" : "")
-					+ (configuration.has(IMotorConfiguration.LocalForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
+					+ (configuration.hasAll(IMotorConfiguration.LocalReverseHardLimitSwitch) ? " [RLimit=" + getCurrentLimitSwitchStatus(Direction.REVERSE) + "]" : "")
+					+ (configuration.hasAll(IMotorConfiguration.LocalForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
 				)
 		);
 	}
@@ -319,39 +376,71 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	protected abstract boolean resetEncoderSensorPositionImpl(Length sensorPosition);
 	protected abstract boolean executeTransition(IMotorState proposedState);
+	protected abstract boolean isUsingPIDSlotIndexForHolding();
+	protected abstract boolean updatePIDSlotIndex(boolean holding);
 	
 	public String toString() {
 		return getName();
 	}
 
+	protected static int SENSOR_RESET_TOLERANCE_PULSES = 50;
 	// Returns true if we zeroed and are now holding position at zero
-	protected boolean autoZeroSensorPositionsIfNecessary() {
+	protected boolean autoResetSensorPositionIfNecessary() {
 		boolean resetEncoders = false;
-/*
-NB: This is doing strange things.  
+		// Do we need to handle forward limit
+		if (configuration.hasAny(MotorConfiguration.LocalForwardHardLimitSwitch|MotorConfiguration.RemoteForwardHardLimitSwitch) 
+				&& configuration.getForwardHardLimitSwitchResetsEncoder() && getCurrentLimitSwitchStatus(Direction.FORWARD)) 
+		{
+			if(Math.abs(getCurrentPosition().getValue() - configuration.getForwardLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
+				Logger.debug("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getForwardLimit() + "."); 
+				resetEncoders = resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
+			}
+		}
+		// Do we need to handle reverse limit
+		if (configuration.hasAny(MotorConfiguration.LocalReverseHardLimitSwitch|MotorConfiguration.RemoteReverseHardLimitSwitch) 
+				&& configuration.getReverseHardLimitSwitchResetsEncoder() && getCurrentLimitSwitchStatus(Direction.REVERSE)) 
+		{
+			if(Math.abs(getCurrentPosition().getValue() - configuration.getReverseLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
+				Logger.debug("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getReverseLimit() + "."); 
+				resetEncoders = resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
+			}
 
-		if (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) && configuration.getForwardHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.FORWARD)) {
-			if(!readPosition().equals(configuration.getForwardLimit())) {
-				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getForwardLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
-			}
-			resetEncoders = true; 
 		}
-		if (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) && configuration.getReverseHardLimitSwitchResetsEncoder() && readLimitSwitch(Direction.NEGATIVE)) {
-			if(!readPosition().equals(configuration.getReverseLimit())) {
-				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + readPosition() + " to " + configuration.getReverseLimit() + "."); 
-				resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
-			}
-			resetEncoders = true; 
-		}
-*/		
 		return resetEncoders;
+	}
+
+	public void checkOperationComplete() {
+ 		switch(currentState.getOperation()) {
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			// NB: We handle transition out of this state in autoResetSensorPositionIfNecessary, which is already polled by periodic. 
+			break;
+		case DISABLED:
+			// Nothing to do here
+			break;
+		case HOLDING_CURRENT_POSITION:
+			// Nothing to do here
+			break;
+		case MOVING_IN_DIRECTION_AT_RATE:
+			// Nothing to do here
+			break;
+		case MOVING_TO_ABSOLUTE_POSITION:
+		case MOVING_TO_RELATIVE_POSITION:
+			boolean shouldBeHolding = getTargetState().getCurrentPositionErrorWithin(LengthUOM.Inches.create(0.25));
+			if(isUsingPIDSlotIndexForHolding() != shouldBeHolding) {
+				Logger.info(this + " updating PID.  We are " + (shouldBeHolding ? "" : "not ") + "close to target.");
+				updatePIDSlotIndex(shouldBeHolding);
+			}
+			break;
+		default:
+			throw new UnsupportedOperationException(this + " got an unrecognized operation: " + currentState + " in periodic.");		
+		}
 	}
 	/*
 	 * We will change behavior as we reach our target...
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#periodic()
 	 */
 	public void periodic() {
-		// ...
+		autoResetSensorPositionIfNecessary();
+		checkOperationComplete();
 	}
 }

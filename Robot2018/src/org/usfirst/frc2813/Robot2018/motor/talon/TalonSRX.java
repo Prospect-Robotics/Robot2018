@@ -108,9 +108,6 @@ public final class TalonSRX extends AbstractMotorController {
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		boolean result = true;
-		if(!resetEncoderSensorPosition(PID.Auxilliary, sensorPosition)) {
-			result = false;
-		}
 		if(!resetEncoderSensorPosition(PID.Primary, sensorPosition)) {
 			result = false;
 		}
@@ -217,8 +214,9 @@ public final class TalonSRX extends AbstractMotorController {
 		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, pid.getPIDIndex(), getTimeout());
 		srx.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
 		int readBack = srx.getSelectedSensorPosition(pid.getPIDIndex());
-		if(readBack != rawValue) {
+		if(Math.abs(readBack - rawValue) > SENSOR_RESET_TOLERANCE_PULSES) {
 			Logger.error(this + " failed setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ") - got " + readBack + " instead.");
+			srx.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
 			return false;
 		}
 		return true;
@@ -244,7 +242,7 @@ public final class TalonSRX extends AbstractMotorController {
 	
 	public String getDiagnotics() {
 		return super.getDiagnostics()
-				+ (configuration.has(IMotorConfiguration.Disconnected) ? "" :
+				+ (configuration.hasAll(IMotorConfiguration.Disconnected) ? "" :
 				  " [ControlMode=" + lastControlMode
 				+ ", ControlModeValue=" + lastControlModeValue
 				+ ", SlotIndex=" + lastSlot

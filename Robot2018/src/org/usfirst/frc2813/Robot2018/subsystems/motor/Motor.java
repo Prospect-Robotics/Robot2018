@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
@@ -171,6 +172,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public final void periodic() {
 		super.periodic();
 		controller.periodic();
+		dumpSubsystemStatusAtIntervals();
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -252,7 +254,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	@Override
 	public void configure() {
-		if(getConfiguration().has(IMotorConfiguration.Disconnected)) {
+		if(getConfiguration().hasAll(IMotorConfiguration.Disconnected)) {
 			Logger.error("" + this + " has it's motor configured to disconnected.  Not configuring anything.");
 			return;
 		}
@@ -317,7 +319,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			Logger.warning("encoder not functional. Refusing action.");
 			return false;	
 		}
-		if(getConfiguration().has(IMotorConfiguration.Disconnected)) {
+		if(getConfiguration().hasAll(IMotorConfiguration.Disconnected)) {
 			controller.disable();
 			Logger.warning("Motor configuration says it's disconnected. Refusing action.");
 			return false;	
@@ -416,4 +418,15 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
 		return controller.getCurrentPositionErrorWithin(marginOfError);
 	}
+	private long DISPLAY_INTERVAL = 2500;
+	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
+	private void dumpSubsystemStatusAtIntervals() {
+		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
+			lastPositionReport = System.currentTimeMillis();
+			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
+			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
+//			Logger.info("[[PERIODIC]] " + Robot.intake.getDiagnostics());
+		}
+	}
+
 }

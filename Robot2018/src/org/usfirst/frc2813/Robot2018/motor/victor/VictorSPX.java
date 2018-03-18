@@ -240,7 +240,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	
 	public String getDiagnotics() {
 		return super.getDiagnostics()
-				+ (configuration.has(IMotorConfiguration.Disconnected) ? "" :
+				+ (configuration.hasAll(IMotorConfiguration.Disconnected) ? "" :
 				  " [ControlMode=" + lastControlMode
 				+ ", ControlModeValue=" + lastControlModeValue
 				+ ", SlotIndex=" + lastSlot

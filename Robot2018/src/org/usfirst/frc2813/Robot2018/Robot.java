@@ -118,6 +118,7 @@ public class Robot extends TimedRobot {
 
 	//@Override
 	public void teleopInit() {
+		System.out.println("teleopInit STARTED");
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
@@ -130,24 +131,12 @@ public class Robot extends TimedRobot {
 		new POST().start();
 	}
 
-	/** TODO: DELETE ALL THIS WHEN NO LONGER NECESSARY */
-	private long DISPLAY_INTERVAL = 750;
-	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
-	private void dumpSubsystemStatusAtIntervals() {
-		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
-			lastPositionReport = System.currentTimeMillis();
-			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
-			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
-//			Logger.info("[[PERIODIC]] " + Robot.intake.getDiagnostics());
-		}
-	}
 	/**
 	 * This function is called periodically during operator control
 	 */
 	//@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		dumpSubsystemStatusAtIntervals();
 	}
 
 	public void robotPeriodic() {

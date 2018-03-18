@@ -46,11 +46,6 @@ public interface IMotorConfiguration {
 	/*
 	 * Find out if a capability is supported
 	 */
-	boolean has(long capability);
-
-	/*
-	 * Find out if a capability is supported
-	 */
 	long getCapabilities();
 
 	/*
