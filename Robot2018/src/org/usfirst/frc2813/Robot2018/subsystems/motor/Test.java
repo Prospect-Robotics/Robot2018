@@ -5,7 +5,7 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
  * So I removed the JUnit classes.  The function can still be called manually from somewhere as needed.
  */
 class Test  {
-	// @org.junit.jupiter.api.Test
+	@org.junit.jupiter.api.Test
 	void test() {
 //		ElevatorConfiguration.mathReport();
 		ArmConfiguration.mathReport();
