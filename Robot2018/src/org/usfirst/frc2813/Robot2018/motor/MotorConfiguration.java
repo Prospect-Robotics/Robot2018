@@ -16,8 +16,6 @@ import org.usfirst.frc2813.units.values.Value;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.first.wpilibj.command.Command;
-
 /*
  * This class is an immutable description of an axis as used by a motor, a subsystem's API, or a sensor.
  * The idea is to encapsulate everything about the axis so that the subsystem can completely initialize 

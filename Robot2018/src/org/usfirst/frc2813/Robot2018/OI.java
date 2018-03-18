@@ -9,7 +9,6 @@ import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorTesting;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleState;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;

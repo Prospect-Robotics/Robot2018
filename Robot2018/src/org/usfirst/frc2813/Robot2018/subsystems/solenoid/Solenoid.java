@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 
-import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.subsystems.SubsystemBinary;
 import org.usfirst.frc2813.logging.Logger;

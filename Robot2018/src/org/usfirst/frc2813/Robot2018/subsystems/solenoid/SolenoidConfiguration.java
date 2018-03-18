@@ -4,8 +4,6 @@ import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidType;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 
-import edu.wpi.first.wpilibj.command.Command;
-
 /*
  * Configuration for a solenoid.  What am I and is my logic reversed?
  */

@@ -1,7 +1,6 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
-import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
@@ -12,7 +11,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.JawsConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.IntakeConfiguration;
+import org.usfirst.frc2813.logging.Logger;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 

@@ -3,8 +3,6 @@ package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidType;
 
-import edu.wpi.first.wpilibj.command.Command;
-
 /*
  * NB: We considered having a default command for the jaws to open, so that if you weren't running
  * a "holding", "intaking", or "outtaking" command that they would spring back open again - 

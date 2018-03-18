@@ -4,19 +4,11 @@ import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
-import org.usfirst.frc2813.Robot2018.motor.talon.TalonPID;
-import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
-import org.usfirst.frc2813.logging.LogLevel;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public abstract class AbstractMotorController implements IMotorController {
 	

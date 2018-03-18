@@ -4,8 +4,6 @@ import org.usfirst.frc2813.Robot2018.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.command.Subsystem;
-
 /**
  *
  */
