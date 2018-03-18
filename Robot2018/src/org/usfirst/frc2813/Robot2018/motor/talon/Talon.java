@@ -3,11 +3,13 @@ package org.usfirst.frc2813.Robot2018.motor.talon;
 import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
-import org.usfirst.frc2813.Robot2018.motor.IMotorController;
-import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
-import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
-import org.usfirst.frc2813.Robot2018.motor.MotorState;
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
+import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
+import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
+import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
+import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
@@ -35,8 +37,8 @@ public final class Talon extends AbstractMotorController {
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	// Last arg sent for controlMode
-	private TalonProfileSlot lastSlotIndex            = TalonProfileSlot.HoldingPosition;
-	private TalonPID         lastPIDIndex             = TalonPID.Primary;
+	private TalonProfileSlot lastSlot                 = TalonProfileSlot.HoldingPosition;
+	private TalonPID         lastPID                  = TalonPID.Primary;
 	// last control mode parameter
 	protected ControlMode    lastControlMode          = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	private double           lastControlModeValue     = 0;
@@ -64,7 +66,7 @@ public final class Talon extends AbstractMotorController {
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	public Talon(MotorConfiguration configuration, TalonSRX srx) {
+	public Talon(IMotorConfiguration configuration, TalonSRX srx) {
 		super(configuration);
 		this.srx = srx;
 	}
@@ -85,7 +87,7 @@ public final class Talon extends AbstractMotorController {
 	}
 	
 	@Override
-	public boolean readLimitSwitch(Direction direction) {
+	public boolean getCurrentLimitSwitchStatus(Direction direction) {
 		if (direction.isNegative()) {
 			return srx.getSensorCollection().isRevLimitSwitchClosed();
 		} else {
@@ -95,7 +97,7 @@ public final class Talon extends AbstractMotorController {
 	
 	@Override
 	public final Length getCurrentPosition() {
-		int raw = srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex());
+		int raw = srx.getSelectedSensorPosition(lastPID.getPIDIndex());
 		Length length = configuration.getNativeSensorLengthUOM().create(raw); 
 //		Logger.info("readPosition " + raw + " --> " + length);
 		return length;
@@ -117,10 +119,10 @@ public final class Talon extends AbstractMotorController {
 		return result;
 	}
 
-	protected boolean executeTransition(MotorState proposedState) {
+	protected boolean executeTransition(IMotorState proposedState) {
 		// New PID/Slot are almost always maintain
-		TalonProfileSlot newSlotIndex        = lastSlotIndex;
-		TalonPID         newPIDIndex         = lastPIDIndex;
+		TalonProfileSlot newSlotIndex        = lastSlot;
+		TalonPID         newPIDIndex         = lastPID;
 		ControlMode      newControlMode      = ControlMode.Disabled;
 		double           newControlModeValue = 0;
 
@@ -138,17 +140,17 @@ public final class Talon extends AbstractMotorController {
 			newPIDIndex    = PID_INDEX_FOR_HOLD_POSITION;
 			newControlModeValue = getCurrentPosition().getValue();
 			break;
-		case MOVING_TO_POSITION:
+		case MOVING_TO_ABSOLUTE_POSITION:
 			newControlMode = ControlMode.Position;
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
-			newControlModeValue = toSensorUnits(proposedState.getPosition()).getValue();
+			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
 			break;
-		case MOVING:
+		case MOVING_IN_DIRECTION_AT_RATE:
 			newControlMode = ControlMode.Velocity;
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
-			newControlModeValue = toMotorUnits(proposedState.getRate()).getValue() * proposedState.getDirection().getMultiplierAsDouble();
+			newControlModeValue = toMotorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			break;
 		}
 		
@@ -159,8 +161,8 @@ public final class Talon extends AbstractMotorController {
 		
 		this.lastControlMode = newControlMode;
 		this.lastControlModeValue = newControlModeValue;
-		this.lastSlotIndex = newSlotIndex;
-		this.lastPIDIndex = newPIDIndex;
+		this.lastSlot = newSlotIndex;
+		this.lastPID = newPIDIndex;
 		return true;
 	}
 
@@ -171,8 +173,8 @@ public final class Talon extends AbstractMotorController {
 	private int getTimeout() {
 		switch(currentState.getOperation()) {
 		case HOLDING_CURRENT_POSITION:
-		case MOVING:
-		case MOVING_TO_POSITION:
+		case MOVING_IN_DIRECTION_AT_RATE:
+		case MOVING_TO_ABSOLUTE_POSITION:
 			return RUNNING_CONFIGURATION_COMMAND_TIMEOUT_MS;
 		case DISABLED:
 		default:
@@ -230,18 +232,18 @@ public final class Talon extends AbstractMotorController {
 	
 	public String getDiagnotics() {
 		return super.getDiagnostics()
-				+ (configuration.has(MotorConfiguration.Disconnected) ? "" :
+				+ (configuration.has(IMotorConfiguration.Disconnected) ? "" :
 				  " [ControlMode=" + lastControlMode
 				+ ", ControlModeValue=" + lastControlModeValue
-				+ ", SlotIndex=" + lastSlotIndex
-				+ ", PIDIndex=" + lastPIDIndex
+				+ ", SlotIndex=" + lastSlot
+				+ ", PIDIndex=" + lastPID
 				+ "]");
 	}
 	
 	@Override
 	public void configure() {
 		// Start disabled
-		changeState(MotorState.createDisabled());
+		changeState(MotorStateFactory.createDisabled(this));
 		
 		// set the peak and nominal outputs, 12V means full
 		srx.configNominalOutputForward(0, getTimeout());
@@ -268,7 +270,7 @@ public final class Talon extends AbstractMotorController {
 		srx.configSetParameter(ParamEnum.eClearPositionOnQuadIdx, 0 /* disabled */, 0 /* unused */, 0 /* unused */, getTimeout());
 		
 		// Set forward hard limits
-		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardHardLimitSwitch)) {
+		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardHardLimitSwitch)) {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, configuration.getForwardHardLimitSwitchNormal(), getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
 		} else {
@@ -276,7 +278,7 @@ public final class Talon extends AbstractMotorController {
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
 		}
 		// Set reverse hard limits
-		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseHardLimitSwitch)) {
+		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseHardLimitSwitch)) {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, configuration.getReverseHardLimitSwitchNormal(), getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
 		} else {
@@ -284,14 +286,14 @@ public final class Talon extends AbstractMotorController {
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		}
 		// Set forward soft limit
-		if(configuration.hasAll(MotorConfiguration.Forward|MotorConfiguration.LimitPosition|MotorConfiguration.ForwardSoftLimitSwitch)) {
+		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch)) {
 			srx.configForwardSoftLimitEnable(true, getTimeout());
 			srx.configForwardSoftLimitThreshold(configuration.getForwardSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
 		} else {
 			srx.configForwardSoftLimitEnable(false, getTimeout());
 		}
 		// Set reverse soft limit
-		if(configuration.hasAll(MotorConfiguration.Reverse|MotorConfiguration.LimitPosition|MotorConfiguration.ReverseSoftLimitSwitch)) {
+		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch)) {
 			srx.configReverseSoftLimitEnable(true, getTimeout());
 			srx.configReverseSoftLimitThreshold(configuration.getReverseSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
 		} else {
@@ -300,7 +302,7 @@ public final class Talon extends AbstractMotorController {
 		srx.setSensorPhase(configuration.getSensorPhaseIsReversed());
 		srx.setInverted(configuration.getMotorPhaseIsReversed());
 		// Set neutral mode, if specified - otherwise leave it with pre-configured value
-		if(configuration.hasAny(MotorConfiguration.NeutralMode)) {
+		if(configuration.hasAny(IMotorConfiguration.NeutralMode)) {
 			srx.setNeutralMode(configuration.getNeutralMode());
 		} else { 
 			srx.setNeutralMode(NeutralMode.EEPROMSetting); 
@@ -321,5 +323,10 @@ public final class Talon extends AbstractMotorController {
 	}
 	public String toString() {
 		return configuration.getName() + "." + this.getClass().getSimpleName();  
+	}
+
+	@Override
+	public Rate getCurrentRate() {
+		return configuration.getNativeSensorRateUOM().create(srx.getSelectedSensorVelocity(lastPID.getPIDIndex()));
 	}
 }

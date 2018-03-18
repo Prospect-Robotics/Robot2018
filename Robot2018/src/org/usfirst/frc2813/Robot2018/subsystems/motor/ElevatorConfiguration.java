@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
@@ -147,21 +148,21 @@ public class ElevatorConfiguration extends MotorConfiguration {
 		super(
 			"Elevator",
 			(0
-					|MotorConfiguration.ControlDirection
-					|MotorConfiguration.ControlPosition
-					|MotorConfiguration.ControlRate
-					|MotorConfiguration.Forward
-					|MotorConfiguration.ReverseHardLimitSwitch
-					|MotorConfiguration.ForwardSoftLimitSwitch
-					|MotorConfiguration.LimitPosition
-					|MotorConfiguration.LimitRate
-					|MotorConfiguration.SensorToDriveScale
-					|MotorConfiguration.ReadDirection
-					|MotorConfiguration.ReadPosition
-					|MotorConfiguration.ReadRate
-					|MotorConfiguration.Reverse
-					|MotorConfiguration.DefaultRate
-					|MotorConfiguration.NeutralMode
+					|IMotorConfiguration.ControlDirection
+					|IMotorConfiguration.ControlPosition
+					|IMotorConfiguration.ControlRate
+					|IMotorConfiguration.Forward
+					|IMotorConfiguration.ReverseHardLimitSwitch
+					|IMotorConfiguration.ForwardSoftLimitSwitch
+					|IMotorConfiguration.LimitPosition
+					|IMotorConfiguration.LimitRate
+					|IMotorConfiguration.SensorToDriveScale
+					|IMotorConfiguration.ReadDirection
+					|IMotorConfiguration.ReadPosition
+					|IMotorConfiguration.ReadRate
+					|IMotorConfiguration.Reverse
+					|IMotorConfiguration.DefaultRate
+					|IMotorConfiguration.NeutralMode
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM

@@ -5,11 +5,14 @@ import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.ResetEncoderLimitSwitch;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
+import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
-import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
-import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
-import org.usfirst.frc2813.Robot2018.motor.MotorState;
-import org.usfirst.frc2813.Robot2018.motor.MotorUnitConversionAdapter;
+import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
+import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
+import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
+import org.usfirst.frc2813.Robot2018.motor.MotorControllerUnitConversionAdapter;
+import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.talon.Talon;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonSensorPhase;
@@ -56,31 +59,32 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  *    unnecessarily complicate things.
  *
  */
-public final class Motor extends GearheadsSubsystem {
+public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	/* ----------------------------------------------------------------------------------------------
 	 * Configuration
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	private final IMotorController controller;
-	private MotorState currentState;
-	private MotorState previousState;
+	private IMotorState currentState;
+	private IMotorState previousState;
 	
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	public Motor(MotorConfiguration configuration, WPI_VictorSPX victorSPX) {
-		this.controller = new MotorUnitConversionAdapter(configuration, new Victor(configuration, victorSPX));
-		this.currentState = this.previousState = MotorState.createDisabled();
-		this.currentState = MotorState.createDisabled();
-		this.previousState = MotorState.createDisabled();
+	public Motor(IMotorConfiguration configuration, WPI_VictorSPX victorSPX) {
+		this.controller = new MotorControllerUnitConversionAdapter(configuration, new Victor(configuration, victorSPX));
+		this.currentState = this.previousState = MotorStateFactory.createDisabled(this);
+		this.currentState = MotorStateFactory.createDisabled(this);
+		this.previousState = MotorStateFactory.createDisabled(this);
+		configure();
 	}
 
-	public Motor(MotorConfiguration configuration, TalonSRX talonSRX) {
-		this.controller = new MotorUnitConversionAdapter(configuration, new Talon(configuration, talonSRX));
-		this.currentState = MotorState.createDisabled();
-		this.previousState = MotorState.createDisabled();
+	public Motor(IMotorConfiguration configuration, TalonSRX talonSRX) {
+		this.controller = new MotorControllerUnitConversionAdapter(configuration, new Talon(configuration, talonSRX));
+		this.currentState = MotorStateFactory.createDisabled(this);
+		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
 	}
 
@@ -88,38 +92,50 @@ public final class Motor extends GearheadsSubsystem {
 	 * Public API - State Inspection
 	 * ---------------------------------------------------------------------------------------------- */
 
-	public MotorConfiguration getConfiguration() {
+	@Override
+	public IMotorConfiguration getConfiguration() {
 		return controller.getConfiguration();
 	}
-	// 
-	public MotorState getTargetState() {
+
+	@Override
+	public IMotorState getTargetState() {
 		return currentState;
 	}
-	public MotorState getPreviousTargetState() {
+	
+	@Override
+	public IMotorState getPreviousTargetState() {
 		return previousState;
 	}
-	// 
-	public MotorState getControllerState() {
+	
+	/**
+	 * Get the controller's target state
+	 * @see IMotorController.getTargetState()
+	 */
+	public IMotorState getControllerState() {
 		return controller.getTargetState();
 	}
-	public MotorState getControllerPreviousState() {
-		return controller.getTargetState();
+	/**
+	 * Get the controller's previous target state
+	 * @see IMotorController.getPreviousTargetState()
+	 */
+	public IMotorState getControllerPreviousTargetState() {
+		return controller.getPreviousTargetState();
 	}
 	// What is the state of the limit switch (if applicable)
-	public boolean readLimitSwitch(Direction switchDirection) {
-		return controller.readLimitSwitch(switchDirection);
+	public boolean getCurrentLimitSwitchStatus(Direction switchDirection) {
+		return controller.getCurrentLimitSwitchStatus(switchDirection);
 	}
 	// Returns the speed if we are moving, otherwise null
 	public final Rate getTargetSpeed() {
-		return getTargetState().getRate();
+		return getTargetState().getTargetRate();
 	}
 	// Returns the position if we are moving, otherwise null.
 	public final Length getTargetPosition() {
-		return getTargetState().getPosition();
+		return getTargetState().getTargetAbsolutePosition();
 	}
 	// Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
 	public final Direction getTargetDirection() {
-		return getTargetState().getDirection();
+		return getTargetState().getTargetDirection();
 	}
 	// What's my name?
 	public final String toString() {
@@ -162,13 +178,13 @@ public final class Motor extends GearheadsSubsystem {
 	 * ability to alter speed but not direction AND if we aren't moving be able
 	 * to call it safely without initiating any movement.
 	 */
-	public final void setTargetSpeed(Rate newSpeed) {
+	public final void setTargetRate(Rate newSpeed) {
 		if(newSpeed.getValue() < 0) {
 			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
 		}
-		if(getTargetState().getOperation() == MotorOperation.MOVING) {
+		if(getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE) {
 			// Keep moving, call the official function
-			moveInDirectionAtSpeed(getTargetState().getDirection(), newSpeed);
+			moveInDirectionAtRate(getTargetState().getTargetDirection(), newSpeed);
 		} else {
 			Logger.info(getConfiguration().getName() + " was asked to change speed to " + newSpeed + ", but we aren't moving so we won't do it.");
 		}
@@ -181,50 +197,41 @@ public final class Motor extends GearheadsSubsystem {
 		controller.resetEncoderSensorPosition(getConfiguration().getNativeSensorLengthUOM().create(0));
 		dumpDiagnostics();
 	}
-	/**
-	 *  [ACTION] Disable the device. Required to handle run away bots
-	 */
-	public void disable() {
-		changeState(MotorState.createDisabled());
+	
+	@Override
+	public boolean disable() {
+		return changeState(MotorStateFactory.createDisabled(this));
 	}
 
-	/**
-	 *  [ACTION] Move in direction at speed
-	 * @param newSpeed
-	 * @param newDirection
-	 */
-	public void moveInDirectionAtSpeed(Direction direction, Rate rate) {
+	@Override
+	public boolean moveInDirectionAtRate(Direction direction, Rate rate) {
 		if(rate.getValue() < 0) {
 			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
 		}
-		changeState(MotorState.createMoving(direction, rate));
+		return changeState(MotorStateFactory.createMovingInDirectionAtRate(this, direction, rate));
 	}
 
-	/**
-	 *  [ACTION] Move in direction at speed
-	 * @param newSpeed
-	 * @param newDirection
-	 */
-	public void moveInDirectionAtDefaultSpeed(Direction direction) {
-		changeState(MotorState.createMoving(direction, getConfiguration().getDefaultRate()));
+	@Override
+	public boolean moveInDirectionAtDefaultRate(Direction direction) {
+		return changeState(MotorStateFactory.createMovingInDirectionAtRate(this, direction, getConfiguration().getDefaultRate()));
 	}
 
-	/**
-	 *  [ACTION] Move to the absolutePosition
-	 */
-	public void moveToPosition(Length position) {
-		changeState(MotorState.createMovingToPosition(position));
+	@Override
+	public boolean moveToAbsolutePosition(Length absolutePosition) {
+		return changeState(MotorStateFactory.createMovingToAbsolutePosition(this, absolutePosition));
 	}
 
-	/**
-	 * [ACTION] Fight to hold the current position
-	 */
-	public void holdCurrentPosition() {
-		changeState(MotorState.createHoldingPosition());
+	@Override
+	public boolean holdCurrentPosition() {
+		return changeState(MotorStateFactory.createHoldingPosition(this));
 	}
-	
-	// 
-	// Get controller position in subsystem units
+
+	@Override
+	public boolean moveToRelativePosition(Direction direction, Length relativeDistance) {
+		return changeState(MotorStateFactory.createMovingToRelativePosition(this, direction, relativeDistance));
+	}
+
+	@Override
 	public final Length getCurrentPosition() {
 		return toSubsystemUnits(controller.getCurrentPosition());
 	}
@@ -233,18 +240,19 @@ public final class Motor extends GearheadsSubsystem {
 	 * Implementation
 	 * ---------------------------------------------------------------------------------------------- */
 
-	// Configure the motor as specified in our configuration
-	protected void configure() {
-		if(getConfiguration().has(MotorConfiguration.Disconnected)) {
+	@Override
+	public void configure() {
+		if(getConfiguration().has(IMotorConfiguration.Disconnected)) {
 			Logger.error("" + this + " has it's motor configured to disconnected.  Not configuring anything.");
 			return;
 		}
+		setName(getConfiguration().getName());
 		controller.configure();
 	}
 
 	// Guards for state transitions, called by changeState
 	// IMPORTANT: Do not call directly	
-	protected boolean isStateTransitionAllowed(MotorState proposedState) {
+	protected boolean isStateTransitionAllowed(IMotorState proposedState) {
 		if (proposedState.equals(getTargetState()) && proposedState.getOperation() != MotorOperation.DISABLED) {
 			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", getTargetState(), proposedState);
 			new Exception().printStackTrace();
@@ -252,9 +260,10 @@ public final class Motor extends GearheadsSubsystem {
 		}
 		return true;
 	}
+	
 	// Execute for state transitions, called by changeState.  
 	// IMPORTANT: Do not call directly	
-	protected boolean executeTransition(MotorState proposedState) {
+	protected boolean executeTransition(IMotorState proposedState) {
 		// Check that state change is actually changing something. If so, do it.
 		Logger.info(this + " entering " + proposedState);
 		switch(proposedState.getOperation()) {
@@ -265,11 +274,16 @@ public final class Motor extends GearheadsSubsystem {
 		case HOLDING_CURRENT_POSITION:
 			controller.holdCurrentPosition();
 			break;
-		case MOVING:
-			controller.move(proposedState.getDirection(), proposedState.getRate());
+		case MOVING_IN_DIRECTION_AT_RATE:
+			controller.moveInDirectionAtRate(proposedState.getTargetDirection(), proposedState.getTargetRate());
 			break;
-		case MOVING_TO_POSITION:
-			controller.moveToPosition(proposedState.getPosition());
+		case MOVING_TO_ABSOLUTE_POSITION:
+			controller.moveToAbsolutePosition(proposedState.getTargetAbsolutePosition());
+			break;
+		case MOVING_TO_RELATIVE_POSITION:
+			controller.moveToRelativePosition(proposedState.getTargetDirection(), proposedState.getTargetRelativeDistance());
+			break;
+		default:
 			break;
 		}
 		return true;
@@ -286,14 +300,14 @@ public final class Motor extends GearheadsSubsystem {
 	 * with the old state in oldSpeed, oldPosition and oldDirection
 	 * @return true if state change occurred
 	 */
-	protected boolean changeState(MotorState proposedState) {
+	protected boolean changeState(IMotorState proposedState) {
 		Logger.printFormat(LogType.DEBUG, "%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getTargetState(), proposedState);
 		if (!encoderFunctional) {
 			controller.disable();
 			Logger.warning("encoder not functional. Refusing action.");
 			return false;	
 		}
-		if(getConfiguration().has(MotorConfiguration.Disconnected)) {
+		if(getConfiguration().has(IMotorConfiguration.Disconnected)) {
 			controller.disable();
 			Logger.warning("Motor configuration says it's disconnected. Refusing action.");
 			return false;	
@@ -351,5 +365,45 @@ public final class Motor extends GearheadsSubsystem {
 	// Convert a length to display units	
 	protected Rate toSubsystemUnits(Rate l) {
 		return l.convertTo(getConfiguration().getNativeDisplayRateUOM());
+	}
+
+	/**
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentRate()
+	 */
+	@Override 
+	public Rate getCurrentRate() {
+		return controller.getCurrentRate();
+	}
+
+	/*
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentPositionError()
+	 */
+	@Override
+	public Length getCurrentPositionError() {
+		return controller.getCurrentPositionError();
+	}
+
+	/*
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentRateError()
+	 */
+	@Override
+	public Rate getCurrentRateError() {
+		return controller.getCurrentRateError();
+	}
+
+	/**
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentRateErrorWithin(Rate)
+	 */
+	@Override
+	public boolean getCurrentRateErrorWithin(Rate marginOfError) {
+		return controller.getCurrentRateErrorWithin(marginOfError);
+	}
+
+	/**
+	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentPositionErrorWithin(Length)
+	 */
+	@Override
+	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
+		return controller.getCurrentPositionErrorWithin(marginOfError);
 	}
 }
