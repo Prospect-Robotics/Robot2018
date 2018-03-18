@@ -117,6 +117,10 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 			newSetting = proposedState.getTargetRate().convertTo(configuration.getNativeSensorRateUOM()).getValue();
 			break;
 //			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
+		default:
+			break;
 		}
 		if(newSetting < -1 || newSetting > 1) {
 			// return false;

@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.motor.state;
 
+import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
@@ -31,4 +32,7 @@ public final class MotorStateFactory {
 		return new MovingToRelativePosition(motor, targetDirection, targetRelativeDistance);
 	}
 
+	public static IMotorState createCalibrateSensorInDirection(IMotor motor, Direction targetDirection) {
+		return new CalibratingSensorInDirection(motor, targetDirection);
+	}
 }

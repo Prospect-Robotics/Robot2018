@@ -193,6 +193,11 @@ public class MotorState implements IMotorState {
 		return getOperation().isMovingToRelativePosition();
 	}
 
+	@Override
+	public boolean isCalibratingSensorInDirection() {
+		return getOperation().isCalibratingSensorInDirection();
+	}
+
 	/**
 	 * Shortcut to getOperation().isMovingInDirectionAtRate()
 	 */
