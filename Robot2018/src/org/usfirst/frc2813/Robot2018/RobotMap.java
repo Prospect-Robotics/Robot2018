@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 //import edu.wpi.first.wpilibj.WPI_VictorSPX;
@@ -75,9 +76,15 @@ public class RobotMap {
 	public static TalonSRX srxArm;                         // Arm motor controller
 	public static WPI_VictorSPX intakeSpeedController;
 	public static VictorSPX intakeSpeedControllerFollow;
-	//public static Encoder armQuadratureEncoder;
-	//public static DigitalInput armLimitSwitch;
 
+	/**
+	 *  this is our single compressor. We use this for
+	 *   - shifting gears
+	 *   - engage/disengage climbing bar
+	 *   - jaws on arms
+	 *   - elevator lockout ratchet
+	 */
+	public static Compressor compressor;
 	/*
 	 * Called from Robot constructor before subsystems are constructed.
 	 * Construct low level objects for the subsystems such as motor controllers
@@ -185,6 +192,8 @@ public class RobotMap {
 		intakeSpeedControllerFollow = new VictorSPX(6);
 		intakeSpeedControllerFollow.set(ControlMode.Follower, intakeSpeedController.getDeviceID());
 		intakeSpeedControllerFollow.setInverted(true);
+
+		compressor = new Compressor();
 
 		jawsSolenoid = new Solenoid(0,1);
 		elevatorRatchet = new Solenoid(0,2);
