@@ -29,7 +29,7 @@ public class MotorMoveInDirectionAtSpeed extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getDirection() == direction && motor.getSpeed() == speed) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING && motor.getTargetDirection() == direction && motor.getTargetSpeed() == speed) {
 			Logger.info(this + " NOT setting " + motor + " to move in the " + direction + " direction at " + speed + ", it's already doing that.");
 		} else {
 			Logger.info(this + " setting " + motor + " to move in the " + direction + " direction at " + speed + ".");

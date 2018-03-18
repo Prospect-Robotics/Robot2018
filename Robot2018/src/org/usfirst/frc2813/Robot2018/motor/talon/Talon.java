@@ -94,7 +94,7 @@ public final class Talon extends AbstractMotorController {
 	}
 	
 	@Override
-	public final Length readPosition() {
+	public final Length getCurrentPosition() {
 		int raw = srx.getSelectedSensorPosition(lastPIDIndex.getPIDIndex());
 		Length length = configuration.getNativeSensorLengthUOM().create(raw); 
 //		Logger.info("readPosition " + raw + " --> " + length);
@@ -136,7 +136,7 @@ public final class Talon extends AbstractMotorController {
 			newControlMode = ControlMode.Position;
 			newSlotIndex   = PROFILE_SLOT_FOR_HOLD_POSITION;
 			newPIDIndex    = PID_INDEX_FOR_HOLD_POSITION;
-			newControlModeValue = readPosition().getValue();
+			newControlModeValue = getCurrentPosition().getValue();
 			break;
 		case MOVING_TO_POSITION:
 			newControlMode = ControlMode.Position;

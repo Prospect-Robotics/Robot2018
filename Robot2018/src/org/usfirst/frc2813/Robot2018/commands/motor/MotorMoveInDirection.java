@@ -25,7 +25,7 @@ public class MotorMoveInDirection extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getDirection() == direction) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING && motor.getTargetDirection() == direction) {
 			Logger.info(this + " NOT setting " + motor + " to move " + direction + ", it's already doing that.");
 		} else {
 			Logger.info(this + " setting " + motor + " to move in the " + direction + " direction.");

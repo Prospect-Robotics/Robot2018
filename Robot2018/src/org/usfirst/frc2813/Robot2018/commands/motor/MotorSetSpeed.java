@@ -26,13 +26,13 @@ public class MotorSetSpeed extends MotorInstantCommand {
 	// Called once when the command executes
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getSpeed() == speed) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING && motor.getTargetSpeed() == speed) {
 			Logger.info(this + " NOT telling " + motor + " to change speed to " + speed + ", it's already moving at that speed.");
-		} else if(motor.getState().getOperation() != MotorOperation.MOVING ) {
+		} else if(motor.getTargetState().getOperation() != MotorOperation.MOVING ) {
 			Logger.info(this + " NOT telling " + motor + " to change speed to " + speed + ", it's NOT MOVING.");
 		} else {
 			Logger.info(this + " telling " + motor + " to change speed to " + speed + ".");
-			motor.changeSpeed(speed);
+			motor.setTargetSpeed(speed);
 		}		
 	}
 

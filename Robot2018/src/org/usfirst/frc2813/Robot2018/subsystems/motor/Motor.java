@@ -34,7 +34,26 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  * The motor is given a name and a configuration.  Then you can use the
  * capabilities described in the configuration.
  *   
- * General Motor commands are found in the org.usfirst.frc2813.Robot2018.commands.motor package 
+ * General Motor commands are found in the org.usfirst.frc2813.Robot2018.commands.motor package
+ * 
+ *  Nomenclature:
+ *  
+ *  - get/set "target" values -- read the current objective.  If we are going to a position and/or at a 
+ *    a particular speed, the motor is going to try to use it's closed loop logic to maintain the 
+ *    speed and/or reach the target position.  It may in fact go up and down in either speed and may
+ *    overshoot or oscillate on position.  The "target" values are what you told it to try to do.
+ *    
+ *  - get/set "current' values -- state read directly from the motor controller on what it is actually
+ *    doing at this moment.  In some cases we can't actually get up to the moment status on the closed
+ *    loop behavior, but wherever we can - we will use "current".
+ *    
+ *    Talon can give you 'current' position and rate information.  In closed loop modes, depending on 
+ *    the mode in use, we can often get the closed loop error to determine whether we are going
+ *    'forward' or 'reverse' at that moment in time. 
+ *    
+ *    NOTE: Because we have getTargetState() there will be no "getTargetXXX()" functions for parameters
+ *    of the current target state, previous target state, etc. as those are redundant and 
+ *    unnecessarily complicate things.
  *
  */
 public final class Motor extends GearheadsSubsystem {
@@ -73,34 +92,34 @@ public final class Motor extends GearheadsSubsystem {
 		return controller.getConfiguration();
 	}
 	// 
-	public MotorState getState() {
+	public MotorState getTargetState() {
 		return currentState;
 	}
-	public MotorState getPreviousState() {
+	public MotorState getPreviousTargetState() {
 		return previousState;
 	}
 	// 
 	public MotorState getControllerState() {
-		return controller.getState();
+		return controller.getTargetState();
 	}
 	public MotorState getControllerPreviousState() {
-		return controller.getState();
+		return controller.getTargetState();
 	}
 	// What is the state of the limit switch (if applicable)
 	public boolean readLimitSwitch(Direction switchDirection) {
 		return controller.readLimitSwitch(switchDirection);
 	}
 	// Returns the speed if we are moving, otherwise null
-	public final Rate getSpeed() {
-		return getState().getRate();
+	public final Rate getTargetSpeed() {
+		return getTargetState().getRate();
 	}
 	// Returns the position if we are moving, otherwise null.
-	public final Length getPosition() {
-		return getState().getPosition();
+	public final Length getTargetPosition() {
+		return getTargetState().getPosition();
 	}
 	// Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
-	public final Direction getDirection() {
-		return getState().getDirection();
+	public final Direction getTargetDirection() {
+		return getTargetState().getDirection();
 	}
 	// What's my name?
 	public final String toString() {
@@ -114,7 +133,7 @@ public final class Motor extends GearheadsSubsystem {
 	}
 
 	public String getDiagnostics() {
-		return String.format("%s - [%s @ %s] [%s]", this, getState(), readPosition(), controller.getDiagnostics());
+		return String.format("%s - [%s @ %s] [%s]", this, getTargetState(), getCurrentPosition(), controller.getDiagnostics());
 	}
 	/* ----------------------------------------------------------------------------------------------
 	 * Subsystem API
@@ -143,13 +162,13 @@ public final class Motor extends GearheadsSubsystem {
 	 * ability to alter speed but not direction AND if we aren't moving be able
 	 * to call it safely without initiating any movement.
 	 */
-	public final void changeSpeed(Rate newSpeed) {
+	public final void setTargetSpeed(Rate newSpeed) {
 		if(newSpeed.getValue() < 0) {
 			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
 		}
-		if(getState().getOperation() == MotorOperation.MOVING) {
+		if(getTargetState().getOperation() == MotorOperation.MOVING) {
 			// Keep moving, call the official function
-			moveInDirectionAtSpeed(getState().getDirection(), newSpeed);
+			moveInDirectionAtSpeed(getTargetState().getDirection(), newSpeed);
 		} else {
 			Logger.info(getConfiguration().getName() + " was asked to change speed to " + newSpeed + ", but we aren't moving so we won't do it.");
 		}
@@ -206,8 +225,8 @@ public final class Motor extends GearheadsSubsystem {
 	
 	// 
 	// Get controller position in subsystem units
-	public final Length readPosition() {
-		return toSubsystemUnits(controller.readPosition());
+	public final Length getCurrentPosition() {
+		return toSubsystemUnits(controller.getCurrentPosition());
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -226,8 +245,8 @@ public final class Motor extends GearheadsSubsystem {
 	// Guards for state transitions, called by changeState
 	// IMPORTANT: Do not call directly	
 	protected boolean isStateTransitionAllowed(MotorState proposedState) {
-		if (proposedState.equals(getState()) && proposedState.getOperation() != MotorOperation.DISABLED) {
-			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", getState(), proposedState);
+		if (proposedState.equals(getTargetState()) && proposedState.getOperation() != MotorOperation.DISABLED) {
+			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", getTargetState(), proposedState);
 			new Exception().printStackTrace();
 			return false;
 		}
@@ -268,7 +287,7 @@ public final class Motor extends GearheadsSubsystem {
 	 * @return true if state change occurred
 	 */
 	protected boolean changeState(MotorState proposedState) {
-		Logger.printFormat(LogType.DEBUG, "%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getState(), proposedState);
+		Logger.printFormat(LogType.DEBUG, "%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getTargetState(), proposedState);
 		if (!encoderFunctional) {
 			controller.disable();
 			Logger.warning("encoder not functional. Refusing action.");
@@ -297,7 +316,7 @@ public final class Motor extends GearheadsSubsystem {
 			Logger.info(this + " - Translation Occurred [Target: " + proposedState + " Controller: " + getControllerState()); 
 		}
 		
-		Logger.debug(this + " state transition complete.  old: " + getState() + " status: " + proposedState + ".");
+		Logger.debug(this + " state transition complete.  old: " + getTargetState() + " status: " + proposedState + ".");
 		Logger.debug(this + "] " + getDiagnostics());
 		this.previousState = this.currentState;
 		this.currentState = proposedState;

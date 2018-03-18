@@ -4,6 +4,24 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
+/*
+* 
+*  Nomenclature:
+*  
+*  - get/set "target" values -- read the current objective.  If we are going to a position and/or at a 
+*    a particular speed, the motor is going to try to use it's closed loop logic to maintain the 
+*    speed and/or reach the target position.  It may in fact go up and down in either speed and may
+*    overshoot or oscillate on position.  The "target" values are what you told it to try to do.
+*    
+*  - get/set "current' values -- state read directly from the motor controller on what it is actually
+*    doing at this moment.  In some cases we can't actually get up to the moment status on the closed
+*    loop behavior, but wherever we can - we will use "current".
+*    
+*    Talon can give you 'current' position and rate information.  In closed loop modes, depending on 
+*    the mode in use, we can often get the closed loop error to determine whether we are going
+*    'forward' or 'reverse' at that moment in time. 
+*
+*/
 public interface IMotorController {
 	
 	// Information
@@ -13,11 +31,11 @@ public interface IMotorController {
 	// Get the configuration
 	public MotorConfiguration getConfiguration();
 	// Used to read the position
-	public Length readPosition();
+	public Length getCurrentPosition();
 	// Read the motors state of operation
-	public MotorState getState();
+	public MotorState getTargetState();
 	// Get the details of the previous state configuration
-	public MotorState getPreviousState();
+	public MotorState getPreviousTargetState();
 	// Read a limit switch
 	public boolean readLimitSwitch(Direction switchDirection);
 	// Return true if motor inversion can be handled automatically
