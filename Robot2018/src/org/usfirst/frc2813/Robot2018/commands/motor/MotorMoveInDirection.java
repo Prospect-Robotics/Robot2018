@@ -3,13 +3,13 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
-import org.usfirst.frc2813.Robot2018.motor.MotorOperation;
+import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.Direction;
 
 /**
- * Move elevator in given direction until interrupted.
- * Hold current position with PID when interrupted.
+ * Move motor in given direction until interrupted.
+ * Hold current position with PID when interrupted. 
  */
 public class MotorMoveInDirection extends MotorCommand {
 	private final Direction direction;
@@ -25,11 +25,11 @@ public class MotorMoveInDirection extends MotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getState().getOperation() == MotorOperation.MOVING && motor.getDirection() == direction) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetDirection() == direction) {
 			Logger.info(this + " NOT setting " + motor + " to move " + direction + ", it's already doing that.");
 		} else {
 			Logger.info(this + " setting " + motor + " to move in the " + direction + " direction.");
-			motor.moveInDirectionAtDefaultSpeed(direction);
+			motor.moveInDirectionAtDefaultRate(direction);
 		}
 	}
 
@@ -41,10 +41,13 @@ public class MotorMoveInDirection extends MotorCommand {
 	@Override
 	protected void interrupted() {
 		super.interrupted();
+        /*
+        * NOTE: Typically this is also the default command for motor subsystems, so it's kind of redundant but logical. 
+        */
 		motor.holdCurrentPosition();
 	}
 
     public String toString() {
-        return "MotorMoveInDirection(" + motor + ", " + direction + ")";
+        return getClass().getSimpleName() + "(" + motor + ", " + direction + ")";
     }
 }

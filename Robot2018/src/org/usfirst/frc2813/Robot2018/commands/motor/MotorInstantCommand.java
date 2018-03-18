@@ -6,7 +6,7 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 
 /**
- * Disable elevator. Subsystem will quiesce.
+ * Abstract motor instant command
  */
 public abstract class MotorInstantCommand extends GearheadsInstantCommand {
 	protected final Motor motor;

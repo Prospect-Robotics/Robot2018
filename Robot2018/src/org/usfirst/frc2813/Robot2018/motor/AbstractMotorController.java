@@ -1,5 +1,9 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
+import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
+import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
+import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonPID;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
 import org.usfirst.frc2813.logging.LogLevel;
@@ -21,20 +25,20 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * ---------------------------------------------------------------------------------------------- */
 
 	// Motor configuration data
-	protected final MotorConfiguration configuration;
+	protected final IMotorConfiguration configuration;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
 
-	protected MotorState currentState = MotorState.createDisabled();
-	protected MotorState previousState = MotorState.createDisabled();
-	
+	protected IMotorState currentState = MotorStateFactory.createDisabled(this);
+	protected IMotorState previousState = MotorStateFactory.createDisabled(this);
+
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	protected AbstractMotorController(MotorConfiguration configuration) {
+	protected AbstractMotorController(IMotorConfiguration configuration) {
 		this.configuration = configuration;
 	}
 	
@@ -46,20 +50,20 @@ public abstract class AbstractMotorController implements IMotorController {
 	public abstract void configure();
 
 	@Override
-	public MotorState getState() {
+	public IMotorState getTargetState() {
 		return currentState;
 	}
 
 	@Override
-	public MotorState getPreviousState() {
+	public IMotorState getPreviousTargetState() {
 		return previousState;
 	}	
 
-	public MotorConfiguration getConfiguration() {
+	public IMotorConfiguration getConfiguration() {
 		return configuration;
 	}
 	// 
-	public MotorState getMotorStateWithParameters() {
+	public IMotorState getMotorStateWithParameters() {
 		return currentState;
 	}
 
@@ -72,45 +76,51 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * [ACTION] Stop output of the motor
 	 */
 	public final boolean disable() {
-		return changeState(MotorState.createDisabled());
+		return changeState(MotorStateFactory.createDisabled(this));
 	}
 
 	/**
 	 * [ACTION] Set to an absolute encoder position to move to and hold, closed loop
 	 */
 	@Override
-	public final boolean moveToPosition(Length position) {
-		return changeState(MotorState.createMovingToPosition(position));
+	public final boolean moveToAbsolutePosition(Length targetPosition) {
+		return changeState(MotorStateFactory.createMovingToAbsolutePosition(this, targetPosition));
 	}
 	/*
 	 * It is assumed that the units are correct.
 	 * If you need a translator, use MotorUnitConversionAdapter in front!
 	 */
 	@Override
-	public final boolean move(Direction direction, Rate rate) {
-		if(rate.getValue() == 0) {
+	public final boolean moveInDirectionAtRate(Direction targetDirection, Rate targetRate) {
+		if(targetRate.getValue() == 0) {
 			Logger.info(" was told to move with speed zero.  Holding position instead.");
 			return holdCurrentPosition();
-		} if(rate.getValue() < 0) {
+		} if(targetRate.getValue() < 0) {
 			disable();
 			throw new IllegalArgumentException("Move speed must not be negative.  Disabling the motor.");
 		}
 		else {
-			return changeState(MotorState.createMoving(direction, rate));
+			return changeState(MotorStateFactory.createMovingInDirectionAtRate(this, targetDirection, targetRate));
 		}
 	}
+
+	@Override
+	public boolean moveInDirectionAtDefaultRate(Direction direction) {
+		return moveInDirectionAtRate(direction, configuration.getDefaultRate());
+	}
+	
 	/**
 	 * [ACTION] Hold the current position, resist movement
 	 */
 	public final boolean holdCurrentPosition() {
-		if(!changeState(MotorState.createHoldingPosition())) 
+		if(!changeState(MotorStateFactory.createHoldingPosition(this))) 
 			return false;
 		autoZeroSensorPositionsIfNecessary();
 		return true;
 	}
 	
 	@Override
-	public final boolean moveADistance(Length distance) {
+	public final boolean moveToRelativePosition(Direction direction, Length relativeDistance) {
 		// TODO - open loop move
 		return false;
 	}
@@ -118,17 +128,17 @@ public abstract class AbstractMotorController implements IMotorController {
 	@Override
 	public final boolean resetEncoderSensorPosition(Length position) {
 		Logger.info("resetEncoderSensorPosition to " + position + ".");
-		if(!changeState(MotorState.createDisabled())) {
+		if(!changeState(MotorStateFactory.createDisabled(this))) {
 			Logger.info("Could not change state to disabled.  No resetting sensor position.");
 			return false;
 		}
 		if(!resetEncoderSensorPositionImpl(position)) {
-			Logger.error("Failed to read back the sensor position we set.  Leaving motor disabled.  Expected " + position + " but got " + readPosition());
+			Logger.error("Failed to read back the sensor position we set.  Leaving motor disabled.  Expected " + position + " but got " + getCurrentPosition());
 			return false;
 		}
 		if(previousState.getOperation().isHoldingCurrentPosition()) {
 			Logger.info("Returning to hold position mode from hardware limit switch software reset of sensor.");
-			changeState(MotorState.createHoldingPosition());
+			changeState(MotorStateFactory.createHoldingPosition(this));
 		} else {
 			Logger.info("Leaving motor disabled after reached hardware limit switch while not in holding position mode.");
 			return false;
@@ -153,30 +163,30 @@ public abstract class AbstractMotorController implements IMotorController {
 		case DISABLED:
 			break;
 		case HOLDING_CURRENT_POSITION:
-			if(!configuration.hasAll(MotorConfiguration.ControlPosition)) {
-				throw new UnsupportedOperationException(this + " does not have the " + MotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
+			if(!configuration.hasAll(IMotorConfiguration.ControlPosition)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
 			}
 			break;
-		case MOVING:
-			if(!configuration.hasAll(MotorConfiguration.ControlDirection)) {
-				throw new UnsupportedOperationException(this + " does not have the " + MotorConfiguration.ControlDirection + " capability.  Refusing request for " + proposedState + ".");
+		case MOVING_IN_DIRECTION_AT_RATE:
+			if(!configuration.hasAll(IMotorConfiguration.ControlDirection)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlDirection + " capability.  Refusing request for " + proposedState + ".");
 			}
-			if(proposedState.getDirection().isPositive() && !configuration.hasAll(MotorConfiguration.Forward)) {
-				throw new UnsupportedOperationException(this + " does not have the " + MotorConfiguration.Forward + " capability.  Refusing request for " + proposedState + ".");
+			if(proposedState.getTargetDirection().isPositive() && !configuration.hasAll(IMotorConfiguration.Forward)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.Forward + " capability.  Refusing request for " + proposedState + ".");
 			}
-			if(proposedState.getDirection().isNegative() && !configuration.hasAll(MotorConfiguration.Reverse)) {
-				throw new UnsupportedOperationException(this + " does not have the " + MotorConfiguration.Reverse + " capability.  Refusing request for " + proposedState + ".");
+			if(proposedState.getTargetDirection().isNegative() && !configuration.hasAll(IMotorConfiguration.Reverse)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.Reverse + " capability.  Refusing request for " + proposedState + ".");
 			}
-			if(!configuration.hasAll(MotorConfiguration.ControlRate)) {
-				Logger.warning(this + " does not have the " + MotorConfiguration.ControlRate + " capability.  Rate will be ignored.");
+			if(!configuration.hasAll(IMotorConfiguration.ControlRate)) {
+				Logger.warning(this + " does not have the " + IMotorConfiguration.ControlRate + " capability.  Rate will be ignored.");
 			}
-			if(proposedState.getRate().getValue() < 0) {
+			if(proposedState.getTargetRate().getValue() < 0) {
 				throw new IllegalArgumentException(this + " was asked to " + proposedState + ", but negative rate is not supported.  Use the direction parameter instead.");
 			}
 			break;
-		case MOVING_TO_POSITION:
-			if(!configuration.hasAll(MotorConfiguration.ControlPosition)) {
-				throw new UnsupportedOperationException(this + " does not have the " + MotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
+		case MOVING_TO_ABSOLUTE_POSITION:
+			if(!configuration.hasAll(IMotorConfiguration.ControlPosition)) {
+				throw new UnsupportedOperationException(this + " does not have the " + IMotorConfiguration.ControlPosition + " capability.  Refusing request for " + proposedState + ".");
 			}
 			break;
 		default:
@@ -222,13 +232,13 @@ public abstract class AbstractMotorController implements IMotorController {
 	}
 	
 	public String getDiagnostics() {
-		return this + " " + getState() + 
-		(configuration.has(MotorConfiguration.Disconnected)
+		return this + " " + getTargetState() + 
+		(configuration.has(IMotorConfiguration.Disconnected)
 				? " <<<< DISCONNECTED BY CONFIGURATION >>>>" 
 				: (
-					" @ " + readPosition() 
-					+ (configuration.has(MotorConfiguration.ReverseHardLimitSwitch) ? " [RLimit=" + readLimitSwitch(Direction.REVERSE) + "]" : "")
-					+ (configuration.has(MotorConfiguration.ForwardHardLimitSwitch) ? " [FLimit=" + readLimitSwitch(Direction.FORWARD) + "]" : "")
+					" @ " + getCurrentPosition() 
+					+ (configuration.has(IMotorConfiguration.ReverseHardLimitSwitch) ? " [RLimit=" + getCurrentLimitSwitchStatus(Direction.REVERSE) + "]" : "")
+					+ (configuration.has(IMotorConfiguration.ForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
 				)
 		);
 	}
@@ -255,6 +265,26 @@ NB: This is doing strange things.
 		}
 */		
 		return resetEncoders;
+	}
+
+	@Override
+	public Length getCurrentPositionError() {
+		return getTargetState().getCurrentPositionError();
+	}
+
+	@Override
+	public Rate getCurrentRateError() {
+		return getTargetState().getCurrentRateError();
+	}
+
+	@Override
+	public boolean getCurrentRateErrorWithin(Rate marginOfError) {
+		return getTargetState().getCurrentRateErrorWithin(marginOfError);
+	}
+
+	@Override
+	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
+		return getTargetState().getCurrentPositionErrorWithin(marginOfError);
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -291,5 +321,5 @@ NB: This is doing strange things.
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	protected abstract boolean resetEncoderSensorPositionImpl(Length sensorPosition);
-	protected abstract boolean executeTransition(MotorState proposedState);
+	protected abstract boolean executeTransition(IMotorState proposedState);
 }

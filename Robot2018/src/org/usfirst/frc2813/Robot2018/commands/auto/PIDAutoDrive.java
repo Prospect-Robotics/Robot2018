@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.auto;
 
-import org.usfirst.frc2813.RandomPIDController2;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.autonomous.RandomPIDController2;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 
 import edu.wpi.first.wpilibj.PIDSource;

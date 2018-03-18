@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -99,24 +100,24 @@ public class IntakeConfiguration extends MotorConfiguration {
 		super(
 			"Intake",
 			(0
-					|MotorConfiguration.ControlDirection
+					|IMotorConfiguration.ControlDirection
 //					|MotorConfiguration.ControlPosition
-					|MotorConfiguration.ControlRate
-					|MotorConfiguration.Forward
+					|IMotorConfiguration.ControlRate
+					|IMotorConfiguration.Forward
 //					|MotorConfiguration.ForwardHardLimitSwitch
 //					|MotorConfiguration.ForwardSoftLimitSwitch
 //					|MotorConfiguration.LimitPosition
-					|MotorConfiguration.LimitRate
+					|IMotorConfiguration.LimitRate
 //					|MotorConfiguration.SensorToDriveScale
-					|MotorConfiguration.ReadDirection
+					|IMotorConfiguration.ReadDirection
 //					|MotorConfiguration.ReadPosition
 //					|MotorConfiguration.ReadRate
-					|MotorConfiguration.Reverse
+					|IMotorConfiguration.Reverse
 //					|MotorConfiguration.ReverseHardLimitSwitch
 //					|MotorConfiguration.ReverseSoftLimitSwitch
-					|MotorConfiguration.DefaultRate
-					|MotorConfiguration.NeutralMode
-					|MotorConfiguration.Disconnected // NB: WARNING THIS TOTALLY DISABLES IT!!
+					|IMotorConfiguration.DefaultRate
+					|IMotorConfiguration.NeutralMode
+					|IMotorConfiguration.Disconnected // NB: WARNING THIS TOTALLY DISABLES IT!!
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			IntakeSPXMotorPulses,             // nativeMotorLengthUOM

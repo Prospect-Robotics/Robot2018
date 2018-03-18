@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
+import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonProfileSlot;
@@ -150,21 +151,21 @@ public class ArmConfiguration extends MotorConfiguration{
 		super(
 			"Arm",
 			(0
-					|MotorConfiguration.ControlDirection
-					|MotorConfiguration.ControlPosition
-					|MotorConfiguration.ControlRate
-					|MotorConfiguration.Forward
-					|MotorConfiguration.ForwardSoftLimitSwitch
-					|MotorConfiguration.LimitPosition
-					|MotorConfiguration.LimitRate
-					|MotorConfiguration.SensorToDriveScale
-					|MotorConfiguration.ReadDirection
-					|MotorConfiguration.ReadPosition
-					|MotorConfiguration.ReadRate
-					|MotorConfiguration.Reverse
-					|MotorConfiguration.ReverseHardLimitSwitch
-					|MotorConfiguration.DefaultRate
-					|MotorConfiguration.NeutralMode
+					|IMotorConfiguration.ControlDirection
+					|IMotorConfiguration.ControlPosition
+					|IMotorConfiguration.ControlRate
+					|IMotorConfiguration.Forward
+					|IMotorConfiguration.ForwardSoftLimitSwitch
+					|IMotorConfiguration.LimitPosition
+					|IMotorConfiguration.LimitRate
+					|IMotorConfiguration.SensorToDriveScale
+					|IMotorConfiguration.ReadDirection
+					|IMotorConfiguration.ReadPosition
+					|IMotorConfiguration.ReadRate
+					|IMotorConfiguration.Reverse
+					|IMotorConfiguration.ReverseHardLimitSwitch
+					|IMotorConfiguration.DefaultRate
+					|IMotorConfiguration.NeutralMode
 //					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
 					),
 			ArmDegrees,                  	    	// nativeDisplayLengthUOM

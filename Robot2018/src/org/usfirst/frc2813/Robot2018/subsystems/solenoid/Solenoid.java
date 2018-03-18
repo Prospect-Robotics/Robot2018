@@ -17,6 +17,7 @@ public class Solenoid extends SubsystemBinary {
 		this.configuration = configuration;
 		this.solenoid = solenoid;
 		initialize();
+		setName(configuration.getName());
 	}
 
 	@Override
