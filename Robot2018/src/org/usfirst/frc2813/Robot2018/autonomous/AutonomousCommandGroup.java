@@ -31,6 +31,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	private double turnSpeed = 0.25;
 	private double curveSpeed = 0.4;
 
+	private double currentSpeed = 0.0;
+
 	// FIXME! what until type? What values should these be?
 	private static final Length armPositionLevel = LengthUOM.Inches.create(12);
 	private static final Length armPositionHigh = LengthUOM.Inches.create(20);
@@ -47,15 +49,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void setTurnSpeed(double speed) { turnSpeed=speed; }
 	public void setCurveSpeed(double speed) { curveSpeed=speed; }
 
-	private void drive(Length distance, Direction direction) {
-		double speed = direction == Direction.FORWARD ? driveSpeed : -driveSpeed;
-		addSequential(new PIDAutoDrive(speed, distance.convertTo(LengthUOM.Inches).getValue()));
+	private void drive(Length distance, Direction direction, double endSpeed) {
+		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
+		currentSpeed = endSpeed;
 	}
-	public void driveForward(Length distance) {
-		drive(distance, Direction.FORWARD);
+	public void driveForward(Length distance, double endSpeed) {
+		drive(distance, Direction.FORWARD, endSpeed);
 	}
-	public void driveBackward(Length distance) {
-		drive(distance, Direction.BACKWARD);
+	public void driveBackward(Length distance, double endSpeed) {
+		drive(distance, Direction.BACKWARD, endSpeed);
 	}
 
 	public void turnLeft(double angle) {
