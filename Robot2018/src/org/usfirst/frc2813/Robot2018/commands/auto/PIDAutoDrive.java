@@ -121,7 +121,8 @@ public class PIDAutoDrive extends GearheadsCommand {
 	}
 
 	private double distanceTraveled() {
-		return Robot.driveTrain.getDistance() - startPosition;
+		double rawDelta = Robot.driveTrain.getDistance() - startPosition;
+		return direction.isPositive() ? rawDelta : -rawDelta;
 	}
 	
 	/**
@@ -158,7 +159,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		return Math.abs(distanceTraveled()) >= Math.abs(distance);
+		return distanceTraveled() >= distance;
 	}
 
 	// Called once after isFinished returns true
