@@ -27,7 +27,11 @@ public class PIDAutoDrive extends GearheadsCommand {
 
 		@Override
 		public double pidGet() {
-			return Robot.gyro.getAngle() - startAngle;
+			double angleTravelled = Robot.gyro.getAngle() - startAngle;
+			if (onCurve) {
+				angleTravelled -= deltaAngle;
+			}
+			return angleTravelled % 360;
 		}
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
@@ -48,7 +52,15 @@ public class PIDAutoDrive extends GearheadsCommand {
 	private double startPosition;
 	private double accelRamp, decelRamp;
 	private double startAngle; // which may or may not be zero degrees.
+	private double deltaAngle; // for the turn version
+	private boolean onCurve;
 	
+	/**
+	 * Use PID to drive in a straight line for a given distance.
+	 * @param speed - the peak speed. We ramp up to this
+	 * @param direction - forward or backward?
+	 * @param distance - how far to travel
+	 */
 	public PIDAutoDrive(double speed, Direction direction, double distance) {
 		requires(Robot.driveTrain);
 		controller.setInputRange(0, 256);
@@ -60,9 +72,11 @@ public class PIDAutoDrive extends GearheadsCommand {
 		this.distance = distance;
 		accelRamp = ACCELERATION_RAMP;  // here we assume max ramp - ie: start and end at dead stop
 		decelRamp = DECELERATION_RAMP;
+		onCurve = false;
 	}
-	
+
 	/**
+	 * Use PID to drive in a straight line for a given distance.
 	 * Adjust our start/stop ramps and start power so that we effectively start and stop at
 	 * the given ratio of the normal speed. So, if you want to end at 20% speed, set
 	 * endingSpeedFactor to 0.2. Then your next command should set startSpeedFactor to 0.2
@@ -79,6 +93,29 @@ public class PIDAutoDrive extends GearheadsCommand {
 
 		endSpeed += MAX_SPEED * (1 - endSpeedFactor);
 		decelRamp *= 1 - endSpeedFactor;
+	}
+
+	/**
+	 * Use PID to drive along a circular path for a given distance.
+	 * @param speed - the peak speed. We ramp up to this
+	 * @param direction - forward or backward?
+	 * @param distance - how far to travel
+	 * @param startSpeedFactor - how fast are we going? 0..1
+	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
+	 * @param radius - the radius of the circle we are traveling
+	 * @param clockwise - the direction of the circle
+	 */
+	public PIDAutoDrive(double speed, Direction direction, double distance, double startSpeedFactor,
+			double endSpeedFactor, double radius, boolean clockwise) {
+		this(speed, direction, distance, startSpeedFactor, endSpeedFactor);
+		onCurve = true;
+		deltaAngle = (distance * 180.0) / (radius * Math.PI); // just an offset for now
+		if (!clockwise) {
+			deltaAngle *= -1.0;
+		}
+		if (direction.isNegative()) {
+			deltaAngle *= -1.0;
+		}
 	}
 
 	// Called just before this Command runs the first time
@@ -120,7 +157,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		return y1 + (y2 - y1) / (x2 - x1) * (x - x1);
 	}
 
-	private double distanceTraveled() {
+	private double distanceTravelled() {
 		double rawDelta = Robot.driveTrain.getDistance() - startPosition;
 		return direction.isPositive() ? rawDelta : -rawDelta;
 	}
@@ -136,22 +173,49 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 * @return desired speed between MIN_SPEED and maxSpeed
 	 */
 	private double calcThrottle(double distanceTravelled) {
-		double inchesRemaining = distance - distanceTravelled;
-		double throttle = maxSpeed;
+		double distanceRemaining = distance - distanceTravelled;
+		double startLimit, endLimit;
 
-		if (inchesRemaining < 0) {
-			return endSpeed;
-		}
-		if (inchesRemaining < decelRamp) {
-			throttle = interpolate(distance - decelRamp, maxSpeed, distance, endSpeed, distanceTravelled);
-		}
+		// shouldn't happen. Were we pushed? Did we roll?
 		if (distanceTravelled < 0) {
-			return Math.min(throttle, startSpeed);
+			return startSpeed;
 		}
+		
+		// never exceed the start ramp
 		if (distanceTravelled < accelRamp) {
-			return Math.min(throttle, interpolate(0, startSpeed, accelRamp, maxSpeed, distanceTravelled));
+			startLimit = interpolate(0, startSpeed, accelRamp, maxSpeed, distanceTravelled);
 		}
-		return maxSpeed;
+		else {
+			startLimit = maxSpeed;
+		}
+
+		// and never exceed the stop ramp
+		if (distanceRemaining < 0) {
+			endLimit = endSpeed;
+		}
+		else if (distanceRemaining < decelRamp) {
+			endLimit = interpolate(distance - decelRamp, maxSpeed, distance, endSpeed, distanceTravelled);
+		}
+		else {
+			endLimit = maxSpeed;
+		}
+
+		return Math.min(startLimit, endLimit);
+	}
+
+	/**
+	 * interpolate our desired angle offset by interpolating 0..deltaAngle
+	 * @param distanceTravelled
+	 * @return desired offset from startAngle
+	 */
+	private double calcAngle(double distanceTravelled) {
+		if (distanceTravelled < 0) {
+			return 0;
+		}
+		if (distanceTravelled > distance) {
+			return deltaAngle;
+		}
+		return interpolate(0, 0, distance, deltaAngle, distanceTravelled);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -161,7 +225,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		return distanceTraveled() >= distance;
+		return distanceTravelled() >= distance;
 	}
 
 	// Called once after isFinished returns true
@@ -171,23 +235,52 @@ public class PIDAutoDrive extends GearheadsCommand {
 		controller.reset();
 	}
 
-	private void usePIDOutput(double output) {
-		/* set their output to zero when disabled.
-		 * The watchdog will call disable() every 0.1 seconds when
-		 * the command isn't r
-		 * PID controllers running.  Every time the output is written
-		 * we cause the robot to move.  If the watchdog isn't alive,
-		 * don't accept input.
-		 */
-		double newThrottle = calcThrottle(distanceTraveled());
+	/**
+	 * This is the pid callback. It provides out angle adjustment. Call
+	 * the appropriate drive routine based on state - curve or straight.
+	 * @param pidOutput
+	 */
+	private void usePIDOutput(double pidOutput) {
+		if (onCurve) {
+			driveCurve(pidOutput);
+		}
+		else {
+			driveStraight(pidOutput);
+		}
+	}
+
+	/**
+	 * This routine takes PID output for the line PID thinks we are on and
+	 * adjusts for our current angle.
+	 * @param pidOutput
+	 */
+	private void driveCurve(double pidOutput) {
+		double distanceTravelled = distanceTravelled();
+		double newThrottle = calcThrottle(distanceTravelled);
+		double offsetAngle = calcAngle(distanceTravelled);
 		if (direction.isNegative()) {
 			newThrottle *= -1;
 		}
-		Logger.printLabelled(LogType.INFO, "PID stepping",
-				"distance travelled", distanceTraveled(),
-				"New Throttle", newThrottle,
-				"Output", output);
 
-		Robot.driveTrain.arcadeDrive(newThrottle, -output);
+		Logger.printLabelled(LogType.INFO, "PID curve stepping",
+				"distance travelled", distanceTravelled,
+				"offset Angle", offsetAngle,
+				"New Throttle", newThrottle,
+				"PID Output", pidOutput);
+		Robot.driveTrain.arcadeDrive(newThrottle, -((pidOutput + offsetAngle) % 360));
+	}
+
+	private void driveStraight(double pidOutput) {
+		double distanceTravelled = distanceTravelled();
+		double newThrottle = calcThrottle(distanceTravelled);
+		if (direction.isNegative()) {
+			newThrottle *= -1;
+		}
+
+		Logger.printLabelled(LogType.INFO, "PID linear stepping",
+				"distance travelled", distanceTravelled,
+				"New Throttle", newThrottle,
+				"PID Output", pidOutput);
+		Robot.driveTrain.arcadeDrive(newThrottle, -pidOutput);
 	}
 }
