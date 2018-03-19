@@ -4,6 +4,7 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDrive;
+import org.usfirst.frc2813.logging.Logger;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -133,15 +134,15 @@ public class DriveTrain extends GearheadsSubsystem {
 		if (encoderPortFunctional && encoderStarboardFunctional)
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		else if(encoderPortFunctional) {
-			System.out.println("encoderPort NOT FUNCTIONAL");
+			Logger.info("The right drive train encoder is non-functional.");
 			return -encoderPort.getDistance();
 		}
 		else if(encoderStarboardFunctional) {
-			System.out.println("encoderStarboard NOT FUNCTIONAL");
+			Logger.info("The left drive train encoder is non-functional.");
 			return encoderStarboard.getDistance();
 		}
 		else {
-			System.out.println("Both Encoders NOT FUNCTIONAL");
+			Logger.info("Both drive train encoders are non-functional.");
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		}
 	}
