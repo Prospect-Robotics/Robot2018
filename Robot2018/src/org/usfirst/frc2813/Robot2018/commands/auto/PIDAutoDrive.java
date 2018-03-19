@@ -51,7 +51,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 	
 	public PIDAutoDrive(double speed, Direction direction, double distance) {
 		requires(Robot.driveTrain);
-		controller.setInputRange(0, 360);
+		controller.setInputRange(0, 256);
 		controller.setContinuous();
 		controller.setOutputRange(-1, 1);
 		startSpeed = endSpeed = MIN_SPEED;
@@ -185,7 +185,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		}
 		Logger.printLabelled(LogType.INFO, "PID stepping",
 				"distance travelled", distanceTraveled(),
-				"Speed", newThrottle,
+				"New Throttle", newThrottle,
 				"Output", output);
 
 		Robot.driveTrain.arcadeDrive(newThrottle, -output);
