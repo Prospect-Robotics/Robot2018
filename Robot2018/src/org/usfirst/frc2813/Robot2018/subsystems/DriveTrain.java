@@ -20,6 +20,15 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * This is our drive train. It goes.
+ * 
+ * Note that the hardware is probably wired incorrectly.  Normally the motor polarity on both sides of the drive train is wired
+ * the same way and then you set one side's speed controller to inverted and one side's sensor to inverted 
+ * (if encoders and motors face the same way, one side would have sensor and motor inverted in software.  
+ * Conversely, if the encoders and motors face opposite directions then you would need to invert the sensor on one side
+ * and invert the motor on the other). 
+ * 
+ * TODO: Hardware may be wired incorrectly.
+ * TODO:  encoderPort.setReverseDirection is set to true, but we are still multiplying the distance value by -1.  This seems like a bug.
  */
 public class DriveTrain extends GearheadsSubsystem {
     public static final double WHEEL_DIAMETER_INCHES = 4;
@@ -127,9 +136,10 @@ public class DriveTrain extends GearheadsSubsystem {
 		/*
     	 * A note on Encoders and the sign of distance:
     	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
-    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
+    	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS")
+    	 * 
+    	 * NOTE: encoderPort should 
     	 */
-
 		if (encoderPortFunctional && encoderStarboardFunctional)
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		else if(encoderPortFunctional) {
