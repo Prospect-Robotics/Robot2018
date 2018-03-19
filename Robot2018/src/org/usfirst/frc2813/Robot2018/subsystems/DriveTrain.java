@@ -22,14 +22,13 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * This is our drive train. It goes.
  */
 public class DriveTrain extends GearheadsSubsystem {
-    private static final double WHEEL_DIAMETER = 4;
-    public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-    //public static final double REVOLUTIONS_PER_INCH = 1.0 / WHEEL_CIRCUMFERENCE;
-    public static final double PULSES_PER_REVOLUTION = 768; // it should be 256 but the robot only % as far as it should with 256
-    //public static final double PULSES_PER_INCH = PULSES_PER_REVOLUTION * REVOLUTIONS_PER_INCH;goes ~80
-    public static final double INCHES_PER_PULSE = WHEEL_CIRCUMFERENCE / PULSES_PER_REVOLUTION; // inches per revolution times revolutions per pulse (1/pulses per revolution) equals ihes per pulse.
+    public static final double WHEEL_DIAMETER_INCHES = 4;
+    public static final double WHEEL_CIRCUMFERENCE_INCHES = Math.PI * WHEEL_DIAMETER_INCHES;
+    public static final double ENCODER_TO_DRIVE_SCALE = 3;
+    public static final double ENCODER_PULSES_PER_ENCODER_REVOLUTION = 256;
+    public static final double ENCODER_PULSES_PER_WHEEL_REVOLUTION = ENCODER_PULSES_PER_ENCODER_REVOLUTION * ENCODER_TO_DRIVE_SCALE;
+    public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
-	
 	public final SpeedController speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
 	public final SpeedController speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
 	private final VictorSPX speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
@@ -46,7 +45,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		LiveWindow.add((Sendable) speedControllerPort);
 		addChild((Sendable) speedControllerStarboard);
 		LiveWindow.add((Sendable) speedControllerStarboard);
-		
+
 		robotDrive.setSafetyEnabled(true);
 		robotDrive.setExpiration(0.1);
 		// robotDrive.setSensitivity(0.5);//TODO Why aren't we setting sensitivity?
@@ -55,11 +54,11 @@ public class DriveTrain extends GearheadsSubsystem {
 		speedControllerPort.setInverted(false);
 		speedControllerStarboard.setInverted(false);
 
-		encoderStarboard.setDistancePerPulse(INCHES_PER_PULSE);
+		encoderStarboard.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderStarboard.setSamplesToAverage(1);
 		encoderStarboard.setPIDSourceType(PIDSourceType.kRate);
 		encoderPort.setReverseDirection(true);
-		encoderPort.setDistancePerPulse(INCHES_PER_PULSE);
+		encoderPort.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderPort.setSamplesToAverage(1);
 		encoderPort.setPIDSourceType(PIDSourceType.kRate);
 	}
