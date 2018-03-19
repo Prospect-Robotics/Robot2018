@@ -137,21 +137,23 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 */
 	private double calcThrottle(double distanceTravelled) {
 		double inchesRemaining = distance - distanceTravelled;
+		double throttle = maxSpeed;
 
 		if (inchesRemaining < 0) {
 			return endSpeed;
 		}
 		if (inchesRemaining < decelRamp) {
-			return interpolate(distance - decelRamp, maxSpeed, distance, endSpeed, distanceTravelled);
+			throttle = interpolate(distance - decelRamp, maxSpeed, distance, endSpeed, distanceTravelled);
 		}
 		if (distanceTravelled < 0) {
-			return startSpeed;
+			return Math.min(throttle, startSpeed);
 		}
 		if (distanceTravelled < accelRamp) {
-			return interpolate(0, startSpeed, accelRamp, maxSpeed, distanceTravelled);
+			return Math.min(throttle, interpolate(0, startSpeed, accelRamp, maxSpeed, distanceTravelled));
 		}
 		return maxSpeed;
 	}
+
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
 		//new PrintOutEncoderValues(60,Robot.driveTrain.encoderPort,Robot.driveTrain.encoderStarboard);
@@ -183,7 +185,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		}
 		Logger.printLabelled(LogType.INFO, "PID stepping",
 				"distance travelled", distanceTraveled(),
-				"Spped", newThrottle,
+				"Speed", newThrottle,
 				"Output", output);
 
 		Robot.driveTrain.arcadeDrive(newThrottle, -output);
