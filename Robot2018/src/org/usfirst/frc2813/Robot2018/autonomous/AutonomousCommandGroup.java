@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
+import org.usfirst.frc2813.Robot2018.commands.ToggleIntake;
 import org.usfirst.frc2813.Robot2018.commands.auto.AutoCurveDrive;
 import org.usfirst.frc2813.Robot2018.commands.auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
@@ -127,15 +127,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 		levelArm();
 	}
 	public void shootCube() {
-		addSequential(new SpinIntake("SpinIntake DOWN", Direction.OUT));
+		addSequential(new ToggleIntake(Direction.OUT));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
-		addSequential(new SpinIntake("SpinIntake UP", Direction.STOP));
+		addSequential(new ToggleIntake(Direction.STOP));
 	}
 	public void grabCube() {
-		addSequential(new SpinIntake("SpinIntake(IN)", Direction.IN));
+		addSequential(new ToggleIntake(Direction.IN));
 		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));
 		sleep(0.2);
-		addSequential(new SpinIntake("SpinIntake(STOP)", Direction.STOP));
+		addSequential(new ToggleIntake(Direction.STOP));
 	}
 
 	public void sleep(double seconds) {

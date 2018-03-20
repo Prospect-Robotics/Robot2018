@@ -74,8 +74,8 @@ public class OI {
 		 */
 		buttonPanel = new Joystick(0);
 
-		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake("SpinIntake In", Direction.IN));
-		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake("SpinIntake Out", Direction.OUT));
+		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake(Direction.IN));
+		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake(Direction.OUT));
 		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
 		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));

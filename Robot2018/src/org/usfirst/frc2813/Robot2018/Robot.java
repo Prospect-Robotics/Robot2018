@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
 		driveTrain = new DriveTrain();
 		elevator = new Motor(new ElevatorConfiguration(), RobotMap.srxElevator);
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
-		intake = new Intake();
+		intake = new Intake(RobotMap.intakeSpeedController);
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
 
 		positionSelector = RobotMap.positionSelector;
