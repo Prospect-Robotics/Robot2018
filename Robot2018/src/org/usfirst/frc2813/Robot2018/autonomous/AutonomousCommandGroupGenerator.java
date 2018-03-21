@@ -121,7 +121,7 @@ public class AutonomousCommandGroupGenerator {
 		if (RobotMap.gameData.getScale() == Direction.OFF) {
 			// there is no game data. Cross the auto line
 			Logger.info("Autonomous: no game data");
-			autoCmdList.driveForward(LengthUOM.Feet.create(5).multiply(distanceScale), FULL_STOP);
+			autoCmdList.driveForward(feet(5), FULL_STOP);
 			return;
 		}
 
