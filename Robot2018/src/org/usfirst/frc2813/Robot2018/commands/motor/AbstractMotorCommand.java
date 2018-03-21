@@ -9,10 +9,10 @@ import org.usfirst.frc2813.logging.Logger;
  */
 public abstract class AbstractMotorCommand extends GearheadsCommand {
 	protected final Motor motor;
-	public AbstractMotorCommand(Motor motor, boolean requiresSubsystem) {
-		this.motor = motor;
+	public AbstractMotorCommand(Motor subsystem, boolean requiresSubsystem) {
+		this.motor = subsystem;
 		if(requiresSubsystem) {
-			requires(motor);
+			requires(subsystem);
 		}
 		Logger.debug(this + "constructed");
 	}
