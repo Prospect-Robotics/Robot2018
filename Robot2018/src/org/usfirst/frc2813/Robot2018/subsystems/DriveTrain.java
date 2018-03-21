@@ -90,6 +90,10 @@ public class DriveTrain extends GearheadsSubsystem {
 		return gyro;
 	}
 	
+	public Solenoid getGearShiftSolenoid() {
+		return gearShift;
+	}
+	
 	public Encoder getEncoderStarboard() {
 		return encoderStarboard;
 	}
