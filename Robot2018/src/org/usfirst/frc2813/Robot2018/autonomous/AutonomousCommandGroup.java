@@ -1,12 +1,13 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.ToggleIntake;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoCurve;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyro;
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinAsync;
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeStop;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitch;
@@ -397,21 +398,21 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Add a command to start the intake spinning inwards
 	 */
 	private void addIntakeInAsync() {
-		addSequential(new ToggleIntake(Direction.IN));		
+		addSequential(new IntakeSpinAsync(Robot.intake, Direction.IN));		
 	}
 
 	/**
 	 * Add a command to start the intake spinning outwards
 	 */
 	private void addIntakeOutAsync() {
-		addSequential(new ToggleIntake(Direction.OUT));		
+		addSequential(new IntakeSpinAsync(Robot.intake, Direction.OUT));		
 	}
 
 	/**
 	 * Add a command to stop the intake spinning
 	 */
 	private void addIntakeStopSync() {
-		addSequential(new ToggleIntake(Direction.OFF));		
+		addSequential(new IntakeStop(Robot.intake));		
 	}
 
 	/* ------------------------------------------------------------------------------------------------------

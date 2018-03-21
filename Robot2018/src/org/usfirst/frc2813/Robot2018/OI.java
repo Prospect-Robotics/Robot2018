@@ -2,10 +2,10 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.SpinIntake;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorTesting;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleState;
@@ -74,8 +74,8 @@ public class OI {
 		 */
 		buttonPanel = new Joystick(0);
 
-		new JoystickButton(buttonPanel, 1).whileHeld(new SpinIntake(Direction.IN));
-		new JoystickButton(buttonPanel, 2).whileHeld(new SpinIntake(Direction.OUT));
+		new JoystickButton(buttonPanel, 1).whileHeld(new IntakeSpinSync(Robot.intake, Direction.IN));
+		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpinSync(Robot.intake, Direction.OUT));
 		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
 		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
 		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
