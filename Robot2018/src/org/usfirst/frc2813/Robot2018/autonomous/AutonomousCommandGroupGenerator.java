@@ -131,6 +131,13 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.raiseArm();
 
 		if (robotStartingPosition.equals(scalePosition)) {
+			/*
+    		 * If the robot and the scale are on the same side, 
+    		 * drive forward and drop a cube into the scale from the end.
+    		 * 
+			 * NB: We write this script as if the robot and scale are both on the left,
+			 * it will also be used inverted for when the robot and scale are both on the right.
+			 */
 			Logger.info("Autonomous: robot and scale on same side");
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(feet(24), FULL_STOP);
@@ -139,6 +146,19 @@ public class AutonomousCommandGroupGenerator {
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else if (!robotStartingPosition.equals(Direction.CENTER)) {
+			/*
+    		 * If the robot and the scale are on opposite sides,
+    		 * drive forward past the switch, spin towards the
+    		 * opposite side and drive down the alley
+    		 * between the scale and switch to the opposite side
+    		 * then turn towards the scale and then drop a cube 
+    		 * into the scale from that side.
+    		 * 
+    		 * NB: Make sure the other team won't be coming the other direction down the alley! 
+    		 * 
+			 * NB: We write this script as if the robot and scale are both on the left,
+			 * it will also be used inverted for when the robot and scale are both on the right.
+			 */
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info("Autonomous: robot and scale on opposite side");
 			autoCmdList.driveForward(feet(14), TRANSITION_SPEED);
@@ -151,6 +171,15 @@ public class AutonomousCommandGroupGenerator {
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else {
+			/*
+			 * If the robot is in the center, we're going to drop a cube into the switch
+			 * on the correct side.  
+    		 *
+    		 * NB: Make sure there isn't another robot crossing your path before you pick this.
+    		 * 
+			 * NB: We write this script as if the our switch is active to the left of the  
+			 * robot.  If this isn't the case, the script will be run inverted.
+			 */
 			Logger.info("Autonomous: robot in center position");
 			autoCmdList.driveForward(inches(8), TRANSITION_SPEED); // enough to turn
 			autoCmdList.quickTurn(left, 45);
