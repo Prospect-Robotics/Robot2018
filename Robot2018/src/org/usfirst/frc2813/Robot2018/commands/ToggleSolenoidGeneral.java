@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class ToggleSolenoidGeneral extends InstantCommand {
+public class ToggleSolenoidGeneral extends GearheadsInstantCommand {
 	/**
 	 * Switch the position of the intake pistons
 	 */
@@ -27,6 +27,7 @@ public class ToggleSolenoidGeneral extends InstantCommand {
 
     public ToggleSolenoidGeneral(Solenoid solenoid) {
     	this.solenoid = solenoid;
+    	setName(toString());
     }
 
 	//@Override
@@ -38,7 +39,7 @@ public class ToggleSolenoidGeneral extends InstantCommand {
 	}
 
     public String toString() {
-        return "ToggleSolenoidGeneral(" + solenoid + ")";
+        return getClass().getSimpleName() + "(" + solenoid + ")";
     }
 }
 
