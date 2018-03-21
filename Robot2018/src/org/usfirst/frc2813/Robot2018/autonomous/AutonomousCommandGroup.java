@@ -60,7 +60,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		drive(distance, Direction.BACKWARD, endSpeed);
 	}
 	public void turn(Direction direction, double angle) {
-		addSequential(new AutoTurn(turnSpeed, angle * direction.getMultiplierAsDouble()));
+		addSequential(new AutoTurn(direction, angle, turnSpeed));
 	}
 
 	private void curve(Direction direction, double angle, double radius, boolean clockwise) {

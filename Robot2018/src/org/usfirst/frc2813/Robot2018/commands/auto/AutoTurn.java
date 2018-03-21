@@ -2,71 +2,92 @@ package org.usfirst.frc2813.Robot2018.commands.auto;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.logging.Logger;
+import org.usfirst.frc2813.units.Direction;
 
 /**
  * Autonomous turn command. Use gyro and linear interpolation
  * to
  */
 public class AutoTurn extends GearheadsCommand {
-	private final double degrees, rate;
+	private final Direction direction;
+	private final double rate;
+	private final double degrees;
+
+	// These are calculated when we start
 	private double startingAngle;
-	private boolean negativeAngle;
+	private double targetAngle;
+	
 	private static final double LERP_START=60;
 	private static final double LERP_STOP=40;
 	private static final double LERP_END=0.2;
-	private static final double MIN_DEG=0.01;
+	private static final double MIN_DEG=0.5;
 
-	public AutoTurn(double rate, double degrees) {
-		requires(Robot.driveTrain);
+	public AutoTurn(Direction direction, double degrees, double rate) {
+		this.direction = direction;
 		this.rate = rate;
-		if (degrees < 0) {
-			negativeAngle = true;
-			this.degrees = -degrees;
+		this.degrees = degrees;
+		requires(Robot.driveTrain);
+		if(degrees < 0) {
+			throw new IllegalArgumentException("Do not specify reverse directions with negative angles.  Use direction instead.");
 		}
-		else {
-			negativeAngle = false;
-			this.degrees = degrees;
+		if(rate < 0) {
+			throw new IllegalArgumentException("Do not specify rate with negative values.  Use direction instead.");
+		}
+		if(rate > 1.0) {
+			throw new IllegalArgumentException("Do not specify rate greater than 100%.");
 		}
 	}
 
 	// Called just before this Command runs the first time
 	protected void initialize() {
 		startingAngle = Robot.gyro.getAngle();
-	}
-
-	// returns number of degrees we have turned so far
-	private double getAnglesProgressed() {
-		if (negativeAngle)
-			return startingAngle - Robot.gyro.getAngle();
-		return Robot.gyro.getAngle() - startingAngle;
+		targetAngle   = startingAngle + (direction.getMultiplierAsDouble() * degrees);  
 	}
 
 	/**
-	 * Calculate throttle given degrees from target
-	 * @param deg
-	 * @param throttle
+	 * @return the number of degrees we have turned so far, relative to our target direction
+	 * NOTE: If we are turning in the wrong way, this will become a larger magnitude in either positive or negative values until we do a (360-target) - i.e. turn in the wrong direction eventually gets the same result.
+	 */
+	private double getErrorInDegrees() {
+		return targetAngle - Robot.gyro.getAngle();
+	}
+
+	/**
+	 * Distance from target in absolute value (how severe is the error)
+	 */
+	private double getErrorMagnitudeInDegrees() {
+		return Math.abs(getErrorInDegrees());
+	}
+
+	/**
+	 * Calculate throttle given degrees from target, based on the error magnitude,
+	 * which logically cannot be less than 0 or greather than 360, or else things have gone sideways indeed.
+	 * @param degreesToGo The magnitude of the error in degrees from the goal
+	 * @param throttle the rate 0.0-1.0 for percentage of maximum speed
 	 * @return
 	 */
-	private static double calcThrottle(double deg, double throttle) {
-		if (deg < MIN_DEG) {//if at correct location, stop
+	private static double calcThrottle(double errorMagnitudeInDegrees, double throttle) {
+		if (errorMagnitudeInDegrees < MIN_DEG) {//if at correct location, stop
 			return 0;
 		}
-		if (deg <= LERP_STOP) {//if through lerp period, min speed
+		if (errorMagnitudeInDegrees <= LERP_STOP) {//if through lerp period, min speed
 			return LERP_END;
 		}
-		if (deg >= LERP_START) {//if not at lerp period, given speed
+		if (errorMagnitudeInDegrees >= LERP_START) {//if not at lerp period, given speed
 			return throttle;
 		}
-		return (deg - LERP_STOP) * (throttle - LERP_END) / (LERP_START-LERP_STOP) + LERP_END;//deceleration/linear interpolation code
+		return (errorMagnitudeInDegrees - LERP_STOP) * (throttle - LERP_END) / (LERP_START-LERP_STOP) + LERP_END;//deceleration/linear interpolation code
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		Robot.driveTrain.arcadeDrive(0, calcThrottle(getAnglesProgressed(), rate));
+		int directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
+		Robot.driveTrain.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		return getAnglesProgressed() >= degrees;
+		return getErrorMagnitudeInDegrees() <= MIN_DEG;
 	}
 }
