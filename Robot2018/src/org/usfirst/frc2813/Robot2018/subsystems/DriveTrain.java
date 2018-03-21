@@ -3,7 +3,7 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.OIDriveCommand;
 import org.usfirst.frc2813.logging.Logger;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -84,7 +84,7 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	// @Override
 	public void initDefaultCommand() {
-		setDefaultCommand(new OIDrive());
+		setDefaultCommand(new OIDriveCommand());
 	}
 
 	@Override

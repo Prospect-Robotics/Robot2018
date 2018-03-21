@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands.auto;
+package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
@@ -6,7 +6,7 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 /**
  *
  */
-public class AutoCurveDrive extends GearheadsCommand {
+public class AutoCurveDriveCommand extends GearheadsCommand {
 	private final double degrees, rate;
 	private double startingOrientation;
 	@SuppressWarnings("unused")
@@ -18,7 +18,7 @@ public class AutoCurveDrive extends GearheadsCommand {
 	@SuppressWarnings("unused")
 	private static final double MIN_DEG=0.01;
 	private final double turnRadius;
-    public AutoCurveDrive(double rate, double degrees, double turnRadius) {
+    public AutoCurveDriveCommand(double rate, double degrees, double turnRadius) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.driveTrain);
