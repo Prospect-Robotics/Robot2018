@@ -9,7 +9,7 @@ import org.usfirst.frc2813.units.values.Rate;
  * This guy handles scaling of position and rate values based on gearing rations,
  * and compensation for reversed sensor or motor output.
  */
-public final class MotorControllerUnitConversionAdapter implements IMotorController {
+public class MotorControllerUnitConversionAdapter implements IMotorController {
 
 	private final IMotorConfiguration configuration;
 	private final IMotorController   controller;
