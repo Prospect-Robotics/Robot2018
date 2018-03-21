@@ -66,7 +66,7 @@ public class OI {
 		 * (7)  SHIFT GEARS SOLENOID
 		 * (8)  ELEVATOR RATCHET SOLENOID
 		 * (9)  INTAKE/ARM SOLENOID
-		 * (10) ELEVATOR TESTING
+		 * (10) <empty>
 		 * (11) MOVE ARM UP
 		 * (12) MOVE ARM DOWN
 		 *
