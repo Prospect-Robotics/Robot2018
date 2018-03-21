@@ -8,8 +8,6 @@ import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
-
 /**
  * Open/Close the Robot arm jaws
  */

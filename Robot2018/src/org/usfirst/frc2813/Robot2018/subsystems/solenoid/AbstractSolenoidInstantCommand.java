@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 
 import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
-import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 
 /**
  * Abstract Solenoid instant command

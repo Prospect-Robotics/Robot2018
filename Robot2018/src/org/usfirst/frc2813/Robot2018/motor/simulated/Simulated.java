@@ -1,30 +1,21 @@
 package org.usfirst.frc2813.Robot2018.motor.simulated;
 
-import java.util.Iterator;
-
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.ISimulatedMotorController;
 import org.usfirst.frc2813.Robot2018.motor.PID;
-import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
-import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Time;
 
-import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 /**
  * A wrapper class to handle an SRX Talon motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 

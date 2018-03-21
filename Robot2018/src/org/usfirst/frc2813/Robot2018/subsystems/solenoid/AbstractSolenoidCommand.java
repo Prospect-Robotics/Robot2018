@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
-import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.logging.Logger;
 
 /**
