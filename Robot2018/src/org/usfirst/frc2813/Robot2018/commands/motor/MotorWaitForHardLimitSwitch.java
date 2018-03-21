@@ -9,7 +9,7 @@ import org.usfirst.frc2813.units.Direction;
 /**
  * Wait for a motor system to arrive at position, to within +/- allowableError
  */
-public class MotorWaitForHardLimitSwitch extends MotorCommand {
+public class MotorWaitForHardLimitSwitch extends AbstractMotorCommand {
 	private final Direction switchDirection;
 
 	public MotorWaitForHardLimitSwitch(Motor motor, Direction switchDirection) {

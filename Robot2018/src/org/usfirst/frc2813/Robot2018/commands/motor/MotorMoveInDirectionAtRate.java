@@ -11,7 +11,7 @@ import org.usfirst.frc2813.units.values.Rate;
  * Move motor  in given direction at given speed until 
  * interrupted. Hold current position with PID when interrupted.
  */
-public class MotorMoveInDirectionAtRate extends MotorCommand {
+public class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
 	private final Direction direction;
 	private final Rate rate;
 

@@ -7,11 +7,11 @@ import org.usfirst.frc2813.logging.Logger;
 /**
  * Abstract base class for motor commands.
  */
-public abstract class MotorCommand extends GearheadsCommand {
+public abstract class AbstractMotorCommand extends GearheadsCommand {
 	protected final Motor motor;
-	public MotorCommand(Motor motor, boolean requiresMotor) {
+	public AbstractMotorCommand(Motor motor, boolean requiresSubsystem) {
 		this.motor = motor;
-		if(requiresMotor) {
+		if(requiresSubsystem) {
 			requires(motor);
 		}
 		Logger.debug(this + "constructed");

@@ -10,7 +10,7 @@ import org.usfirst.frc2813.units.Direction;
  * Move motor in given direction until interrupted.
  * Hold current position with PID when interrupted. 
  */
-public class MotorMoveInDirection extends MotorCommand {
+public class MotorMoveInDirection extends AbstractMotorCommand {
 	private final Direction direction;
 
 	public MotorMoveInDirection(Motor motor, Direction direction) {

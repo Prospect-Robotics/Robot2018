@@ -11,7 +11,7 @@ import org.usfirst.frc2813.units.Direction;
  * this without further intervention, and then holds the 
  * position with PID. 
  */
-public class MotorCalibrateSensor extends MotorInstantCommand {
+public class MotorCalibrateSensor extends AbstractMotorInstantCommand {
 	private final Direction direction;
 
 	public MotorCalibrateSensor(Motor motor, Direction direction) {

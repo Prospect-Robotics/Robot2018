@@ -8,7 +8,7 @@ import org.usfirst.frc2813.units.values.Length;
 /**
  * Wait for a motor system to arrive at position, to within +/- allowableError
  */
-public class MotorWaitForTargetPosition extends MotorCommand {
+public class MotorWaitForTargetPosition extends AbstractMotorCommand {
 	private final Length allowableError;
 	
 	public MotorWaitForTargetPosition(Motor motor, Length allowableError) {

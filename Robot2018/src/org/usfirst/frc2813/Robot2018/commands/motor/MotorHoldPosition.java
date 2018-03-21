@@ -10,7 +10,7 @@ import org.usfirst.frc2813.logging.Logger;
  * controller, so no further intervention is required to 
  * maintain this. 
  */
-public class MotorHoldPosition extends MotorCommand {
+public class MotorHoldPosition extends AbstractMotorCommand {
 	public MotorHoldPosition(Motor motor) {
 		super(motor, true);
 	}

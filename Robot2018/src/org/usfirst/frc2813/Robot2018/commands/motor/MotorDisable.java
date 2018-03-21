@@ -8,7 +8,7 @@ import org.usfirst.frc2813.logging.Logger;
 /**
  * Disable motor. Subsystem will quiesce.
  */
-public class MotorDisable extends MotorInstantCommand {
+public class MotorDisable extends AbstractMotorInstantCommand {
 	public MotorDisable(Motor motor) {
 		super(motor, true);
 	}
