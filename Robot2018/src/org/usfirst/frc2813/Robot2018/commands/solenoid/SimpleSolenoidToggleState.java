@@ -9,7 +9,8 @@
 // it from being updated in the future.
 
 
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.solenoid;
+import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 
@@ -19,13 +20,13 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class ToggleSolenoidGeneral extends GearheadsInstantCommand {
+public class SimpleSolenoidToggleState extends GearheadsInstantCommand {
 	/**
 	 * Switch the position of the intake pistons
 	 */
 	private final Solenoid solenoid;
 
-    public ToggleSolenoidGeneral(Solenoid solenoid) {
+    public SimpleSolenoidToggleState(Solenoid solenoid) {
     	this.solenoid = solenoid;
     	setName(toString());
     }

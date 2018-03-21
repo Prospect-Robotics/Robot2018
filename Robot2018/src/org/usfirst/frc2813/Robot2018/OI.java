@@ -3,12 +3,12 @@ package org.usfirst.frc2813.Robot2018;
 import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
-import org.usfirst.frc2813.Robot2018.commands.ToggleSolenoidGeneral;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorTesting;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleState;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SimpleSolenoidToggleState;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 
@@ -78,9 +78,9 @@ public class OI {
 		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpinSync(Robot.intake, Direction.OUT));
 		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
 		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
-		new JoystickButton(buttonPanel, 6).whenPressed(new ToggleSolenoidGeneral(RobotMap.climbingBar));
-		new JoystickButton(buttonPanel, 7).whenPressed(new ToggleSolenoidGeneral(RobotMap.driveTrainGearShiftSolenoid));
-		new JoystickButton(buttonPanel, 8).whenPressed(new ToggleSolenoidGeneral(RobotMap.elevatorRatchet));
+		new JoystickButton(buttonPanel, 6).whenPressed(new SimpleSolenoidToggleState(RobotMap.climbingBar));
+		new JoystickButton(buttonPanel, 7).whenPressed(new SimpleSolenoidToggleState(RobotMap.driveTrainGearShiftSolenoid));
+		new JoystickButton(buttonPanel, 8).whenPressed(new SimpleSolenoidToggleState(RobotMap.elevatorRatchet));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleState(Robot.jaws));
 		new JoystickButton(buttonPanel, 10).whenPressed(new MotorTesting(Robot.elevator));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
