@@ -7,7 +7,9 @@ import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.QuickTurnCommand;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetGyro;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitch;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPosition;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetState;
 import org.usfirst.frc2813.logging.Logger;
@@ -27,45 +29,185 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * speed and direction are stateful.
  */
 public class AutonomousCommandGroup extends CommandGroup {
+
+	/* ------------------------------------------------------------------------------------------------------
+	 * Configuration Settings
+	 * ------------------------------------------------------------------------------------------------------ */
+	
+	/**
+	 * This is the sticky setting to be used for all subsequent commands created for driving forwards. 
+	 */
 	private double driveSpeed = 1;
+	/**
+	 * This is the sticky setting to be used for all subsequent commands created for turning in place. 
+	 */
 	private double turnSpeed = 0.25;
+	/**
+	 * This is the sticky setting to be used for all subsequent commands created for driving in an arc. 
+	 */
 	private double curveSpeed = 0.4;
+	/**
+	 * This is the sticky setting for the last speed as we came out of a move.
+	 * TODO: This is not used. 
+	 */
+	private double currentSpeed = 0.0;	
+	/**
+	 * Keep track of whether we think we should have a cube at this point in the sequence, so we can
+	 * scale back movements if necessary.
+	 */
+	private boolean haveCube = true;
 
-	private double currentSpeed = 0.0;
+	/* ------------------------------------------------------------------------------------------------------
+	 * Constants
+	 * ------------------------------------------------------------------------------------------------------ */
 
-	// FIXME! what until type? What values should these be?
-	private static final Length armPositionLevel = LengthUOM.Inches.create(12);
-	private static final Length armPositionHigh = LengthUOM.Inches.create(20);
+	/**
+	 *  FIXME! ideally this should be scaled by the projection of the upcoming
+	 *  angle if we are about to turn. Do this by scaling by the cosine of the
+	 *  angle and clamping at +-90 degrees
+	 *  Package scoped on purpose
+	 */
+	static final double TRANSITION_SPEED_FLUID = 0.2;
+	/**
+	 * Speed zero for stopping after a move.
+	 */
+	static final double TRANSITION_SPEED_STOP = 0.0;
+	/**
+	We needed the ability to scale the distances involved for "mini testing" 
+	when we don't have sufficient surface area for testing.  
+	This should really be coming from a sendable chooser.
+	*/
+	private static double DISTANCE_SCALING_MULTIPLIER = 0.2;
+	/**
+	 * Elevator height for placing cubes on the scale
+	 */
+	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT = inches(60);
+	/**
+	 * Elevator height for placing cubes on the switch
+	 */
+	static final Length ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT = inches(24);
+	/**
+	 * Arm Position for Level extension
+	 * TODO: This should be in ArmDegrees
+	 */
+	static final Length ARM_POSITION_FOR_LEVEL = inches(12);
+	/**
+	 * Arm Position for holding high
+	 * TODO: This should be in ArmDegrees
+	 */
+	static final Length ARM_POSITION_HIGH = inches(20);
 
-	public AutonomousCommandGroup() {
-		Logger.info("Autonomous: adding reset commands");
-		addSequential(new ResetEncoders());
-		addSequential(new ResetGyro());
-		Logger.info("Autonomous: reset commands added");
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for changing sticky settings values used by add command helpers 
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/**
+	 * Set the sticky setting for the speed for drive speed.  This value will be used for all subsequent commands created for driving forwards.
+	 */
+	public void setDriveSpeed(double driveSpeed) { 
+		this.driveSpeed = driveSpeed; 
+	}
+	/**
+	 * Set the sticky setting for the speed for turning.  This value will be used for all subsequent commands created for turning.
+	 */
+	public void setTurnSpeed(double turnSpeed) { 
+		this.turnSpeed = turnSpeed;
+	}
+	/**
+	 * Set the sticky setting for the speed for taking curves.  This value will be used for all subsequent commands created for curved movement.
+	 */
+	public void setCurveSpeed(double curveSpeed) { 
+		this.curveSpeed = curveSpeed; 
+	}
+	/**
+	 * Set the sticky hint about whether we have a cube or not, which can help us scale back our speed to keep it.
+	 */
+	public void setHaveCube(boolean haveCube) { 
+		this.haveCube = haveCube; 
 	}
 
-	// track state
-	public void setDriveSpeed(double speed) { driveSpeed=speed; }
-	public void setTurnSpeed(double speed) { turnSpeed=speed; }
-	public void setCurveSpeed(double speed) { curveSpeed=speed; }
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for calculating scaled distances.
+	 * ------------------------------------------------------------------------------------------------------ */
 
-	private void drive(Length distance, Direction direction, double endSpeed) {
+	/*
+	 * Helper to create a distance in inches, scaled appropriately
+	 */
+	static Length inches(double inches) {
+		return LengthUOM.Inches.create(inches).multiply(DISTANCE_SCALING_MULTIPLIER);
+	}
+
+	/*
+	 * Helper to create a distance in feet, scaled appropriately
+	 * Package scoped on purpose
+	 */
+	static Length feet(double feet) {
+		return LengthUOM.Feet.create(feet).multiply(DISTANCE_SCALING_MULTIPLIER);
+	}
+
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for keeping the code clean
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/*
+	 * Helper to get the placement height of a target
+	 */
+	public Length getPlacementHeight(AutonomousPlacementTarget target) {
+		switch(target) {
+		case SCALE:
+			return ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT;
+		case SWITCH:
+			return ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT;
+		default:
+			throw new IllegalArgumentException("Unsuported target: " + target);
+		}
+	}
+
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for adding Drive Train commands
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/**
+	 * Add commands to reset the drive train encoders and gyros (typically called at the start of a match)
+	 */
+	public void addDriveTrainSensorResetSequenceSync() {
+		addSequential(new ResetEncoders());
+		addSequential(new ResetGyro());
+	}
+	/**
+	 * Add a command for driving forward for a set distance, with a desired speed at the end of the movement.
+	 * TODO: This is going to be the new default.
+	 */
+	private void addDriveCommandSync(Direction direction, Length distance, double endSpeed) {
 		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
 		currentSpeed = endSpeed;
 	}
-	public void driveForward(Length distance, double endSpeed) {
-		drive(distance, Direction.FORWARD, endSpeed);
-	}
-	public void driveBackward(Length distance, double endSpeed) {
-		drive(distance, Direction.BACKWARD, endSpeed);
-	}
-	/*
-	 * Create a command to spin in place, until we reach a specific *relative* angle
+	/**
+	 * Add a command for driving forward for the indicated distance, with a desired speed at the end of the movement.
+	 * @see addDriveCommand
 	 */
-	public void quickTurn(Direction direction, double relativeAgle) {
+	public void addDriveForwardSync(Length distance, double endSpeed) {
+		addDriveCommandSync(Direction.FORWARD, distance, endSpeed);
+	}
+	/**
+	 * Add a command for driving reverse for the indicated distance, with a desired speed at the end of the movement.
+	 * @see addDriveCommand
+	 */
+	public void addDriveBackwardSync(Length distance, double endSpeed) {
+		addDriveCommandSync(Direction.BACKWARD, distance, endSpeed);
+	}
+	/**
+	 * Create a command to spin in place, until we reach a specific *relative* angle.  Will turn in either direction
+	 * until that relative angle is hit, accounting for any overshoot by reversing direction for smaller and smaller
+	 * moves until the target is it.  Right now QuickTurnCommand doesn't have PID, but continues until it gets close
+	 * enough.
+	 */
+	public void addQuickTurnSync(Direction direction, double relativeAgle) {
 		addSequential(new QuickTurnCommand(direction, relativeAgle, turnSpeed));
 	}
-
+	/**
+	 * Create a new command to turn in an arc
+	 */
 	private void curve(Direction direction, double angle, double radius, boolean clockwise) {
 		double speed = curveSpeed;
 		if (direction == Direction.BACKWARD) {
@@ -78,66 +220,259 @@ public class AutonomousCommandGroup extends CommandGroup {
 		}
 		addSequential(new AutoCurveDrive(speed, angle, radius));		
 	}
-	public void curveClockForward(double angle, double radius) {
+	/**
+	 * Create a new command to drive forwards and turn clockwise.  How far?  How fast? How long?
+	 * TODO: This needs work.
+	 */
+	public void addCurveClockForwardSync(double angle, double radius) {
 		curve(Direction.FORWARD, angle, radius, true);
 	}
-	public void curveCounterForward(double angle, double radius) {
+	/**
+	 * Create a new command to drive forwards and turn counter-clockwise.  How far?  How fast? How long?
+	 * TODO: This needs work.
+	 */
+	public void addCurveCounterForwardSync(double angle, double radius) {
 		curve(Direction.FORWARD, angle, radius, false);
 	}
-	public void curveClockBackward(double angle, double radius) {
+	/**
+	 * Create a new command to drive backwards and turn clockwise.  How far?  How fast? How long?
+	 * TODO: This needs work.
+	 */
+	public void addCurveClockBackwardSync(double angle, double radius) {
 		curve(Direction.BACKWARD, angle, radius, true);
 	}
-	public void curveCounterBackward(double angle, double radius) {
+	/**
+	 * Create a new command to drive backwards and turn counter-clockwise.  How far?  How fast? How long?
+	 * TODO: This needs work.
+	 */
+	public void addCurveCounterBackwardSync(double angle, double radius) {
 		curve(Direction.BACKWARD, angle, radius, false);
 	}
 
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for adding Elevator commands
+	 * ------------------------------------------------------------------------------------------------------ */
+
 	/**
-	 * elevator commands. Note that the move commands are instant commands.
-	 * Follow up with with waitForElevator if you're not sure the elevator
-	 * has arrived.
-	 * @param position
+	 * Calibrate the elevator (move down), but don't wait for completion.
+	 * To check it you would have to wait for a limit switch. 
 	 */
-	public void elevatorMoveToPosition(Length position) {
+	public void addElevatorCalibrateAsync() {
+		addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
+	}
+	/**
+	 * Wait for the Elevator to hit the hard reset limit
+	 */
+	public void addElevatorWaitForHardLimitSwitchSync() {
+		addSequential(new MotorWaitForHardLimitSwitch(Robot.elevator, Direction.DOWN));
+	}
+
+	/**
+	 * Calibrate the elevator (move down) and wait for the limit switch to be reached, so we know that 
+	 * our sensor has been set the value of the lower limit (zero).
+	 */
+	public void addElevatorCalibrateSequenceSync() {
+		addElevatorCalibrateAsync();
+		addElevatorWaitForHardLimitSwitchSync();
+	}
+
+	/**
+	 * Move the elevator to the indicated position.  Does not wait for completion.
+	 */
+	public void addElevatorMoveToPositionAsync(Length position) {
+		/**
+		 * TODO When Necessary: 
+		 * Allow overriding maximum rate for PID move to position, 
+		 * go slower when we have a cube in the jaws!
+		 */
 		addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position));
 	}
-	public void lowerElevator() {
-		elevatorMoveToPosition(LengthUOM.Inches.create(0));
+	/*
+	 * Start the elevator moving in the background
+	 */
+	public void addElevatorMoveToPlacementHeightAsync(AutonomousPlacementTarget target) {
+		addElevatorMoveToPositionAsync(getPlacementHeight(target));
 	}
-	public void armMoveToPosition(Length position) {
-		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, position));
+	/**
+	 * Lower the Elevator to the bottom 
+	 */
+	public void addElevatorLowerAsync() {
+		addElevatorMoveToPositionAsync(LengthUOM.Inches.create(0));
 	}
-	public void waitForElevator() {
-		// Wait for Elevator to reach it's destiniation to within +/- one inch.
+	/**
+	 * Wait for the Elevator to reach a target position. 
+	 */
+	public void addElevatorWaitForTargetPositionSync() {
+		// Wait for Elevator to reach it's destination to within +/- one inch.
 		addSequential(new MotorWaitForTargetPosition(Robot.elevator, LengthUOM.Inches.create(1)));
 	}
 
-	// arm control commands
-	public void levelArm() {
-		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armPositionLevel));
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for adding Arm commands
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/**
+	 * Calibrate the arm (move down), but don't wait for completion.
+	 * To check it you would have to wait for a limit switch. 
+	 */
+	public void addArmCalibrateAsync() {
+		addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN));
 	}
-	public void raiseArm() {
-		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armPositionHigh));
-	}
-	private void openJaws() {
-		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));		
-	}
-	public void dropCube() {
-		openJaws();
-		levelArm();
-	}
-	public void shootCube() {
-		addSequential(new ToggleIntake(Direction.OUT));
-		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));
-		addSequential(new ToggleIntake(Direction.STOP));
-	}
-	public void grabCube() {
-		addSequential(new ToggleIntake(Direction.IN));
-		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));
-		sleep(0.2);
-		addSequential(new ToggleIntake(Direction.STOP));
+	/**
+	 * Wait for the Arm to hit the hard reset limit
+	 */
+	public void addArmWaitForHardLimitSwitchSync() {
+		addSequential(new MotorWaitForHardLimitSwitch(Robot.arm, Direction.IN));
 	}
 
-	public void sleep(double seconds) {
+	/**
+	 * Calibrate the elevator (move down) and wait for the limit switch to be reached, so we know that 
+	 * our sensor has been set the value of the lower limit (zero).
+	 */
+	public void addArmCalibrateSequenceSync() {
+		addArmCalibrateAsync();
+		addArmWaitForHardLimitSwitchSync();
+	}
+
+	/**
+	 * Move the arm to the indicated position.  Does not wait for completion.
+	 */
+	public void addArmMoveToPositionAsync(Length position) {
+		addSequential(new MotorMoveToAbsolutePosition(Robot.arm, position));
+	}
+
+	/**
+	 * Move the arm In. 
+	 */
+	public void addArmMoveInAsync() {
+		addArmMoveToPositionAsync(LengthUOM.Inches.create(0));
+	}
+
+	/**
+	 * Wait for the Arm to reach a target position.
+	 * TODO: This should be moving to within a tolerance in ArmDegrees, not inches.
+	 */
+	public void addArmWaitForTargetPositionSync() {
+		// Wait for Arm to reach it's destination to within +/- one half inch.
+		addSequential(new MotorWaitForTargetPosition(Robot.arm, LengthUOM.Inches.create(0.5)));
+	}
+
+	/**
+	 * Move the arm to the "level" position, but do not wait.
+	 */
+	public void addArmMoveToLevelPositionAsync() {
+		addArmMoveToPositionAsync(ARM_POSITION_FOR_LEVEL);
+	}
+	
+	/**
+	 * Move the arm to the "high" position, but do not wait.
+	 */
+	public void addArmMoveToHighPositionAsync() {
+		addArmMoveToPositionAsync(ARM_POSITION_HIGH);
+	}
+
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for adding Jaws commands
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/**
+	 * Add a synchronous command to open the jaws
+	 */
+	private void addJawsOpenSync() {
+		addSequential(new SolenoidSetState(Robot.jaws, Direction.OPEN));		
+	}
+
+	/**
+	 * Add a synchronous command to close the jaws
+	 */
+	private void addJawsCloseSync() {
+		addSequential(new SolenoidSetState(Robot.jaws, Direction.CLOSE));		
+	}
+
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for adding intake commands
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/**
+	 * Add a command to start the intake spinning inwards
+	 */
+	private void addIntakeInAsync() {
+		addSequential(new ToggleIntake(Direction.IN));		
+	}
+
+	/**
+	 * Add a command to start the intake spinning outwards
+	 */
+	private void addIntakeOutAsync() {
+		addSequential(new ToggleIntake(Direction.OUT));		
+	}
+
+	/**
+	 * Add a command to stop the intake spinning
+	 */
+	private void addIntakeStopSync() {
+		addSequential(new ToggleIntake(Direction.OFF));		
+	}
+
+	/* ------------------------------------------------------------------------------------------------------
+	 * Helpers for adding complex command sequences
+	 * ------------------------------------------------------------------------------------------------------ */
+
+	/**
+	 * Add a delay in seconds
+	 */
+	public void addDelayInSecondsSync(double seconds) {
 		addSequential(new TimedCommand(seconds));
 	}
+
+	/**
+	 * Add a drop cube sequence.
+	 */
+	public void addDropCubeSequenceSync() {
+		addJawsOpenSync();
+		// NB: We expect to have a cube... but since the jaws were open I assume we're trying to shake it loose so go fast...
+		addArmMoveToLevelPositionAsync(); 
+		addArmWaitForTargetPositionSync();
+	}
+	
+	/**
+	 * Add a "shoot" sequence
+	 */
+	public void addShootCubeSequence() {
+		addIntakeOutAsync();
+		addJawsOpenSync();
+		addIntakeStopSync();
+	}
+	
+	/**
+	 * Add a "grab" sequence
+	 */
+	public void addGrabCubeSequence() {
+		addIntakeInAsync();
+		addJawsCloseSync();
+		addDelayInSecondsSync(0.2);
+		addIntakeStopSync();
+	}
+
+	/**
+	 * Add a "deliver" sequence tailored towards target.
+	 */
+	public void addDeliverCubeSequenceSync(AutonomousPlacementTarget target) {
+		/*
+		 * NB: We will always 'move to placement height' here even though we have probably optimized
+		 * by doing this in advance.  This prevents us from slamming the arm into the field if somehow
+		 * we have forgotten that step, and makes this command a little more flexible.
+		 */
+		addElevatorMoveToPlacementHeightAsync(target);
+		/*
+		 * Always wait for the target position to be reached before continuing, to avoid slamming into
+		 * the field.
+		 */
+		addElevatorWaitForTargetPositionSync();
+		addDriveForwardSync(feet(2), TRANSITION_SPEED_STOP);
+		addDropCubeSequenceSync();
+		addDriveBackwardSync(feet(2), TRANSITION_SPEED_FLUID);
+		addElevatorMoveToPlacementHeightAsync(target);
+	}
+	
 }
