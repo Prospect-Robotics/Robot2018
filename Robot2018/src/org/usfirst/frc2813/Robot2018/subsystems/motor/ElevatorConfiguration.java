@@ -26,7 +26,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	
 	private static final Length RANGE_MIN = LengthUOM.Inches.create(0);
 	private static final Length SAFETY_MARGIN = LengthUOM.Inches.create(4);
-	private static final Length RANGE_MAX = LengthUOM.Inches.create(85);
+	private static final Length RANGE_MAX = LengthUOM.Inches.create(82);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
 	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
@@ -155,7 +155,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|IMotorConfiguration.Reverse
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
-					|IMotorConfiguration.Disconnected // NB: WARNING !!
+//					|IMotorConfiguration.Disconnected // NB: WARNING !!
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM
