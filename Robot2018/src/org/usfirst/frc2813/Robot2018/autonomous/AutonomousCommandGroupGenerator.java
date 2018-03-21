@@ -127,7 +127,7 @@ public class AutonomousCommandGroupGenerator {
 
 		// These return immediately and can happen while we drive
 		Logger.info("Autonomous: set default elevator/arm position");
-		autoCmdList.elevatorMoveToPosition(switchHeight); // min needed and max safe during drive
+		startElevatorMovingToPlacementHeight(Target.SWITCH);
 		autoCmdList.raiseArm();
 
 		if (robotStartingPosition.equals(scalePosition)) {
@@ -141,7 +141,7 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info("Autonomous: robot and scale on same side");
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(feet(24), FULL_STOP);
-			autoCmdList.elevatorMoveToPosition(scaleHeight);
+			startElevatorMovingToPlacementHeight(Target.SCALE);
 			autoCmdList.quickTurn(right, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
@@ -166,7 +166,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.driveForward(feet(15), TRANSITION_SPEED);
 			autoCmdList.quickTurn(left, 90);
 			autoCmdList.driveForward(feet(8), FULL_STOP);
-			autoCmdList.elevatorMoveToPosition(scaleHeight);
+			startElevatorMovingToPlacementHeight(Target.SCALE);
 			autoCmdList.quickTurn(left, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
@@ -185,15 +185,30 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.quickTurn(left, 45);
 			autoCmdList.driveForward(feet(6), TRANSITION_SPEED); // diagonally from start to far side of near switch
 			autoCmdList.quickTurn(right, 45);
-			autoCmdList.elevatorMoveToPosition(switchHeight); 
 			deliverCubeRoutine(Target.SWITCH);
 		}
 	}
+
+	/*
+	 * Start the elevator moving in the background
+	 */
+	private void startElevatorMovingToPlacementHeight(Target target) {
+		Length height = null;
+		switch(target) {
+		case SCALE:
+			height = scaleHeight;
+			break;
+		case SWITCH:
+			height = switchHeight;
+			break;
+		default:
+			throw new IllegalArgumentException("Unsuported target: " + target);
+		}
+		autoCmdList.elevatorMoveToPosition(height);
+	}
 	
 	private void deliverCubeRoutine(Target target) {
-		if (target == Target.SCALE) {
-			autoCmdList.waitForElevator();
-		}
+		autoCmdList.waitForElevator();
 		autoCmdList.driveForward(feet(2), FULL_STOP);
 		autoCmdList.dropCube();
 		autoCmdList.driveBackward(feet(2), TRANSITION_SPEED);
