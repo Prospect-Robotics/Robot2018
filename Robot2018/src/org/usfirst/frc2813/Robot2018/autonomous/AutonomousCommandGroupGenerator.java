@@ -32,6 +32,54 @@ public class AutonomousCommandGroupGenerator {
 	*/
 	private static double distanceScale = 0.2;
 	
+	private static Direction SCRIPT_BIAS = Direction.LEFT;
+	/**
+	 * If we are in neutral or reverse direction (LEFT), return the direction unmodified.
+	 * If we are in the right position (i.e. position isn't neutral and doesn't match the input, reverse it)
+	 */
+	private static Direction getBiasedDirection(Direction startingPosition, Direction goalPosition, Direction referenceDirection) {
+		
+		if(startingPosition.isNeutral()) {
+			return goalPosition.equals(SCRIPT_BIAS) ? referenceDirection : referenceDirection.getInverse();
+		} else if(!startingPosition.equals(SCRIPT_BIAS)) {
+			return referenceDirection.getInverse();
+		} else {
+			return referenceDirection;
+		}
+	}
+
+	/**
+	 * Validate assumption about direction biasing
+	 */
+	private static void verify(Direction startingPosition, Direction goalPosition, Direction original, Direction expected) {
+		if(getBiasedDirection(startingPosition, goalPosition, original) != expected) {
+			throw new IllegalArgumentException("In " + startingPosition + " position, biased " + original + " should have been " + expected + ".");
+		}
+	}
+	
+	/**
+	 * Validate direction assumptions
+	 */
+	private static void verifyDirections() {
+		// If we start at the left, there's no change...
+		verify(Direction.LEFT,  Direction.LEFT, Direction.LEFT, Direction.LEFT);
+		verify(Direction.LEFT,  Direction.LEFT, Direction.RIGHT, Direction.RIGHT);
+		verify(Direction.LEFT,  Direction.RIGHT, Direction.LEFT, Direction.LEFT);
+		verify(Direction.LEFT,  Direction.RIGHT, Direction.RIGHT, Direction.RIGHT);
+
+		// If we start at the center, we will reverse direction if the target is on the right
+		verify(Direction.CENTER, Direction.LEFT, Direction.LEFT, Direction.LEFT);
+		verify(Direction.CENTER, Direction.LEFT, Direction.RIGHT, Direction.RIGHT);
+		verify(Direction.CENTER, Direction.RIGHT, Direction.LEFT, Direction.RIGHT);
+		verify(Direction.CENTER, Direction.RIGHT, Direction.RIGHT, Direction.LEFT);
+		
+		// If we start on the right, we always want the opposite
+		verify(Direction.RIGHT,  Direction.LEFT, Direction.LEFT, Direction.RIGHT);
+		verify(Direction.RIGHT,  Direction.LEFT, Direction.RIGHT, Direction.LEFT);
+		verify(Direction.RIGHT,  Direction.RIGHT, Direction.LEFT, Direction.RIGHT);
+		verify(Direction.RIGHT,  Direction.RIGHT, Direction.RIGHT, Direction.LEFT);
+	}
+	
 	private int directionBias;  // used to share code between left/right
 
 	/**
@@ -42,10 +90,15 @@ public class AutonomousCommandGroupGenerator {
 	 */
 	public AutonomousCommandGroupGenerator() {
 		// Read our location on the field
-		Direction position = Robot.positionSelector.getSelected();
+		Direction robotStartingPosition = Robot.positionSelector.getSelected();
+		Direction nearSwitchPosition = RobotMap.gameData.getNearSwitch();
+		Direction scalePosition = RobotMap.gameData.getScale();
 
-		 // allows left->right and right->left to share code
-		directionBias = (position == Direction.LEFT) ? -1 : 1;
+		// Sanity test our direction biases
+		verifyDirections();
+
+		// allows left->right and right->left to share code
+		directionBias = getBiasedDirection(robotStartingPosition, nearSwitchPosition, Direction.LEFT).getMultiplier();
 
 		if (RobotMap.gameData.getScale() == Direction.OFF) {
 			// there is no game data. Cross the auto line
@@ -59,7 +112,7 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.elevatorMoveToPosition(switchHeight); // min needed and max safe during drive
 		autoCmdList.raiseArm();
 
-		if (position == RobotMap.gameData.getScale()) {
+		if (robotStartingPosition.equals(scalePosition)) {
 			Logger.info("Autonomous: robot and scale on same side");
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(LengthUOM.Feet.create(24).multiply(distanceScale), FULL_STOP);
@@ -67,7 +120,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.turnRight(90 * directionBias);
 			deliverCubeRoutine(Target.SCALE);
 		}
-		else if (position != Direction.CENTER) {
+		else if (!robotStartingPosition.equals(Direction.CENTER)) {
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info("Autonomous: robot and scale on opposite side");
 			autoCmdList.driveForward(LengthUOM.Feet.create(14).multiply(distanceScale), TRANSITION_SPEED);
@@ -80,10 +133,6 @@ public class AutonomousCommandGroupGenerator {
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else {
-			// We are in the center start position
-			 // allows left->right and right->left to share code
-			directionBias = (position == Direction.LEFT) ? -1 : 1;
-
 			Logger.info("Autonomous: robot in center position");
 			autoCmdList.driveForward(LengthUOM.Inches.create(8).multiply(distanceScale), TRANSITION_SPEED); // enough to turn
 			autoCmdList.turnLeft(45 * directionBias);
