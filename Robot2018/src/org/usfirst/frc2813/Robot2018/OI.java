@@ -3,12 +3,12 @@ package org.usfirst.frc2813.Robot2018;
 import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinSync;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirectionSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorTesting;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleState;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SimpleSolenoidToggleState;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SimpleSolenoidToggleStateInstant;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 
@@ -76,15 +76,15 @@ public class OI {
 
 		new JoystickButton(buttonPanel, 1).whileHeld(new IntakeSpinSync(Robot.intake, Direction.IN));
 		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpinSync(Robot.intake, Direction.OUT));
-		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
-		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
-		new JoystickButton(buttonPanel, 6).whenPressed(new SimpleSolenoidToggleState(RobotMap.climbingBar));
-		new JoystickButton(buttonPanel, 7).whenPressed(new SimpleSolenoidToggleState(RobotMap.driveTrainGearShiftSolenoid));
-		new JoystickButton(buttonPanel, 8).whenPressed(new SimpleSolenoidToggleState(RobotMap.elevatorRatchet));
+		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirectionSync(Robot.elevator, Direction.DOWN));
+		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirectionSync(Robot.elevator, Direction.UP));
+		new JoystickButton(buttonPanel, 6).whenPressed(new SimpleSolenoidToggleStateInstant(RobotMap.climbingBar));
+		new JoystickButton(buttonPanel, 7).whenPressed(new SimpleSolenoidToggleStateInstant(RobotMap.driveTrainGearShiftSolenoid));
+		new JoystickButton(buttonPanel, 8).whenPressed(new SimpleSolenoidToggleStateInstant(RobotMap.elevatorRatchet));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleState(Robot.jaws));
 		new JoystickButton(buttonPanel, 10).whenPressed(new MotorTesting(Robot.elevator));
-		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
-		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
+		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.IN));
+		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.OUT));
 
 		joystick1 = new Joystick(1);
 		joystick2 = new Joystick(2);
@@ -93,7 +93,7 @@ public class OI {
 		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
-		SmartDashboard.putData("OIDrive", new DriveTrainOIDrive(Robot.driveTrain, joystick1, joystick2));
+		SmartDashboard.putData("OIDrive", new DriveTrainOIDriveSync(Robot.driveTrain, joystick1, joystick2));
 
 		driveStyleChooser = new SendableChooser<>();
 		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);

@@ -7,8 +7,8 @@ import org.usfirst.frc2813.units.Direction;
 /**
  * This class sets the Intake in/out/off and exits
  */
-public class IntakeStop extends AbstractIntakeInstantCommand {
-	public IntakeStop(Intake subsystem) {
+public class IntakeStopInstant extends AbstractIntakeInstantCommand {
+	public IntakeStopInstant(Intake subsystem) {
 		super(subsystem, true /* require intake */);
 	}
 

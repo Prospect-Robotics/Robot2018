@@ -10,11 +10,11 @@ import org.usfirst.frc2813.units.values.Length;
  * Move motor to a relative position. Motor controller does this without
  * further intervention.
  */
-public final class MotorMoveToRelativePosition extends AbstractMotorInstantCommand {
+public final class MotorMoveToRelativePositionAsync extends AbstractMotorInstantCommand {
 	private final Direction direction;
 	private final Length relativeDistance;
 
-	public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance) {
+	public MotorMoveToRelativePositionAsync(Motor motor, Direction direction, Length relativeDistance) {
 		super(motor, true);
 		this.direction = direction;
 		this.relativeDistance = relativeDistance;

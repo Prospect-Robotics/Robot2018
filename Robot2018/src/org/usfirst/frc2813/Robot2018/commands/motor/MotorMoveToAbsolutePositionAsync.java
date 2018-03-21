@@ -11,10 +11,10 @@ import org.usfirst.frc2813.units.values.Length;
  * this without further intervention, and then holds the 
  * position with PID. 
  */
-public final class MotorMoveToAbsolutePosition extends AbstractMotorInstantCommand {
+public final class MotorMoveToAbsolutePositionAsync extends AbstractMotorInstantCommand {
 	private final Length position;
 
-	public MotorMoveToAbsolutePosition(Motor motor, Length position) {
+	public MotorMoveToAbsolutePositionAsync(Motor motor, Length position) {
 		super(motor, true);
 		this.position = position;
 		setName(toString());

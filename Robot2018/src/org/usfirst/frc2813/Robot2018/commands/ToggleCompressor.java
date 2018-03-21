@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
 /**
- *
+ * Compressor state toggle for debugging.
  */
 public class ToggleCompressor extends GearheadsInstantCommand {
 	private final Compressor compressor;

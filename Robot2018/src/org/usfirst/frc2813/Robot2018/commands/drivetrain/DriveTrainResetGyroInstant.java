@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Reset the Gyro counter.
  */
-public final class DriveTrainResetGyro extends AbstractDriveTrainInstantCommand {
+public final class DriveTrainResetGyroInstant extends AbstractDriveTrainInstantCommand {
 
 	/*
 	 * Reset the Gyro
 	 * Whatever is already running may be using the gyro... so require the subsystem.
 	 */
-    public DriveTrainResetGyro(DriveTrain driveTrain) {
+    public DriveTrainResetGyroInstant(DriveTrain driveTrain) {
     	super(driveTrain, true /* require subsystem */);
     	setName(toString());
     }

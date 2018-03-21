@@ -11,14 +11,14 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  * NB: This class is here temporarily and will be replaced by DriveTrainAutoDrive (currently PIDAutoDrive)
  * @see org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive
  */
-public final class DriveTrainAutoCurve extends AbstractDriveTrainCommand {
+public final class DriveTrainAutoCurveSync extends AbstractDriveTrainCommand {
 	private final double degrees;
 	private final double rate;
 	private final double turnRadius;
 
 	private double startingOrientation;
 	
-    public DriveTrainAutoCurve(DriveTrain driveTrain, double rate, double degrees, double turnRadius) {
+    public DriveTrainAutoCurveSync(DriveTrain driveTrain, double rate, double degrees, double turnRadius) {
     	super(driveTrain, true /* require driveTrain */);
     	this.turnRadius=turnRadius;
     	this.degrees=degrees;

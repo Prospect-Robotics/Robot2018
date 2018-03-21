@@ -4,16 +4,17 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.values.Length;
+import org.usfirst.frc2813.units.Direction;
 
 /**
  * Wait for a motor system to arrive at position, to within +/- allowableError
  */
-public final class MotorWaitForTargetPosition extends AbstractMotorCommand {
-	private final Length allowableError;
-	
-	public MotorWaitForTargetPosition(Motor motor, Length allowableError) {
+public final class MotorWaitForHardLimitSwitchSync extends AbstractMotorCommand {
+	private final Direction switchDirection;
+
+	public MotorWaitForHardLimitSwitchSync(Motor motor, Direction switchDirection) {
 		super(motor, false); // NB: IF this is running asynchronously, we don't interrupt the other command...
-		this.allowableError = allowableError;
+		this.switchDirection = switchDirection;
 		setName(toString());
 	}
 
@@ -22,9 +23,9 @@ public final class MotorWaitForTargetPosition extends AbstractMotorCommand {
 		super.initialize();
 		// NB: If the motor is moving to a position (relative or absolute)
 		if(!isFinished()) {
-			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s.",this,motor,motor.getTargetState().getTargetAbsolutePosition());
+			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s hard limit switch.", this, motor, switchDirection);
 		} else {
-			Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach position, it's already done that.",this,motor);
+			Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach %s hard limit switch, it's already there.", this, motor, switchDirection);
 		}
 		setInterruptible(true);
 	}
@@ -32,10 +33,10 @@ public final class MotorWaitForTargetPosition extends AbstractMotorCommand {
 	@Override
 	protected boolean isFinished() {
 		// NB: If there's no target position (absolute or relative), this will always return true.
-		return motor.getCurrentPositionErrorWithin(allowableError);
+		return motor.getCurrentLimitSwitchStatus(switchDirection);
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", allowableError=" + allowableError + ")";
+        return getClass().getSimpleName() + "(" + motor + ", switchDirection=" + switchDirection + ")";
     }
 }

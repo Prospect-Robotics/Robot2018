@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  * Open/Close the Robot arm jaws, depending on the current state
  */
-public class SolenoidToggleState extends InstantCommand {
+public class SolenoidToggleStateInstant extends InstantCommand {
 	private final Solenoid solenoid;
 
-    public SolenoidToggleState(Solenoid solenoid) {
+    public SolenoidToggleStateInstant(Solenoid solenoid) {
     	this.solenoid = solenoid;
     }
 

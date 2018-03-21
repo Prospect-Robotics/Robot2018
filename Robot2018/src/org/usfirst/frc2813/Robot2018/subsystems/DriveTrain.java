@@ -5,7 +5,7 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 import org.usfirst.frc2813.Robot2018.OI;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveSync;
 import org.usfirst.frc2813.logging.Logger;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -114,7 +114,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		 because DriveTrain has to be created before OI creates the joysticks.  Plus they are asking for
 		 a default command inside a subsystem, which is mixing the UI with the implementation and
 		 is poor design, but nothing we can do. */
-		setDefaultCommand(new DriveTrainOIDrive(this, Robot.oi.getJoystick1(), Robot.oi.getJoystick2()));
+		setDefaultCommand(new DriveTrainOIDriveSync(this, Robot.oi.getJoystick1(), Robot.oi.getJoystick2()));
 	}
 
 	@Override

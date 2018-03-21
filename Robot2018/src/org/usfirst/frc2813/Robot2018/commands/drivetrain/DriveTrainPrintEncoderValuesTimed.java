@@ -9,19 +9,20 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 /**
  * Print out the drive train encoder values to the log.
  */
-public final class DriveTrainPrintEncoderValues extends AbstractDriveTrainTimedCommand {
+public final class DriveTrainPrintEncoderValuesTimed extends AbstractDriveTrainTimedCommand {
 	private long last;
 	private double timeout;
 	private final Encoder starboardEncoder;
 	private final Encoder portEncoder;
 
-	public DriveTrainPrintEncoderValues(DriveTrain driveTrain, double timeout) {
+	public DriveTrainPrintEncoderValuesTimed(DriveTrain driveTrain, double timeout) {
 		super(driveTrain, false /* do not require subsystem for background monitoring command */, timeout);
 		this.last = 0;
 		this.timeout = timeout;
 		this.portEncoder = driveTrain.getEncoderPort();
 		this.starboardEncoder = driveTrain.getEncoderStarboard();
 		setName(toString());
+		setRunWhenDisabled(true);
 	}
 
 	// Called just before this Command runs the first time

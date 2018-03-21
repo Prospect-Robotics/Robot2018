@@ -20,13 +20,13 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class SimpleSolenoidToggleState extends GearheadsInstantCommand {
+public class SimpleSolenoidToggleStateInstant extends GearheadsInstantCommand {
 	/**
 	 * Switch the position of the intake pistons
 	 */
 	private final Solenoid solenoid;
 
-    public SimpleSolenoidToggleState(Solenoid solenoid) {
+    public SimpleSolenoidToggleStateInstant(Solenoid solenoid) {
     	this.solenoid = solenoid;
     	setName(toString());
     }

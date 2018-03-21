@@ -10,10 +10,10 @@ import org.usfirst.frc2813.units.values.Rate;
  * If the motor is moving, change speeds.  If not, has no effect.Set the speed on a Motor subsystem.  It will take immediate effect
  * Also, do NOT attempt to change direction! 
  */
-public final class MotorSetTargetRate extends AbstractMotorInstantCommand {
+public final class MotorAdjustTargetRateInstant extends AbstractMotorInstantCommand {
 	private final Rate targetRate;
 
-	public MotorSetTargetRate(Motor motor, Rate targetRate) {
+	public MotorAdjustTargetRateInstant(Motor motor, Rate targetRate) {
 		super(motor, false /* NB: we don't need to 'interrupt' existing movement for this */);
 		this.targetRate=targetRate;
 		if(targetRate.getValue() < 0) {

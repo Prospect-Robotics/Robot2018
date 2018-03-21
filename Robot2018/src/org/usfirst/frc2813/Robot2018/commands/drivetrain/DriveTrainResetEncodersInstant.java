@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Reset the encoders
  */
-public class DriveTrainResetEncoders extends AbstractDriveTrainInstantCommand {
+public class DriveTrainResetEncodersInstant extends AbstractDriveTrainInstantCommand {
 
 	/**
 	 * Reset the DriveTrain encoders
 	 * Whatever is already running may be using the encoders... so require the subsystem.
 	 */
-    public DriveTrainResetEncoders(DriveTrain driveTrain) {
+    public DriveTrainResetEncodersInstant(DriveTrain driveTrain) {
         super(driveTrain, true /* require subsystem */);
     }
 
