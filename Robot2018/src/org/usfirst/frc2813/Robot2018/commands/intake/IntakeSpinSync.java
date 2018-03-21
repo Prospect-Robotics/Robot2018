@@ -18,11 +18,12 @@ public class IntakeSpinSync extends AbstractIntakeCommand {
 	// We only need to call this once
 	protected void initialize() {
 		super.initialize();
-		if(intake.getCurrentDirection().equals(direction)) {
+		if(intake.getTargetDirection().equals(direction)) {
 			if(!isDefaultCommand()) {
 				Logger.warning("Telling " + intake + " to spin " + direction + ", but it already is.");
 			}
 		} else {
+			Logger.warning("Telling " + intake + " to spin " + direction + ".");
 			intake.spin(direction);
 		}
 	}
