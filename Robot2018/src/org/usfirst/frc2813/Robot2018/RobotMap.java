@@ -188,10 +188,10 @@ public class RobotMap {
 		//LiveWindow.addActuator("Intake", "Speed Controller 1", intakeSpeedController);
 		
 		// FIXME move to subsystem
-		intakeSpeedController.setInverted(false);
+		intakeSpeedController.setInverted(true);
 		intakeSpeedControllerFollow = new VictorSPX(6);
 		intakeSpeedControllerFollow.set(ControlMode.Follower, intakeSpeedController.getDeviceID());
-		intakeSpeedControllerFollow.setInverted(true);
+		intakeSpeedControllerFollow.setInverted(intakeSpeedController.getInverted() ? false : true); // track master
 
 		compressor = new Compressor();
 
