@@ -48,6 +48,24 @@ public class Robot extends TimedRobot {
 	public static Solenoid gearShifter;
 
 	/**
+	 * Officially documenting our logical model for the robot.  LEFT is negative.  
+	 * This is consistent with a compass and a gyro, and has nothing to do with any input device axis.
+	 */
+	public static final double LEFT_BIAS = -1.0;
+	/**
+	 * Officially documenting our logical model for the robot.  RIGHT is positive.  
+	 * This is consistent with a compass and a gyro, and has nothing to do with any input device axis.
+	 */
+	public static final double RIGHT_BIAS = 1.0;
+	/**
+	 * Officially documenting our logical model for the robot.  FORWARD is positive.   
+	 */
+	public static final double FORWARD_BIAS = 1.0;
+	/**
+	 * Officially documenting our logical model for the robot.  REVERSE is negative.   
+	 */
+	public static final double REVERSE_BIAS = -1.0;
+	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
