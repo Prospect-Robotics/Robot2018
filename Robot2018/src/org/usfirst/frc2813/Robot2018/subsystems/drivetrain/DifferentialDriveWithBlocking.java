@@ -27,20 +27,21 @@ public class DifferentialDriveWithBlocking extends DifferentialDrive {
 		return false;
 	}
 	
-	private void enterBlockingMode() {
-		// TODO: Start PID loop to keep the encoders from moving
+	private void enterDefensiveHoldPositionMode() {
+		// TODO: Start holding position
 	}
 	
-	private void exitBlockingMode() {
-		// TODO: Start PID loop to keep the encoders from moving
+	private void exitDefensiveHoldPositionMode() {
+		// TODO: Stop holding position
 	}
 	
 	@Override
 	public void arcadeDrive(double xSpeed, double zRotation) {
 		if(isIdleArcade(xSpeed, zRotation)) {
-			enterBlockingMode();
+			super.stopMotor();
+			enterDefensiveHoldPositionMode();
 		} else {
-			exitBlockingMode();
+			exitDefensiveHoldPositionMode();
 			super.arcadeDrive(xSpeed, zRotation);
 		}
 	}
@@ -48,9 +49,10 @@ public class DifferentialDriveWithBlocking extends DifferentialDrive {
 	@Override
 	public void arcadeDrive(double xSpeed, double zRotation, boolean squaredInputs) {
 		if(isIdleArcade(xSpeed, zRotation)) {
-			enterBlockingMode();
+			super.stopMotor();
+			enterDefensiveHoldPositionMode();
 		} else {
-			exitBlockingMode();
+			exitDefensiveHoldPositionMode();
 			super.arcadeDrive(xSpeed, zRotation, squaredInputs);
 		}
 	}
@@ -58,9 +60,10 @@ public class DifferentialDriveWithBlocking extends DifferentialDrive {
 	@Override
 	public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
 		if(isIdleCurvature(xSpeed, zRotation)) {
-			enterBlockingMode();
+			super.stopMotor();
+			enterDefensiveHoldPositionMode();
 		} else {
-			exitBlockingMode();
+			exitDefensiveHoldPositionMode();
 			super.curvatureDrive(xSpeed, zRotation, isQuickTurn);
 		}
 	}
@@ -68,9 +71,10 @@ public class DifferentialDriveWithBlocking extends DifferentialDrive {
 	@Override
 	public void tankDrive(double leftSpeed, double rightSpeed) {
 		if(isIdleTank(leftSpeed, rightSpeed)) {
-			enterBlockingMode();
+			super.stopMotor();
+			enterDefensiveHoldPositionMode();
 		} else {
-			exitBlockingMode();
+			exitDefensiveHoldPositionMode();
 			super.tankDrive(leftSpeed, rightSpeed);
 		}
 	}
@@ -78,9 +82,10 @@ public class DifferentialDriveWithBlocking extends DifferentialDrive {
 	@Override
 	public void tankDrive(double leftSpeed, double rightSpeed, boolean squaredInputs) {
 		if(isIdleTank(leftSpeed, rightSpeed)) {
-			enterBlockingMode();
+			super.stopMotor();
+			enterDefensiveHoldPositionMode();
 		} else {
-			exitBlockingMode();
+			exitDefensiveHoldPositionMode();
 			super.tankDrive(leftSpeed, rightSpeed, squaredInputs);
 		}
 	}
