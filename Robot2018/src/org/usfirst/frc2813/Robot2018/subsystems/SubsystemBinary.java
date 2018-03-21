@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -9,13 +10,13 @@ import org.usfirst.frc2813.units.Direction;
 public abstract class SubsystemBinary extends GearheadsSubsystem {
 	protected static Direction state;
 
-    /**
-     * Constructor. configure your motor controller and set your
-     * geometry and state. Override and call super. Note that
-     * to change any of the defaults set here, call super first!
-     */
+	/**
+	 * Constructor. configure your motor controller and set your
+	 * geometry and state. Override and call super. Note that
+	 * to change any of the defaults set here, call super first!
+	 */
 	public void initialize() {
-        state = getControllerState();
+		state = getControllerState();
 	}
 
 	/**
@@ -34,16 +35,26 @@ public abstract class SubsystemBinary extends GearheadsSubsystem {
 	 * user facing command to change subsystem state
 	 */
 	public void setState(Direction direction) {
-        if (!encoderFunctional) return;
+		if (!encoderFunctional) return;
 
 		state = direction;
-		setControllerState(direction);
+		if (isEmulated()) {
+			Logger.info("EMULATOR: " + this + " set command: " + state);
+		}
+		else {
+			setControllerState(direction);        	
+		}
 	}
-	/*
+	/**
 	 * Get the current state
 	 */
 	public Direction getState() {
-		return getControllerState();
-	}
-	
+		if (isEmulated()) {
+			Logger.info("EMULATOR: " + this + " get command: " + state);
+			return state;
+		}
+		else {
+			return getControllerState();        	
+		}
+	}	
 }
