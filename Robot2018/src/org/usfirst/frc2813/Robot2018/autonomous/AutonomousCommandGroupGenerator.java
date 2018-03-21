@@ -80,6 +80,21 @@ public class AutonomousCommandGroupGenerator {
 		verify(Direction.RIGHT,  Direction.RIGHT, Direction.RIGHT, Direction.LEFT);
 	}
 
+	/*
+	 * Helper to create a length in inches, scaled appropriately
+	 */
+	private Length inches(double inches) {
+		return LengthUOM.Inches.create(inches).multiply(distanceScale);
+	}
+	
+	/*
+	 * Helper to create a length in feet, scaled appropriately
+	 */
+	private Length feet(double feet) {
+		return LengthUOM.Feet.create(feet).multiply(distanceScale);
+	}
+	
+	
 	/**
 	 * Code to be run during the Autonomous 15 second period.
 	 * This code uses the gameData from the driver station and a
@@ -118,7 +133,7 @@ public class AutonomousCommandGroupGenerator {
 		if (robotStartingPosition.equals(scalePosition)) {
 			Logger.info("Autonomous: robot and scale on same side");
 			// we are on the same side as the scale. Leave switch for team mates
-			autoCmdList.driveForward(LengthUOM.Feet.create(24).multiply(distanceScale), FULL_STOP);
+			autoCmdList.driveForward(feet(24), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
 			autoCmdList.turn(right, 90);
 			deliverCubeRoutine(Target.SCALE);
@@ -126,20 +141,20 @@ public class AutonomousCommandGroupGenerator {
 		else if (!robotStartingPosition.equals(Direction.CENTER)) {
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info("Autonomous: robot and scale on opposite side");
-			autoCmdList.driveForward(LengthUOM.Feet.create(14).multiply(distanceScale), TRANSITION_SPEED);
+			autoCmdList.driveForward(feet(14), TRANSITION_SPEED);
 			autoCmdList.turn(right, 90);
-			autoCmdList.driveForward(LengthUOM.Feet.create(15).multiply(distanceScale), TRANSITION_SPEED);
+			autoCmdList.driveForward(feet(15), TRANSITION_SPEED);
 			autoCmdList.turn(left, 90);
-			autoCmdList.driveForward(LengthUOM.Feet.create(8).multiply(distanceScale), FULL_STOP);
+			autoCmdList.driveForward(feet(8), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
 			autoCmdList.turn(left, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else {
 			Logger.info("Autonomous: robot in center position");
-			autoCmdList.driveForward(LengthUOM.Inches.create(8).multiply(distanceScale), TRANSITION_SPEED); // enough to turn
+			autoCmdList.driveForward(inches(8), TRANSITION_SPEED); // enough to turn
 			autoCmdList.turn(left, 45);
-			autoCmdList.driveForward(LengthUOM.Feet.create(6).multiply(distanceScale), TRANSITION_SPEED); // diagonally from start to far side of near switch
+			autoCmdList.driveForward(feet(6), TRANSITION_SPEED); // diagonally from start to far side of near switch
 			autoCmdList.turn(right, 45);
 			autoCmdList.elevatorMoveToPosition(switchHeight); 
 			deliverCubeRoutine(Target.SWITCH);
@@ -150,9 +165,9 @@ public class AutonomousCommandGroupGenerator {
 		if (target == Target.SCALE) {
 			autoCmdList.waitForElevator();
 		}
-		autoCmdList.driveForward(LengthUOM.Feet.create(2).multiply(distanceScale), FULL_STOP);
+		autoCmdList.driveForward(feet(2), FULL_STOP);
 		autoCmdList.dropCube();
-		autoCmdList.driveBackward(LengthUOM.Feet.create(2).multiply(distanceScale), TRANSITION_SPEED);
+		autoCmdList.driveBackward(feet(2), TRANSITION_SPEED);
 		if (target == Target.SCALE) {
 			autoCmdList.elevatorMoveToPosition(switchHeight);
 		}
