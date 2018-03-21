@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
+import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoCurveSync;
@@ -164,7 +165,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	/*
 	 * Helper to get the placement height of a target
 	 */
-	public Length getPlacementHeight(AutonomousPlacementTarget target) {
+	public Length getPlacementHeight(PlacementTargetType target) {
 		switch(target) {
 		case SCALE:
 			return ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT;
@@ -302,7 +303,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	/*
 	 * Start the elevator moving in the background
 	 */
-	public void addElevatorMoveToPlacementHeightAsync(AutonomousPlacementTarget target) {
+	public void addElevatorMoveToPlacementHeightAsync(PlacementTargetType target) {
 		addElevatorMoveToPositionAsync(getPlacementHeight(target));
 	}
 	/**
@@ -469,7 +470,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	/**
 	 * Add a "deliver" sequence tailored towards target.
 	 */
-	public void addDeliverCubeSequenceSync(AutonomousPlacementTarget target) {
+	public void addDeliverCubeSequenceSync(PlacementTargetType target) {
 		/*
 		 * NB: We will always 'move to placement height' here even though we have probably optimized
 		 * by doing this in advance.  This prevents us from slamming the arm into the field if somehow

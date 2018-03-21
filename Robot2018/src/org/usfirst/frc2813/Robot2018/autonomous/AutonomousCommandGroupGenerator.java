@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
+import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.logging.Logger;
@@ -120,16 +121,16 @@ public class AutonomousCommandGroupGenerator {
 	public AutonomousCommandGroupGenerator() {
 		// Determine our game configuration
 		Direction robotStartingPosition = Robot.positionSelector.getSelected();
-		Direction nearSwitchPosition = RobotMap.gameData.getNearSwitch();
-		Direction farSwitchPosition = RobotMap.gameData.getFarSwitch();
-		Direction scalePosition = RobotMap.gameData.getScale();
+		Direction nearSwitchPosition = RobotMap.gameData.getNearSwitchPosition();
+		Direction farSwitchPosition = RobotMap.gameData.getFarSwitchPosition();
+		Direction scalePosition = RobotMap.gameData.getScalePosition();
 
 		/**
 		 * Determine our biased directions. 
 		 * @see getBiasedDirection 
 		 */
-		Direction left     = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitch(), Direction.LEFT);
-		Direction right    = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitch(), Direction.RIGHT);
+		Direction left     = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitchPosition(), Direction.LEFT);
+		Direction right    = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitchPosition(), Direction.RIGHT);
 
 		/*
 		 * Sanity check our biasing logic 
@@ -167,12 +168,12 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.setHaveCube(true);
 		
 		// Tell the Elevator to go to the switch height, but don't wat for it.  It's low enough it's not a problem to start moving.
-		autoCmdList.addElevatorMoveToPlacementHeightAsync(AutonomousPlacementTarget.SWITCH);
+		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
 
 		// Move the Arm down to the high position 
 		autoCmdList.addArmMoveToHighPositionAsync();
 
-		if (RobotMap.gameData.getScale() == Direction.OFF) {
+		if (!RobotMap.gameData.isGameDataValid()) {
 			// Make a note of our lack of configuration 
 			Logger.error(this + ": No game data.");
 			// Just cross the auto line
@@ -191,11 +192,11 @@ public class AutonomousCommandGroupGenerator {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.addDriveForwardSync(feet(24), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			// Start raising elevator while we are turning...
-			autoCmdList.addElevatorMoveToPlacementHeightAsync(AutonomousPlacementTarget.SCALE);
+			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
 			// Turn to face the scale
 			autoCmdList.addQuickTurnSync(right, 90);
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-			autoCmdList.addDeliverCubeSequenceSync(AutonomousPlacementTarget.SCALE);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
@@ -220,10 +221,10 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.addDriveForwardSync(feet(15), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 			autoCmdList.addQuickTurnSync(left, 90);
 			autoCmdList.addDriveForwardSync(feet(8), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-			autoCmdList.addElevatorMoveToPlacementHeightAsync(AutonomousPlacementTarget.SCALE);
+			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
 			autoCmdList.addQuickTurnSync(left, 90);
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-			autoCmdList.addDeliverCubeSequenceSync(AutonomousPlacementTarget.SCALE);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
@@ -243,7 +244,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.addDriveForwardSync(feet(6), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
 			autoCmdList.addQuickTurnSync(right, 45);
 			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
-			autoCmdList.addDeliverCubeSequenceSync(AutonomousPlacementTarget.SWITCH);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
