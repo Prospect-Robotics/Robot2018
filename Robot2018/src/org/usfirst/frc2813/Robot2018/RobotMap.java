@@ -196,6 +196,7 @@ public class RobotMap {
 
 		jawsSolenoid = new Solenoid(0,1);
 		elevatorRatchet = new Solenoid(0,2);
+		driveTrainGearShiftSolenoid = new Solenoid(0,3);
 		climbingBar = new Solenoid(0,4);
 	}
 }
