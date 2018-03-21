@@ -2,6 +2,8 @@
 
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import org.usfirst.frc2813.Robot2018.OI;
+import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
 import org.usfirst.frc2813.logging.Logger;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -38,6 +41,7 @@ public class DriveTrain extends GearheadsSubsystem {
     public static final double ENCODER_PULSES_PER_WHEEL_REVOLUTION = ENCODER_PULSES_PER_ENCODER_REVOLUTION * ENCODER_TO_DRIVE_SCALE;
     public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
+    private final Gyro gyro;
 	public final SpeedController speedControllerPort;
 	public final SpeedController speedControllerStarboard;
 	private final VictorSPX speedControllerPortFollow;
@@ -49,7 +53,8 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	public boolean encoderPortFunctional, encoderStarboardFunctional; // set by POST.
 
-	public DriveTrain() {
+	public DriveTrain(Gyro gyro) {
+		this.gyro = gyro;
 		speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
 		speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
 		speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
@@ -82,9 +87,18 @@ public class DriveTrain extends GearheadsSubsystem {
 		encoderPort.setPIDSourceType(PIDSourceType.kRate);
 	}
 
+	public Gyro getGyro() {
+		return gyro;
+	}
+	
 	// @Override
 	public void initDefaultCommand() {
-		setDefaultCommand(new DriveTrainOIDrive());
+		/*
+		NOTE: The WPI model makes it impossible not to reach outside DriveTrain to grab joysticks from OI
+		 because DriveTrain has to be created before OI creates the joysticks.  Plus they are asking for
+		 a default command inside a subsystem, which is mixing the UI with the implementation and
+		 is poor design, but nothing we can do. */
+		setDefaultCommand(new DriveTrainOIDrive(this, Robot.oi.getJoystick1(), Robot.oi.getJoystick2()));
 	}
 
 	@Override

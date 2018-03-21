@@ -2,39 +2,39 @@
 
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Drives the robot in arcade drive with Robot.oi.joystick1.
  */
-public class DriveTrainOIDrive extends Command {
-	public DriveTrainOIDrive() {
-		requires(Robot.driveTrain);
+public class DriveTrainOIDrive extends AbstractDriveTrainCommand {
+	
+	private final Joystick joystick1; 
+	private final Joystick joystick2;
+	
+	public DriveTrainOIDrive(DriveTrain driveTrain, Joystick joystick1, Joystick joystick2) {
+		super(driveTrain, true /* require the subsystem */);
+		this.joystick1 = joystick1;
+		this.joystick2 = joystick2;
 	}
 
-	// Called just before this Command runs the first time
+	/**
+	 * Called repeatedly when this Command is scheduled to run
+	 */
 	@Override
-	protected void initialize() {}
-
-	// Called repeatedly when this Command is scheduled to run
-	//@Override
 	protected void execute() {
-		Robot.driveTrain.arcadeDrive(Robot.oi.joystick1, Robot.oi.joystick2);
+		super.execute();
+		driveTrain.arcadeDrive(joystick1, joystick2);
 	}
 
-	// Make this return true when this Command no longer needs to run execute()
-	@Override
+	/**
+	 * Never finished, wait for interruption?
+	 */
 	protected boolean isFinished() {
 		return false;
 	}
-
-	// Called once after isFinished returns true
-	@Override
-	protected void end() {}
-
-	// Called when another command which requires one or more of the same
-	// subsystems is scheduled to run
-	@Override
-	protected void interrupted() {}
 }

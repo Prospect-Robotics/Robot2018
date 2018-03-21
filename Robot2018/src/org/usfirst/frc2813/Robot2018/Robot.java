@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
 		Logger.info("In robotInit");
 
 		RobotMap.init();
-		driveTrain = new DriveTrain();
+		driveTrain = new DriveTrain(gyro);
 		elevator = new Motor(new ElevatorConfiguration(), RobotMap.srxElevator);
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
 		intake = new Intake(RobotMap.intakeSpeedController);

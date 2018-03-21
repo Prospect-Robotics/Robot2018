@@ -2,14 +2,17 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Autonomous turn command. Use gyro and linear interpolation
  * to
  */
-public class DriveTrainQuickTurn extends GearheadsCommand {
+public class DriveTrainQuickTurn extends AbstractDriveTrainCommand {
 	private final Direction direction;
 	private final double relativeAngleInDegrees;
 	private final double rate;
@@ -26,11 +29,11 @@ public class DriveTrainQuickTurn extends GearheadsCommand {
 	/*
 	 * Create a quick turn command for turning in a direction for a specific number of degrees.
 	 */
-	public DriveTrainQuickTurn(Direction direction, double relativeAngleInDegrees, double rate) {
+	public DriveTrainQuickTurn(DriveTrain driveTrain, Direction direction, double relativeAngleInDegrees, double rate) {
+		super(driveTrain, true /* require the subsystem */);
 		this.direction = direction;
 		this.rate = rate;
 		this.relativeAngleInDegrees = relativeAngleInDegrees;
-		requires(Robot.driveTrain);
 		if(relativeAngleInDegrees < 0) {
 			throw new IllegalArgumentException("Do not specify reverse directions with negative angles.  Use direction instead.");
 		}
@@ -44,7 +47,8 @@ public class DriveTrainQuickTurn extends GearheadsCommand {
 
 	// Called just before this Command runs the first time
 	protected void initialize() {
-		startingAngle = Robot.gyro.getAngle();
+		super.initialize();
+		startingAngle = driveTrain.getGyro().getAngle();
 		targetAngle   = startingAngle + (direction.getMultiplierAsDouble() * relativeAngleInDegrees);  
 	}
 
@@ -53,7 +57,7 @@ public class DriveTrainQuickTurn extends GearheadsCommand {
 	 * NOTE: If we are turning in the wrong way, this will become a larger magnitude in either positive or negative values until we do a (360-target) - i.e. turn in the wrong direction eventually gets the same result.
 	 */
 	private double getErrorInDegrees() {
-		return targetAngle - Robot.gyro.getAngle();
+		return targetAngle - driveTrain.getGyro().getAngle();
 	}
 
 	/**
@@ -85,8 +89,9 @@ public class DriveTrainQuickTurn extends GearheadsCommand {
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
+		super.execute();
 		int directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
-		Robot.driveTrain.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
+		driveTrain.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
