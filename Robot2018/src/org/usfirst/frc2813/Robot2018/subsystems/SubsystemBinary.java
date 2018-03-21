@@ -8,7 +8,7 @@ import org.usfirst.frc2813.units.Direction;
  * two states.
  */
 public abstract class SubsystemBinary extends GearheadsSubsystem {
-	protected static Direction state;
+	protected static Direction state = Direction.NEUTRAL;
 
 	/**
 	 * Constructor. configure your motor controller and set your
@@ -16,7 +16,7 @@ public abstract class SubsystemBinary extends GearheadsSubsystem {
 	 * to change any of the defaults set here, call super first!
 	 */
 	public void initialize() {
-		state = getControllerState();
+		getState();
 	}
 
 	/**
@@ -51,10 +51,10 @@ public abstract class SubsystemBinary extends GearheadsSubsystem {
 	public Direction getState() {
 		if (isEmulated()) {
 			Logger.info("EMULATOR: " + this + " get command: " + state);
-			return state;
 		}
 		else {
-			return getControllerState();        	
+			state = getControllerState();
 		}
+		return state;
 	}	
 }
