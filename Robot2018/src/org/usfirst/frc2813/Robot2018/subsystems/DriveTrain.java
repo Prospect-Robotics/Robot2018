@@ -103,10 +103,10 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
 		/*
-		 * WPI library expects forward to be negative to match the way Joystick values work on Windows.
+		 * WPI library expects forward and left to be negative to match the way Joystick values work on Windows.
 		 * When we want to go forward, we reverse the sign to match at this place.  
 		 */
-		robotDrive.arcadeDrive(- forwardSpeed, turnSpeed, false); // false here means do not square the inputs (if
+		robotDrive.arcadeDrive(- forwardSpeed, - turnSpeed, false); // false here means do not square the inputs (if
 																// omitted, the argument defaults to true)
 	}
 
