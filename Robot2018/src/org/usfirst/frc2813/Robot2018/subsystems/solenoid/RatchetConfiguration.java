@@ -9,23 +9,19 @@ import org.usfirst.frc2813.units.Direction;
 import edu.wpi.first.wpilibj.command.Command;
 
 /*
- * Jaws solenoid configuration
- * NB: We considered having a default command for the jaws to open, so that if you weren't running
- * a "holding", "intaking", or "outtaking" command that they would spring back open again - 
- * such as automatically springing open when the outtake was done...but decided the potential to
- * lose a cube due to a software bug was too greate. 
+ * Ratchet configuration
  */
-public class JawsConfiguration extends SolenoidConfiguration {
+public class RatchetConfiguration extends SolenoidConfiguration {
 
 	/*
 	 * Configuration of the Jaws subsystem
 	 */
-	public JawsConfiguration() {
+	public RatchetConfiguration() {
 		super(
-				"Jaws", 
+				"Ratchet", 
 				SolenoidLogic.SolenoidLogicNormal, 
 				SolenoidType.SingleSolenoid, 
-				Direction.OPEN,
+				Direction.DISENGAGED,
 				null);
 	}
 }

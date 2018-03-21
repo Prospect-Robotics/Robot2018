@@ -8,6 +8,7 @@ import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirectionSync;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SimpleSolenoidToggleStateInstant;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
+import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 
@@ -77,9 +78,9 @@ public class OI {
 		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpinSync(Robot.intake, Direction.OUT));
 		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirectionSync(Robot.elevator, Direction.DOWN));
 		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirectionSync(Robot.elevator, Direction.UP));
-		new JoystickButton(buttonPanel, 6).whenPressed(new SimpleSolenoidToggleStateInstant(RobotMap.climbingBar));
-		new JoystickButton(buttonPanel, 7).whenPressed(new SimpleSolenoidToggleStateInstant(RobotMap.driveTrainGearShiftSolenoid));
-		new JoystickButton(buttonPanel, 8).whenPressed(new SimpleSolenoidToggleStateInstant(RobotMap.elevatorRatchet));
+		new JoystickButton(buttonPanel, 6).whenPressed(new SolenoidToggleStateInstant(Robot.climbingBar));
+		new JoystickButton(buttonPanel, 7).whenPressed(new SolenoidToggleStateInstant(Robot.driveTrain.getGearShiftSolenoid()));
+		new JoystickButton(buttonPanel, 8).whenPressed(new SolenoidToggleStateInstant(Robot.ratchet));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleStateInstant(Robot.jaws));
 //		new JoystickButton(buttonPanel, 10).whenPressed(new MotorTesting(Robot.elevator));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.IN));

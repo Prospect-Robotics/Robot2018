@@ -14,25 +14,34 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
  */
 public class SolenoidSetStateInstant extends InstantCommand {
 	private final Solenoid solenoid;
-	private final Direction state;
+	private final Direction position;
+	private final boolean isDefaultCommand;
 
-    public SolenoidSetStateInstant(Solenoid solenoid, Direction state) {
+    public SolenoidSetStateInstant(Solenoid solenoid, Direction position, boolean isDefaultCommand) {
     	this.solenoid = solenoid;
-        this.state = state;
+        this.position = position;
+        this.isDefaultCommand = isDefaultCommand;
+    }
+
+    public SolenoidSetStateInstant(Solenoid solenoid, Direction position) {
+    	this(solenoid, position, false);
     }
 
 	//@Override
 	protected void initialize() {
 		super.initialize();
-		if(solenoid.getState() == state) {
-			Logger.printFormat(LogType.INFO,"%1$s NOT changing %2$s from %3$s to %4$s, it's already %4$s",this,solenoid,solenoid.getState(),state);
+		if(solenoid.getPosition() == position) {
+			// NB: Do not be noisy if it's the default command
+			if(!isDefaultCommand) {
+				Logger.printFormat(LogType.INFO,"%1$s NOT changing %2$s from %3$s to %4$s, it's already %4$s",this,solenoid,solenoid.getPosition(),position);
+			}
 		} else {
-			Logger.printFormat(LogType.INFO,"%s changing %s from %s to %s",this,solenoid,solenoid.getState(),state);
-			solenoid.setState(state);
+			Logger.printFormat(LogType.INFO,"%s changing %s from %s to %s",this,solenoid,solenoid.getPosition(),position);
+			solenoid.setPosition(position);
 		}
 	}
 
     public String toString() {
-        return "SolenoidSetState(" + solenoid + ", state=" + state + ")";
+        return "SolenoidSetState(" + solenoid + ", position=" + position + ")";
     }
 }

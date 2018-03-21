@@ -5,7 +5,10 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveSync;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.GearShiftConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.logging.Logger;
+import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -14,7 +17,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -61,7 +63,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		this.speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
 		this.speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerStarFollow;
 		this.robotDrive = RobotMap.driveTrainRobotDrive;
-		this.gearShift = RobotMap.driveTrainGearShiftSolenoid;
+		this.gearShift = new Solenoid(new GearShiftConfiguration(), RobotMap.gearShiftSolenoid);
 
 		addChild(robotDrive);
 		addChild((Sendable) speedControllerPort);
@@ -209,17 +211,18 @@ public class DriveTrain extends GearheadsSubsystem {
 		}
 	}
 
-	/**
-	 * Reset both encoders, restoring the value returned by {@link #getDistance() Robot.driveTrain.getDistance()} to zero.
-	 */
-	public void reset() {
-		encoderStarboard.reset();
-		encoderPort.reset();
-	}
 	public void setBrakeCoast(NeutralMode b) {
 		((VictorSPX) speedControllerPort).setNeutralMode(b);
 		((VictorSPX) speedControllerStarboard).setNeutralMode(b);
 		speedControllerPortFollow.setNeutralMode(b);
 		speedControllerStarboardFollow.setNeutralMode(b);
 	}
+	
+	/**
+	 * Set the gear shifter into high or low gear
+	 */
+	public void setGearShift(Direction gear) {
+		this.gearShift.setPosition(gear);
+	}
+	
 }

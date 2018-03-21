@@ -9,7 +9,9 @@ import org.usfirst.frc2813.Robot2018.subsystems.Intake;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.ClimbingBarConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.JawsConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.RatchetConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -46,6 +48,8 @@ public class Robot extends TimedRobot {
 	public static Solenoid jaws;
 	public static UsbCamera camera;
 	public static Solenoid gearShifter;
+	public static Solenoid ratchet;
+	public static Solenoid climbingBar;
 
 	/**
 	 * Officially documenting our logical model for the robot.  LEFT is negative.
@@ -79,6 +83,8 @@ public class Robot extends TimedRobot {
 		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
 		intake = new Intake(RobotMap.intakeSpeedController);
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
+		ratchet = new Solenoid(new RatchetConfiguration(), RobotMap.ratchetSolenoid);
+		climbingBar = new Solenoid(new ClimbingBarConfiguration(), RobotMap.climbingBarSolenoid);
 
 		positionSelector = RobotMap.positionSelector;
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
@@ -113,6 +119,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		Logger.info("Autonomous Init");
 		driveTrain.setBrakeCoast(NeutralMode.Brake);
+		driveTrain.setGearShift(Direction.LOW_GEAR);
 
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();

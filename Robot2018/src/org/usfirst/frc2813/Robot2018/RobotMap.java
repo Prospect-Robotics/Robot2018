@@ -55,15 +55,15 @@ public class RobotMap {
 	//TODO verify if encoders are correctly named port/starboard
 	public static Encoder driveTrainQuadratureEncoderStarboard;// Starboard Motor
 	public static Encoder driveTrainQuadratureEncoderPort;// Port Motor
-	public static Solenoid driveTrainGearShiftSolenoid;
+	public static Solenoid gearShiftSolenoid;
 	public static Solenoid jawsSolenoid;
 
 	/*
 	 * Elevator Subsystem
 	 */
 	public static TalonSRX srxElevator;                     // Elevator motor controller
-	public static Solenoid elevatorRatchet;
-	public static Solenoid climbingBar;
+	public static Solenoid ratchetSolenoid;
+	public static Solenoid climbingBarSolenoid;
 	public static VictorSPX elevatorSpeedControllerPort;	//  The WPI_VictorSPX type is used for the master elevator motor - others will follow this one
 															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
 	public static VictorSPX elevatorSpeedControllerStarboard;		//  Controller Starboard will follow controller Port; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
@@ -195,8 +195,8 @@ public class RobotMap {
 		compressor = new Compressor();
 
 		jawsSolenoid = new Solenoid(0,1);
-		elevatorRatchet = new Solenoid(0,2);
-		driveTrainGearShiftSolenoid = new Solenoid(0,3);
-		climbingBar = new Solenoid(0,4);
+		ratchetSolenoid = new Solenoid(0,2);
+		gearShiftSolenoid = new Solenoid(0,3);
+		climbingBarSolenoid = new Solenoid(0,4);
 	}
 }

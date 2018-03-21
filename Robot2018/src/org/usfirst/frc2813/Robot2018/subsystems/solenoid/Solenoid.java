@@ -1,26 +1,25 @@
 package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
-import org.usfirst.frc2813.Robot2018.subsystems.SubsystemBinary;
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
  * Solenoid subsystem controls a simple subsystem that goes on and off.
  */
-public class Solenoid extends SubsystemBinary {
+public class Solenoid extends GearheadsSubsystem {
 	private final SolenoidConfiguration configuration;
 	private final edu.wpi.first.wpilibj.Solenoid solenoid;
-	
+
 	public Solenoid(SolenoidConfiguration configuration, edu.wpi.first.wpilibj.Solenoid solenoid) {
 		this.configuration = configuration;
 		this.solenoid = solenoid;
 		initialize();
 		setName(configuration.getName());
 	}
-
-	@Override
-	protected Direction getControllerState() {
+	
+	public Direction getPosition() {
 		boolean state = solenoid.get();
 		if (configuration.getSolenoidLogic() == SolenoidLogic.SolenoidLogicReversed) {
 			state = !state;
@@ -28,8 +27,7 @@ public class Solenoid extends SubsystemBinary {
 		return state ? Direction.ON : Direction.OFF;
 	}
 
-	@Override
-	protected void setControllerState(Direction direction) {
+	public void setPosition(Direction direction) {
 		boolean state = direction.isPositive(); 
 		if (configuration.getSolenoidLogic() == SolenoidLogic.SolenoidLogicReversed) {
 			state = !state;
@@ -48,8 +46,14 @@ public class Solenoid extends SubsystemBinary {
 			setDefaultCommand(configuration.getDefaultCommandFactory().createCommand(this));
 		}
 	}
-	
+
 	public String toString() {
 		return configuration.getName();
+	}
+
+	protected void initialize() {
+		if(configuration.getDefaultPosition() != null) {
+			setPosition(configuration.getDefaultPosition());
+		}
 	}
 }

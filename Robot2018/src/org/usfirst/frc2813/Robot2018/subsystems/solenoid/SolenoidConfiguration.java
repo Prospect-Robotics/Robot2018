@@ -3,6 +3,7 @@ package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidType;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
+import org.usfirst.frc2813.units.Direction;
 
 /*
  * Configuration for a solenoid.  What am I and is my logic reversed?
@@ -11,15 +12,17 @@ public class SolenoidConfiguration {
 	private final String name;
 	private final SolenoidLogic solenoidLogic;
 	private final SolenoidType solenoidType;
+	private final Direction defaultPosition;
 	private final ICommandFactory<Solenoid> defaultCommandFactory;
 	
 	/*
 	 * Create a new configuration for a binary solenoid
 	 */
-	public SolenoidConfiguration(String name, SolenoidLogic solenoidLogic, SolenoidType solenoidType, ICommandFactory<Solenoid> defaultCommandFactory) {
+	public SolenoidConfiguration(String name, SolenoidLogic solenoidLogic, SolenoidType solenoidType, Direction defaultPosition, ICommandFactory<Solenoid> defaultCommandFactory) {
 		this.name = name;
 		this.solenoidLogic = solenoidLogic;
 		this.solenoidType = solenoidType;
+		this.defaultPosition = defaultPosition;
 		this.defaultCommandFactory = defaultCommandFactory;
 	}
 	/*
@@ -41,6 +44,12 @@ public class SolenoidConfiguration {
 		return solenoidType;
 	}
 	/*
+	 * Get the default position
+	 */
+	public Direction getDefaultPosition() {
+		return defaultPosition;
+	}
+	/*
 	 * Get the default command to run (may be null)
 	 */
 	public ICommandFactory<Solenoid> getDefaultCommandFactory() {
@@ -58,6 +67,7 @@ public class SolenoidConfiguration {
 		.append("Name.................................." + getName() + "\n")
 		.append("SolenoidType.........................." + getSolenoidType() + "\n")
 		.append("SolenoidLogic........................." + getSolenoidLogic() + "\n")
+		.append("DefaultPosition......................." + getDefaultPosition() + "\n")
 		.append("DefaultCommandFactory................." + getDefaultCommandFactory() + "\n")
 		.append("\n")
 		.append("----------------------------------------------------------------------------\n")
