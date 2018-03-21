@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  * Drives the robot in arcade drive with Robot.oi.joystick1.
  */
-public class OIDriveCommand extends Command {
-	public OIDriveCommand() {
+public class OIDrive extends Command {
+	public OIDrive() {
 		requires(Robot.driveTrain);
 	}
 

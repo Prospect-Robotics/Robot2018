@@ -7,17 +7,21 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class ResetDriveTrainGyroCommand extends InstantCommand {
-
-    public ResetDriveTrainGyroCommand() {
+public class ResetDriveTrainEncoders extends InstantCommand {
+	/**
+	 * Reset the DriveTrain encoders
+	 */
+    public ResetDriveTrainEncoders() {
         super();
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
+        requires(Robot.driveTrain);
     }
 
     // Called once when the command executes
     protected void initialize() {
-    	Robot.gyro.reset();
+    	Robot.driveTrain.encoderStarboard.reset();
+    	Robot.driveTrain.encoderPort.reset();
     }
 
 }
