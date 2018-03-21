@@ -48,10 +48,10 @@ public class AutonomousCommandGroupGenerator {
 		
 		if(startingPosition.isNeutral()) {
 			return nearSwitchPosition.equals(SCRIPT_BIAS) ? referenceDirection : referenceDirection.getInverse();
-		} else if(!startingPosition.equals(SCRIPT_BIAS)) {
-			return referenceDirection.getInverse();
-		} else {
+		} else if(startingPosition.equals(SCRIPT_BIAS)) {
 			return referenceDirection;
+		} else {
+			return referenceDirection.getInverse();
 		}
 	}
 
