@@ -25,14 +25,14 @@ public class SolenoidSetStateInstant extends GearheadsInstantCommand {
 	//@Override
 	protected void initialize() {
 		super.initialize();
-		if(solenoid.getPosition() == position) {
+		if(solenoid.getCurrentPosition() == position) {
 			// NB: Do not be noisy if it's the default command
 			if(!isDefaultCommand()) {
-				Logger.printFormat(LogType.INFO,"%1$s NOT changing %2$s from %3$s to %4$s, it's already %4$s",this,solenoid,solenoid.getPosition(),position);
+				Logger.printFormat(LogType.INFO,"%1$s NOT changing %2$s from %3$s to %4$s, it's already %4$s",this,solenoid,solenoid.getCurrentPosition(),position);
 			}
 		} else {
-			Logger.printFormat(LogType.INFO,"%s changing %s from %s to %s",this,solenoid,solenoid.getPosition(),position);
-			solenoid.setPosition(position);
+			Logger.printFormat(LogType.INFO,"%s changing %s from %s to %s",this,solenoid,solenoid.getCurrentPosition(),position);
+			solenoid.setTargetPosition(position);
 		}
 	}
 

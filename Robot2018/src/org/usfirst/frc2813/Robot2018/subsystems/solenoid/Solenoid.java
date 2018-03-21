@@ -12,6 +12,7 @@ import org.usfirst.frc2813.units.Direction;
 public class Solenoid extends GearheadsSubsystem {
 	private final SolenoidConfiguration configuration;
 	private final edu.wpi.first.wpilibj.Solenoid solenoid;
+	private Direction targetPosition;
 
 	public Solenoid(SolenoidConfiguration configuration, edu.wpi.first.wpilibj.Solenoid solenoid) {
 		this.configuration = configuration;
@@ -20,15 +21,23 @@ public class Solenoid extends GearheadsSubsystem {
 		setName(configuration.getName());
 	}
 	
-	public Direction getPosition() {
-		boolean state = solenoid.get();
-		if (configuration.getSolenoidLogic() == SolenoidLogic.SolenoidLogicReversed) {
-			state = !state;
+	public Direction getTargetPosition() {
+		return targetPosition;
+	}
+	
+	public Direction getCurrentPosition() {
+		if(isEmulated()) {
+			return targetPosition;
+		} else {
+			boolean state = solenoid.get();
+			if (configuration.getSolenoidLogic() == SolenoidLogic.SolenoidLogicReversed) {
+				state = !state;
+			}
+			return state ? Direction.ON : Direction.OFF;
 		}
-		return state ? Direction.ON : Direction.OFF;
 	}
 
-	public void setPosition(Direction direction) {
+	public void setTargetPosition(Direction direction) {
 		boolean state = direction.isPositive(); 
 		if (configuration.getSolenoidLogic() == SolenoidLogic.SolenoidLogicReversed) {
 			state = !state;
@@ -38,7 +47,10 @@ public class Solenoid extends GearheadsSubsystem {
 		} else {
 			Logger.info(configuration.getName() + " changing state to " + direction + " [HW state " + state + "].");
 		}
-		solenoid.set(state);
+		if(!isEmulated()) {
+			solenoid.set(state);
+		}
+		this.targetPosition = direction;
 	}
 
 	@Override
@@ -58,7 +70,12 @@ public class Solenoid extends GearheadsSubsystem {
 
 	protected void initialize() {
 		if(configuration.getDefaultPosition() != null) {
-			setPosition(configuration.getDefaultPosition());
+			setTargetPosition(configuration.getDefaultPosition());
+		} else if(isEmulated()) {
+			setTargetPosition(Direction.NEGATIVE);
+		} else {
+			// update targetPosition value to current position, in case we didn't have a default and it's real hardware
+			this.targetPosition = getCurrentPosition();
 		}
 	}
 }

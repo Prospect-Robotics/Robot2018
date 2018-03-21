@@ -22,10 +22,10 @@ public class SolenoidToggleStateInstant extends GearheadsInstantCommand {
 	//@Override
 	protected void initialize() {
 		super.initialize();
-		Direction oldPosition = solenoid.getPosition();
+		Direction oldPosition = solenoid.getCurrentPosition();
 		Direction newPosition = oldPosition.getInverse();
 		Logger.info(this + " toggling " + solenoid + " from " + oldPosition + " to " + newPosition);
-		solenoid.setPosition(newPosition);
+		solenoid.setTargetPosition(newPosition);
 	}
 
     public String toString() {

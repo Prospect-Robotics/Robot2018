@@ -223,7 +223,7 @@ public class DriveTrain extends GearheadsSubsystem {
 	 * Set the gear shifter into high or low gear
 	 */
 	public void setGearShift(Direction gear) {
-		this.gearShift.setPosition(gear);
+		this.gearShift.setTargetPosition(gear);
 	}
 	
 }
