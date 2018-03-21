@@ -23,11 +23,22 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 
 
 /**
- * AutoCmd - generate the autonomous command sequence. Note that this class constructs
- * the command list and provides methods to add new commands and then calls a generator
- * to generate the command list based on field setup.
- *
- * speed and direction are stateful.
+ * AutonomousCommandGroup is a subclass of {@link CommandGroup} with helper methods and a little state
+ * so that we can more easily build scripts.  This class is used by {@link AutonomousCommandGroupGenerator}
+ * to build the autonomous command sequences.
+ * 
+ * Naming Conventions For adding individual Commands:
+ * 
+ * add<device><action><Async|Sync>
+ * 
+ * Naming Conventions for adding command sequences:
+ *  
+ * add<Goal>Sequence<Sync|Async>:
+ * 
+ *     where *Async means that the command doesn't finish what it started and you better make sure it's 
+ *     done later in your script.
+ *     where *Sync means the command is complete before it returns.
+ *      
  */
 public class AutonomousCommandGroup extends CommandGroup {
 
