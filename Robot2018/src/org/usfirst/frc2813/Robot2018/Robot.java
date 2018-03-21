@@ -48,21 +48,21 @@ public class Robot extends TimedRobot {
 	public static Solenoid gearShifter;
 
 	/**
-	 * Officially documenting our logical model for the robot.  LEFT is negative.  
+	 * Officially documenting our logical model for the robot.  LEFT is negative.
 	 * This is consistent with a compass and a gyro, and has nothing to do with any input device axis.
 	 */
 	public static final double LEFT_BIAS = -1.0;
 	/**
-	 * Officially documenting our logical model for the robot.  RIGHT is positive.  
+	 * Officially documenting our logical model for the robot.  RIGHT is positive.
 	 * This is consistent with a compass and a gyro, and has nothing to do with any input device axis.
 	 */
 	public static final double RIGHT_BIAS = 1.0;
 	/**
-	 * Officially documenting our logical model for the robot.  FORWARD is positive.   
+	 * Officially documenting our logical model for the robot.  FORWARD is positive.
 	 */
 	public static final double FORWARD_BIAS = 1.0;
 	/**
-	 * Officially documenting our logical model for the robot.  REVERSE is negative.   
+	 * Officially documenting our logical model for the robot.  REVERSE is negative.
 	 */
 	public static final double REVERSE_BIAS = -1.0;
 	/**
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
 
 		positionSelector = RobotMap.positionSelector;
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
-		
+
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be
 		// constructed yet. Thus, their requires() statements may grab null
@@ -101,10 +101,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit(){
-		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Coast);
-		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Coast);
-		RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Coast);
-		RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Coast);
+		driveTrain.setBrakeCoast(NeutralMode.Coast);
 	}
 
 	@Override
@@ -115,14 +112,11 @@ public class Robot extends TimedRobot {
 	//@Override
 	public void autonomousInit() {
 		Logger.info("Autonomous Init");
-		
+		driveTrain.setBrakeCoast(NeutralMode.Brake);
+
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
-		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
-		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
-		RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
-		RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
 		new POST(autonomousCommand).start();
 	}
 
@@ -136,16 +130,13 @@ public class Robot extends TimedRobot {
 
 	//@Override
 	public void teleopInit() {
-		System.out.println("teleopInit STARTED");
+		Logger.info("teleopInit STARTED");
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 		if (autonomousCommand != null) autonomousCommand.cancel();
-		RobotMap.driveTrainSpeedControllerStarboard.setNeutralMode(NeutralMode.Brake);
-		RobotMap.driveTrainSpeedControllerPort.setNeutralMode(NeutralMode.Brake);
-		RobotMap.driveTrainSpeedControllerStarFollow.setNeutralMode(NeutralMode.Brake);
-		RobotMap.driveTrainSpeedControllerPortFollow.setNeutralMode(NeutralMode.Brake);
+		driveTrain.setBrakeCoast(NeutralMode.Brake);
 		new POST().start();
 	}
 
