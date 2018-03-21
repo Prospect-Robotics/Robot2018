@@ -12,7 +12,6 @@ import org.usfirst.frc2813.units.Direction;
  * lose a cube due to a software bug was too greate. 
  */
 public class JawsConfiguration extends SolenoidConfiguration {
-
 	/*
 	 * Configuration of the Jaws subsystem
 	 */
@@ -21,7 +20,7 @@ public class JawsConfiguration extends SolenoidConfiguration {
 				"Jaws", 
 				SolenoidLogic.SolenoidLogicNormal, 
 				SolenoidType.SingleSolenoid, 
-				Direction.OPEN,
+				Direction.CLOSE,
 				null);
 	}
 }
