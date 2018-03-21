@@ -45,7 +45,7 @@ public class AutonomousCommandGroupGenerator {
 		Direction position = Robot.positionSelector.getSelected();
 
 		 // allows left->right and right->left to share code
-		directionBias = (position == Direction.LEFT) ? 1 : -1;
+		directionBias = (position == Direction.LEFT) ? -1 : 1;
 
 		if (RobotMap.gameData.getScale() == Direction.OFF) {
 			// there is no game data. Cross the auto line
@@ -82,7 +82,7 @@ public class AutonomousCommandGroupGenerator {
 		else {
 			// We are in the center start position
 			 // allows left->right and right->left to share code
-			directionBias = (position == Direction.LEFT) ? 1 : -1;
+			directionBias = (position == Direction.LEFT) ? -1 : 1;
 
 			Logger.info("Autonomous: robot in center position");
 			autoCmdList.driveForward(LengthUOM.Inches.create(8).multiply(distanceScale), TRANSITION_SPEED); // enough to turn
