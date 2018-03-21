@@ -32,7 +32,7 @@ public class AutonomousCommandGroupGenerator {
 	 * 
 	 * This is the function that handles the inversion according to the following logic:
 	 * 
-	 * ROBOT       SCALE       GOAL_DIRECTION    RESULT
+	 * ROBOT       NEAR_SWITCH GOAL_DIRECTION    RESULT
 	 * ----------- ----------- -----------       ------------
 	 * 
 	 * LEFT        <any>       <any>             <unchanged>
@@ -44,10 +44,10 @@ public class AutonomousCommandGroupGenerator {
 	 * 
 	 * @see SCRIPT_BIAS
 	 */
-	private static Direction getBiasedDirection(Direction startingPosition, Direction scalePosition, Direction referenceDirection) {
+	private static Direction getBiasedDirection(Direction startingPosition, Direction nearSwitchPosition, Direction referenceDirection) {
 		
 		if(startingPosition.isNeutral()) {
-			return scalePosition.equals(SCRIPT_BIAS) ? referenceDirection : referenceDirection.getInverse();
+			return nearSwitchPosition.equals(SCRIPT_BIAS) ? referenceDirection : referenceDirection.getInverse();
 		} else if(!startingPosition.equals(SCRIPT_BIAS)) {
 			return referenceDirection.getInverse();
 		} else {
