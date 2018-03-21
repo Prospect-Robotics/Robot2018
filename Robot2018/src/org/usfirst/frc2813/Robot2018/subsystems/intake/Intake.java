@@ -32,7 +32,7 @@ public class Intake extends GearheadsSubsystem {
 		}
 		this.speed = speed;
 	}
-	
+
 	public double getTargetSpeed() {
 		return speed;
 	}
@@ -42,15 +42,27 @@ public class Intake extends GearheadsSubsystem {
 	}
 	
 	public double getCurrentSpeed() {
-		return spx.get();
+		if(isEmulated()) {
+			return speed;
+		} else {
+			return spx.get();
+		}
 	}
 	
 	public Direction getCurrentDirection() {
-		return spx.get() < 0 ? Direction.OUT : (spx.get() == 0 ? Direction.STOP : Direction.IN);
+		if(isEmulated()) {
+			return direction;
+		} else {
+			return spx.get() < 0 ? Direction.OUT : (spx.get() == 0 ? Direction.STOP : Direction.IN);
+		}
 	}
 	
 	public boolean isEnabled() {
-		return spx.get() > 0;
+		if(isEmulated()) {
+			return speed > 0;
+		} else {
+			return spx.get() > 0;
+		}
 	}
 
 	public void spin(Direction direction) {
@@ -62,7 +74,9 @@ public class Intake extends GearheadsSubsystem {
 		}
 		else {
 			Logger.printLabelled(LogType.INFO, "INTAKE spin", "Direction", direction, "Speed", speed);
-			spx.set(direction.isPositive() ? -speed : speed);
+			if(!isEmulated()) {
+				spx.set(direction.isPositive() ? -speed : speed);
+			}
 		}
 		this.direction = direction;
 	}
