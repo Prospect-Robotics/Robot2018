@@ -121,6 +121,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		robotDrive.curvatureDrive(forwardSpeed, turnRadius, false);
 	}
 	
+	static boolean sentEncoderWarnings = false;
 	/**
 	 * Return the distance the robot has traveled in feet since the last call to
 	 * {@link #reset Robot.driveTrain.reset()}, or robot program start, whichever
@@ -143,15 +144,24 @@ public class DriveTrain extends GearheadsSubsystem {
 		if (encoderPortFunctional && encoderStarboardFunctional)
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		else if(encoderPortFunctional) {
-			Logger.info("The right drive train encoder is non-functional.");
+			if(!sentEncoderWarnings) {
+				Logger.info("WARNING: The right drive train encoder is non-functional.");
+				sentEncoderWarnings = true;
+			}
 			return -encoderPort.getDistance();
 		}
 		else if(encoderStarboardFunctional) {
-			Logger.info("The left drive train encoder is non-functional.");
+			if(!sentEncoderWarnings) {
+				Logger.info("WARNING: The left drive train encoder is non-functional.");
+				sentEncoderWarnings = true;
+			}
 			return encoderStarboard.getDistance();
 		}
 		else {
-			Logger.info("Both drive train encoders are non-functional.");
+			if(!sentEncoderWarnings) {
+				Logger.info("WARNING: Both drive train encoders are non-functional.");
+				sentEncoderWarnings = true;
+			}
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		}
 	}
