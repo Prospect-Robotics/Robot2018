@@ -135,27 +135,27 @@ public class AutonomousCommandGroupGenerator {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(feet(24), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
-			autoCmdList.turn(right, 90);
+			autoCmdList.quickTurn(right, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else if (!robotStartingPosition.equals(Direction.CENTER)) {
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info("Autonomous: robot and scale on opposite side");
 			autoCmdList.driveForward(feet(14), TRANSITION_SPEED);
-			autoCmdList.turn(right, 90);
+			autoCmdList.quickTurn(right, 90);
 			autoCmdList.driveForward(feet(15), TRANSITION_SPEED);
-			autoCmdList.turn(left, 90);
+			autoCmdList.quickTurn(left, 90);
 			autoCmdList.driveForward(feet(8), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
-			autoCmdList.turn(left, 90);
+			autoCmdList.quickTurn(left, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else {
 			Logger.info("Autonomous: robot in center position");
 			autoCmdList.driveForward(inches(8), TRANSITION_SPEED); // enough to turn
-			autoCmdList.turn(left, 45);
+			autoCmdList.quickTurn(left, 45);
 			autoCmdList.driveForward(feet(6), TRANSITION_SPEED); // diagonally from start to far side of near switch
-			autoCmdList.turn(right, 45);
+			autoCmdList.quickTurn(right, 45);
 			autoCmdList.elevatorMoveToPosition(switchHeight); 
 			deliverCubeRoutine(Target.SWITCH);
 		}

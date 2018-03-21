@@ -3,8 +3,8 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.ToggleIntake;
 import org.usfirst.frc2813.Robot2018.commands.auto.AutoCurveDrive;
-import org.usfirst.frc2813.Robot2018.commands.auto.AutoTurn;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.QuickTurnCommand;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
@@ -59,8 +59,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void driveBackward(Length distance, double endSpeed) {
 		drive(distance, Direction.BACKWARD, endSpeed);
 	}
-	public void turn(Direction direction, double angle) {
-		addSequential(new AutoTurn(direction, angle, turnSpeed));
+	/*
+	 * Create a command to spin in place, until we reach a specific *relative* angle
+	 */
+	public void quickTurn(Direction direction, double relativeAgle) {
+		addSequential(new QuickTurnCommand(direction, relativeAgle, turnSpeed));
 	}
 
 	private void curve(Direction direction, double angle, double radius, boolean clockwise) {
