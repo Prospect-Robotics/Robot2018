@@ -67,6 +67,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Keep track of whether we think we should have a cube at this point in the sequence, so we can
 	 * scale back movements if necessary.
 	 */
+	@SuppressWarnings("unused")
 	private boolean haveCube = true;
 
 	/* ------------------------------------------------------------------------------------------------------
