@@ -105,6 +105,7 @@ public class AutonomousCommandGroupGenerator {
 		// Read our location on the field
 		Direction robotStartingPosition = Robot.positionSelector.getSelected();
 		Direction nearSwitchPosition = RobotMap.gameData.getNearSwitch();
+		Direction farSwitchPosition = RobotMap.gameData.getFarSwitch();
 		Direction scalePosition = RobotMap.gameData.getScale();
 
 		/**
@@ -116,11 +117,11 @@ public class AutonomousCommandGroupGenerator {
 
 		// Sanity test our direction biases
 		verifyDirections();
-		Logger.info("AutonomousCommandGroupGenerator: Position=" + robotStartingPosition + " nearSwitch=" + nearSwitchPosition + " scale=" + scalePosition + " adjusted_left=" + left + " adjusted_right=" + right);
+		Logger.info(this + ": Robot=" + robotStartingPosition + " NearSwitch=" + nearSwitchPosition + " Scale=" + scalePosition + " FarSwitch=" + farSwitchPosition + " AdjustedLeft=" + left + " AdjustedRight=" + right + ".");
 
 		if (RobotMap.gameData.getScale() == Direction.OFF) {
 			// there is no game data. Cross the auto line
-			Logger.info("Autonomous: no game data");
+			Logger.info(this + ": No game data.");
 			autoCmdList.driveForward(feet(5), FULL_STOP);
 			return;
 		}
@@ -138,7 +139,7 @@ public class AutonomousCommandGroupGenerator {
 			 * NB: We write this script as if the robot and scale are both on the left,
 			 * it will also be used inverted for when the robot and scale are both on the right.
 			 */
-			Logger.info("Autonomous: robot and scale on same side");
+			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(feet(24), FULL_STOP);
 			startElevatorMovingToPlacementHeight(Target.SCALE);
@@ -160,7 +161,7 @@ public class AutonomousCommandGroupGenerator {
 			 * it will also be used inverted for when the robot and scale are both on the right.
 			 */
 			// from far side we cross over between switch and scale and place block on scale
-			Logger.info("Autonomous: robot and scale on opposite side");
+			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition + " position and the Scale is at the " + scalePosition + " position.");
 			autoCmdList.driveForward(feet(14), TRANSITION_SPEED);
 			autoCmdList.quickTurn(right, 90);
 			autoCmdList.driveForward(feet(15), TRANSITION_SPEED);
@@ -180,7 +181,7 @@ public class AutonomousCommandGroupGenerator {
 			 * NB: We write this script as if the our switch is active to the left of the  
 			 * robot.  If this isn't the case, the script will be run inverted.
 			 */
-			Logger.info("Autonomous: robot in center position");
+			Logger.info(this + ": Robot is in the center position, with the near switch at the " + nearSwitchPosition + " position.");
 			autoCmdList.driveForward(inches(8), TRANSITION_SPEED); // enough to turn
 			autoCmdList.quickTurn(left, 45);
 			autoCmdList.driveForward(feet(6), TRANSITION_SPEED); // diagonally from start to far side of near switch
@@ -215,5 +216,9 @@ public class AutonomousCommandGroupGenerator {
 		if (target == Target.SCALE) {
 			autoCmdList.elevatorMoveToPosition(switchHeight);
 		}
+	}
+	
+	public String toString() {
+		return "Autonymous";
 	}
 }
