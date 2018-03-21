@@ -66,11 +66,18 @@ public enum Direction{
 	/** Alias for NEGATIVE */
 	LOW_GEAR(Canonical.NEGATIVE),
 
-	/* Alias for POSITIVE */
+	/* Alias for POSITIVE - opposite is IDLE - it's an on/off */
 	ENGAGED(Canonical.POSITIVE),
-	/** Alias for NEGATIVE */
-	DISENGAGED(Canonical.NEGATIVE),
+	/** Alias for NEUTRAL */
+	DISENGAGED(Canonical.NEUTRAL),
 
+	/* Alias for POSITIVE - opposite is IDLE - it's an on/off */
+	ENABLED(Canonical.POSITIVE),
+	/** Alias for NEUTRAL */
+	DISABLED(Canonical.NEUTRAL),
+
+	/** Alias for NEUTRAL */
+	IDLE(Canonical.NEUTRAL),
 	/** Alias for NEUTRAL */
 	CENTER(Canonical.NEUTRAL);
 	
@@ -124,7 +131,6 @@ public enum Direction{
 	public boolean isNegative() {
 		return canonicalDirection == Canonical.NEGATIVE;
 	}
-	
 	/**
 	 * Two directions are equal if they are the same or have the same canonical representation
 	 */
@@ -183,6 +189,10 @@ public enum Direction{
 			return DISENGAGED;
 		case DISENGAGED:
 			return ENGAGED;
+		case ENABLED:
+			return DISABLED;
+		case DISABLED:
+			return ENABLED;
 		default:
 			if(canonicalDirection == Canonical.POSITIVE) {
 				return NEGATIVE;
