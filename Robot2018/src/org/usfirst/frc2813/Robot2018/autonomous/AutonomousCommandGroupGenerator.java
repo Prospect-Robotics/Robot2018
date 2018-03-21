@@ -79,8 +79,6 @@ public class AutonomousCommandGroupGenerator {
 		verify(Direction.RIGHT,  Direction.RIGHT, Direction.LEFT, Direction.RIGHT);
 		verify(Direction.RIGHT,  Direction.RIGHT, Direction.RIGHT, Direction.LEFT);
 	}
-	
-	private int directionBias;  // used to share code between left/right
 
 	/**
 	 * Code to be run during the Autonomous 15 second period.
@@ -94,11 +92,16 @@ public class AutonomousCommandGroupGenerator {
 		Direction nearSwitchPosition = RobotMap.gameData.getNearSwitch();
 		Direction scalePosition = RobotMap.gameData.getScale();
 
+		/**
+		 * The script is written from a left-hand position.  If we are on the right side, everything is reversed.
+		 * If we are in the middle, then we use the switch direction.
+		 */
+		Direction left     = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitch(), Direction.LEFT);
+		Direction right    = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitch(), Direction.RIGHT);
+
 		// Sanity test our direction biases
 		verifyDirections();
-
-		// allows left->right and right->left to share code
-		directionBias = getBiasedDirection(robotStartingPosition, nearSwitchPosition, Direction.LEFT).getMultiplier();
+		Logger.info("AutonomousCommandGroupGenerator: Position=" + robotStartingPosition + " nearSwitch=" + nearSwitchPosition + " scale=" + scalePosition + " adjusted_left=" + left + " adjusted_right=" + right);
 
 		if (RobotMap.gameData.getScale() == Direction.OFF) {
 			// there is no game data. Cross the auto line
@@ -117,27 +120,27 @@ public class AutonomousCommandGroupGenerator {
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.driveForward(LengthUOM.Feet.create(24).multiply(distanceScale), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
-			autoCmdList.turnRight(90 * directionBias);
+			autoCmdList.turn(right, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else if (!robotStartingPosition.equals(Direction.CENTER)) {
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info("Autonomous: robot and scale on opposite side");
 			autoCmdList.driveForward(LengthUOM.Feet.create(14).multiply(distanceScale), TRANSITION_SPEED);
-			autoCmdList.turnRight(90 * directionBias);
+			autoCmdList.turn(right, 90);
 			autoCmdList.driveForward(LengthUOM.Feet.create(15).multiply(distanceScale), TRANSITION_SPEED);
-			autoCmdList.turnLeft(90 * directionBias);
+			autoCmdList.turn(left, 90);
 			autoCmdList.driveForward(LengthUOM.Feet.create(8).multiply(distanceScale), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
-			autoCmdList.turnLeft(90 * directionBias);
+			autoCmdList.turn(left, 90);
 			deliverCubeRoutine(Target.SCALE);
 		}
 		else {
 			Logger.info("Autonomous: robot in center position");
 			autoCmdList.driveForward(LengthUOM.Inches.create(8).multiply(distanceScale), TRANSITION_SPEED); // enough to turn
-			autoCmdList.turnLeft(45 * directionBias);
+			autoCmdList.turn(left, 45);
 			autoCmdList.driveForward(LengthUOM.Feet.create(6).multiply(distanceScale), TRANSITION_SPEED); // diagonally from start to far side of near switch
-			autoCmdList.turnRight(45 * directionBias);
+			autoCmdList.turn(right, 45);
 			autoCmdList.elevatorMoveToPosition(switchHeight); 
 			deliverCubeRoutine(Target.SWITCH);
 		}

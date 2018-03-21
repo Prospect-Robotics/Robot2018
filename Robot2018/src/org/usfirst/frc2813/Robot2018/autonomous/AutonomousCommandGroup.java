@@ -59,13 +59,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void driveBackward(Length distance, double endSpeed) {
 		drive(distance, Direction.BACKWARD, endSpeed);
 	}
-
-	public void turnLeft(double angle) {
-		addSequential(new AutoTurn(turnSpeed, angle));
+	public void turn(Direction direction, double angle) {
+		addSequential(new AutoTurn(turnSpeed, angle * direction.getMultiplierAsDouble()));
 	}
-	public void turnLeft() { turnLeft(90); } // Default turns are 90 degree
-	public void turnRight(double angle) { turnLeft(-angle); } // right turn is a negative left turn
-	public void turnRight() { turnLeft(-90); }
 
 	private void curve(Direction direction, double angle, double radius, boolean clockwise) {
 		double speed = curveSpeed;
