@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
-import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
@@ -423,9 +422,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	private void dumpSubsystemStatusAtIntervals() {
 		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
 			lastPositionReport = System.currentTimeMillis();
-			Logger.info("[[PERIODIC]] " + Robot.elevator.getDiagnostics());
-			Logger.info("[[PERIODIC]] " + Robot.arm.getDiagnostics());
-//			Logger.info("[[PERIODIC]] " + Robot.intake.getDiagnostics());
+			Logger.info("[[PERIODIC]] " + getDiagnostics());
 		}
 	}
 
