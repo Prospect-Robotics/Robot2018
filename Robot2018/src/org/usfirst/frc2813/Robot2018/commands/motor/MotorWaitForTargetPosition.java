@@ -12,7 +12,7 @@ public class MotorWaitForTargetPosition extends MotorCommand {
 	private final Length allowableError;
 	
 	public MotorWaitForTargetPosition(Motor motor, Length allowableError) {
-		super(motor, true);
+		super(motor, false); // NB: IF this is running asynchronously, we don't interrupt the other command...
 		this.allowableError = allowableError;
 	}
 
@@ -23,7 +23,7 @@ public class MotorWaitForTargetPosition extends MotorCommand {
 		if(!isFinished()) {
 			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s.",this,motor,motor.getTargetState().getTargetAbsolutePosition());
 		} else {
-			Logger.printFormat(LogType.INFO,"%s waiting pointlessly for %s to reach position, it's already done that.",this,motor);
+			Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach position, it's already done that.",this,motor);
 		}
 		setInterruptible(true);
 	}
