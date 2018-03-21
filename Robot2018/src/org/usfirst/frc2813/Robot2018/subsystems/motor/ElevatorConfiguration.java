@@ -25,13 +25,13 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	// Talon constants
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
 	
-	private static final Length RANGE_MIN = LengthUOM.Inches.create(-6);
+	private static final Length RANGE_MIN = LengthUOM.Inches.create(0);
 	private static final Length SAFETY_MARGIN = LengthUOM.Inches.create(4);
 	private static final Length RANGE_MAX = LengthUOM.Inches.create(85);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
 	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
-	
+
 	// Motor constants
 	private static final double    MAX_RPMS_UNLOADED             = 18700;
 	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
