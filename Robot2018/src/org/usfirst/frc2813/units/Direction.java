@@ -60,7 +60,17 @@ public enum Direction{
 	STOP(Canonical.POSITIVE),
 	/** Alias for NEGATIVE */
 	GO(Canonical.NEGATIVE),
-	
+
+	/* Alias for POSITIVE */
+	HIGH_GEAR(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	LOW_GEAR(Canonical.NEGATIVE),
+
+	/* Alias for POSITIVE */
+	ENGAGED(Canonical.POSITIVE),
+	/** Alias for NEGATIVE */
+	DISENGAGED(Canonical.NEGATIVE),
+
 	/** Alias for NEUTRAL */
 	CENTER(Canonical.NEUTRAL);
 	
@@ -165,6 +175,14 @@ public enum Direction{
 			return GO;
 		case GO:
 			return STOP;
+		case HIGH_GEAR:
+			return LOW_GEAR;
+		case LOW_GEAR:
+			return HIGH_GEAR;
+		case ENGAGED:
+			return DISENGAGED;
+		case DISENGAGED:
+			return ENGAGED;
 		default:
 			if(canonicalDirection == Canonical.POSITIVE) {
 				return NEGATIVE;
