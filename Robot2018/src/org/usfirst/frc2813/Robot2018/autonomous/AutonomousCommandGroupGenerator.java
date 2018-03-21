@@ -27,6 +27,11 @@ public class AutonomousCommandGroupGenerator {
 	private static final double TRANSITION_SPEED = 0.2;
 	private static final double FULL_STOP = 0.0;
 
+	/*
+	Ability to scale the distances involved for "mini testing" when we don't have sufficient surface area for testing.
+	*/
+	private static double distanceScale = 0.2;
+	
 	private int directionBias;  // used to share code between left/right
 
 	/**
@@ -45,10 +50,10 @@ public class AutonomousCommandGroupGenerator {
 		if (RobotMap.gameData.getScale() == Direction.OFF) {
 			// there is no game data. Cross the auto line
 			Logger.info("Autonomous: no game data");
-			autoCmdList.driveForward(LengthUOM.Feet.create(5), FULL_STOP);
+			autoCmdList.driveForward(LengthUOM.Feet.create(5).multiply(distanceScale), FULL_STOP);
 			return;
 		}
-		
+
 		// These return immediately and can happen while we drive
 		Logger.info("Autonomous: set default elevator/arm position");
 		autoCmdList.elevatorMoveToPosition(switchHeight); // min needed and max safe during drive
@@ -57,7 +62,7 @@ public class AutonomousCommandGroupGenerator {
 		if (position == RobotMap.gameData.getScale()) {
 			Logger.info("Autonomous: robot and scale on same side");
 			// we are on the same side as the scale. Leave switch for team mates
-			autoCmdList.driveForward(LengthUOM.Feet.create(24), FULL_STOP);
+			autoCmdList.driveForward(LengthUOM.Feet.create(24).multiply(distanceScale), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
 			autoCmdList.turnRight(90 * directionBias);
 			deliverCubeRoutine(Target.SCALE);
@@ -65,11 +70,11 @@ public class AutonomousCommandGroupGenerator {
 		else if (position != Direction.CENTER) {
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info("Autonomous: robot and scale on opposite side");
-			autoCmdList.driveForward(LengthUOM.Feet.create(14), TRANSITION_SPEED);
+			autoCmdList.driveForward(LengthUOM.Feet.create(14).multiply(distanceScale), TRANSITION_SPEED);
 			autoCmdList.turnRight(90 * directionBias);
-			autoCmdList.driveForward(LengthUOM.Feet.create(15), TRANSITION_SPEED);
+			autoCmdList.driveForward(LengthUOM.Feet.create(15).multiply(distanceScale), TRANSITION_SPEED);
 			autoCmdList.turnLeft(90 * directionBias);
-			autoCmdList.driveForward(LengthUOM.Feet.create(8), FULL_STOP);
+			autoCmdList.driveForward(LengthUOM.Feet.create(8).multiply(distanceScale), FULL_STOP);
 			autoCmdList.elevatorMoveToPosition(scaleHeight);
 			autoCmdList.turnLeft(90 * directionBias);
 			deliverCubeRoutine(Target.SCALE);
@@ -80,9 +85,9 @@ public class AutonomousCommandGroupGenerator {
 			directionBias = (position == Direction.LEFT) ? 1 : -1;
 
 			Logger.info("Autonomous: robot in center position");
-			autoCmdList.driveForward(LengthUOM.Inches.create(8), TRANSITION_SPEED); // enough to turn
+			autoCmdList.driveForward(LengthUOM.Inches.create(8).multiply(distanceScale), TRANSITION_SPEED); // enough to turn
 			autoCmdList.turnLeft(45 * directionBias);
-			autoCmdList.driveForward(LengthUOM.Feet.create(6), TRANSITION_SPEED); // diagonally from start to far side of near switch
+			autoCmdList.driveForward(LengthUOM.Feet.create(6).multiply(distanceScale), TRANSITION_SPEED); // diagonally from start to far side of near switch
 			autoCmdList.turnRight(45 * directionBias);
 			autoCmdList.elevatorMoveToPosition(switchHeight); 
 			deliverCubeRoutine(Target.SWITCH);
@@ -93,9 +98,9 @@ public class AutonomousCommandGroupGenerator {
 		if (target == Target.SCALE) {
 			autoCmdList.waitForElevator();
 		}
-		autoCmdList.driveForward(LengthUOM.Feet.create(2), FULL_STOP);
+		autoCmdList.driveForward(LengthUOM.Feet.create(2).multiply(distanceScale), FULL_STOP);
 		autoCmdList.dropCube();
-		autoCmdList.driveBackward(LengthUOM.Feet.create(2), TRANSITION_SPEED);
+		autoCmdList.driveBackward(LengthUOM.Feet.create(2).multiply(distanceScale), TRANSITION_SPEED);
 		if (target == Target.SCALE) {
 			autoCmdList.elevatorMoveToPosition(switchHeight);
 		}
