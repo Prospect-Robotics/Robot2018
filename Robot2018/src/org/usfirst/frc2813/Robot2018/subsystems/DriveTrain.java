@@ -20,13 +20,13 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * This is our drive train. It goes.
- * 
+ *
  * Note that the hardware is probably wired incorrectly.  Normally the motor polarity on both sides of the drive train is wired
- * the same way and then you set one side's speed controller to inverted and one side's sensor to inverted 
- * (if encoders and motors face the same way, one side would have sensor and motor inverted in software.  
+ * the same way and then you set one side's speed controller to inverted and one side's sensor to inverted
+ * (if encoders and motors face the same way, one side would have sensor and motor inverted in software.
  * Conversely, if the encoders and motors face opposite directions then you would need to invert the sensor on one side
- * and invert the motor on the other). 
- * 
+ * and invert the motor on the other).
+ *
  * TODO: Hardware may be wired incorrectly.
  * TODO:  encoderPort.setReverseDirection is set to true, but we are still multiplying the distance value by -1.  This seems like a bug.
  */
@@ -38,17 +38,27 @@ public class DriveTrain extends GearheadsSubsystem {
     public static final double ENCODER_PULSES_PER_WHEEL_REVOLUTION = ENCODER_PULSES_PER_ENCODER_REVOLUTION * ENCODER_TO_DRIVE_SCALE;
     public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
-	public final SpeedController speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
-	public final SpeedController speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
-	private final VictorSPX speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
-	private final VictorSPX speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerStarFollow;
-	private final DifferentialDrive robotDrive = RobotMap.driveTrainRobotDrive;
-	public final Encoder encoderStarboard = RobotMap.driveTrainQuadratureEncoderStarboard;
-	public final Encoder encoderPort = RobotMap.driveTrainQuadratureEncoderPort;
-	public final Solenoid gearShift = RobotMap.driveTrainGearShiftSolenoid;
+	public final SpeedController speedControllerPort;
+	public final SpeedController speedControllerStarboard;
+	private final VictorSPX speedControllerPortFollow;
+	private final VictorSPX speedControllerStarboardFollow;
+	private final DifferentialDrive robotDrive;
+	public final Encoder encoderStarboard;
+	public final Encoder encoderPort;
+	public final Solenoid gearShift;
+
 	public boolean encoderPortFunctional, encoderStarboardFunctional; // set by POST.
-	
+
 	public DriveTrain() {
+		speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
+		speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
+		speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
+		speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerStarFollow;
+		robotDrive = RobotMap.driveTrainRobotDrive;
+		encoderStarboard = RobotMap.driveTrainQuadratureEncoderStarboard;
+		encoderPort = RobotMap.driveTrainQuadratureEncoderPort;
+		gearShift = RobotMap.driveTrainGearShiftSolenoid;
+
 		addChild(robotDrive);
 		addChild((Sendable) speedControllerPort);
 		LiveWindow.add((Sendable) speedControllerPort);
@@ -92,19 +102,19 @@ public class DriveTrain extends GearheadsSubsystem {
 	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
 		/*
 		 *  The arcadeDrive call parameters are (signed) speed and (signed) turn value [-1, 1]
-		 *  Pushing the joystick forward to drive forward decreases the joystick's Y parameter.  
+		 *  Pushing the joystick forward to drive forward decreases the joystick's Y parameter.
 		 *  Even though the arcadeDrive calls this field "xSpeed", it comes from the Y axis of the joystick
-		 *  Pushing the joystick left and right changes the joystick's X parameter.  
+		 *  Pushing the joystick left and right changes the joystick's X parameter.
 		 *  Even though the arcadeDrive calls this field "zRotation", it comes from the X axis of the joystick.
 		 */
 		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX() * Math.abs(joystick1.getX()), false);
-		
+
 	}
 
 	public void arcadeDrive(double forwardSpeed, double turnSpeed) {
 		/*
 		 * WPI library expects forward and left to be negative to match the way Joystick values work on Windows.
-		 * When we want to go forward, we reverse the sign to match at this place.  
+		 * When we want to go forward, we reverse the sign to match at this place.
 		 */
 		robotDrive.arcadeDrive(- forwardSpeed, - turnSpeed, false); // false here means do not square the inputs (if
 																// omitted, the argument defaults to true)
@@ -120,17 +130,17 @@ public class DriveTrain extends GearheadsSubsystem {
 	public void curvatureDrive(double forwardSpeed, double turnRadius) {
 		robotDrive.curvatureDrive(forwardSpeed, turnRadius, false);
 	}
-	
+
 	static boolean sentEncoderWarnings = false;
 	/**
 	 * Return the distance the robot has traveled in feet since the last call to
 	 * {@link #reset Robot.driveTrain.reset()}, or robot program start, whichever
 	 * was later. If the robot drove backwards, the value returned will be negative.
 	 * If the robot spins in place, the value will not change.
-	 * 
+	 *
 	 * DriveTrain.getDistance() also checks to ensure functionality of the encoders and throws
 	 * an error to the console if both encoders are nonfunctional
-	 * 
+	 *
 	 * @return the average of the left and right encoder values
 	 */
 	public double getDistance() {
@@ -138,8 +148,8 @@ public class DriveTrain extends GearheadsSubsystem {
     	 * A note on Encoders and the sign of distance:
     	 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
     	 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS")
-    	 * 
-    	 * NOTE: encoderPort should 
+    	 *
+    	 * NOTE: encoderPort should
     	 */
 		if (encoderPortFunctional && encoderStarboardFunctional)
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
@@ -178,6 +188,5 @@ public class DriveTrain extends GearheadsSubsystem {
 		((VictorSPX) speedControllerStarboard).setNeutralMode(b);
 		speedControllerPortFollow.setNeutralMode(b);
 		speedControllerStarboardFollow.setNeutralMode(b);
-		
 	}
 }
