@@ -74,17 +74,14 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	
 	private boolean getHasHardLimit(Direction direction) {
 		if(direction.isPositive()) {
-			if(configuration.getForwardHardLimitSwitchNormal() == LimitSwitchNormal.Disabled) {
-				return false;
-			}
 			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition) 
-					&& configuration.hasAny(IMotorConfiguration.LocalForwardHardLimitSwitch|IMotorConfiguration.RemoteForwardHardLimitSwitch);
+					&& configuration.hasAny(IMotorConfiguration.LocalForwardHardLimitSwitch|IMotorConfiguration.RemoteForwardHardLimitSwitch)
+					&& configuration.getForwardHardLimitSwitchNormal() != LimitSwitchNormal.Disabled;
+					
 		} else {
-			if(configuration.getReverseHardLimitSwitchNormal() == LimitSwitchNormal.Disabled) {
-				return false;
-			}
 			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition) 
-					&& configuration.hasAny(IMotorConfiguration.LocalReverseHardLimitSwitch|IMotorConfiguration.RemoteReverseHardLimitSwitch);
+					&& configuration.hasAny(IMotorConfiguration.LocalReverseHardLimitSwitch|IMotorConfiguration.RemoteReverseHardLimitSwitch)
+					&& configuration.getReverseHardLimitSwitchNormal() == LimitSwitchNormal.Disabled;
 		}
 	}
 	
@@ -134,6 +131,10 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	}
 
 	private void updateEncoderPosition() {
+		// Don't try to update encoder position before our first command
+		if(currentState == null) {
+			return;
+		}
 		// Handle auto-hard reset
 		if(getCurrentLimitSwitchStatus(Direction.FORWARD) && configuration.getForwardHardLimitSwitchResetsEncoder()) {
 			this.encoderValue = 0;
