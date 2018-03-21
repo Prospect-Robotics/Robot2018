@@ -1,12 +1,9 @@
 // RobotBuilder Version: 2.0
 
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
-import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Drives the robot in arcade drive with Robot.oi.joystick1.

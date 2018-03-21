@@ -1,11 +1,8 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 import org.usfirst.frc2813.logging.Logger;
-
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * NB: This class is here temporarily and will be replaced by DriveTrainAutoDrive (currently PIDAutoDrive)

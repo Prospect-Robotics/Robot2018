@@ -14,7 +14,6 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePositionA
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitchSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPositionSync;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
-import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;

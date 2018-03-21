@@ -4,7 +4,6 @@ import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.command.TimedCommand;
 
 /**
  * Print out the drive train encoder values to the log.

@@ -1,12 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
-import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
-import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
-
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Autonomous turn command. Use gyro and linear interpolation

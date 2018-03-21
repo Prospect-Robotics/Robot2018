@@ -3,9 +3,9 @@ package org.usfirst.frc2813.Robot2018.motor.victor;
 import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
-import org.usfirst.frc2813.Robot2018.motor.PID;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.PID;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;

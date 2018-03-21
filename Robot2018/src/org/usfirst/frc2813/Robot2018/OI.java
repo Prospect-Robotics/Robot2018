@@ -6,8 +6,8 @@ import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirectionSync;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SimpleSolenoidToggleStateInstant;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
 import org.usfirst.frc2813.Robot2018.subsystems.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 

@@ -1,12 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.intake;
 
-import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.Intake;
-import org.usfirst.frc2813.logging.LogType;
-import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
-
-import edu.wpi.first.wpilibj.command.Command;
 
 /**
  * Spin the Intake IN or OUT, while held.   Stop when interrupted.

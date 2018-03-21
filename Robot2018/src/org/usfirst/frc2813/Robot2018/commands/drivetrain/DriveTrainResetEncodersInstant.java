@@ -1,10 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
-import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
-
-import edu.wpi.first.wpilibj.command.InstantCommand;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Reset the encoders
