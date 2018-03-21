@@ -69,6 +69,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
+	/**
+	 * Create a motor subsystem with a VictorSPX
+	 */
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX victorSPX) {
 		this.configuration = configuration;
 		this.hardwareController  = new MotorControllerUnitConversionAdapter(configuration, new VictorSPX(configuration, victorSPX));
@@ -79,6 +82,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		configure();
 	}
 
+	/**
+	 * Create a motor subsystem with a TalonSRX
+	 */
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX talonSRX) {
 		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new TalonSRX(configuration, talonSRX));
@@ -88,6 +94,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		configure();
 	}
 
+	/**
+	 * Create a motor subsystem with a PWM speed controller only
+	 */
 	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController) {
 		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWM(configuration, speedController));
@@ -97,6 +106,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		configure();
 	}
 
+	/**
+	 * Create a motor subsystem with a PWM and an encoder
+	 */
 	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController, Encoder sensor) {
 		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWMWithEncoder(configuration, speedController, sensor));
@@ -106,10 +118,13 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		configure();
 	}
 
-	public Motor(IMotorConfiguration configuration, Simulated simulatedMotorController) {
+	/**
+	 * Create a motor subsystem with a simulated motor controller
+	 */
+	public Motor(IMotorConfiguration configuration) {
 		this.configuration = configuration;
 		this.hardwareController = null;
-		this.simulatedController = simulatedMotorController;
+		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
