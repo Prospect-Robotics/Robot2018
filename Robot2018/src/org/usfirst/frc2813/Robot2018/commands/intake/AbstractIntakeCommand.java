@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.intake;
 
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
-import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
 
 /**
  * Abstract base class for motor commands.

@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.intake;
 
-import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -13,6 +14,13 @@ public class IntakeStopInstant extends AbstractIntakeInstantCommand {
 
 	@Override
 	protected void initialize() {
-		intake.spin(Direction.STOP);
+		super.initialize();
+		if(intake.getCurrentDirection().equals(Direction.STOP)) {
+			if(!isDefaultCommand()) {
+				Logger.warning("Telling " + intake + " to stop, but it already is.");
+			}
+		} else {
+			intake.spin(Direction.STOP);
+		}
 	}
 }

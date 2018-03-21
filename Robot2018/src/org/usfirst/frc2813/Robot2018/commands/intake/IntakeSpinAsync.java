@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.intake;
 
-import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -15,6 +16,13 @@ public class IntakeSpinAsync extends AbstractIntakeInstantCommand {
 
 	@Override
 	protected void initialize() {
-		intake.spin(direction);
+		super.initialize();
+		if(intake.getCurrentDirection().equals(direction)) {
+			if(!isDefaultCommand()) {
+				Logger.warning("Telling " + intake + " to spin " + direction + ", but it already is.");
+			}
+		} else {
+			intake.spin(direction);
+		}
 	}
 }

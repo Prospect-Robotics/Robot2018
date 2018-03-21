@@ -5,7 +5,7 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
-import org.usfirst.frc2813.Robot2018.subsystems.Intake;
+import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;

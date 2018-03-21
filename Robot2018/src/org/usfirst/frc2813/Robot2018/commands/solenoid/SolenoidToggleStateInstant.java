@@ -2,6 +2,7 @@
 
 package org.usfirst.frc2813.Robot2018.commands.solenoid;
 
+import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -11,7 +12,7 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  * Open/Close the Robot arm jaws, depending on the current state
  */
-public class SolenoidToggleStateInstant extends InstantCommand {
+public class SolenoidToggleStateInstant extends GearheadsInstantCommand {
 	private final Solenoid solenoid;
 
     public SolenoidToggleStateInstant(Solenoid solenoid) {

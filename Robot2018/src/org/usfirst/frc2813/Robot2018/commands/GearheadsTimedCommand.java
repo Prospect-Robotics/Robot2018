@@ -7,27 +7,24 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 /**
  * This class contains code common to all Subsystems
  */
-public abstract class GearheadsTimedCommand extends TimedCommand {
+public abstract class GearheadsTimedCommand extends GearheadsCommand {
 	static {
 		Logger.addMe();
 	}
-	
+
 	public GearheadsTimedCommand(double timeout) {
 		super(timeout);
 	}
 
-	// @Override
-	protected void execute() {
-		Logger.debug(this + "in execute");
+	public GearheadsTimedCommand(String name, double timeout) {
+		super(name, timeout);
+	}
+
+	/**
+	 * Ends command when timed out.
+	 */
+	protected boolean isFinished() {
+		return isTimedOut();
 	}
 	
-	// @Override
-	protected void initialize() {
-		Logger.debug(this + "in initialize");
-	}
-	
-	// @Override
-	protected void interrupted() {
-		Logger.debug(this + "interrupted");
-	}
 }

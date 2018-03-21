@@ -26,9 +26,13 @@ public final class MotorAdjustTargetRateInstant extends AbstractMotorInstantComm
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetSpeed() == targetRate) {
-			Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's already moving at that speed.",this,motor,targetRate);
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's already moving at that speed.",this,motor,targetRate);
+			}
 		} else if(motor.getTargetState().getOperation() != MotorOperation.MOVING_IN_DIRECTION_AT_RATE ) {
-			Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's NOT MOVING.",this,motor,targetRate);
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's NOT MOVING.",this,motor,targetRate);
+			}
 		} else {
 			Logger.printFormat(LogType.INFO,"%s telling %s to change target rate to %s.",this,motor,targetRate);
 			motor.setTargetRate(targetRate);

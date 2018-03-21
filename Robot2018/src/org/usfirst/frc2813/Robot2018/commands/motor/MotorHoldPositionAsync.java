@@ -19,11 +19,13 @@ public final class MotorHoldPositionAsync extends AbstractMotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getTargetState().getOperation() != MotorOperation.HOLDING_CURRENT_POSITION) {
+		if(!motor.getTargetState().getOperation().equals(MotorOperation.HOLDING_CURRENT_POSITION)) {
 			Logger.printFormat(LogType.INFO,"%s setting %s to hold position",this,motor);
 			motor.holdCurrentPosition();
 		} else {
-			Logger.printFormat(LogType.INFO,"%s not setting %s to hold position, it's already doing that",this,motor);
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s not setting %s to hold position, it's already doing that",this,motor);
+			}
 		}
 		setInterruptible(true);
 	}

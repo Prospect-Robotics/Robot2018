@@ -24,7 +24,9 @@ public final class MotorWaitForHardLimitSwitchSync extends AbstractMotorCommand 
 		if(!isFinished()) {
 			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s hard limit switch.", this, motor, switchDirection);
 		} else {
-			Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach %s hard limit switch, it's already there.", this, motor, switchDirection);
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach %s hard limit switch, it's already there.", this, motor, switchDirection);
+			}
 		}
 		setInterruptible(true);
 	}

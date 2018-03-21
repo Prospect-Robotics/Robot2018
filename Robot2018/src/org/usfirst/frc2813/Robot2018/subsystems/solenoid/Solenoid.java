@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.solenoid;
 
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.solenoid.SolenoidLogic;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.Logger;
@@ -43,7 +44,11 @@ public class Solenoid extends GearheadsSubsystem {
 	@Override
 	protected void initDefaultCommand() {
 		if(configuration.getDefaultCommandFactory() != null) {
-			setDefaultCommand(configuration.getDefaultCommandFactory().createCommand(this));
+			GearheadsCommand c = configuration.getDefaultCommandFactory().createCommand(this);
+			if(c != null) {
+				setDefaultCommand(c);
+				c.setIsDefaultCommand(true);
+			}
 		}
 	}
 

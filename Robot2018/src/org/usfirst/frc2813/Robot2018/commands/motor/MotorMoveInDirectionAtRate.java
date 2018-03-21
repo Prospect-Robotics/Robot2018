@@ -28,8 +28,10 @@ public final class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetDirection() == direction && motor.getTargetSpeed() == rate) {
-			Logger.printFormat(LogType.INFO,"%s NOT setting %s to move in the %s direction at %s, it's already doing that.",this,motor,direction,rate);
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetDirection().equals(direction) && motor.getTargetSpeed() == rate) {
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT setting %s to move in the %s direction at %s, it's already doing that.",this,motor,direction,rate);
+			}
 		} else {
 			Logger.printFormat(LogType.INFO,"%s setting %s to move in the %s direction at %s.",this,motor,direction,rate);
 			motor.moveInDirectionAtRate(direction, rate);

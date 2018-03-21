@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPositionAsync;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
@@ -146,7 +147,7 @@ public class IntakeConfiguration extends MotorConfiguration {
 			null, // remoteReverseHardLimitSwitchSource
 			null, // remoteReverseHardLimitSwitchDeviceId
 			new ICommandFactory<Motor>() { // defaultCommand 
-				public Command createCommand(Motor m) { 
+				public GearheadsCommand createCommand(Motor m) { 
 					return new MotorHoldPositionAsync(m); 
 				}
 			},

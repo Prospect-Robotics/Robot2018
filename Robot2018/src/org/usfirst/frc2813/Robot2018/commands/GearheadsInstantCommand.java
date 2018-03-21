@@ -4,26 +4,24 @@ import org.usfirst.frc2813.logging.Logger;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
-/**
- * This class contains code common to all Subsystems
- */
-public abstract class GearheadsInstantCommand extends InstantCommand {
+public abstract class GearheadsInstantCommand extends GearheadsCommand {
 	static {
 		Logger.addMe();
 	}
 
-	// @Override
-	protected void execute() {
-		Logger.debug(this + "in execute");
+	public GearheadsInstantCommand() {
+		super();
+	}
+
+	public GearheadsInstantCommand(String name) {
+		super(name);
+	}
+
+	/*
+	 * Yep, this is the only difference
+	 */
+	protected boolean isFinished() {
+	  return true;
 	}
 	
-	// @Override
-	protected void initialize() {
-		Logger.debug(this + "in initialize");
-	}
-	
-	// @Override
-	protected void interrupted() {
-		Logger.debug(this + "interrupted");
-	}
 }

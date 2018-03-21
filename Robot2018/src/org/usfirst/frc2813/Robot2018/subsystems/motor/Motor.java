@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
@@ -163,7 +164,11 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public final void initDefaultCommand() {
 		// Set to hold position by default
 		if(getConfiguration().getDefaultCommandFactory() != null) {
-			setDefaultCommand(getConfiguration().getDefaultCommandFactory().createCommand(this));
+			GearheadsCommand c = getConfiguration().getDefaultCommandFactory().createCommand(this);
+			if(c != null) {
+				setDefaultCommand(c);
+				c.setIsDefaultCommand(true);
+			}
 		}
 	}
 

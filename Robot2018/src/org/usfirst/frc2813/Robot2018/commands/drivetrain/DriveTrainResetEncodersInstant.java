@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
+import org.usfirst.frc2813.logging.Logger;
 
 /**
  * Reset the encoders
@@ -18,6 +19,7 @@ public class DriveTrainResetEncodersInstant extends AbstractDriveTrainInstantCom
     // Called once when the command executes
     protected void initialize() {
     	super.initialize();
+    	Logger.info(this + " resetting drive train encoders.");
     	driveTrain.getEncoderStarboard().reset();
     	driveTrain.getEncoderPort().reset();
     }

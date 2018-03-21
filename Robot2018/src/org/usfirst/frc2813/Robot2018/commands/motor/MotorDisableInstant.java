@@ -18,7 +18,9 @@ public final class MotorDisableInstant extends AbstractMotorInstantCommand {
 	protected void initialize() {
 		super.initialize();
 		if(motor.getTargetState().getOperation() == MotorOperation.DISABLED) {
-			Logger.printFormat(LogType.INFO,"%s NOT SETTING %s to disable (neutral state), it's already disabled.", this, motor);
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT SETTING %s to disable (neutral state), it's already disabled.", this, motor);
+			}
 		} else {
 			Logger.printFormat(LogType.INFO,"%s setting %s to disable (neutral state).",this,motor);
 		}

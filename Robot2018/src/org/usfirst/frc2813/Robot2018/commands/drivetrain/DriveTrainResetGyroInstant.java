@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.subsystems.DriveTrain;
+import org.usfirst.frc2813.logging.Logger;
 
 /**
  * Reset the Gyro counter.
@@ -21,6 +22,7 @@ public final class DriveTrainResetGyroInstant extends AbstractDriveTrainInstantC
      */
     protected void initialize() {
     	super.initialize();
+    	Logger.info(this + " resetting drive train gyro.");
     	driveTrain.getGyro().reset();
     }
     

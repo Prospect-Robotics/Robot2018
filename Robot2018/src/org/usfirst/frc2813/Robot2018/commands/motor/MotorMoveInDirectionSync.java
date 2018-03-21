@@ -25,8 +25,10 @@ public final class MotorMoveInDirectionSync extends AbstractMotorCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetDirection() == direction) {
-			Logger.printFormat(LogType.INFO,"%s NOT setting %s to move %s, it's already doing that.",this,motor,direction);
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetDirection().equals(direction)) {
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT setting %s to move %s, it's already doing that.",this,motor,direction);
+			}
 		} else {
 			Logger.printFormat(LogType.INFO,"%s setting %s to move in the %s direction",this,motor,direction);
 			motor.moveInDirectionAtDefaultRate(direction);

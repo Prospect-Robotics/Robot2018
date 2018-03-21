@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPositionAsync;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
@@ -187,7 +188,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			null, // remoteReverseHardLimitSwitchSource
 			null, // remoteReverseHardLimitSwitchDeviceId
 			new ICommandFactory<Motor>() { // defaultCommand 
-				public Command createCommand(Motor m) { 
+				public GearheadsCommand createCommand(Motor m) { 
 					return new MotorHoldPositionAsync(m); 
 				}
 			},

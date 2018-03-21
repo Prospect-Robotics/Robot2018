@@ -24,7 +24,9 @@ public final class MotorWaitForTargetPositionSync extends AbstractMotorCommand {
 		if(!isFinished()) {
 			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s.",this,motor,motor.getTargetState().getTargetAbsolutePosition());
 		} else {
-			Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach position, it's already done that.",this,motor);
+			if(!isDefaultCommand()) {
+				Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach position, it's already done that.",this,motor);
+			}
 		}
 		setInterruptible(true);
 	}
