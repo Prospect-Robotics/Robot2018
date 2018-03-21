@@ -22,8 +22,6 @@ public class Intake extends GearheadsSubsystem {
 	}
 
 	public void initDefaultCommand() {
-		// Set the default command for a subsystem here.
-		//setDefaultCommand(new MySpecialCommand());
 	}
 
 	public void setTargetSpeed(double speed) {
@@ -52,11 +50,20 @@ public class Intake extends GearheadsSubsystem {
 	public Direction getCurrentDirection() {
 		if(isEmulated()) {
 			return direction;
-		} else {
-			return spx.get() < 0 ? Direction.OUT : (spx.get() == 0 ? Direction.STOP : Direction.IN);
+		} else if(getCurrentSpeed() == 0) {
+			return Direction.STOP;
+		} else if(spx.get() == 0) {
+			return Direction.STOP;
 		}
+		else if(spx.get() < 0) {
+			return Direction.IN;
+		} 
+		else if(spx.get() > 0) {
+			return Direction.OUT;
+		}
+		throw new IllegalStateException("Universe implosion imminent!");
 	}
-	
+
 	public boolean isEnabled() {
 		if(isEmulated()) {
 			return speed > 0;
@@ -65,31 +72,26 @@ public class Intake extends GearheadsSubsystem {
 		}
 	}
 
-	public void spin(Direction direction) {
-		if (direction.isNeutral()) {
-			stop();
-		}
-		if (isEmulated()) {
-			Logger.printLabelled(LogType.INFO, "EMULATOR: Intake spin", "Direction", direction, "Speed", speed);
-		}
-		else {
-			Logger.printLabelled(LogType.INFO, "INTAKE spin", "Direction", direction, "Speed", speed);
+	public void spin(Direction targetDirection) {
+		Logger.info(this + " spin(" + targetDirection + ").");
+		if (targetDirection.isNeutral()) {
+			Logger.info(this + " spin(" + targetDirection + ") - stopping.");
+			if (!isEmulated()) {
+				spx.set(0); // NB: Just in case disable doesn't clear speed.  Couldn't find a isDisabled() function.
+				spx.disable();
+			}
+			this.direction = Direction.IDLE;
+		} else {
+			Logger.info(this + " intake spin.  Direction=" + targetDirection + " speed=" + speed);
 			if(!isEmulated()) {
-				spx.set(direction.isPositive() ? -speed : speed);
+				spx.set(targetDirection.isPositive() ? -speed : speed);
 			}
 		}
-		this.direction = direction;
+		this.direction = targetDirection;
 	}
 
 	public void stop() {
-		if (isEmulated()) {
-			Logger.info("EMULATOR: Intake stop");
-		}
-		else {
-			Logger.info("INTAKE stop");
-			spx.set(0); // NB: Just in case disable doesn't clear speed.  Couldn't find a isDisabled() function.
-			spx.disable();
-		}
+		spin(Direction.IDLE);
 	}
 }
 
