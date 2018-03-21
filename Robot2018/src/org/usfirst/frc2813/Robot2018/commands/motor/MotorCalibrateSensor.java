@@ -11,12 +11,13 @@ import org.usfirst.frc2813.units.Direction;
  * this without further intervention, and then holds the 
  * position with PID. 
  */
-public class MotorCalibrateSensor extends AbstractMotorInstantCommand {
+public final class MotorCalibrateSensor extends AbstractMotorInstantCommand {
 	private final Direction direction;
 
 	public MotorCalibrateSensor(Motor motor, Direction direction) {
 		super(motor, true);
 		this.direction = direction;
+		setName(toString());
 	}
 
 	@Override
@@ -31,6 +32,6 @@ public class MotorCalibrateSensor extends AbstractMotorInstantCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", " + direction + ")";
+        return getClass().getSimpleName() + "(" + motor + ", direction=" + direction + ")";
     }
 }

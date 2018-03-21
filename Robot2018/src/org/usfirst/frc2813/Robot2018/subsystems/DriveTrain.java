@@ -42,27 +42,27 @@ public class DriveTrain extends GearheadsSubsystem {
     public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
     private final Gyro gyro;
-	public final SpeedController speedControllerPort;
-	public final SpeedController speedControllerStarboard;
+    private final SpeedController speedControllerPort;
+	private final SpeedController speedControllerStarboard;
 	private final VictorSPX speedControllerPortFollow;
 	private final VictorSPX speedControllerStarboardFollow;
 	private final DifferentialDrive robotDrive;
-	public final Encoder encoderStarboard;
-	public final Encoder encoderPort;
-	public final Solenoid gearShift;
+	private final Encoder encoderStarboard;
+	private final Encoder encoderPort;
+	private final Solenoid gearShift;
 
 	public boolean encoderPortFunctional, encoderStarboardFunctional; // set by POST.
 
 	public DriveTrain(Gyro gyro) {
 		this.gyro = gyro;
-		speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
-		speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
-		speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
-		speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerStarFollow;
-		robotDrive = RobotMap.driveTrainRobotDrive;
-		encoderStarboard = RobotMap.driveTrainQuadratureEncoderStarboard;
-		encoderPort = RobotMap.driveTrainQuadratureEncoderPort;
-		gearShift = RobotMap.driveTrainGearShiftSolenoid;
+		this.encoderStarboard = RobotMap.driveTrainQuadratureEncoderStarboard;
+		this.encoderPort = RobotMap.driveTrainQuadratureEncoderPort;
+		this.speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
+		this.speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
+		this.speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
+		this.speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerStarFollow;
+		this.robotDrive = RobotMap.driveTrainRobotDrive;
+		this.gearShift = RobotMap.driveTrainGearShiftSolenoid;
 
 		addChild(robotDrive);
 		addChild((Sendable) speedControllerPort);
@@ -89,6 +89,22 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	public Gyro getGyro() {
 		return gyro;
+	}
+	
+	public Encoder getEncoderStarboard() {
+		return encoderStarboard;
+	}
+	
+	public Encoder getEncoderPort() {
+		return encoderPort;
+	}
+	
+	public SpeedController getSpeedControllerStarboard() {
+		return speedControllerStarboard;
+	}
+	
+	public SpeedController getSpeedControllerPort() {
+		return speedControllerPort;
 	}
 	
 	// @Override

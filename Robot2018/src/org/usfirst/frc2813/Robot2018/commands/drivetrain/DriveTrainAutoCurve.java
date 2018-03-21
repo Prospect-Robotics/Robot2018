@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  * NB: This class is here temporarily and will be replaced by DriveTrainAutoDrive (currently PIDAutoDrive)
  * @see org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive
  */
-public class DriveTrainAutoCurve extends AbstractDriveTrainCommand {
+public final class DriveTrainAutoCurve extends AbstractDriveTrainCommand {
 	private final double degrees;
 	private final double rate;
 	private final double turnRadius;
@@ -23,6 +23,7 @@ public class DriveTrainAutoCurve extends AbstractDriveTrainCommand {
     	this.turnRadius=turnRadius;
     	this.degrees=degrees;
     	this.rate   =rate;
+		setName(toString());
     }
     
     protected void initialize() {
@@ -52,5 +53,9 @@ public class DriveTrainAutoCurve extends AbstractDriveTrainCommand {
     protected boolean isFinished() {
     	Logger.info(this + " Degrees=%.3f GyroAngle=%.3f startingOrientation=%.3f\n", degrees, driveTrain.getGyro().getAngle(), startingOrientation);
         return degrees > 0 ? degreesRotated() >= degrees : degreesRotated() <= degrees;
+    }
+    
+    public String toString() {
+    	return getClass().getSimpleName() + "(" + driveTrain + ", rate=" + rate + ", degrees=" + degrees + ", turnRadius=" + turnRadius + ")"; 
     }
 }

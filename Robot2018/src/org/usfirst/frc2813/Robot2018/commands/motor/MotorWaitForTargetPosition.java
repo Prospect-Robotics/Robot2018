@@ -8,12 +8,13 @@ import org.usfirst.frc2813.units.values.Length;
 /**
  * Wait for a motor system to arrive at position, to within +/- allowableError
  */
-public class MotorWaitForTargetPosition extends AbstractMotorCommand {
+public final class MotorWaitForTargetPosition extends AbstractMotorCommand {
 	private final Length allowableError;
 	
 	public MotorWaitForTargetPosition(Motor motor, Length allowableError) {
 		super(motor, false); // NB: IF this is running asynchronously, we don't interrupt the other command...
 		this.allowableError = allowableError;
+		setName(toString());
 	}
 
 	@Override
@@ -35,6 +36,6 @@ public class MotorWaitForTargetPosition extends AbstractMotorCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + "," + allowableError + ")";
+        return getClass().getSimpleName() + "(" + motor + ", allowableError=" + allowableError + ")";
     }
 }

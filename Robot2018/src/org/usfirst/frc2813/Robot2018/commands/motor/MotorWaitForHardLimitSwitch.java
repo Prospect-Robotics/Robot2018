@@ -9,12 +9,13 @@ import org.usfirst.frc2813.units.Direction;
 /**
  * Wait for a motor system to arrive at position, to within +/- allowableError
  */
-public class MotorWaitForHardLimitSwitch extends AbstractMotorCommand {
+public final class MotorWaitForHardLimitSwitch extends AbstractMotorCommand {
 	private final Direction switchDirection;
 
 	public MotorWaitForHardLimitSwitch(Motor motor, Direction switchDirection) {
 		super(motor, false); // NB: IF this is running asynchronously, we don't interrupt the other command...
 		this.switchDirection = switchDirection;
+		setName(toString());
 	}
 
 	@Override
@@ -36,6 +37,6 @@ public class MotorWaitForHardLimitSwitch extends AbstractMotorCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + "," + switchDirection + ")";
+        return getClass().getSimpleName() + "(" + motor + ", switchDirection=" + switchDirection + ")";
     }
 }

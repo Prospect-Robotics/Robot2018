@@ -14,25 +14,10 @@ public abstract class AbstractMotorCommand extends GearheadsCommand {
 		if(requiresSubsystem) {
 			requires(subsystem);
 		}
-		Logger.debug(this + "constructed");
-	}
-
-	// @Override
-	protected void execute() {
-		Logger.debug(this + "in execute");
 	}
 	
-	// @Override
-	protected void initialize() {
-		Logger.debug(this + "in initialize");
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "(" + motor + ", ...)";
 	}
-	
-	// @Override
-	protected void interrupted() {
-		Logger.debug(this + "interrupted");
-	}
-    // @Override
-    public String toString() {
-    	return getClass().getSimpleName() + "(" + motor + ", ...)";
-    }
 }

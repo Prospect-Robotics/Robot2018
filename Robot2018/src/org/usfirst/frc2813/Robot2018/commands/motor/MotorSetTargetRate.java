@@ -10,7 +10,7 @@ import org.usfirst.frc2813.units.values.Rate;
  * If the motor is moving, change speeds.  If not, has no effect.Set the speed on a Motor subsystem.  It will take immediate effect
  * Also, do NOT attempt to change direction! 
  */
-public class MotorSetTargetRate extends AbstractMotorInstantCommand {
+public final class MotorSetTargetRate extends AbstractMotorInstantCommand {
 	private final Rate targetRate;
 
 	public MotorSetTargetRate(Motor motor, Rate targetRate) {
@@ -19,6 +19,7 @@ public class MotorSetTargetRate extends AbstractMotorInstantCommand {
 		if(targetRate.getValue() < 0) {
 			throw new IllegalArgumentException("Speed may not be negative.  Use directions to go in reverse.");
 		}
+		setName(toString());
 	}
 
 	// Called once when the command executes
@@ -35,7 +36,7 @@ public class MotorSetTargetRate extends AbstractMotorInstantCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", " + targetRate + ")";
+        return getClass().getSimpleName() + "(" + motor + ", targetRate=" + targetRate + ")";
     }
 
 }

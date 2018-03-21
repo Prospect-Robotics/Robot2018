@@ -11,7 +11,7 @@ import org.usfirst.frc2813.units.values.Rate;
  * Move motor  in given direction at given speed until 
  * interrupted. Hold current position with PID when interrupted.
  */
-public class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
+public final class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
 	private final Direction direction;
 	private final Rate rate;
 
@@ -22,6 +22,7 @@ public class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
 		if(this.direction.isNeutral()) {
 			throw new IllegalArgumentException("Use MotorHoldPosition or MotorDisable instead of passing a neutral direction to " + getClass().getSimpleName());
 		}
+		setName(toString());
 	}
 
 	@Override
@@ -51,6 +52,6 @@ public class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", " + direction + ", " + rate + ")";
+        return getClass().getSimpleName() + "(" + motor + ", direction=" + direction + ", rate=" + rate + ")";
     }
 }

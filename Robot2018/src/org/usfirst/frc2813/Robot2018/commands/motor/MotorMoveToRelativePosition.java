@@ -10,7 +10,7 @@ import org.usfirst.frc2813.units.values.Length;
  * Move motor to a relative position. Motor controller does this without
  * further intervention.
  */
-public class MotorMoveToRelativePosition extends AbstractMotorInstantCommand {
+public final class MotorMoveToRelativePosition extends AbstractMotorInstantCommand {
 	private final Direction direction;
 	private final Length relativeDistance;
 
@@ -18,6 +18,7 @@ public class MotorMoveToRelativePosition extends AbstractMotorInstantCommand {
 		super(motor, true);
 		this.direction = direction;
 		this.relativeDistance = relativeDistance;
+		setName(toString());
 	}
 
 	@Override
@@ -28,6 +29,6 @@ public class MotorMoveToRelativePosition extends AbstractMotorInstantCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", " + direction + "," + relativeDistance + ")";
+        return getClass().getSimpleName() + "(" + motor + ", direction=" + direction + ", relativeDistance=" + relativeDistance + ")";
     }
 }

@@ -11,4 +11,19 @@ public abstract class GearheadsCommand extends Command {
 	static {
 		Logger.addMe();
 	}
+
+	// @Override
+	protected void execute() {
+		Logger.debug(this + "in execute");
+	}
+	
+	// @Override
+	protected void initialize() {
+		Logger.debug(this + "in initialize");
+	}
+	
+	// @Override
+	protected void interrupted() {
+		Logger.debug(this + "interrupted");
+	}
 }

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Reset the Gyro counter.
  */
-public class DriveTrainResetGyro extends AbstractDriveTrainInstantCommand {
+public final class DriveTrainResetGyro extends AbstractDriveTrainInstantCommand {
 
 	/*
 	 * Reset the Gyro
@@ -17,6 +17,7 @@ public class DriveTrainResetGyro extends AbstractDriveTrainInstantCommand {
 	 */
     public DriveTrainResetGyro(DriveTrain driveTrain) {
     	super(driveTrain, true /* require subsystem */);
+    	setName(toString());
     }
 
     /**
@@ -26,5 +27,8 @@ public class DriveTrainResetGyro extends AbstractDriveTrainInstantCommand {
     	super.initialize();
     	driveTrain.getGyro().reset();
     }
-
+    
+    public String toString() {
+    	return getClass().getSimpleName() + "(" + driveTrain + ")"; 
+    }
 }

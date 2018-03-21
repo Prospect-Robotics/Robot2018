@@ -17,26 +17,10 @@ public abstract class AbstractDriveTrainCommand extends GearheadsCommand {
 		if(requiresSubsystem) {
 			requires(subsystem);
 		}
-		Logger.debug(this + " constructed");
-	}
-
-	// @Override
-	protected void execute() {
-		Logger.debug(this + " in execute");
+		Logger.debug(this + " constructor.");
 	}
 	
-	// @Override
-	protected void initialize() {
-		Logger.debug(this + " in initialize");
+	public String toString() {
+		return getClass().getSimpleName() + "(" + driveTrain + ", ...)";
 	}
-	
-	// @Override
-	protected void interrupted() {
-		Logger.debug(this + " interrupted");
-	}
-	
-    // @Override
-    public String toString() {
-    	return getClass().getSimpleName() + "(" + driveTrain + ", ...)";
-    }
 }

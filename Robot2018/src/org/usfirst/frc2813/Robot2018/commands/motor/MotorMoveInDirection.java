@@ -10,7 +10,7 @@ import org.usfirst.frc2813.units.Direction;
  * Move motor in given direction until interrupted.
  * Hold current position with PID when interrupted. 
  */
-public class MotorMoveInDirection extends AbstractMotorCommand {
+public final class MotorMoveInDirection extends AbstractMotorCommand {
 	private final Direction direction;
 
 	public MotorMoveInDirection(Motor motor, Direction direction) {
@@ -19,6 +19,7 @@ public class MotorMoveInDirection extends AbstractMotorCommand {
 		if(this.direction.isNeutral()) {
 			throw new IllegalArgumentException("Use MotorHoldPosition or MotorDisable instead of passing a neutral direction to " + getClass().getSimpleName());
 		}
+		setName(toString());
 	}
 
 	@Override
@@ -47,6 +48,6 @@ public class MotorMoveInDirection extends AbstractMotorCommand {
 	}
 
     public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", " + direction + ")";
+        return getClass().getSimpleName() + "(" + motor + ", direction=" + direction + ")";
     }
 }

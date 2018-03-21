@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Drives the robot in arcade drive with Robot.oi.joystick1.
  */
-public class DriveTrainOIDrive extends AbstractDriveTrainCommand {
+public final class DriveTrainOIDrive extends AbstractDriveTrainCommand {
 	
 	private final Joystick joystick1; 
 	private final Joystick joystick2;
@@ -20,6 +20,7 @@ public class DriveTrainOIDrive extends AbstractDriveTrainCommand {
 		super(driveTrain, true /* require the subsystem */);
 		this.joystick1 = joystick1;
 		this.joystick2 = joystick2;
+		setName(toString());
 	}
 
 	/**
@@ -37,4 +38,8 @@ public class DriveTrainOIDrive extends AbstractDriveTrainCommand {
 	protected boolean isFinished() {
 		return false;
 	}
+    
+    public String toString() {
+    	return getClass().getSimpleName() + "(" + driveTrain + ", joystick1=" + joystick1 + ", joystick2=" + joystick2 + ")"; 
+    }
 }

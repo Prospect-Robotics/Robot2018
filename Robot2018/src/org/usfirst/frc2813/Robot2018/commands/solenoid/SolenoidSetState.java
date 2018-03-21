@@ -33,6 +33,6 @@ public class SolenoidSetState extends InstantCommand {
 	}
 
     public String toString() {
-        return "SolenoidSetState(" + solenoid + ", " + state + ")";
+        return "SolenoidSetState(" + solenoid + ", state=" + state + ")";
     }
 }

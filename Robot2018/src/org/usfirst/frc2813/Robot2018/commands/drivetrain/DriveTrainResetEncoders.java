@@ -22,8 +22,12 @@ public class DriveTrainResetEncoders extends AbstractDriveTrainInstantCommand {
     // Called once when the command executes
     protected void initialize() {
     	super.initialize();
-    	driveTrain.encoderStarboard.reset();
-    	driveTrain.encoderPort.reset();
+    	driveTrain.getEncoderStarboard().reset();
+    	driveTrain.getEncoderPort().reset();
+    }
+    
+    public String toString() {
+    	return getClass().getSimpleName() + "(" + driveTrain + ")"; 
     }
 
 }

@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  * Autonomous turn command. Use gyro and linear interpolation
  * to
  */
-public class DriveTrainQuickTurn extends AbstractDriveTrainCommand {
+public final class DriveTrainQuickTurn extends AbstractDriveTrainCommand {
 	private final Direction direction;
 	private final double relativeAngleInDegrees;
 	private final double rate;
@@ -43,6 +43,7 @@ public class DriveTrainQuickTurn extends AbstractDriveTrainCommand {
 		if(rate > 1.0) {
 			throw new IllegalArgumentException("Do not specify rate greater than 100%.");
 		}
+		setName(toString());
 	}
 
 	// Called just before this Command runs the first time
@@ -98,4 +99,8 @@ public class DriveTrainQuickTurn extends AbstractDriveTrainCommand {
 	protected boolean isFinished() {
 		return getErrorMagnitudeInDegrees() <= MIN_DEG;
 	}
+    
+    public String toString() {
+    	return getClass().getSimpleName() + "(" + driveTrain + ", direction=" + direction + ", relativeAngleInDegrees=" + relativeAngleInDegrees + ", rate=" + rate + ")"; 
+    }
 }
