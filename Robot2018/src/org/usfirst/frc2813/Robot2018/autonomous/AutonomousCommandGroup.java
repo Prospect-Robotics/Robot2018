@@ -210,6 +210,29 @@ public class AutonomousCommandGroup extends CommandGroup {
 		addDriveCommandSync(Direction.BACKWARD, distance, endSpeed);
 	}
 	/**
+	 * Add a command for driving on a circular path for a set distance, with a desired speed at the end of the movement.
+	 */
+	private void addCurveCommandSync(Direction direction, Length distance, double radius, boolean clockwise, double endSpeed) {
+		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed, radius, clockwise));
+		currentSpeed = endSpeed;
+	}
+	/**
+	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
+	 * end of the movement.
+	 * @see addCurveCommandSync
+	 */
+	public void addCurveForwardSync(Length distance, double radius, boolean clockwise, double endSpeed) {
+		addCurveCommandSync(Direction.FORWARD, distance, radius, clockwise, endSpeed);
+	}
+	/**
+	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
+	 * end of the movement.
+	 * @see addCurveCommandSync
+	 */
+	public void addCurveBackwardSync(Length distance, double radius, boolean clockwise, double endSpeed) {
+		addCurveCommandSync(Direction.BACKWARD, distance, radius, clockwise, endSpeed);
+	}
+	/**
 	 * Create a command to spin in place, until we reach a specific *relative* angle.  Will turn in either direction
 	 * until that relative angle is hit, accounting for any overshoot by reversing direction for smaller and smaller
 	 * moves until the target is it.  Right now QuickTurnCommand doesn't have PID, but continues until it gets close
@@ -217,49 +240,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	public void addQuickTurnSync(Direction direction, double relativeAgle) {
 		addSequential(new DriveTrainQuickTurnSync(Robot.driveTrain, direction, relativeAgle, turnSpeed));
-	}
-	/**
-	 * Create a new command to turn in an arc
-	 */
-	private void curve(Direction direction, double angle, double radius, boolean clockwise) {
-		double speed = curveSpeed;
-		if (direction == Direction.BACKWARD) {
-			speed = -speed;
-			angle = -angle;
-		}
-		if (!clockwise) {
-			radius = -radius;
-			angle = -angle;
-		}
-		addSequential(new DriveTrainAutoCurveSync(Robot.driveTrain, speed, angle, radius));		
-	}
-	/**
-	 * Create a new command to drive forwards and turn clockwise.  How far?  How fast? How long?
-	 * TODO: This needs work.
-	 */
-	public void addCurveClockForwardSync(double angle, double radius) {
-		curve(Direction.FORWARD, angle, radius, true);
-	}
-	/**
-	 * Create a new command to drive forwards and turn counter-clockwise.  How far?  How fast? How long?
-	 * TODO: This needs work.
-	 */
-	public void addCurveCounterForwardSync(double angle, double radius) {
-		curve(Direction.FORWARD, angle, radius, false);
-	}
-	/**
-	 * Create a new command to drive backwards and turn clockwise.  How far?  How fast? How long?
-	 * TODO: This needs work.
-	 */
-	public void addCurveClockBackwardSync(double angle, double radius) {
-		curve(Direction.BACKWARD, angle, radius, true);
-	}
-	/**
-	 * Create a new command to drive backwards and turn counter-clockwise.  How far?  How fast? How long?
-	 * TODO: This needs work.
-	 */
-	public void addCurveCounterBackwardSync(double angle, double radius) {
-		curve(Direction.BACKWARD, angle, radius, false);
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
