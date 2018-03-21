@@ -59,6 +59,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 * Configuration
 	 * ---------------------------------------------------------------------------------------------- */
 	
+	private final IMotorConfiguration configuration;
 	private final IMotorController hardwareController;
 	private final ISimulatedMotorController simulatedController;
 	private IMotorState currentState;
@@ -69,6 +70,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX victorSPX) {
+		this.configuration = configuration;
 		this.hardwareController  = new MotorControllerUnitConversionAdapter(configuration, new VictorSPX(configuration, victorSPX));
 		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = this.previousState = MotorStateFactory.createDisabled(this);
@@ -78,6 +80,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	}
 
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX talonSRX) {
+		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new TalonSRX(configuration, talonSRX));
 		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
@@ -86,6 +89,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	}
 
 	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController) {
+		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWM(configuration, speedController));
 		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
@@ -94,11 +98,22 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	}
 
 	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController, Encoder sensor) {
+		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWMWithEncoder(configuration, speedController, sensor));
 		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
+	}
+
+	public Motor(IMotorConfiguration configuration, Simulated simulatedMotorController) {
+		this.configuration = configuration;
+		this.hardwareController = null;
+		this.simulatedController = simulatedMotorController;
+		this.currentState = MotorStateFactory.createDisabled(this);
+		this.previousState = MotorStateFactory.createDisabled(this);
+		configure();
+		enableEmulator();
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -111,8 +126,10 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public void enableEmulator() {
 		if(!isEmulated()) {
 			super.enableEmulator();
-			Logger.info(this + " is enabling simulation.  Disabling real motor.");
-			hardwareController.disable();
+			if(hardwareController != null) {
+				Logger.info(this + " is enabling simulation.  Disabling real motor.");
+				hardwareController.disable();
+			}
 			Logger.info(this + " is enabling simulation.  Configuring simulated motor.");
 			simulatedController.configure();
 		}
@@ -123,11 +140,15 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 */
 	public void disableEmulator() {
 		if(isEmulated()) {
-			super.disableEmulator();
 			Logger.info(this + " is disabling simulation.  Disabling simulated motor.");
 			simulatedController.disable();
-			Logger.info(this + " is disabling simulation.  Reconfiguring real motor.");
-			hardwareController.configure();
+			if(hardwareController == null) {
+				Logger.error(this + " was configured with only simulated motor, so you cannot configure real hardware.  Subsystem disabled.");
+			} else {
+				Logger.info(this + " is disabling simulation.  Reconfiguring real motor.");
+				hardwareController.configure();
+			}
+			super.disableEmulator();
 		}
 	}
 
@@ -137,7 +158,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	@Override
 	public IMotorConfiguration getConfiguration() {
-		return hardwareController.getConfiguration();
+		return configuration;
 	}
 
 	@Override
@@ -151,7 +172,16 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	}
 	
 	private IMotorController getMotorController() {
-		return isEmulated() ? simulatedController : hardwareController;
+		if(isEmulated()) {
+			return simulatedController;
+		} else {
+			 if(hardwareController != null) {
+				 return hardwareController;
+			 } else {
+				 Logger.error(this + " was asked for the motor controller with simulation disabled, but there's no 'real' hardware.  Returning the simulated motor controller.  This is probably bad.");
+				 return simulatedController;
+			 }
+		}
 	}
 	
 	/**
@@ -297,8 +327,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			return;
 		}
 		setName(getConfiguration().getName());
-		hardwareController.configure();
-		simulatedController.configure();
+		getMotorController().configure();
 	}
 
 	// Guards for state transitions, called by changeState
