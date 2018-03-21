@@ -3,10 +3,10 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.ToggleIntake;
 import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoCurveDrive;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.QuickTurn;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetDriveTrainEncoders;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.ResetDriveTrainGyro;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoCurve;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncoders;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitch;
@@ -171,8 +171,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Add commands to reset the drive train encoders and gyros (typically called at the start of a match)
 	 */
 	public void addDriveTrainSensorResetSequenceSync() {
-		addSequential(new ResetDriveTrainEncoders());
-		addSequential(new ResetDriveTrainGyro());
+		addSequential(new DriveTrainResetEncoders());
+		addSequential(new DriveTrainResetGyro());
 	}
 	/**
 	 * Add a command for driving forward for a set distance, with a desired speed at the end of the movement.
@@ -203,7 +203,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * enough.
 	 */
 	public void addQuickTurnSync(Direction direction, double relativeAgle) {
-		addSequential(new QuickTurn(direction, relativeAgle, turnSpeed));
+		addSequential(new DriveTrainQuickTurn(direction, relativeAgle, turnSpeed));
 	}
 	/**
 	 * Create a new command to turn in an arc
@@ -218,7 +218,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 			radius = -radius;
 			angle = -angle;
 		}
-		addSequential(new AutoCurveDrive(speed, angle, radius));		
+		addSequential(new DriveTrainAutoCurve(speed, angle, radius));		
 	}
 	/**
 	 * Create a new command to drive forwards and turn clockwise.  How far?  How fast? How long?

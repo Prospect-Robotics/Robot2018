@@ -7,9 +7,9 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class ResetDriveTrainGyro extends InstantCommand {
+public class DriveTrainResetGyro extends InstantCommand {
 
-    public ResetDriveTrainGyro() {
+    public DriveTrainResetGyro() {
         super();
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);

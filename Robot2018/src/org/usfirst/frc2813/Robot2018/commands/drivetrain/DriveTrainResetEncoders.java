@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 /**
  *
  */
-public class ResetDriveTrainEncoders extends InstantCommand {
+public class DriveTrainResetEncoders extends InstantCommand {
 	/**
 	 * Reset the DriveTrain encoders
 	 */
-    public ResetDriveTrainEncoders() {
+    public DriveTrainResetEncoders() {
         super();
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
