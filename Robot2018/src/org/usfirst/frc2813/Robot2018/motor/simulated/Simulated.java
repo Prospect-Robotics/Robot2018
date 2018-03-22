@@ -23,7 +23,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
  * if you need a translation layer.  
  */
 public final class Simulated extends AbstractMotorController implements ISimulatedMotorController {
-	
+
 	/* ----------------------------------------------------------------------------------------------
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
@@ -231,5 +231,9 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	protected boolean setPIDProfileSlot(PIDProfileSlot profileSlot) {
 		this.lastSlot = profileSlot;
 		return true;
+	}
+	@Override
+	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
+		return isSoftLimitReached(switchDirection);
 	}
 }

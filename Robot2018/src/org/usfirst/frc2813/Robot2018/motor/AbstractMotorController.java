@@ -642,11 +642,12 @@ public abstract class AbstractMotorController implements IMotorController {
 	protected boolean isPhysicalLimitReached(Direction direction) {
 		return isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition());
 	}
-
 	/**
-	 * Get the soft limit switch status.  Returns false if we don't have one. 
+	 * Get the soft limit switch status.  Returns false if we don't have one.
+	 * NOTE: Most motor controllers don't have an accessor to tell you if they stopped
+	 * because of a limit switch, this is strictly based on position calculations. 
 	 */
-	protected boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
+	public boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
 		if(getHasSoftLimit(direction)) {
 			return isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
 		}

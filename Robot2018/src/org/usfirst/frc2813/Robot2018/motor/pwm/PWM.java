@@ -126,4 +126,8 @@ public class PWM extends AbstractMotorController implements IMotor {
 		// not used
 		return true;
 	}
+	@Override
+	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
+		return false; // Not supported yet
+	}
 }

@@ -517,4 +517,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public boolean isDisconnected() {
 		return configuration.hasAll(IMotorConfiguration.Disconnected);
 	}
+
+	@Override
+	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
+		return getMotorController().getCurrentSoftLimitSwitchStatus(switchDirection);
+	}
 }

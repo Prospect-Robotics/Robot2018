@@ -63,6 +63,10 @@ public interface IMotor {
 	 * Read the current state of the hard limit switch.
 	 */
 	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection);
+	/**
+	 * Read the current state of the soft limit switch.
+	 */
+	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection);
 
 	// Debugging
 	

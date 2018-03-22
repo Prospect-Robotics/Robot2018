@@ -290,4 +290,9 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	public boolean isDisconnected() {
 		return controller.isDisconnected();
 	}
+
+	@Override
+	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
+		return controller.getCurrentSoftLimitSwitchStatus(switchDirection);
+	}
 }

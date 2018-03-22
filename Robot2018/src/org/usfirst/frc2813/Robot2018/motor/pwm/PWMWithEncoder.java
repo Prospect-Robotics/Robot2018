@@ -153,4 +153,8 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 		this.lastPIDProfileSlot = profileSlot;
 		return true;
 	}
+	@Override
+	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
+		return false; // Not supported yet
+	}
 }
