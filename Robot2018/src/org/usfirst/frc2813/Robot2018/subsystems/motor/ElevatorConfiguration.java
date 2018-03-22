@@ -164,9 +164,9 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			ElevatorSRXMotorPulseRate,          // nativeMotorRateUOM
 			ElevatorSRXMotorPulseRate,          // nativeSensorRateUOM
 			RateUOM.InchesPerSecond.create(0),  // minimumForwardRate
-			RateUOM.InchesPerSecond.create(12), // maximumForwardRate (placeholder)
+			RateUOM.InchesPerSecond.create(36), // maximumForwardRate (placeholder)
 			RateUOM.InchesPerSecond.create(0),  // minimumReverseRate
-			RateUOM.InchesPerSecond.create(12), // maximumReverseRate (placeholder)
+			RateUOM.InchesPerSecond.create(36), // maximumReverseRate (placeholder)
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
 			MAXIMUM_POSITION_INCHES,                          // forwardLimit (placeholder)
 			MINIMUM_POSITION_INCHES,                          // reverseLimit
