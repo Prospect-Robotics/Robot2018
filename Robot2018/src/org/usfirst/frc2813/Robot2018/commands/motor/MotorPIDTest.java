@@ -17,7 +17,8 @@ public final class MotorPIDTest extends AbstractMotorCommand {
 	private final Length maxHeight;
 	private final Length MARGIN_OF_ERROR = LengthUOM.Inches.create(0.5);
 
-	private final Direction targetDirection = Direction.REVERSE;
+	private Direction targetDirection = Direction.REVERSE;
+	private Length targetPosition = LengthUOM.Inches.create(0);
 	
 	public MotorPIDTest(Motor motor, Length minHeight, Length maxHeight) {
 		super(motor, true);
@@ -34,7 +35,12 @@ public final class MotorPIDTest extends AbstractMotorCommand {
 
 	protected void execute() {
 		if(motor.getCurrentPositionErrorWithin(MARGIN_OF_ERROR)) {
-			motor.moveToAbsolutePosition(targetDirection.equals(Direction.FORWARD) ? minHeight : maxHeight);
+			targetDirection = targetDirection.getInverse();
+			Logger.info("REVERSING.  GOING " + targetDirection + " @ " + motor.getCurrentPosition() + " Error " + motor.getCurrentPositionError() + " Goal " + targetPosition);
+			Length targetPosition = targetDirection.equals(Direction.FORWARD) ? minHeight : maxHeight;
+			motor.moveToAbsolutePosition(targetPosition);
+		} else {
+			Logger.info("NOT THERE.  GOING " + targetDirection + " @ " + motor.getCurrentPosition() + " Error " + motor.getCurrentPositionError() + " Goal " + targetPosition);
 		}
 	}
 	
