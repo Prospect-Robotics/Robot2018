@@ -1,6 +1,8 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
@@ -18,9 +20,12 @@ import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -97,8 +102,41 @@ public class Robot extends TimedRobot {
 		// Add commands to Autonomous Sendable Chooser
 
 		// initialize the camera
-		camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(640, 480);
+		//camera = CameraServer.getInstance().startAutomaticCapture();
+		//camera.setResolution(640, 480);
+           new Thread(() -> {
+               UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+               camera.setResolution(640, 480);
+               
+               CvSink cvSink = CameraServer.getInstance().getVideo();
+               CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+               
+               Mat source = new Mat();
+               Mat output = new Mat();
+               
+               while(!Thread.interrupted()) {
+                   cvSink.grabFrame(source);
+                   Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+                   outputStream.putFrame(output);
+                }
+            }).start();
+		/*new Thread(() -> {
+			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+			camera.setResolution(640, 480);
+			CvSink cvSink = CameraServer.getInstance().getVideo();
+			Mat source = new Mat();
+			Mat output = new Mat();
+			while(!Thread.interrupted()) {
+				cvSink.grabFrame(source);
+				Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+				//outputStream.putFrame(output);
+			}			
+			
+			
+			
+			
+			
+		}).start();*/
 	}
 
 	/**
@@ -112,6 +150,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
+		
 		Scheduler.getInstance().run();
 	}
 
