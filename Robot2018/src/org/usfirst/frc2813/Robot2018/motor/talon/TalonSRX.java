@@ -78,7 +78,7 @@ public final class TalonSRX extends AbstractMotorController {
 	}
 	
 	@Override
-	public boolean getCurrentLimitSwitchStatus(Direction direction) {
+	public boolean getCurrentHardLimitSwitchStatus(Direction direction) {
 		if (direction.isNegative()) {
 			return mc.getSensorCollection().isRevLimitSwitchClosed();
 		} else {
@@ -137,7 +137,7 @@ public final class TalonSRX extends AbstractMotorController {
 			break;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			newControlMode = ControlMode.Velocity;
-			if(!getCurrentLimitSwitchStatus(proposedState.getTargetDirection())) {
+			if(!getCurrentHardLimitSwitchStatus(proposedState.getTargetDirection())) {
 				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			}
 		default:

@@ -34,7 +34,7 @@ public final class MotorWaitForHardLimitSwitchSync extends AbstractMotorCommand 
 	@Override
 	protected boolean isFinished() {
 		// NB: If there's no target position (absolute or relative), this will always return true.
-		return motor.getCurrentLimitSwitchStatus(switchDirection);
+		return motor.getCurrentHardLimitSwitchStatus(switchDirection);
 	}
 
     public String toString() {

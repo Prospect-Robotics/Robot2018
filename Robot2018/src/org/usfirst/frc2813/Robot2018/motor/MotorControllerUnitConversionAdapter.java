@@ -96,9 +96,9 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	}
 
 	@Override
-	public boolean getCurrentLimitSwitchStatus(Direction switchDirection) {
+	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
 		// [RELATIVE] Must adjust direction
-		return controller.getCurrentLimitSwitchStatus(adjustPhase(switchDirection));
+		return controller.getCurrentHardLimitSwitchStatus(adjustPhase(switchDirection));
 	}
 
 	@Override

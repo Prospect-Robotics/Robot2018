@@ -29,8 +29,6 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	private PIDProfileSlot   lastSlot                 = PIDProfileSlot.HoldingPosition;
-	protected ControlMode    lastControlMode          = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
-	private double           lastControlModeValue     = 0;
 	private int encoderValue = 0;
 	private long lastCommandTimestamp = System.currentTimeMillis();
 
@@ -58,7 +56,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	}
 
 	@Override
-	public boolean getCurrentLimitSwitchStatus(Direction direction) {
+	public boolean getCurrentHardLimitSwitchStatus(Direction direction) {
 		return isHardLimitReached(direction);
 	}
 
@@ -189,41 +187,6 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	}
 
 	protected boolean executeTransition(IMotorState proposedState) {
-		// New PID/Slot are almost always maintain
-		ControlMode      newControlMode      = ControlMode.Disabled;
-		double           newControlModeValue = 0;
-
-		// Figure out the new control mode and argument
-		switch(proposedState.getOperation()) {
-		case DISABLED:
-			newControlMode = ControlMode.Disabled;
-			newControlModeValue = 0;
-			break;
-		case HOLDING_CURRENT_POSITION:
-			newControlMode = ControlMode.Position;
-			newControlModeValue = getCurrentPosition().getValue();
-			break;
-		case MOVING_TO_ABSOLUTE_POSITION:
-			newControlMode = ControlMode.Position;
-			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
-			break;
-		case MOVING_TO_RELATIVE_POSITION:
-			newControlMode = ControlMode.Position;
-			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
-			break;
-		case MOVING_IN_DIRECTION_AT_RATE:
-			newControlMode = ControlMode.Velocity;
-			newControlModeValue = toMotorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
-			break;
-		case CALIBRATING_SENSOR_IN_DIRECTION:
-			newControlMode = ControlMode.Velocity;
-			newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
-		default:
-			break;
-		}
-
-		this.lastControlMode = newControlMode;
-		this.lastControlModeValue = newControlModeValue;
 		this.lastSlot = getAppropriatePIDProfileSlot(proposedState);
 		this.lastCommandTimestamp = System.currentTimeMillis();
 		return true;
@@ -245,6 +208,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		changeState(MotorStateFactory.createDisabled(this));
 	}
 
+	@Override
 	public String toString() {
 		return configuration.getName() + "." + this.getClass().getSimpleName();  
 	}

@@ -172,7 +172,7 @@ public abstract class AbstractMotorController implements IMotorController {
 			break;
 		case MOVING_IN_DIRECTION_AT_RATE:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetDirection();
-			if(getCurrentLimitSwitchStatus(directionOfTravel)) {
+			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
 				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of auto-calibrating sensor operation.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
@@ -183,7 +183,7 @@ public abstract class AbstractMotorController implements IMotorController {
 			break;
 		case MOVING_TO_ABSOLUTE_POSITION:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetAbsolutePosition().getValue() > getCurrentPosition().getValue() ? Direction.FORWARD : Direction.REVERSE; 
-			if(getCurrentLimitSwitchStatus(directionOfTravel)) {
+			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
 				Logger.error("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the absolute position is beyond the hardware limit.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
@@ -203,7 +203,7 @@ public abstract class AbstractMotorController implements IMotorController {
 				Logger.error("Relative and absolute commands calculated did not match!");
 			}
 // DEBUGGING
-			if(getCurrentLimitSwitchStatus(directionOfTravel)) {
+			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
 				Logger.error("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the relative position was beyond the hardware limit.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
@@ -329,8 +329,8 @@ public abstract class AbstractMotorController implements IMotorController {
 				? " <<<< DISCONNECTED BY CONFIGURATION >>>>" 
 				: (
 					" @ " + getCurrentPosition() 
-					+ (configuration.hasAll(IMotorConfiguration.LocalReverseHardLimitSwitch) ? " [RLimit=" + getCurrentLimitSwitchStatus(Direction.REVERSE) + "]" : "")
-					+ (configuration.hasAll(IMotorConfiguration.LocalForwardHardLimitSwitch) ? " [FLimit=" + getCurrentLimitSwitchStatus(Direction.FORWARD) + "]" : "")
+					+ (configuration.hasAll(IMotorConfiguration.LocalReverseHardLimitSwitch) ? " [RLimit=" + getCurrentHardLimitSwitchStatus(Direction.REVERSE) + "]" : "")
+					+ (configuration.hasAll(IMotorConfiguration.LocalForwardHardLimitSwitch) ? " [FLimit=" + getCurrentHardLimitSwitchStatus(Direction.FORWARD) + "]" : "")
 				)
 		);
 	}
@@ -403,7 +403,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		boolean resetEncoders = false;
 		// Do we need to handle forward limit
 		if (configuration.hasAny(MotorConfiguration.LocalForwardHardLimitSwitch|MotorConfiguration.RemoteForwardHardLimitSwitch) 
-				&& configuration.getForwardHardLimitSwitchResetsEncoder() && getCurrentLimitSwitchStatus(Direction.FORWARD)) 
+				&& configuration.getForwardHardLimitSwitchResetsEncoder() && getCurrentHardLimitSwitchStatus(Direction.FORWARD)) 
 		{
 			if(Math.abs(getCurrentPosition().getValue() - configuration.getForwardLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
 				/*
@@ -422,7 +422,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		}
 		// Do we need to handle reverse limit
 		if (configuration.hasAny(MotorConfiguration.LocalReverseHardLimitSwitch|MotorConfiguration.RemoteReverseHardLimitSwitch) 
-				&& configuration.getReverseHardLimitSwitchResetsEncoder() && getCurrentLimitSwitchStatus(Direction.REVERSE)) 
+				&& configuration.getReverseHardLimitSwitchResetsEncoder() && getCurrentHardLimitSwitchStatus(Direction.REVERSE)) 
 		{
 			if(Math.abs(getCurrentPosition().getValue() - configuration.getReverseLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
 				/*

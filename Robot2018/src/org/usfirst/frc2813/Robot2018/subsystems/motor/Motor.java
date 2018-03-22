@@ -215,8 +215,8 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		return getMotorController().getPreviousTargetState();
 	}
 	// What is the state of the limit switch (if applicable)
-	public boolean getCurrentLimitSwitchStatus(Direction switchDirection) {
-		return getMotorController().getCurrentLimitSwitchStatus(switchDirection);
+	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
+		return getMotorController().getCurrentHardLimitSwitchStatus(switchDirection);
 	}
 	// Returns the speed if we are moving, otherwise null
 	public final Rate getTargetSpeed() {

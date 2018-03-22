@@ -56,7 +56,7 @@ public class PWM extends AbstractMotorController implements IMotor {
 	}
 
 	@Override
-	public boolean getCurrentLimitSwitchStatus(Direction switchDirection) {
+	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
 		throw new UnsupportedOperationException(this + " does not support limit switches.");
 	}
 

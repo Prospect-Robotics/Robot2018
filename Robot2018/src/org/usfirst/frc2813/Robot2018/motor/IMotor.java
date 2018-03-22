@@ -60,9 +60,9 @@ public interface IMotor {
 	 */
 	public IMotorState getPreviousTargetState();
 	/**
-	 * Read the current state of the limit switch.
+	 * Read the current state of the hard limit switch.
 	 */
-	public boolean getCurrentLimitSwitchStatus(Direction switchDirection);
+	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection);
 
 	// Debugging
 	
