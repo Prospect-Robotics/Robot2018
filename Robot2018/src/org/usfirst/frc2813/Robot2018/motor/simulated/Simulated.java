@@ -28,10 +28,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	// Last arg sent for controlMode
-	private PIDProfileSlot lastSlot                 = PIDProfileSlot.HoldingPosition;
-	private PID         lastPID                  = PID.Primary;
-	// last control mode parameter
+	private PIDProfileSlot   lastSlot                 = PIDProfileSlot.HoldingPosition;
 	protected ControlMode    lastControlMode          = ControlMode.Position; // Remember last assigned control mode, help us implement state transitions
 	private double           lastControlModeValue     = 0;
 	private int encoderValue = 0;
@@ -40,15 +37,6 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	/* ----------------------------------------------------------------------------------------------
 	 * Constants
 	 * ---------------------------------------------------------------------------------------------- */
-	
-	// We will use separate profiles for holding and moving
-	public static final PIDProfileSlot PROFILE_SLOT_FOR_HOLD_POSITION = PIDProfileSlot.HoldingPosition;
-	// We will use separate profiles for holding and moving
-	public static final PIDProfileSlot PROFILE_SLOT_FOR_MOVE          = PIDProfileSlot.Moving;
-	// We will use the primary PID loop, not the aux
-	public static final PID PID_INDEX_FOR_HOLD_POSITION            = PID.Primary;
-	// We will use the primary PID loop, not the aux
-	public static final PID PID_INDEX_FOR_MOVE                     = PID.Primary;
 	
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
@@ -68,78 +56,10 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		this.encoderValue = toSensorUnits(sensorPosition).getValueAsInt();
 		return true;
 	}
-	
-	private Length getPhysicalLimit(Direction direction) {
-		return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit();
-	}
-	
-	private boolean getHasHardLimit(Direction direction) {
-		if(direction.isPositive()) {
-			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition) 
-					&& configuration.hasAny(IMotorConfiguration.LocalForwardHardLimitSwitch|IMotorConfiguration.RemoteForwardHardLimitSwitch)
-					&& configuration.getForwardHardLimitSwitchNormal() != LimitSwitchNormal.Disabled;
-					
-		} else {
-			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition) 
-					&& configuration.hasAny(IMotorConfiguration.LocalReverseHardLimitSwitch|IMotorConfiguration.RemoteReverseHardLimitSwitch)
-					&& configuration.getReverseHardLimitSwitchNormal() != LimitSwitchNormal.Disabled;
-		}
-	}
-	
-	private boolean getHasSoftLimit(Direction direction) {
-		if(direction.isPositive()) {
-			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch); 
-		} else {
-			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch);
-		}
-	}
-
-	private Length getHardSwitchLimit(Direction direction) {
-		if(getHasHardLimit(direction)) {
-			return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit(); 
-		}
-		return null;
-	}
-
-	private static boolean isLimitExceeded(Direction direction, Length limit, Length position) {
-		if(direction.isPositive()) {
-			return position.getCanonicalValue() > limit.getCanonicalValue(); 
-		} else {
-			return position.getCanonicalValue() < limit.getCanonicalValue();
-		}
-	}
-
-	private static boolean isLimitReached(Direction direction, Length limit, Length position) {
-		if(direction.isPositive()) {
-			return position.getCanonicalValue() >= limit.getCanonicalValue(); 
-		} else {
-			return position.getCanonicalValue() <= limit.getCanonicalValue();
-		}
-	}
 
 	@Override
 	public boolean getCurrentLimitSwitchStatus(Direction direction) {
-		if(getHasHardLimit(direction)) {
-			boolean reached = isLimitReached(direction, getHardSwitchLimit(direction), getCurrentPosition());
-//			Logger.info(this + " We think we have " + (reached ? "" : "not ") + "reached a " + direction + " limit switch @ " + getHardSwitchLimit(direction) + " and we are @ " + getCurrentPosition() + ".");
-			return reached;
-		}
-//		Logger.info(this + " We don't think we have a " + direction + " limit switch.");
-		return false;
-	}
-
-	private Length getSoftLimit(Direction direction) {
-		if(getHasSoftLimit(direction)) {
-			return direction.isPositive() ? configuration.getForwardSoftLimit() : configuration.getReverseSoftLimit();
-		}
-		return null;
-	}
-
-	private boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
-		if(getHasSoftLimit(direction)) {
-			return isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
-		}
-		return false;
+		return isHardLimitReached(direction);
 	}
 
 	private void updateEncoderPosition() {
@@ -204,7 +124,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		}
 		// Next, see if a hard limit would have stopped us.
 		if(getHasHardLimit(targetDirection)) {
-			Length hardLimit = getHardSwitchLimit(targetDirection);
+			Length hardLimit = getHardLimit(targetDirection);
 			if(isLimitExceeded(targetDirection, hardLimit, projectedAbsolutePosition)) { 
 				projectedAbsolutePosition = hardLimit;
 				resetEncoderFromHardLimit = targetDirection.isPositive() 
@@ -270,8 +190,6 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 
 	protected boolean executeTransition(IMotorState proposedState) {
 		// New PID/Slot are almost always maintain
-		PIDProfileSlot   newSlotIndex        = lastSlot;
-		PID         	 newPIDIndex         = lastPID;
 		ControlMode      newControlMode      = ControlMode.Disabled;
 		double           newControlModeValue = 0;
 
@@ -279,38 +197,26 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		switch(proposedState.getOperation()) {
 		case DISABLED:
 			newControlMode = ControlMode.Disabled;
-			newSlotIndex   = PROFILE_SLOT_FOR_HOLD_POSITION;
-			newPIDIndex    = PID_INDEX_FOR_HOLD_POSITION;
 			newControlModeValue = 0;
 			break;
 		case HOLDING_CURRENT_POSITION:
 			newControlMode = ControlMode.Position;
-			newSlotIndex   = PROFILE_SLOT_FOR_HOLD_POSITION;
-			newPIDIndex    = PID_INDEX_FOR_HOLD_POSITION;
 			newControlModeValue = getCurrentPosition().getValue();
 			break;
 		case MOVING_TO_ABSOLUTE_POSITION:
 			newControlMode = ControlMode.Position;
-			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
-			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
 			break;
 		case MOVING_TO_RELATIVE_POSITION:
 			newControlMode = ControlMode.Position;
-			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
-			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
 			break;
 		case MOVING_IN_DIRECTION_AT_RATE:
 			newControlMode = ControlMode.Velocity;
-			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
-			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toMotorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			break;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			newControlMode = ControlMode.Velocity;
-			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
-			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 		default:
 			break;
@@ -318,8 +224,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 
 		this.lastControlMode = newControlMode;
 		this.lastControlModeValue = newControlModeValue;
-		this.lastSlot = newSlotIndex;
-		this.lastPID = newPIDIndex;
+		this.lastSlot = getAppropriatePIDProfileSlot(proposedState);
 		this.lastCommandTimestamp = System.currentTimeMillis();
 		return true;
 	}
@@ -343,24 +248,24 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	public String toString() {
 		return configuration.getName() + "." + this.getClass().getSimpleName();  
 	}
-
-	protected boolean isUsingPIDSlotIndexForHolding() {
-		return lastSlot != null && lastSlot.equals(PROFILE_SLOT_FOR_HOLD_POSITION);
-	}
-	
-	protected boolean updatePIDSlotIndex(boolean holding) {
-		if(null == lastPID || null == lastSlot) {
-			return false;
-		}
-		this.lastSlot = holding ? PROFILE_SLOT_FOR_HOLD_POSITION : PROFILE_SLOT_FOR_MOVE;
-		return true;
-	}
-	
+		
 	/**
 	 * At periodic intervals, we'll update our projected position.  Why not wait and do it lazily?  Cause we'll go boom when we hit a physical limit, and we'll reset counter if necessary!
 	 */
+	@Override
 	public void periodic() {
 		super.periodic();
 		updateEncoderPosition();
+	}
+
+	@Override
+	protected PIDProfileSlot getPIDProfileSlot() {
+		return lastSlot;
+	}
+
+	@Override
+	protected boolean setPIDProfileSlot(PIDProfileSlot profileSlot) {
+		this.lastSlot = profileSlot;
+		return true;
 	}
 }

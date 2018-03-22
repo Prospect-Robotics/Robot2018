@@ -4,6 +4,7 @@ import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
@@ -48,11 +49,6 @@ public class PWM extends AbstractMotorController implements IMotor {
 		}
 		initialize();
 	}
-	// We will use separate profiles for holding and moving
-	public static final int PROFILE_SLOT_FOR_HOLD_POSITION = 0;
-	// We will use separate profiles for holding and moving
-	public static final int PROFILE_SLOT_FOR_MOVE          = 1;
-	private int lastSlot = PROFILE_SLOT_FOR_HOLD_POSITION;
 
 	@Override
 	public Length getCurrentPosition() {
@@ -89,13 +85,11 @@ public class PWM extends AbstractMotorController implements IMotor {
 	
 	protected boolean executeTransition(IMotorState proposedState) {
 		double		newSetting = 0;
-		int newSlot = PROFILE_SLOT_FOR_MOVE;
 		switch(proposedState.getOperation()) {
 		case DISABLED:
 			newSetting = 0;
 			break;
 		case HOLDING_CURRENT_POSITION:
-			newSlot = PROFILE_SLOT_FOR_HOLD_POSITION;
 			throw new UnsupportedOperationException("PWM controllers do not support holding position.  There are no sensors.");
 		case MOVING_TO_ABSOLUTE_POSITION:
 			throw new UnsupportedOperationException("PWM controllers do not support absolute positioning.  There are no sensors.");
@@ -111,9 +105,8 @@ public class PWM extends AbstractMotorController implements IMotor {
 		if(newSetting < -1 || newSetting > 1) {
 			// return false;
 			throw new IllegalArgumentException("PWM value must be between -1.0 and 1.0");
-		}		
+		}
 		speedController.set(newSetting);
-		lastSlot = newSlot;
 		return true;
 	}
 
@@ -121,12 +114,16 @@ public class PWM extends AbstractMotorController implements IMotor {
 	public Rate getCurrentRate() {
 		return configuration.getNativeSensorRateUOM().create(speedController.get());
 	}
-	protected boolean isUsingPIDSlotIndexForHolding() {
-		return lastSlot == PROFILE_SLOT_FOR_HOLD_POSITION;
+
+	@Override
+	protected PIDProfileSlot getPIDProfileSlot() {
+		// not used
+		return null;
 	}
-	
-	protected boolean updatePIDSlotIndex(boolean holding) {
-		this.lastSlot = holding ? PROFILE_SLOT_FOR_HOLD_POSITION : PROFILE_SLOT_FOR_MOVE;
+
+	@Override
+	protected boolean setPIDProfileSlot(PIDProfileSlot profileSlot) {
+		// not used
 		return true;
 	}
 }

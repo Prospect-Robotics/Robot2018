@@ -10,6 +10,9 @@ import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+
 public abstract class AbstractMotorController implements IMotorController {
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -18,6 +21,17 @@ public abstract class AbstractMotorController implements IMotorController {
 
 	// Motor configuration data
 	protected final IMotorConfiguration configuration;
+
+	/* ----------------------------------------------------------------------------------------------
+	 * Constants
+	 * ---------------------------------------------------------------------------------------------- */
+	
+	// We will use separate profiles for holding, moving to position, and moving at a rate
+	public static final PIDProfileSlot PROFILE_SLOT_FOR_HOLD_POSITION     = PIDProfileSlot.HoldingPosition;
+	// We will use separate profiles for holding, moving to position, and moving at a rate
+	public static final PIDProfileSlot PROFILE_SLOT_FOR_MOVE_TO_POSITION  = PIDProfileSlot.MovingToPosition;
+	// We will use separate profiles for holding, moving to position, and moving at a rate
+	public static final PIDProfileSlot PROFILE_SLOT_FOR_MOVE_AT_VELOCITY  = PIDProfileSlot.MovingAtVelocity;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * State
@@ -376,8 +390,8 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	protected abstract boolean resetEncoderSensorPositionImpl(Length sensorPosition);
 	protected abstract boolean executeTransition(IMotorState proposedState);
-	protected abstract boolean isUsingPIDSlotIndexForHolding();
-	protected abstract boolean updatePIDSlotIndex(boolean holding);
+	protected abstract PIDProfileSlot getPIDProfileSlot();
+	protected abstract boolean setPIDProfileSlot(PIDProfileSlot profileSlot);
 	
 	public String toString() {
 		return getName();
@@ -428,32 +442,68 @@ public abstract class AbstractMotorController implements IMotorController {
 		return resetEncoders;
 	}
 
-	public void checkOperationComplete() {
- 		switch(currentState.getOperation()) {
-		case CALIBRATING_SENSOR_IN_DIRECTION:
-			// NB: We handle transition out of this state in autoResetSensorPositionIfNecessary, which is already polled by periodic. 
-			break;
-		case DISABLED:
-			// Nothing to do here
-			break;
+	private static final Length POSITION_TOLERANCE_FOR_PID_PROFILE = LengthUOM.Inches.create(0.25);
+	/**
+	 * Determine the appropriate PID profile for the state specified, taking into account
+	 * current hardware values.
+	 */
+	protected PIDProfileSlot getAppropriatePIDProfileSlot(IMotorState state) {
+		switch(state.getOperation()) {
 		case HOLDING_CURRENT_POSITION:
-			// Nothing to do here
-			break;
-		case MOVING_IN_DIRECTION_AT_RATE:
-			// Nothing to do here
-			break;
+		case DISABLED:
+			return PROFILE_SLOT_FOR_HOLD_POSITION;
 		case MOVING_TO_ABSOLUTE_POSITION:
 		case MOVING_TO_RELATIVE_POSITION:
-			boolean shouldBeHolding = getTargetState().getCurrentPositionErrorWithin(LengthUOM.Inches.create(0.25));
-			if(isUsingPIDSlotIndexForHolding() != shouldBeHolding) {
-				Logger.info(this + " updating PID.  We are " + (shouldBeHolding ? "" : "not ") + "close to target.");
-				updatePIDSlotIndex(shouldBeHolding);
+			if(state.getCurrentPositionErrorWithin(POSITION_TOLERANCE_FOR_PID_PROFILE)) {
+				return PROFILE_SLOT_FOR_HOLD_POSITION;
+			} else {
+				return PROFILE_SLOT_FOR_MOVE_TO_POSITION;
 			}
-			break;
+		case MOVING_IN_DIRECTION_AT_RATE:
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			return PROFILE_SLOT_FOR_MOVE_AT_VELOCITY;
 		default:
-			throw new UnsupportedOperationException(this + " got an unrecognized operation: " + currentState + " in periodic.");		
+			throw new IllegalStateException("Unsupported operation: " + state.getOperation());
 		}
 	}
+
+	/**
+	 * Determine the appropriate PID profile for the current operation and motor state
+	 */
+	protected PIDProfileSlot getAppropriatePIDProfileSlotForCurrentState() {
+		return getAppropriatePIDProfileSlot(getTargetState());
+	}
+	
+	/**
+	 * Determine the appropriate PID profile for the current operation and motor state, and 
+	 * change if necessary
+	 */
+	protected void updatePIDProfileSlotForCurrentState() {
+		PIDProfileSlot correctPIDProfileSlot = getAppropriatePIDProfileSlotForCurrentState();
+		if(!getPIDProfileSlot().equals(correctPIDProfileSlot)) {
+			if(getTargetState().isMovingToPosition()) {
+				Logger.info(this + " updating PID profile to " + correctPIDProfileSlot + ".  We are " + (correctPIDProfileSlot.equals(PIDProfileSlot.HoldingPosition) ? "close to" : "far from") + " the target.");	
+			} else {
+				Logger.warning(this + " updating PID profile to " + correctPIDProfileSlot + ", but we are not in a state that requires changing PID profiles.");
+				(new Throwable()).printStackTrace();
+			}
+			setPIDProfileSlot(correctPIDProfileSlot);
+		}
+	}
+
+	/**
+	 * For any operation that can 'finish' and we change states automatically, this is the place to put the checks
+	 */
+	public void checkOperationComplete() {
+		/*
+		 * The only command that ever "completes" is calibration
+		 */
+		if(getTargetState().getOperation().equals(MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION) && isHardLimitReached(getTargetState().getTargetDirection())) {
+			Logger.info(this + " sensor calibration completed.  Switching to holding position.");
+			changeState(MotorStateFactory.createHoldingPosition(this));
+		}
+	}
+	
 	/*
 	 * We will change behavior as we reach our target...
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#periodic()
@@ -461,11 +511,145 @@ public abstract class AbstractMotorController implements IMotorController {
 	@Override
 	public void periodic() {
 		autoResetSensorPositionIfNecessary();
+		updatePIDProfileSlotForCurrentState();
 		checkOperationComplete();
 	}
-	
+
+	/**
+	 * Short cut for exposing a configuration setting for disabling hardware 	 
+	 */
 	@Override
 	public boolean isDisconnected() {
 		return getConfiguration().hasAll(IMotorConfiguration.Disconnected);
+	}
+	
+	/**
+	 * Get the physical limit of the hardware
+	 */
+	protected Length getPhysicalLimit(Direction direction) {
+		return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit();
+	}
+
+	/**
+	 * Do we have a hard limit in the indicated direction 
+	 */
+	protected boolean getHasHardLimit(Direction direction) {
+		if(direction.isPositive()) {
+			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition) 
+					&& configuration.hasAny(IMotorConfiguration.LocalForwardHardLimitSwitch|IMotorConfiguration.RemoteForwardHardLimitSwitch)
+					&& configuration.getForwardHardLimitSwitchNormal() != LimitSwitchNormal.Disabled;
+					
+		} else {
+			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition) 
+					&& configuration.hasAny(IMotorConfiguration.LocalReverseHardLimitSwitch|IMotorConfiguration.RemoteReverseHardLimitSwitch)
+					&& configuration.getReverseHardLimitSwitchNormal() != LimitSwitchNormal.Disabled;
+		}
+	}
+
+	/**
+	 * Do we have a soft limit in the indicated direction 
+	 */
+	protected boolean getHasSoftLimit(Direction direction) {
+		if(direction.isPositive()) {
+			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch); 
+		} else {
+			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch);
+		}
+	}
+
+	/**
+	 * Get the soft limit switch position for the given direction, or null if we don't have one.
+	 * @see getHasSoftLimit 
+	 */
+	protected Length getSoftLimit(Direction direction) {
+		if(getHasSoftLimit(direction)) {
+			return direction.isPositive() ? configuration.getForwardSoftLimit() : configuration.getReverseSoftLimit();
+		}
+		return null;
+	}
+
+	/**
+	 * Get the hard limit switch position for the given direction, or null if we don't have one.
+	 * @see getHasHardLimit 
+	 */
+	protected Length getHardLimit(Direction direction) {
+		if(getHasHardLimit(direction)) {
+			return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit(); 
+		}
+		return null;
+	}
+
+	/**
+	 * Shortcut to see if position exceeds limit
+	 */
+	protected static boolean isLimitExceeded(Direction direction, Length limit, Length position) {
+		if(direction.isPositive()) {
+			return position.getCanonicalValue() > limit.getCanonicalValue(); 
+		} else {
+			return position.getCanonicalValue() < limit.getCanonicalValue();
+		}
+	}
+
+	/**
+	 * Shortcut to see if position meets or exceeds limit
+	 */
+	protected static boolean isLimitReached(Direction direction, Length limit, Length position) {
+		if(direction.isPositive()) {
+			return position.getCanonicalValue() >= limit.getCanonicalValue(); 
+		} else {
+			return position.getCanonicalValue() <= limit.getCanonicalValue();
+		}
+	}
+
+	/**
+	 * Shortcut - do we have a hard limit in the indicated direction that we have exceeded?
+	 */
+	protected boolean isHardLimitExceeded(Direction direction) {
+		return getHasHardLimit(direction) && isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition());
+	}
+
+	/**
+	 * Shortcut - do we have a hard limit in the indicated direction that we have reached?
+	 */
+	protected boolean isHardLimitReached(Direction direction) {
+		return getHasHardLimit(direction) && isLimitReached(direction, getHardLimit(direction), getCurrentPosition());
+	}
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have exceeded?
+	 */
+	protected boolean isSoftLimitExceeded(Direction direction) {
+		return getHasSoftLimit(direction) && isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
+	}
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have reached?
+	 */
+	protected boolean isSoftLimitReached(Direction direction) {
+		return getHasSoftLimit(direction) && isLimitReached(direction, getSoftLimit(direction), getCurrentPosition());
+	}
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have exceeded?
+	 */
+	protected boolean isPhysicalLimitExceeded(Direction direction) {
+		return isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition());
+	}
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have reached?
+	 */
+	protected boolean isPhysicalLimitReached(Direction direction) {
+		return isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition());
+	}
+
+	/**
+	 * Get the soft limit switch status.  Returns false if we don't have one. 
+	 */
+	protected boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
+		if(getHasSoftLimit(direction)) {
+			return isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
+		}
+		return false;
 	}
 }

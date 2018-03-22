@@ -12,7 +12,8 @@ public enum PIDProfileSlot {
 	ProfileSlot2(2), 
 	ProfileSlot3(3),
 	HoldingPosition(ProfileSlot0), 
-	Moving(ProfileSlot1);
+	MovingToPosition(ProfileSlot1),
+	MovingAtVelocity(ProfileSlot2);
 
 	public final int profileSlotIndex;
 	public final PIDProfileSlot canonicalProfileSlot;
