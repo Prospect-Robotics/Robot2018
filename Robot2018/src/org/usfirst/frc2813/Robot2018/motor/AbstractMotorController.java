@@ -361,27 +361,27 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	// Convert a length to sensor units
 	protected final Length toSensorUnits(Length l) {
-		return l.convertTo(configuration.getNativeSensorLengthUOM());
+		return l == null ? null : configuration.getNativeSensorLengthUOM().create(l.convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
 	}
 	// Convert a length to motor units	
 	protected final Length toMotorUnits(Length l) {
-		return l.convertTo(configuration.getNativeMotorLengthUOM());
+		return l == null ? null : l.convertTo(configuration.getNativeMotorLengthUOM());
 	}	
 	// Convert a length to display units	
 	protected final Length toSubsystemUnits(Length l) {
-		return l.convertTo(configuration.getNativeDisplayLengthUOM());
+		return l == null ? null : l.convertTo(configuration.getNativeDisplayLengthUOM());
 	}
 	// Convert a length to sensor units
-	protected final Rate toSensorUnits(Rate l) {
-		return l.convertTo(configuration.getNativeSensorRateUOM());
+	protected final Rate toSensorUnits(Rate r) {
+		return r == null ? null : configuration.getNativeSensorRateUOM().create(r.convertTo(configuration.getNativeSensorRateUOM()).getValueAsInt());
 	}
 	// Convert a length to motor units	
-	protected final Rate toMotorUnits(Rate l) {
-		return l.convertTo(configuration.getNativeMotorRateUOM());
+	protected final Rate toMotorUnits(Rate r) {
+		return r == null ? null : r.convertTo(configuration.getNativeMotorRateUOM());
 	}
 	// Convert a length to display units	
-	protected final Rate toSubsystemUnits(Rate l) {
-		return l.convertTo(configuration.getNativeDisplayRateUOM());
+	protected final Rate toSubsystemUnits(Rate r) {
+		return r == null ? null : r.convertTo(configuration.getNativeDisplayRateUOM());
 	}
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -396,7 +396,19 @@ public abstract class AbstractMotorController implements IMotorController {
 	public String toString() {
 		return getName();
 	}
-
+	
+	public Length getForwardLimit() {
+		return toSensorUnits(configuration.getForwardLimit());
+	}
+	public Length getReverseLimit() {
+		return toSensorUnits(configuration.getReverseLimit());
+	}
+	public Length getForwardSoftLimit() {
+		return toSensorUnits(configuration.getForwardSoftLimit());
+	}
+	public Length getReverseSoftLimit() {
+		return toSensorUnits(configuration.getReverseSoftLimit());
+	}
 	protected static int SENSOR_RESET_TOLERANCE_PULSES = 50;
 	// Returns true if we zeroed and are now holding position at zero
 	protected boolean autoResetSensorPositionIfNecessary() {
@@ -405,7 +417,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		if (configuration.hasAny(MotorConfiguration.LocalForwardHardLimitSwitch|MotorConfiguration.RemoteForwardHardLimitSwitch) 
 				&& configuration.getForwardHardLimitSwitchResetsEncoder() && getCurrentHardLimitSwitchStatus(Direction.FORWARD)) 
 		{
-			if(Math.abs(getCurrentPosition().getValue() - configuration.getForwardLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
+			if(Math.abs(getCurrentPosition().getValue() - getForwardLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
 				/*
 				 * If we are moving in reverse from a forward limit switch, don't mess with it
 				 */
@@ -413,18 +425,18 @@ public abstract class AbstractMotorController implements IMotorController {
 					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() < getTargetState().getStartingAbsolutePosition().getCanonicalValue())
 				)
 				{
-					Logger.info("Forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getForwardLimit() + ".");
+					Logger.info("Forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + ".");
 					return true;
 				}
-				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getForwardLimit() + "."); 
-				resetEncoders = resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
+				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + "."); 
+				resetEncoders = resetEncoderSensorPosition(getForwardLimit());
 			}
 		}
 		// Do we need to handle reverse limit
 		if (configuration.hasAny(MotorConfiguration.LocalReverseHardLimitSwitch|MotorConfiguration.RemoteReverseHardLimitSwitch) 
 				&& configuration.getReverseHardLimitSwitchResetsEncoder() && getCurrentHardLimitSwitchStatus(Direction.REVERSE)) 
 		{
-			if(Math.abs(getCurrentPosition().getValue() - configuration.getReverseLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
+			if(Math.abs(getCurrentPosition().getValue() - getReverseLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
 				/*
 				 * If we are moving in reverse from a forward limit switch, don't mess with it
 				 */
@@ -432,11 +444,11 @@ public abstract class AbstractMotorController implements IMotorController {
 					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() > getTargetState().getStartingAbsolutePosition().getCanonicalValue())
 				)
 				{
-					Logger.info("Reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getReverseLimit() + ".");
+					Logger.info("Reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + ".");
 					return true;
 				}
-				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getReverseLimit() + "."); 
-				resetEncoders = resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
+				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + "."); 
+				resetEncoders = resetEncoderSensorPosition(getReverseLimit());
 			}
 		}
 		return resetEncoders;
@@ -473,7 +485,7 @@ public abstract class AbstractMotorController implements IMotorController {
 	protected PIDProfileSlot getAppropriatePIDProfileSlotForCurrentState() {
 		return getAppropriatePIDProfileSlot(getTargetState());
 	}
-	
+
 	/**
 	 * Determine the appropriate PID profile for the current operation and motor state, and 
 	 * change if necessary
@@ -482,7 +494,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		PIDProfileSlot correctPIDProfileSlot = getAppropriatePIDProfileSlotForCurrentState();
 		if(!getPIDProfileSlot().equals(correctPIDProfileSlot)) {
 			if(getTargetState().isMovingToPosition()) {
-				Logger.info(this + " updating PID profile to " + correctPIDProfileSlot + ".  We are " + (correctPIDProfileSlot.equals(PIDProfileSlot.HoldingPosition) ? "close to" : "far from") + " the target.");	
+				Logger.info(this + " updating PID profile to " + correctPIDProfileSlot + ".  We are " + (correctPIDProfileSlot.equals(PIDProfileSlot.HoldingPosition) ? "close to" : "far from") + " the target.  PositionError=" + getTargetState().getCurrentPositionError());	
 			} else {
 				Logger.warning(this + " updating PID profile to " + correctPIDProfileSlot + ", but we are not in a state that requires changing PID profiles.");
 				(new Throwable()).printStackTrace();
@@ -527,7 +539,7 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Get the physical limit of the hardware
 	 */
 	protected Length getPhysicalLimit(Direction direction) {
-		return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit();
+		return direction.isPositive() ? getForwardLimit() : getReverseLimit();
 	}
 
 	/**
@@ -556,25 +568,66 @@ public abstract class AbstractMotorController implements IMotorController {
 			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch);
 		}
 	}
-
+	
 	/**
 	 * Get the soft limit switch position for the given direction, or null if we don't have one.
 	 * @see getHasSoftLimit 
 	 */
 	protected Length getSoftLimit(Direction direction) {
 		if(getHasSoftLimit(direction)) {
-			return direction.isPositive() ? configuration.getForwardSoftLimit() : configuration.getReverseSoftLimit();
+			return direction.isPositive() ? getForwardSoftLimit() : getReverseSoftLimit();
 		}
 		return null;
 	}
 
+	/**
+	 * Get the minimum forward rate, in the pulses (and rounded)
+	 */
+	protected Rate getMinimumForwardRate() {
+		return toSensorUnits(configuration.getMinimumForwardRate());
+	}
+	/**
+	 * Get the maximum forward rate, in the pulses (and rounded)
+	 */
+	protected Rate getMaximumForwardRate() {
+		return toSensorUnits(configuration.getMaximumForwardRate());
+	}
+	/**
+	 * Get the maximum reverse rate, in the pulses (and rounded)
+	 */
+	protected Rate getMaximumReverseRate() {
+		return toSensorUnits(configuration.getMaximumReverseRate());
+	}
+	/**
+	 * Get the maximum forward rate, in the pulses (and rounded)
+	 */
+	protected Rate getMinimumReverseRate() {
+		return toSensorUnits(configuration.getMinimumReverseRate());
+	}
+	/**
+	 * Get the maximum rate, in the pulses (and rounded)
+	 */
+	protected Rate getMaximumRate(Direction direction) {
+		return direction.isPositive()
+				? getMaximumForwardRate()
+				: getMaximumReverseRate();
+	}
+	/**
+	 * Get the minimum rate, in the pulses (and rounded)
+	 */
+	protected Rate getMinimumRate(Direction direction) {
+		return direction.isPositive()
+				? getMinimumForwardRate()
+				: getMinimumReverseRate();
+	}
+	
 	/**
 	 * Get the hard limit switch position for the given direction, or null if we don't have one.
 	 * @see getHasHardLimit 
 	 */
 	protected Length getHardLimit(Direction direction) {
 		if(getHasHardLimit(direction)) {
-			return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit(); 
+			return direction.isPositive() ? getForwardLimit() : getReverseLimit(); 
 		}
 		return null;
 	}
@@ -599,6 +652,26 @@ public abstract class AbstractMotorController implements IMotorController {
 		} else {
 			return position.getCanonicalValue() <= limit.getCanonicalValue();
 		}
+	}
+
+	/**
+	 * Clamp a length to a limit
+	 */
+	protected static Length clampToLimit(Direction direction, Length limit, Length input) {
+		return isLimitExceeded(direction, limit, input) ? limit : input;
+	}
+	/**
+	 * Clamp a rate to a limit range
+	 */
+	protected static Rate clampToLimit(Rate lowerLimit, Rate upperLimit, Rate input) {
+		Rate r = input;
+		if(upperLimit != null && input.getCanonicalValue() > upperLimit.getCanonicalValue()) {
+			r = upperLimit;
+		} 
+		if(lowerLimit != null && input.getCanonicalValue() < lowerLimit.getCanonicalValue()) {
+			r = lowerLimit;
+		}
+		return r;
 	}
 
 	/**

@@ -291,7 +291,7 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		// Set forward soft limit
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch)) {
 			mc.configForwardSoftLimitEnable(true, getTimeout());
-			mc.configForwardSoftLimitThreshold(configuration.getForwardSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
+			mc.configForwardSoftLimitThreshold(getForwardSoftLimit().getValueAsInt(), getTimeout());
 		} else {
 			mc.configForwardSoftLimitThreshold(0, getTimeout()); // Clear it so it's not confusing us in RoboRio Web UI
 			mc.configForwardSoftLimitEnable(false, getTimeout());
@@ -299,7 +299,7 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		// Set reverse soft limit
 		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch)) {
 			mc.configReverseSoftLimitEnable(true, getTimeout());
-			mc.configReverseSoftLimitThreshold(configuration.getReverseSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
+			mc.configReverseSoftLimitThreshold(getReverseSoftLimit().getValueAsInt(), getTimeout());
 		} else {
 			mc.configReverseSoftLimitThreshold(0, getTimeout()); // Clear it so it's not confusing us in RoboRio Web UI
 			mc.configReverseSoftLimitEnable(false, getTimeout());
