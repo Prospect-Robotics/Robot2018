@@ -149,7 +149,7 @@ public interface IMotor {
 	/*
 	 * Move the arm towards a hard limit switch (until we hit it)
 	 */
-	boolean calibrateSensorInDirection(Direction directio);
+	boolean calibrateSensorInDirection(Direction direction);
 	/*
 	 * Hook for periodic updates.  We use this to update our behavior 
 	 * as we are reaching our target condition. 
