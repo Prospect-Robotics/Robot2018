@@ -155,10 +155,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		switch(currentState.getOperation()) {
 		case DISABLED:
 		case HOLDING_CURRENT_POSITION:
-			// No change to encoder position unless you are simulating instability
-			if(distance.getValue() > 0) {
-				throw new java.lang.IllegalStateException(this + " in " + currentState + " but calculated a simulated distance.");
-			}
+			// Do not update during simulation in disabled mode
 			return;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 		case MOVING_IN_DIRECTION_AT_RATE:
