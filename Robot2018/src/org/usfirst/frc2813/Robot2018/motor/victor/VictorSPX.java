@@ -271,7 +271,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		configurePID(PIDProfileSlot.ProfileSlot3, 0, 0, 0, 0);
 
 		// Start with primary PID set to relative
-		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, PID.Primary.getPIDIndex(), getTimeout());
+		spx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, PID.Primary.getPIDIndex(), getTimeout());
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
