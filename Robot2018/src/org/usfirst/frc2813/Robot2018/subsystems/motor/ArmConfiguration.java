@@ -42,7 +42,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	 * 
 	 * TODO: I don't think it's really 12.
 	 */
-	private static final Length LENGTH_OF_DRIVE_AXIS_TO_ARM_END  = LengthUOM.Inches.create(12);
+	private static final Length LENGTH_OF_DRIVE_AXIS_TO_ARM_END  = LengthUOM.Inches.create(0.5);
 	/*
 	 * To find the 'arc length' we will use as a reference in mapping angular distance to linear distance,
 	 * we will take the 'arc length' of a complete circle of radius RADIUS_DRIVE_AXIS_TO_ARM_END.
@@ -61,7 +61,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	/*
 	 * Now we can define a length unit representing one degree.
 	 */
-	private static final LengthUOM ArmDegrees = new LengthUOM("degree", "degrees", "deg", LengthUOM.CanonicalLengthUOM, DRIVE_INCHES_PER_ONE_DEGREE.getCanonicalValue());
+	public static final LengthUOM ArmDegrees = new LengthUOM("degree", "degrees", "deg", LengthUOM.CanonicalLengthUOM, DRIVE_INCHES_PER_ONE_DEGREE.getCanonicalValue());
 	/*
 	 * Now let's figure out a length of drive inches per pulse 
 	 */
@@ -147,7 +147,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.LocalReverseHardLimitSwitch
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
-					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
+//					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
 					),
 			ArmDegrees,                   	    	// nativeDisplayLengthUOM
 			ArmSRXMotorPulses,                  	// nativeMotorLengthUOM
@@ -214,13 +214,19 @@ public class ArmConfiguration extends MotorConfiguration{
  		System.out.println("Arm 100% Rate....................." + ArmRateOnePercentOutputPerOneSecond.create(100) + " = " + ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(RateUOM.FeetPerSecond));
  		System.out.println("Arm 100% Rate....................." + ArmRateOnePercentOutputPerOneSecond.create(100) + " = " + ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(ArmDegreesPerSecond));
  		System.out.println("Arm % Rate Table..................");
-		for(int q = 0; q <= 100; q++) {
-			Rate pct = ArmRateOnePercentOutputPerOneSecond.create(q);
-			Rate pr = ArmSRXMotorPulseRate.create(pct.convertTo(ArmSRXMotorPulseRate).getValueAsInt());
-			Rate rpm = ArmSRXEncoderRPM.create(pct.convertTo(ArmSRXEncoderRPM).getValueAsInt());
-			Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
-			System.out.println("                                  " + pct + " = " + pr + " = " + rpm + " = " + ips);	
-		}
-	
+ 		/*		for(int q = 0; q <= 100; q++) {
+		Rate pct = ArmRateOnePercentOutputPerOneSecond.create(q);
+		Rate pr = ArmSRXMotorPulseRate.create(pct.convertTo(ArmSRXMotorPulseRate).getValueAsInt());
+		Rate rpm = ArmSRXEncoderRPM.create(pct.convertTo(ArmSRXEncoderRPM).getValueAsInt());
+		Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
+		System.out.println("                                  " + pct + " = " + pr + " = " + rpm + " = " + ips);	
+	}
+*/
+ 		for(int q = 0; q <= 360; q++) {
+		Length degrees = ArmDegrees.create(q);
+		Length pulses = degrees.convertTo(ArmSRXMotorPulses);
+		System.out.println("                                  " + degrees + " = " + pulses);	
+	}
+
 	}
 }
