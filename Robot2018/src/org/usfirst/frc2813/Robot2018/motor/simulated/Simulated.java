@@ -8,6 +8,7 @@ import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.values.Length;
@@ -81,7 +82,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		} else {
 			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition) 
 					&& configuration.hasAny(IMotorConfiguration.LocalReverseHardLimitSwitch|IMotorConfiguration.RemoteReverseHardLimitSwitch)
-					&& configuration.getReverseHardLimitSwitchNormal() == LimitSwitchNormal.Disabled;
+					&& configuration.getReverseHardLimitSwitchNormal() != LimitSwitchNormal.Disabled;
 		}
 	}
 	
@@ -92,15 +93,23 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 			return configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch);
 		}
 	}
-	
+
 	private Length getHardSwitchLimit(Direction direction) {
 		if(getHasHardLimit(direction)) {
 			return direction.isPositive() ? configuration.getForwardLimit() : configuration.getReverseLimit(); 
 		}
 		return null;
 	}
-	
+
 	private static boolean isLimitExceeded(Direction direction, Length limit, Length position) {
+		if(direction.isPositive()) {
+			return position.getCanonicalValue() > limit.getCanonicalValue(); 
+		} else {
+			return position.getCanonicalValue() < limit.getCanonicalValue();
+		}
+	}
+
+	private static boolean isLimitReached(Direction direction, Length limit, Length position) {
 		if(direction.isPositive()) {
 			return position.getCanonicalValue() >= limit.getCanonicalValue(); 
 		} else {
@@ -111,18 +120,21 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	@Override
 	public boolean getCurrentLimitSwitchStatus(Direction direction) {
 		if(getHasHardLimit(direction)) {
-			return isLimitExceeded(direction, getHardSwitchLimit(direction), getCurrentPosition());
+			boolean reached = isLimitReached(direction, getHardSwitchLimit(direction), getCurrentPosition());
+//			Logger.info(this + " We think we have " + (reached ? "" : "not ") + "reached a " + direction + " limit switch @ " + getHardSwitchLimit(direction) + " and we are @ " + getCurrentPosition() + ".");
+			return reached;
 		}
+//		Logger.info(this + " We don't think we have a " + direction + " limit switch.");
 		return false;
 	}
-	
+
 	private Length getSoftLimit(Direction direction) {
 		if(getHasSoftLimit(direction)) {
 			return direction.isPositive() ? configuration.getForwardSoftLimit() : configuration.getReverseSoftLimit();
 		}
 		return null;
 	}
-	
+
 	private boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
 		if(getHasSoftLimit(direction)) {
 			return isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
@@ -134,13 +146,6 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// Don't try to update encoder position before our first command
 		if(currentState == null) {
 			return;
-		}
-		// Handle auto-hard reset
-		if(getCurrentLimitSwitchStatus(Direction.FORWARD) && configuration.getForwardHardLimitSwitchResetsEncoder()) {
-			this.encoderValue = 0;
-		}
-		if(getCurrentLimitSwitchStatus(Direction.REVERSE) && configuration.getReverseHardLimitSwitchResetsEncoder()) {
-			this.encoderValue = 0;
 		}
 		// Determine a rate
 		Rate rate = getCurrentRate();
@@ -169,6 +174,10 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// No change to encoder position unless you are simulating instability
 		boolean resetEncoderFromHardLimit = false;
 		Direction targetDirection = currentState.getTargetDirection();
+		if(targetDirection == null) {
+			Logger.info(this + " targetDirection is NULL: " + currentState);
+			throw new IllegalStateException("KABOOM!");
+		}
 		Length distanceWithSign = distance.multiply(targetDirection.getMultiplierAsDouble());
 		// Where would we end up if we were going in the same direction the entire time
 		Length projectedAbsolutePosition = start.add(distanceWithSign);
@@ -182,7 +191,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// Next, see if a soft limit would have stopped us.
 		if(getHasSoftLimit(targetDirection)) {
 			Length softLimit = getSoftLimit(targetDirection);
-			if(isLimitExceeded(targetDirection, softLimit, projectedAbsolutePosition)) { 
+			if(isLimitReached(targetDirection, softLimit, projectedAbsolutePosition)) { 
 				projectedAbsolutePosition = softLimit;
 			}
 		}
@@ -199,7 +208,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// Lastly, did we break the robot?
 		Length physicalLimit = getPhysicalLimit(targetDirection);
 		if(isLimitExceeded(targetDirection, physicalLimit, projectedAbsolutePosition)) {
-			throw new IllegalStateException(this + ": KABOOM!  You just broke the robot.  Moved " + targetDirection + " beyond " + physicalLimit + " and broke the hardware.");
+			throw new IllegalStateException(this + ": KABOOM!  You just broke the robot.  Moved " + targetDirection + " beyond " + physicalLimit + " and broke the hardware.  Projected=" + projectedAbsolutePosition);
 		}
 		// Now do the hardware-based encoder reset if necessary, which is always zero
 		if(resetEncoderFromHardLimit) {
