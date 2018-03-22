@@ -82,7 +82,7 @@ public class OI {
 		new JoystickButton(buttonPanel, 7).whenPressed(new SolenoidToggleStateInstant(Robot.driveTrain.getGearShiftSolenoid()));
 		new JoystickButton(buttonPanel, 8).whenPressed(new SolenoidToggleStateInstant(Robot.ratchet));
 		new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleStateInstant(Robot.jaws));
-		new JoystickButton(buttonPanel, 10).whenPressed(new MotorPIDTest(Robot.elevator, LengthUOM.Inches.create(0), LengthUOM.Inches.create(30)));
+		new JoystickButton(buttonPanel, 10).whileHeld(new MotorPIDTest(Robot.elevator, LengthUOM.Inches.create(5), LengthUOM.Inches.create(30)));
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.IN));
 		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.OUT));
 
