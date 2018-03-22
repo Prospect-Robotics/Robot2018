@@ -8,6 +8,8 @@ import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
+import org.usfirst.frc2813.logging.LogLevel;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.TimeUOM;
@@ -29,13 +31,25 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	private PIDProfileSlot   lastSlot                 = PIDProfileSlot.HoldingPosition;
-	private int encoderValue = 0;
-	private long lastCommandTimestamp = System.currentTimeMillis();
-
+	private int encoderValue 						  = 0;
+	private long lastCommandTimestamp 				  = System.currentTimeMillis();
+	private long lastEncoderPositionUpdate            = 0;
+	
 	/* ----------------------------------------------------------------------------------------------
-	 * Constants
+	 * Debugging
 	 * ---------------------------------------------------------------------------------------------- */
 	
+	private static LogType logLevel = LogType.DEBUG;
+	private static void debug(String message) {
+		Logger.print(logLevel, message);
+	}
+	private static void warning(String message) {
+		Logger.print(LogType.ERROR, message);
+	}	
+	private static void error(String message) {
+		Logger.print(LogType.ALWAYS, message);
+	}
+
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
@@ -51,7 +65,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
-		this.encoderValue = toSensorUnits(sensorPosition).getValueAsInt();
+		setEncoderPosition(toSensorUnits(sensorPosition).getValueAsInt());
 		return true;
 	}
 
@@ -60,25 +74,51 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		return isHardLimitReached(direction);
 	}
 
+	private void setEncoderPosition(int pos) {
+		debug("Setting sensor position.  Was " + encoderValue + " Now " + pos);
+		this.encoderValue = pos;
+	}
+
+	private IMotorState lastCompletedCommand = null; 
+	private boolean updating = false;
 	private void updateEncoderPosition() {
+		// Do not accidentally loop forever, but we do need getCurentPosition() to update if it's not being called indirectly by updateEncoderPosition
+		if(updating) {
+			return;
+		}
+		updating = true;		
+		debug("Updating: " + this + " - " + getDiagnostics());
 		// Don't try to update encoder position before our first command
 		if(currentState == null) {
+			updating = false;
+			return;
+		}
+		// Waiting for something new...
+		if(currentState == lastCompletedCommand) {
+			updating = false;
 			return;
 		}
 		// Determine a rate
 		Rate rate = getCurrentRate();
+		debug("Current Rate: " + rate);
 		// Determine starting position
 		Length start = currentState.getStartingAbsolutePosition();
+		// Determine the current time
+		long now = System.currentTimeMillis();
+		if(lastEncoderPositionUpdate == 0) {
+			lastEncoderPositionUpdate = lastCommandTimestamp; 
+		}
 		// Determine an elapsed time
-		Time elapsedTime = TimeUOM.Milliseconds.create(System.currentTimeMillis() - lastCommandTimestamp);
+		Time elapsedTime = TimeUOM.Milliseconds.create(now - lastEncoderPositionUpdate); // TimeUOM.Milliseconds.create(System.currentTimeMillis() - lastCommandTimestamp);
+		debug("Elapsed: " + elapsedTime);
 		// Potential travel distance
 		Length distance = rate.getLength(elapsedTime);
-		
 		// Determine where we should be based on command and elapsed time
 		switch(currentState.getOperation()) {
 		case DISABLED:
 		case HOLDING_CURRENT_POSITION:
-			// Do not update during simulation in disabled mode
+			lastCompletedCommand = currentState;
+			updating = false;
 			return;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 		case MOVING_IN_DIRECTION_AT_RATE:
@@ -92,57 +132,65 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// No change to encoder position unless you are simulating instability
 		boolean resetEncoderFromHardLimit = false;
 		Direction targetDirection = currentState.getTargetDirection();
-		if(currentState.getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION || currentState.getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION) {
+		if(currentState.getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION || currentState.getOperation() == MotorOperation.MOVING_TO_RELATIVE_POSITION) {
 			targetDirection = 
-					currentState.getTargetAbsolutePosition().getCanonicalValue() < getCurrentPosition().getCanonicalValue() 
+					currentState.getTargetAbsolutePosition().getCanonicalValue() < configuration.getNativeSensorLengthUOM().create(encoderValue).getCanonicalValue() 
 					? Direction.REVERSE 
 					: Direction.FORWARD
 					;
 		}
 		if(targetDirection == null) {
-			Logger.info(this + " targetDirection is NULL: " + currentState);
-			throw new IllegalStateException("KABOOM!");
+			throw new IllegalStateException("Simulator error.  targetDirection is null!");
 		}
+		debug("RawDistance: " + distance);		
 		Length distanceWithSign = distance.multiply(targetDirection.getMultiplierAsDouble());
+		debug("distanceWithSign: " + distanceWithSign);		
 		// Where would we end up if we were going in the same direction the entire time
 		Length projectedAbsolutePosition = start.add(distanceWithSign);
+		debug("projectedAbsolutePosition: " + projectedAbsolutePosition);		
 		// OK, see where PID would have stopped us
 		Length targetAbsolutePosition = currentState.getTargetAbsolutePosition();
 		if(targetAbsolutePosition != null) {
-			if(targetAbsolutePosition.getCanonicalValue() < projectedAbsolutePosition.getCanonicalValue()) {
-				projectedAbsolutePosition = targetAbsolutePosition;
-			}
+			projectedAbsolutePosition = clampToLimit(targetDirection, targetAbsolutePosition /* limit */, projectedAbsolutePosition);
 		}
+		debug("projectedAbsolutePosition: " + projectedAbsolutePosition);		
+		debug("Start=" + start + " CommandDistance=" + distanceWithSign + " Projected=" + projectedAbsolutePosition + " Target=" + targetAbsolutePosition);
 		// Next, see if a soft limit would have stopped us.
-		if(getHasSoftLimit(targetDirection)) {
-			Length softLimit = getSoftLimit(targetDirection);
-			if(isLimitReached(targetDirection, softLimit, projectedAbsolutePosition)) { 
-				projectedAbsolutePosition = softLimit;
-			}
+		Length softLimit = null;
+		if(getHasSoftLimit(targetDirection) && isLimitReached(targetDirection, softLimit = getSoftLimit(targetDirection), projectedAbsolutePosition)) {
+			warning("Soft Limit Reached.  Clamping to " + softLimit + ".");
+			projectedAbsolutePosition = clampToLimit(targetDirection, softLimit, projectedAbsolutePosition);
+			lastCompletedCommand = currentState;
 		}
 		// Next, see if a hard limit would have stopped us.
-		if(getHasHardLimit(targetDirection)) {
-			Length hardLimit = getHardLimit(targetDirection);
-			if(isLimitExceeded(targetDirection, hardLimit, projectedAbsolutePosition)) { 
-				projectedAbsolutePosition = hardLimit;
-				resetEncoderFromHardLimit = targetDirection.isPositive() 
-						? configuration.getForwardHardLimitSwitchResetsEncoder() 
-						: configuration.getReverseHardLimitSwitchResetsEncoder(); 
-			}
+		Length hardLimit = null;
+		if(getHasHardLimit(targetDirection) && isLimitReached(targetDirection, hardLimit = getHardLimit(targetDirection), projectedAbsolutePosition)) {
+			warning("Hard Limit Reached.  Clamping to " + hardLimit + ".");
+			projectedAbsolutePosition = clampToLimit(targetDirection, hardLimit, projectedAbsolutePosition);
+			resetEncoderFromHardLimit = targetDirection.isPositive() ? configuration.getForwardHardLimitSwitchResetsEncoder() : configuration.getReverseHardLimitSwitchResetsEncoder();
+			lastCompletedCommand = currentState;
 		}
 		// Lastly, did we break the robot?
 		Length physicalLimit = getPhysicalLimit(targetDirection);
 		if(isLimitExceeded(targetDirection, physicalLimit, projectedAbsolutePosition)) {
-			throw new IllegalStateException(this + ": KABOOM!  You just broke the robot.  Moved " + targetDirection + " beyond " + physicalLimit + " and broke the hardware.  Projected=" + projectedAbsolutePosition);
+			projectedAbsolutePosition = clampToLimit(targetDirection, getPhysicalLimit(targetDirection), projectedAbsolutePosition);
+			lastCompletedCommand = currentState;
+			error(this + ": KABOOM!  You just broke the robot.  Moved " + targetDirection + " beyond " + physicalLimit + " and broke the hardware.  Projected=" + projectedAbsolutePosition);
 		}
 		// Now do the hardware-based encoder reset if necessary, which is always zero
 		if(resetEncoderFromHardLimit) {
+			warning("Resetting encoder due to " + targetDirection + " hard limit.");
 			projectedAbsolutePosition = projectedAbsolutePosition.getUOM().create(0);
 		}
 		// Now update the encoder value from our projection
-		this.encoderValue = projectedAbsolutePosition.getValueAsInt();
+		int newEncoderValue = toSensorUnits(projectedAbsolutePosition).getValueAsInt();
+		debug("newEncoderValue: " + newEncoderValue);		
+		if(this.encoderValue != newEncoderValue) {
+			setEncoderPosition(newEncoderValue);
+		}
+		updating = false;
 	}
-	
+
 	@Override
 	public final Length getCurrentPosition() {
 		updateEncoderPosition();
@@ -151,26 +199,39 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 
 	@Override
 	public Rate getCurrentRate() {
-		Rate rate = configuration.getDefaultRate();
-		if(currentState.getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE) {
-			// Determine the range for rates
-			Rate minimumRate = 
-					currentState.getTargetDirection().isPositive() 
-					? configuration.getMinimumForwardRate() 
-					: configuration.getMinimumReverseRate();
-			Rate maximumRate = 
-					currentState.getTargetDirection().isPositive() 
-					? configuration.getMaximumForwardRate() 
-					: configuration.getMaximumReverseRate();
-
-			// Is motor going too slow and stalls?
-			if(currentState.getTargetRate().getCanonicalValue() < minimumRate.getCanonicalValue()) {
-				rate = configuration.getNativeSensorRateUOM().create(0);
+		Rate rate = configuration.getDefaultRate().getUOM().create(0);
+		// Determine the range for rates
+		switch(currentState.getOperation()) {
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+		case MOVING_IN_DIRECTION_AT_RATE:
+			Direction targetDirection = currentState.getTargetDirection();
+			if(currentState.getTargetRate() != null) {
+				debug("currentState.getTargetRate(): " + currentState.getTargetRate());
+				rate = toSensorUnits(currentState.getTargetRate());
+			} else {
+				debug("configuration.getDefaultRate(): " + configuration.getDefaultRate());
+				rate = toSensorUnits(configuration.getDefaultRate());
 			}
-			// Is motor going too fast and maxxed out?
-			if(currentState.getTargetRate().getCanonicalValue() > maximumRate.getCanonicalValue()) {
-				rate = maximumRate;
+			clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
+			clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
+			debug("VELOCITY RATE: " + rate);
+			break;
+		case DISABLED:
+		case HOLDING_CURRENT_POSITION:
+			// leave at zero
+			break;
+		case MOVING_TO_ABSOLUTE_POSITION:
+		case MOVING_TO_RELATIVE_POSITION:
+			if(encoderValue == currentState.getTargetAbsolutePosition().getValueAsInt()) {
+				break; // leave at zero, we're done 
 			}
+			// Assume PID is flying for now
+			rate = encoderValue < currentState.getTargetAbsolutePosition().getValue() 
+					? getMaximumForwardRate() 
+					: getMaximumReverseRate();
+			break;
+		default:
+			throw new UnsupportedOperationException("Unsupported operation: " + getTargetState());
 		}
 		// TODO: Improve rate simulation, maybe add fake output for testing PID at some point.  
 		return rate;
@@ -189,6 +250,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	protected boolean executeTransition(IMotorState proposedState) {
 		this.lastSlot = getAppropriatePIDProfileSlot(proposedState);
 		this.lastCommandTimestamp = System.currentTimeMillis();
+		this.lastEncoderPositionUpdate = 0;
 		return true;
 	}
 
@@ -218,8 +280,8 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	 */
 	@Override
 	public void periodic() {
-		super.periodic();
 		updateEncoderPosition();
+		super.periodic(); // NB: Always update encoder position before calling superclass, which depends on simulated data!	
 	}
 
 	@Override
