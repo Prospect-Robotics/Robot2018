@@ -131,7 +131,8 @@ public abstract class Value<T_UOM extends UOM, T_UV extends Value> {
 	
 	// Get the short description in <units> <abbrev>
 	public final String getShortDescription() {
-		return String.format("%.4g %s", getValue(), uom.getUnitNameAbbreviation());
+		//return String.format("%.4g %s", getValue(), uom.getUnitNameAbbreviation());
+		return getValue() + " " + uom.getUnitNameAbbreviation();
 	}
 
     // Show the type+value description
