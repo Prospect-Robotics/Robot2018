@@ -90,7 +90,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	when we don't have sufficient surface area for testing.  
 	This should really be coming from a sendable chooser.
 	*/
-	private static double DISTANCE_SCALING_MULTIPLIER = 0.2;
+	private static double DISTANCE_SCALING_MULTIPLIER = 1.0; // TODO: should only apply to wheels 
 	/**
 	 * Elevator height for placing cubes on the scale
 	 */
@@ -251,13 +251,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * To check it you would have to wait for a limit switch. 
 	 */
 	public void addElevatorCalibrateAsync() {
-		addSequential(new MotorCalibrateSensorAsync(Robot.elevator, Direction.DOWN));
+		if(!Robot.elevator.isDisconnected())
+			addSequential(new MotorCalibrateSensorAsync(Robot.elevator, Direction.DOWN));
 	}
 	/**
 	 * Wait for the Elevator to hit the hard reset limit
 	 */
 	public void addElevatorWaitForHardLimitSwitchSync() {
-		addSequential(new MotorWaitForHardLimitSwitchSync(Robot.elevator, Direction.DOWN));
+		if(!Robot.elevator.isDisconnected())
+			addSequential(new MotorWaitForHardLimitSwitchSync(Robot.elevator, Direction.DOWN));
 	}
 
 	/**
@@ -278,7 +280,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * Allow overriding maximum rate for PID move to position, 
 		 * go slower when we have a cube in the jaws!
 		 */
-		addSequential(new MotorMoveToAbsolutePositionAsync(Robot.elevator, position));
+		if(!Robot.elevator.isDisconnected())
+			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.elevator, position));
 	}
 	/*
 	 * Start the elevator moving in the background
@@ -297,7 +300,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	public void addElevatorWaitForTargetPositionSync() {
 		// Wait for Elevator to reach it's destination to within +/- one inch.
-		addSequential(new MotorWaitForTargetPositionSync(Robot.elevator, LengthUOM.Inches.create(1)));
+		if(!Robot.elevator.isDisconnected())
+			addSequential(new MotorWaitForTargetPositionSync(Robot.elevator, LengthUOM.Inches.create(1)));
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
@@ -309,13 +313,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * To check it you would have to wait for a limit switch. 
 	 */
 	public void addArmCalibrateAsync() {
-		addSequential(new MotorCalibrateSensorAsync(Robot.arm, Direction.IN));
+		if(!Robot.arm.isDisconnected())
+			addSequential(new MotorCalibrateSensorAsync(Robot.arm, Direction.IN));
 	}
 	/**
 	 * Wait for the Arm to hit the hard reset limit
 	 */
 	public void addArmWaitForHardLimitSwitchSync() {
-		addSequential(new MotorWaitForHardLimitSwitchSync(Robot.arm, Direction.IN));
+		if(!Robot.arm.isDisconnected())
+			addSequential(new MotorWaitForHardLimitSwitchSync(Robot.arm, Direction.IN));
 	}
 
 	/**
@@ -331,7 +337,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Move the arm to the indicated position.  Does not wait for completion.
 	 */
 	public void addArmMoveToPositionAsync(Length position) {
-		addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, position));
+		if(!Robot.arm.isDisconnected())
+			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, position));
 	}
 
 	/**
@@ -347,7 +354,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	public void addArmWaitForTargetPositionSync() {
 		// Wait for Arm to reach it's destination to within +/- one half inch.
-		addSequential(new MotorWaitForTargetPositionSync(Robot.arm, LengthUOM.Inches.create(0.5)));
+		if(!Robot.arm.isDisconnected())
+			addSequential(new MotorWaitForTargetPositionSync(Robot.arm, LengthUOM.Inches.create(0.5)));
 	}
 
 	/**
@@ -448,9 +456,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 
 	/**
-	 * Add a "deliver" sequence tailored towards target.
+	 * Add a "deliver" sequence tailored towards target.  Elevator may still be returning to placement height at the end
 	 */
-	public void addDeliverCubeSequenceSync(PlacementTargetType target) {
+	public void addDeliverCubeSequenceSync(PlacementTargetType target, boolean returnToPlacementHeightAsync) {
 		/*
 		 * NB: We will always 'move to placement height' here even though we have probably optimized
 		 * by doing this in advance.  This prevents us from slamming the arm into the field if somehow
@@ -462,10 +470,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * the field.
 		 */
 		addElevatorWaitForTargetPositionSync();
-		addDriveForwardSync(feet(2), TRANSITION_SPEED_STOP);
 		addDropCubeSequenceSync();
-		addDriveBackwardSync(feet(2), TRANSITION_SPEED_FLUID);
-		addElevatorMoveToPlacementHeightAsync(target);
+		if(returnToPlacementHeightAsync) {
+			addElevatorMoveToPlacementHeightAsync(target);
+		}
 	}
 	
 }

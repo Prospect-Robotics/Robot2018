@@ -458,8 +458,14 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * We will change behavior as we reach our target...
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#periodic()
 	 */
+	@Override
 	public void periodic() {
 		autoResetSensorPositionIfNecessary();
 		checkOperationComplete();
+	}
+	
+	@Override
+	public boolean isDisconnected() {
+		return getConfiguration().hasAll(IMotorConfiguration.Disconnected);
 	}
 }

@@ -5,6 +5,7 @@ import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
 import org.usfirst.frc2813.Robot2018.motor.ISimulatedMotorController;
+import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerUnitConversionAdapter;
 import org.usfirst.frc2813.Robot2018.motor.SimulatedMotorControllerUnitConversionAdapter;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
@@ -511,5 +512,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			lastPositionReport = System.currentTimeMillis();
 			Logger.info("[[PERIODIC]] " + getDiagnostics());
 		}
+	}
+	
+	public boolean isDisconnected() {
+		return configuration.hasAll(IMotorConfiguration.Disconnected);
 	}
 }

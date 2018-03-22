@@ -147,7 +147,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.LocalReverseHardLimitSwitch
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
-//					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
+					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
 					),
 			ArmDegrees,                   	    	// nativeDisplayLengthUOM
 			ArmSRXMotorPulses,                  	// nativeMotorLengthUOM

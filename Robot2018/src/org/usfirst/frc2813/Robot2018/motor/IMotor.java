@@ -146,13 +146,17 @@ public interface IMotor {
 	 * @See IMotorState.getCurrentPositionErrorWithin()
 	 */
 	boolean getCurrentPositionErrorWithin(Length marginOfError);
-	/*
+	/**
 	 * Move the arm towards a hard limit switch (until we hit it)
 	 */
 	boolean calibrateSensorInDirection(Direction direction);
-	/*
+	/**
 	 * Hook for periodic updates.  We use this to update our behavior 
 	 * as we are reaching our target condition. 
 	 */
 	void periodic();
+	/**
+	 * For testing auto, we'll ignore this device if it's disconnected 
+	 */
+	boolean isDisconnected();
 }

@@ -195,7 +195,7 @@ public class AutonomousCommandGroupGenerator {
 			// Turn to face the scale
 			autoCmdList.addQuickTurnSync(right, 90);
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
@@ -223,7 +223,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
 			autoCmdList.addQuickTurnSync(left, 90);
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
@@ -243,7 +243,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.addDriveForwardSync(feet(6), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
 			autoCmdList.addQuickTurnSync(right, 45);
 			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
-			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}

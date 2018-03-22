@@ -24,9 +24,9 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	// Talon constants
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
 	
-	private static final Length RANGE_MIN = LengthUOM.Inches.create(0);
-	private static final Length SAFETY_MARGIN = LengthUOM.Inches.create(4);
-	private static final Length RANGE_MAX = LengthUOM.Inches.create(82);
+	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0);
+	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(82);
+	private static final Length SAFETY_MARGIN_INCHES = LengthUOM.Inches.create(4);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
 	private static final double MOTOR_TO_DRIVE = 1.0/30.5;
@@ -36,8 +36,6 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
 
 	// Software Settings
-	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0.0);
-	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(24.0); // TBD
 	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(12); // TBD
 
 	// Hardware Inputs
@@ -130,7 +128,8 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	public static List<PIDConfiguration> createPidConfigurations() {
 		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
 		pidConfigurations.add(new PIDConfiguration("Holding", PIDProfileSlot.HoldingPosition.getProfileSlotIndex(), 0.8, 0.0, 0.0, 0.0));
-		pidConfigurations.add(new PIDConfiguration("Moving", PIDProfileSlot.Moving.getProfileSlotIndex(), 0.45, 0.011, 45.0, 0.0)); 
+		pidConfigurations.add(new PIDConfiguration("Moving", PIDProfileSlot.Moving.getProfileSlotIndex(), 0.5, 0.0, 0.0, 0.0)); 
+//		pidConfigurations.add(new PIDConfiguration("Moving", PIDProfileSlot.Moving.getProfileSlotIndex(), 0.45, 0.011, 45.0, 0.0)); 
 		pidConfigurations.add(new PIDConfiguration("ProfileSlot3", PIDProfileSlot.ProfileSlot2.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		pidConfigurations.add(new PIDConfiguration("ProfileSlot4", PIDProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0.0, 0.0, 0.0, 0.0));
 		return Collections.unmodifiableList(pidConfigurations);
@@ -170,13 +169,13 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			RateUOM.InchesPerSecond.create(0),  // minimumReverseRate
 			RateUOM.InchesPerSecond.create(12), // maximumReverseRate (placeholder)
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
-			RANGE_MAX,                          // forwardLimit (placeholder)
-			RANGE_MIN,                          // reverseLimit
+			MAXIMUM_POSITION_INCHES,                          // forwardLimit (placeholder)
+			MINIMUM_POSITION_INCHES,                          // reverseLimit
 			null,                               // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
-			RANGE_MAX.subtract(SAFETY_MARGIN),        // forwardSoftLimit - set to 4" below the end of the physical range 
+			MAXIMUM_POSITION_INCHES.subtract(SAFETY_MARGIN_INCHES),        // forwardSoftLimit - set to 4" below the end of the physical range 
 			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
 			RateUOM.InchesPerSecond.create(12), // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
