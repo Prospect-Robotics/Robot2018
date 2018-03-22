@@ -378,6 +378,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		case MOVING_TO_RELATIVE_POSITION:
 			getMotorController().moveToRelativePosition(proposedState.getTargetDirection(), proposedState.getTargetRelativeDistance());
 			break;
+		case CALIBRATING_SENSOR_IN_DIRECTION:
+			getMotorController().calibrateSensorInDirection(proposedState.getTargetDirection());
+			break;
 		default:
 			break;
 		}
@@ -501,7 +504,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
 		return getMotorController().getCurrentPositionErrorWithin(marginOfError);
 	}
-	private long DISPLAY_INTERVAL = 2500;
+	private static final long DISPLAY_INTERVAL = 2500;
 	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
 	private void dumpSubsystemStatusAtIntervals() {
 		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
