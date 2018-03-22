@@ -129,7 +129,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.HoldingPosition, 0.8, 0.0, 0.0, 0.0));
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingToPosition, 0.7, 0.0, 0.0, 0.0)); 
-		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingAtVelocity, 0.7, 0.0, 0.0, 0.0)); 
+		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingAtVelocity, 0.3, 0.0, 0.3, 0.5));
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.ProfileSlot3, 0.0, 0.0, 0.0, 0.0));
 		return Collections.unmodifiableList(pidConfigurations);
 	}
@@ -168,8 +168,8 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			RateUOM.InchesPerSecond.create(0),  // minimumReverseRate
 			RateUOM.InchesPerSecond.create(36), // maximumReverseRate (placeholder)
 			Double.valueOf(SENSOR_TO_DRIVE),    // sensorToDriveScale (per JT - output 1:1 on Elevator)
-			MAXIMUM_POSITION_INCHES,                          // forwardLimit (placeholder)
-			MINIMUM_POSITION_INCHES,                          // reverseLimit
+			MAXIMUM_POSITION_INCHES,            // forwardLimit (placeholder)
+			MINIMUM_POSITION_INCHES,            // reverseLimit
 			null,                               // forwardHardLimitSwitchNormal
 			null,                               // forwardHardLimitSwitchResetsEncoder
 			LimitSwitchNormal.NormallyOpen,     // reverseHardLimitSwitchNormal
