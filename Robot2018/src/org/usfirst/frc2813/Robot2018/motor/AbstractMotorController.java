@@ -114,7 +114,7 @@ public abstract class AbstractMotorController implements IMotorController {
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public final boolean moveToRelativePosition(Direction targetDirection, Length targetRelativeDistance) {
 		return changeState(MotorStateFactory.createMovingToRelativePosition(this, targetDirection, targetRelativeDistance)); 
@@ -392,6 +392,15 @@ public abstract class AbstractMotorController implements IMotorController {
 				&& configuration.getForwardHardLimitSwitchResetsEncoder() && getCurrentLimitSwitchStatus(Direction.FORWARD)) 
 		{
 			if(Math.abs(getCurrentPosition().getValue() - configuration.getForwardLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
+				/*
+				 * If we are moving in reverse from a forward limit switch, don't mess with it
+				 */
+				if ( /* moving at rate or to position in reverse */ ((getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE || getTargetState().getOperation() == MotorOperation.MOVING_TO_RELATIVE_POSITION) && getTargetState().getTargetDirection().equals(Direction.REVERSE)) 
+					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() < getTargetState().getStartingAbsolutePosition().getCanonicalValue())
+				)
+				{
+					Logger.debug("Forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getForwardLimit() + ".");
+				}
 				Logger.debug("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getForwardLimit() + "."); 
 				resetEncoders = resetEncoderSensorPosition(toSensorUnits(configuration.getForwardLimit()));
 			}
@@ -401,10 +410,18 @@ public abstract class AbstractMotorController implements IMotorController {
 				&& configuration.getReverseHardLimitSwitchResetsEncoder() && getCurrentLimitSwitchStatus(Direction.REVERSE)) 
 		{
 			if(Math.abs(getCurrentPosition().getValue() - configuration.getReverseLimit().getValue()) > SENSOR_RESET_TOLERANCE_PULSES) {
+				/*
+				 * If we are moving in reverse from a forward limit switch, don't mess with it
+				 */
+				if ( /* moving at rate or to position in reverse */ ((getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE || getTargetState().getOperation() == MotorOperation.MOVING_TO_RELATIVE_POSITION) && getTargetState().getTargetDirection().equals(Direction.FORWARD)) 
+					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() > getTargetState().getStartingAbsolutePosition().getCanonicalValue())
+				)
+				{
+					Logger.debug("Reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getReverseLimit() + ".");
+				}
 				Logger.debug("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + configuration.getReverseLimit() + "."); 
 				resetEncoders = resetEncoderSensorPosition(toSensorUnits(configuration.getReverseLimit()));
 			}
-
 		}
 		return resetEncoders;
 	}
