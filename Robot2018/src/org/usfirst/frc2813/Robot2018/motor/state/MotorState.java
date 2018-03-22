@@ -99,10 +99,12 @@ public class MotorState implements IMotorState {
 	@Override
 	public String getDescription() {
 		return "MotorState[Op=" + operation 
-				+ (targetDirection != null ? " Dir=" + targetDirection : "")
-				+ (targetRate != null ? " Rate=" + targetRate : "")
-				+ (targetAbsolutePosition != null ? " AbsPos=" + targetAbsolutePosition : "")
-				+ (targetRelativeDistance != null ? " RelDist=" + targetRelativeDistance : "")
+				+ (targetDirection != null ? " TgtDir=" + targetDirection : "")
+				+ (targetRate != null ? " TgtRate=" + targetRate : "")
+				+ (targetAbsolutePosition != null ? " TgtAbsPos=" + targetAbsolutePosition : "")
+				+ (targetRelativeDistance != null ? " TgtRelDist=" + targetRelativeDistance : "")
+				+ (targetRate != null ? " TgtRateErr=" + getCurrentRateError() : "")
+				+ (operation.isMovingToPosition() ? " TgtPosErr=" + getCurrentPositionError() : "")
 				+ "]";
 	}
 	
@@ -208,12 +210,12 @@ public class MotorState implements IMotorState {
 
 	@Override
 	public boolean getCurrentRateErrorWithin(Rate marginOfError) {
-		return Math.abs(getCurrentRateError().getValue()) <= Math.abs(marginOfError.getValue());
+		return Math.abs(getCurrentRateError().getCanonicalValue()) <= Math.abs(marginOfError.getCanonicalValue());
 	}
 
 	@Override
 	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
-		return Math.abs(getCurrentPositionError().getValue()) <= Math.abs(marginOfError.getValue());
+		return Math.abs(getCurrentPositionError().getCanonicalValue()) <= Math.abs(marginOfError.getCanonicalValue());
 	}
 
 	@Override
