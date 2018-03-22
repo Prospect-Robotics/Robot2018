@@ -23,7 +23,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 /**
- * A wrapper class to handle an SRX Talon motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
+ * A wrapper class to handle an Talon SRX motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
  * if you need a translation layer.  
  */
 public final class TalonSRX extends AbstractMotorController {
@@ -158,7 +158,7 @@ public final class TalonSRX extends AbstractMotorController {
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			if(!getCurrentLimitSwitchStatus(proposedState.getTargetDirection())) {
-				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble()  / 2;
+				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble()  / 3;
 			}
 		default:
 			break;
@@ -270,6 +270,9 @@ public final class TalonSRX extends AbstractMotorController {
 		configurePID(PIDProfileSlot.ProfileSlot1, 0, 0, 0, 0);
 		configurePID(PIDProfileSlot.ProfileSlot2, 0, 0, 0, 0);
 		configurePID(PIDProfileSlot.ProfileSlot3, 0, 0, 0, 0);
+
+		// Start with primary PID set to relative
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, PID.Primary.getPIDIndex(), getTimeout());
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.

@@ -22,6 +22,10 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
+/**
+ * A wrapper class to handle an Victor SPX motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
+ * if you need a translation layer.  
+ */
 public class VictorSPX extends AbstractMotorController implements IMotor {
 	private final com.ctre.phoenix.motorcontrol.can.VictorSPX spx;
 	
@@ -104,9 +108,6 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	@Override
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		boolean result = true;
-		if(!resetEncoderSensorPosition(PID.Auxilliary, sensorPosition)) {
-			result = false;
-		}
 		if(!resetEncoderSensorPosition(PID.Primary, sensorPosition)) {
 			result = false;
 		}
@@ -268,6 +269,9 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		configurePID(PIDProfileSlot.ProfileSlot1, 0, 0, 0, 0);
 		configurePID(PIDProfileSlot.ProfileSlot2, 0, 0, 0, 0);
 		configurePID(PIDProfileSlot.ProfileSlot3, 0, 0, 0, 0);
+
+		// Start with primary PID set to relative
+		srx.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, PID.Primary.getPIDIndex(), getTimeout());
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
@@ -282,7 +286,8 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		// Set forward hard limits
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteForwardHardLimitSwitch)) {
 			spx.configForwardLimitSwitchSource(configuration.getRemoteForwardHardLimitSwitchSource(), configuration.getForwardHardLimitSwitchNormal(), configuration.getRemoteForwardHardLimitSwitchDeviceId(), getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
+//			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
+setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);			
 		} else {
 			spx.configForwardLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
@@ -290,7 +295,8 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		// Set reverse hard limits
 		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteReverseHardLimitSwitch)) {
 			spx.configReverseLimitSwitchSource(configuration.getRemoteReverseHardLimitSwitchSource(), configuration.getReverseHardLimitSwitchNormal(), configuration.getRemoteReverseHardLimitSwitchDeviceId(), getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
+//			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
+setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);			
 		} else {
 			spx.configReverseLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
@@ -331,6 +337,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	 	    Logger.info(this + " loaded : " + pidConfiguration);
 		}
 	}
+
 	public String toString() {
 		return configuration.getName() + "." + this.getClass().getSimpleName();  
 	}
