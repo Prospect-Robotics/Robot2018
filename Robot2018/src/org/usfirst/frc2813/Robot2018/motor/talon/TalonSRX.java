@@ -157,7 +157,9 @@ public final class TalonSRX extends AbstractMotorController {
 			newControlMode = ControlMode.Velocity;
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
-			newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+			if(!getCurrentLimitSwitchStatus(proposedState.getTargetDirection())) {
+				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble()  / 2;
+			}
 		default:
 			break;
 		}
@@ -279,44 +281,36 @@ public final class TalonSRX extends AbstractMotorController {
 		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
 		srx.configSetParameter(ParamEnum.eClearPositionOnQuadIdx, 0 /* disabled */, 0 /* unused */, 0 /* unused */, getTimeout());
 		
-		// Set local forward hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
+		// Set forward hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.LocalForwardHardLimitSwitch)) {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, configuration.getForwardHardLimitSwitchNormal(), getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
+		} else if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteForwardHardLimitSwitch)) {
+			srx.configForwardLimitSwitchSource(configuration.getRemoteForwardHardLimitSwitchSource(), configuration.getForwardHardLimitSwitchNormal(), configuration.getRemoteForwardHardLimitSwitchDeviceId(), getTimeout());
+//			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
+setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);			
 		} else {
 			srx.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
 		}
-		// Set local reverse hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
+		// Set reverse hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
 		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.LocalReverseHardLimitSwitch)) {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, configuration.getReverseHardLimitSwitchNormal(), getTimeout());
+//			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
+setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);			
+		} else if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteReverseHardLimitSwitch)) {
+			srx.configReverseLimitSwitchSource(configuration.getRemoteReverseHardLimitSwitchSource(), configuration.getReverseHardLimitSwitchNormal(), configuration.getRemoteReverseHardLimitSwitchDeviceId(), getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
 		} else {
 			srx.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, getTimeout());
 			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		}
-		// Set remote forward hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
-		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteForwardHardLimitSwitch)) {
-			srx.configForwardLimitSwitchSource(configuration.getRemoteForwardHardLimitSwitchSource(), configuration.getForwardHardLimitSwitchNormal(), configuration.getRemoteForwardHardLimitSwitchDeviceId(), getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
-		} else {
-			srx.configForwardLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
-		}
-		// Set remote reverse hard limits.  NB: You won't have both local and remote, so it's ok that they both are writing to clear flag here.
-		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteReverseHardLimitSwitch)) {
-			srx.configReverseLimitSwitchSource(configuration.getRemoteReverseHardLimitSwitchSource(), configuration.getReverseHardLimitSwitchNormal(), configuration.getRemoteReverseHardLimitSwitchDeviceId(), getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
-		} else {
-			srx.configReverseLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
-		}
-		
 		// Set forward soft limit
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch)) {
 			srx.configForwardSoftLimitEnable(true, getTimeout());
 			srx.configForwardSoftLimitThreshold(configuration.getForwardSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
 		} else {
+			srx.configForwardSoftLimitThreshold(0, getTimeout()); // Clear it so it's not confusing us in RoboRio Web UI
 			srx.configForwardSoftLimitEnable(false, getTimeout());
 		}
 		// Set reverse soft limit
@@ -324,6 +318,7 @@ public final class TalonSRX extends AbstractMotorController {
 			srx.configReverseSoftLimitEnable(true, getTimeout());
 			srx.configReverseSoftLimitThreshold(configuration.getReverseSoftLimit().convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt(), getTimeout());
 		} else {
+			srx.configReverseSoftLimitThreshold(0, getTimeout()); // Clear it so it's not confusing us in RoboRio Web UI
 			srx.configReverseSoftLimitEnable(false, getTimeout());
 		}
 		srx.setSensorPhase(configuration.getSensorPhaseIsReversed());

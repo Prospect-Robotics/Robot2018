@@ -156,7 +156,9 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 			newControlMode = ControlMode.Velocity;
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
-			newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+			if(!getCurrentLimitSwitchStatus(proposedState.getTargetDirection())) {
+				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble()  / 2;
+			}
 		default:
 			break;
 		}
@@ -276,7 +278,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		spx.configAllowableClosedloopError(PIDProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0, getTimeout());
 		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
 		spx.configSetParameter(ParamEnum.eClearPositionOnQuadIdx, 0 /* disabled */, 0 /* unused */, 0 /* unused */, getTimeout());
-		
+
 		// Set forward hard limits
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteForwardHardLimitSwitch)) {
 			spx.configForwardLimitSwitchSource(configuration.getRemoteForwardHardLimitSwitchSource(), configuration.getForwardHardLimitSwitchNormal(), configuration.getRemoteForwardHardLimitSwitchDeviceId(), getTimeout());
