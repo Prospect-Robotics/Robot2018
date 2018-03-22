@@ -14,6 +14,7 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePositionA
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitchSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPositionSync;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
@@ -101,14 +102,12 @@ public class AutonomousCommandGroup extends CommandGroup {
 	static final Length ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT = inches(24);
 	/**
 	 * Arm Position for Level extension
-	 * TODO: This should be in ArmDegrees
 	 */
-	static final Length ARM_POSITION_FOR_LEVEL = inches(12);
+	static final Length ARM_POSITION_FOR_LEVEL = armDegrees(133);
 	/**
 	 * Arm Position for holding high
-	 * TODO: This should be in ArmDegrees
 	 */
-	static final Length ARM_POSITION_HIGH = inches(20);
+	static final Length ARM_POSITION_HIGH = armDegrees(20);
 
 	/* ------------------------------------------------------------------------------------------------------
 	 * Helpers for changing sticky settings values used by add command helpers 
@@ -156,6 +155,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	static Length feet(double feet) {
 		return LengthUOM.Feet.create(feet).multiply(DISTANCE_SCALING_MULTIPLIER);
+	}
+	
+	static Length armDegrees(double degrees) {
+		return ArmConfiguration.ArmDegrees.create(degrees);
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
