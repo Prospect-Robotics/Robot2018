@@ -174,6 +174,13 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// No change to encoder position unless you are simulating instability
 		boolean resetEncoderFromHardLimit = false;
 		Direction targetDirection = currentState.getTargetDirection();
+		if(currentState.getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION || currentState.getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION) {
+			targetDirection = 
+					currentState.getTargetAbsolutePosition().getCanonicalValue() < getCurrentPosition().getCanonicalValue() 
+					? Direction.REVERSE 
+					: Direction.FORWARD
+					;
+		}
 		if(targetDirection == null) {
 			Logger.info(this + " targetDirection is NULL: " + currentState);
 			throw new IllegalStateException("KABOOM!");
