@@ -126,7 +126,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 			throw new IllegalArgumentException("Margin of error is +/- an absolute value and should not be negative."); 
 		}
 		// [RELATIVE] Must adjust units, scale
-		return getCurrentRateErrorWithin(toSensorUnitsScale(marginOfError).getAbsoluteValue());
+		return controller.getCurrentRateErrorWithin(toSensorUnitsScale(marginOfError).getAbsoluteValue());
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 			throw new IllegalArgumentException("Margin of error is +/- an absolute value and should not be negative."); 
 		}
 		// [RELATIVE] Must adjust units, scale
-		return getCurrentPositionErrorWithin(toSensorUnitsScale(marginOfError).getAbsoluteValue());
+		return controller.getCurrentPositionErrorWithin(toSensorUnitsScale(marginOfError).getAbsoluteValue());
 	}
 
 	@Override
@@ -284,5 +284,10 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	@Override
 	public void periodic() {
 		controller.periodic();
+	}
+
+	@Override
+	public boolean isDisconnected() {
+		return controller.isDisconnected();
 	}
 }
