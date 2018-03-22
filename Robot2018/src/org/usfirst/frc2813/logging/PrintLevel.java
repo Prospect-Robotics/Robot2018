@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 /**
  * @author Adrian Guerra
  *
+ * NB: If you want to test code standalone that uses the logger, replace referneces to DriverStation.reportXXX with System.out.println
+ *     It has to be commented, not switched.  If the DriverStation is loaded it will crash outside of RoboRIO.
  */
 enum PrintLevel {
 	DEFAULT {
@@ -20,12 +22,14 @@ enum PrintLevel {
 		@Override
 		void print(String content) {
 			DriverStation.reportWarning(content,false);
+			//System.out.println(content);
 		}
 	},
 	ERROR {
 		@Override
 		void print(String content) {
 			DriverStation.reportError(content,false);
+			//System.out.println(content);
 		}
 	};
 	abstract void print(String content);
