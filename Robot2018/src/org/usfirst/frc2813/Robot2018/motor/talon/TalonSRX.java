@@ -158,7 +158,7 @@ public final class TalonSRX extends AbstractMotorController {
 			newSlotIndex   = PROFILE_SLOT_FOR_MOVE;
 			newPIDIndex    = PID_INDEX_FOR_MOVE;
 			if(!getCurrentLimitSwitchStatus(proposedState.getTargetDirection())) {
-				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble()  / 3;
+				newControlModeValue = toMotorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			}
 		default:
 			break;
