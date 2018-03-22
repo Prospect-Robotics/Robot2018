@@ -31,7 +31,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 			if (onCurve) {
 				angleTravelled -= deltaAngle;
 			}
-			return angleTravelled % 360;
+			return angleTravelled % 360.0;
 		}
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
@@ -54,7 +54,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 	private double startAngle; // which may or may not be zero degrees.
 	private double deltaAngle; // for the turn version
 	private boolean onCurve;
-	
+
 	/**
 	 * Use PID to drive in a straight line for a given distance.
 	 * @param speed - the peak speed. We ramp up to this
@@ -63,9 +63,9 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 */
 	public PIDAutoDrive(double speed, Direction direction, double distance) {
 		requires(Robot.driveTrain);
-		controller.setInputRange(0, 256);
+		controller.setInputRange(-360, 360);
 		controller.setContinuous();
-		controller.setOutputRange(-1, 1);
+		controller.setOutputRange(-180, 180);
 		startSpeed = endSpeed = MIN_SPEED;
 		maxSpeed=speed;
 		this.direction = direction;
@@ -267,7 +267,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 				"offset Angle", offsetAngle,
 				"New Throttle", newThrottle,
 				"PID Output", pidOutput);
-		Robot.driveTrain.arcadeDrive(newThrottle, -((pidOutput + offsetAngle) % 360));
+		Robot.driveTrain.arcadeDrive(newThrottle, ((pidOutput + offsetAngle) % 360.0));
 	}
 
 	private void driveStraight(double pidOutput) {
@@ -280,7 +280,8 @@ public class PIDAutoDrive extends GearheadsCommand {
 		Logger.printLabelled(LogType.INFO, "PID linear stepping",
 				"distance travelled", distanceTravelled,
 				"New Throttle", newThrottle,
-				"PID Output", pidOutput);
-		Robot.driveTrain.arcadeDrive(newThrottle, -pidOutput);
+				"PID Output", pidOutput,
+				"Angular Drift", Robot.gyro.getAngle() - startAngle);
+		Robot.driveTrain.arcadeDrive(newThrottle, pidOutput);
 	}
 }
