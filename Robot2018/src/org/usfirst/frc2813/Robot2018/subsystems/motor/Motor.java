@@ -53,9 +53,19 @@ import edu.wpi.first.wpilibj.PWMSpeedController;
  *    of the current target state, previous target state, etc. as those are redundant and 
  *    unnecessarily complicate things.
  *
+ *  To run standalone tests, comment out "extends GearheadsSubsystem", then uncomment the block marked SIMULATION
+ *
  */
 public final class Motor extends GearheadsSubsystem implements IMotor {
-
+/*
+	// BEGIN STANDALONE TESTING STUBS
+	public String getName() { return configuration.getName(); }
+	public void setName(String name) {  }
+	protected boolean encoderFunctional = true;
+	protected boolean emulated = true;
+	public boolean isEmulated() { return emulated; }
+	// END STANDALONE TESTING STUBS
+*/
 	/* ----------------------------------------------------------------------------------------------
 	 * Configuration
 	 * ---------------------------------------------------------------------------------------------- */
@@ -141,7 +151,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 */
 	public void enableEmulator() {
 		if(!isEmulated()) {
-			super.enableEmulator();
+			super.enableEmulator(); // STANDALONE TESTING: COMMENT OUT THIS LINE
 			if(hardwareController != null) {
 				Logger.info(this + " is enabling simulation.  Disabling real motor.");
 				hardwareController.disable();
@@ -164,7 +174,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 				Logger.info(this + " is disabling simulation.  Reconfiguring real motor.");
 				hardwareController.configure();
 			}
-			super.disableEmulator();
+			super.disableEmulator(); // STANDALONE TESTING: COMMENT OUT THIS LINE
 		}
 	}
 
@@ -254,7 +264,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		if(getConfiguration().getDefaultCommandFactory() != null) {
 			GearheadsCommand c = getConfiguration().getDefaultCommandFactory().createCommand(this);
 			if(c != null) {
-				setDefaultCommand(c);
+//				setDefaultCommand(c);
 				c.setIsDefaultCommand(true);
 			}
 		}
@@ -262,7 +272,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	// Periodic
 	public final void periodic() {
-		super.periodic();
+//		super.periodic();
 		getMotorController().periodic();
 		dumpSubsystemStatusAtIntervals();
 	}
