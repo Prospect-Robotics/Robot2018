@@ -311,7 +311,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		// Transition successful, save the state.
 		this.previousState = this.currentState;
 		this.currentState = motorState;
-		Logger.info(this + " transition complete: " + getDiagnostics());		
+		Logger.info(this + " transition complete: " + getDiagnostics() + " (was " + previousState + ")");		
 		return true;
 	}
 	
@@ -425,10 +425,10 @@ public abstract class AbstractMotorController implements IMotorController {
 					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() < getTargetState().getStartingAbsolutePosition().getCanonicalValue())
 				)
 				{
-					Logger.info("Forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + ".");
-					return true;
+					Logger.info(this + " forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.");
+					return false;
 				}
-				Logger.info("Forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + "."); 
+				Logger.info(this + " forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + "."); 
 				resetEncoders = resetEncoderSensorPosition(getForwardLimit());
 			}
 		}
@@ -444,10 +444,10 @@ public abstract class AbstractMotorController implements IMotorController {
 					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() > getTargetState().getStartingAbsolutePosition().getCanonicalValue())
 				)
 				{
-					Logger.info("Reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + ".");
-					return true;
+					Logger.info(this + " reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.");
+					return false;
 				}
-				Logger.info("Reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + "."); 
+				Logger.info(this + " reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + "."); 
 				resetEncoders = resetEncoderSensorPosition(getReverseLimit());
 			}
 		}
