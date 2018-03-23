@@ -211,6 +211,11 @@ public class DriveTrain extends GearheadsSubsystem {
 			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
 		}
 	}
+	
+	public void stop() {
+		speedControllerPort.set(0);
+		speedControllerStarboard.set(0);
+	}
 
 	public void setBrakeCoast(NeutralMode b) {
 		((VictorSPX) speedControllerPort).setNeutralMode(b);
