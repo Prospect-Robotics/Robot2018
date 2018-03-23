@@ -27,7 +27,7 @@ class Test  {
 	
 	interface Periodic {
 		void periodic();
-	};
+	}
 
 	/**
 	 * I just call periodic on something every 100ms
@@ -57,7 +57,7 @@ class Test  {
 				}
 			}
 		}
-	};
+	}
 
 	private static IMotorState lastAnnounced = null;
 	private static Length lastSeen = null;
