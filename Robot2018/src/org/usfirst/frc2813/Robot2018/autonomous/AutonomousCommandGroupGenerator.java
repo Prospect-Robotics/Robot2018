@@ -221,7 +221,38 @@ public class AutonomousCommandGroupGenerator {
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
-		else if (!robotStartingPosition.equals(Direction.CENTER)) {
+		else if (robotStartingPosition.equals(Direction.CENTER)) {
+			/*
+			 * If the robot is in the center, we're going to drop a cube into the switch
+			 * on the correct side.  
+    		 *
+    		 * NB: Make sure there isn't another robot crossing your path before you pick this.
+    		 * 
+			 * NB: We write this script as if the our switch is active to the left of the  
+			 * robot.  If this isn't the case, the script will be run inverted.
+			 */
+			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the " + nearSwitchPosition + " position.");
+			if (useCurves) {
+				/**
+				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
+				 * The distance to the scale less our length is how far we need to move forward. This S curve does that in 2 arcs, so set
+				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
+				 */
+				radius = inches((140-46)/2);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+			}
+			else {
+				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
+				autoCmdList.addQuickTurnSync(left, 45);
+				autoCmdList.addDriveForwardSync(inches(121), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
+				autoCmdList.addQuickTurnSync(right, 45);
+			}
+			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
+			// Remember we let go of our cube, we can really fly now...
+			autoCmdList.setHaveCube(false);
+		} else {
 			/*
     		 * If the robot and the scale are on opposite sides,
     		 * drive forward past the switch, spin towards the
@@ -262,38 +293,6 @@ public class AutonomousCommandGroupGenerator {
 			}
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
 			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
-			// Remember we let go of our cube, we can really fly now...
-			autoCmdList.setHaveCube(false);
-		}
-		else {
-			/*
-			 * If the robot is in the center, we're going to drop a cube into the switch
-			 * on the correct side.  
-    		 *
-    		 * NB: Make sure there isn't another robot crossing your path before you pick this.
-    		 * 
-			 * NB: We write this script as if the our switch is active to the left of the  
-			 * robot.  If this isn't the case, the script will be run inverted.
-			 */
-			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the " + nearSwitchPosition + " position.");
-			if (useCurves) {
-				/**
-				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
-				 * The distance to the scale less our length is how far we need to move forward. This S curve does that in 2 arcs, so set
-				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
-				 */
-				radius = inches((140-46)/2);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-			}
-			else {
-				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
-				autoCmdList.addQuickTurnSync(left, 45);
-				autoCmdList.addDriveForwardSync(inches(121), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
-				autoCmdList.addQuickTurnSync(right, 45);
-			}
-			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
-			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
