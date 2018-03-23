@@ -157,14 +157,14 @@ public class MotorConfiguration implements IMotorConfiguration {
 	/*
 	 * If SensorToMotorScale is supported, return the scaling factor to convert from motor to sensor position/rate
 	 */
-	private final Double sensorToDriveScalingFactor;
+	private final Double sensorToDriveScalingMultiplier;
 	/* (non-Javadoc)
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getSensorToDriveScalingFactor()
 	 */
 	@Override
-	public final double getSensorToDriveScalingFactor() {
+	public final double getSensorToDriveScalingMultiplier() {
 		requireAll(SensorToDriveScale);
-		return sensorToDriveScalingFactor;
+		return sensorToDriveScalingMultiplier;
 	}
 	
 	/*
@@ -489,7 +489,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 			Rate maximumForwardRate, // requireAll(Forward|ControlRate|LimitRate)
 			Rate minimumReverseRate, // requireAll(Reverse|ControlRate|LimitRate)
 			Rate maximumReverseRate, // requireAll(Reverse|ControlRate|LimitRate)
-			Double sensorToDriveScalingFactor, // requireAll(SensorToDriveScale)
+			Double sensorToDriveScalingMultiplier, // requireAll(SensorToDriveScale)
 			Length forwardLimit, // requireAll(Forward|ControlPosition|LimitPosition)
 			Length reverseLimit, // requireAll(Reverse|ControlPosition|LimitPosition)
 			LimitSwitchNormal forwardHardLimitSwitchNormal, // requireAll(Forward|ForwardSoftLimitSwitch)
@@ -515,7 +515,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 		this.sensorPhaseIsReversed = sensorPhaseIsReversed;
 		this.motorPhaseIsReversed = motorPhaseIsReversed;
 		this.nativeSensorLengthUOM = nativeSensorLengthUOM;
-		this.sensorToDriveScalingFactor = sensorToDriveScalingFactor;
+		this.sensorToDriveScalingMultiplier = sensorToDriveScalingMultiplier;
 		this.nativeDisplayRateUOM = nativeDisplayRateUOM;
 		this.nativeMotorRateUOM = nativeMotorRateUOM;
 		this.nativeSensorRateUOM = nativeSensorRateUOM;
@@ -639,7 +639,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 		checkParameter("maximumForwardRate", maximumForwardRate, 0, Forward|ControlRate|LimitRate);
 		checkParameter("minimumReverseRate", minimumReverseRate, 0, Reverse|ControlRate|LimitRate);
 		checkParameter("maximumReverseRate", maximumReverseRate, 0, Reverse|ControlRate|LimitRate);
-		checkParameter("sensorToDriveScalingFactor", sensorToDriveScalingFactor, SensorToDriveScale, 0);
+		checkParameter("sensorToDriveScalingFactor", sensorToDriveScalingMultiplier, SensorToDriveScale, 0);
 		checkParameter("forwardLimit", forwardLimit, 0, Forward|ControlPosition|LimitPosition);
 		checkParameter("reverseLimit", reverseLimit, 0, Reverse|ControlPosition|LimitPosition);
 		checkParameter("forwardHardLimitSwitchNormal", forwardHardLimitSwitchNormal, 0, Forward|LocalForwardHardLimitSwitch);
@@ -741,7 +741,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 		.append("\n")
 		.append("sensorPhaseIsReversed................." + sensorPhaseIsReversed + "\n")
 		.append("motorPhaseIsReversed.................." + motorPhaseIsReversed + "\n")
-		.append("sensorToDriveScalingFactor............" + sensorToDriveScalingFactor + "\n")
+		.append("sensorToDriveScalingMultiplier........" + sensorToDriveScalingMultiplier + "\n")
 		.append("\n")
 		.append("Miscellaneous:\n")
 		.append("\n")

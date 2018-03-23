@@ -72,7 +72,7 @@ public interface IMotorConfiguration {
 
 	LengthUOM getNativeSensorLengthUOM();
 
-	double getSensorToDriveScalingFactor();
+	double getSensorToDriveScalingMultiplier();
 
 	RateUOM getNativeDisplayRateUOM();
 
