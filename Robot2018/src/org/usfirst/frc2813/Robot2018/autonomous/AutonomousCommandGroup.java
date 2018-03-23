@@ -2,11 +2,10 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.auto.PIDAutoDrive;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoCurveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncodersInstant;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyroInstant;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinAsync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeStopInstant;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensorAsync;
@@ -201,7 +200,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * TODO: This is going to be the new default.
 	 */
 	private void addDriveCommandSync(Direction direction, Length distance, double endSpeed) {
-		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
+		addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
 		currentSpeed = endSpeed;
 	}
 	/**
@@ -227,7 +226,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * @param endSpeed - speed coming out this command
 	 */
 	private void addCurveCommandSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
-		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
+		addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 				endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 		currentSpeed = endSpeed;
 	}

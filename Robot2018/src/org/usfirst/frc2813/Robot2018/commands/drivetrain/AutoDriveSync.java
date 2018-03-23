@@ -1,7 +1,8 @@
-package org.usfirst.frc2813.Robot2018.commands.auto;
+package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -9,11 +10,12 @@ import org.usfirst.frc2813.units.Direction;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Class to use PID control of autonomous drive. Note that all units are inches
  */
-public class PIDAutoDrive extends GearheadsCommand {
+public class AutoDriveSync extends AbstractDriveTrainCommand {
 	private final PIDSource m_source = new PIDSource() {
 
 		@Override
@@ -34,7 +36,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		 */
 		@Override
 		public double pidGet() {
-			double angleTravelled = Robot.gyro.getAngle() - startAngle;
+			double angleTravelled = gyro.getAngle() - startAngle;
 			if (onCurve) {
 				// We subtract the angle we're expecting to be facing from the current angle, so that what is left is just the error, signed value  
 				angleTravelled -= calcAngle(distanceTravelled());
@@ -74,6 +76,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 	private static final double MIN_SPEED = 0.2;  // speed to go if at a dead stop. The fastest we can go without spinning out
 	private static final double MAX_SPEED = 1.0;
 
+	private final Gyro gyro;
 	private final Direction direction;
 	private final double distance;
 	private double startSpeed, endSpeed, maxSpeed;
@@ -91,8 +94,9 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
 	 */
-	public PIDAutoDrive(double speed, Direction direction, double distance) {
-		requires(Robot.driveTrain);
+	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance) {
+		super(driveTrain, true);
+		this.gyro = driveTrain.getGyro();
 		controller.setInputRange(-360, 360);
 		controller.setContinuous();
 		controller.setOutputRange(-1.0, 1.0);
@@ -116,8 +120,8 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 * @param startSpeedFactor - how fast are we going? 0..1
 	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
 	 */
-	public PIDAutoDrive(double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
-		this(speed, direction, distance);
+	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
+		this(driveTrain, speed, direction, distance);
 		startSpeed += MAX_SPEED * (1 - startSpeedFactor);
 		accelRamp *= 1 - startSpeedFactor;
 
@@ -135,9 +139,9 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 * @param radius - the radius of the circle we are traveling
 	 * @param clockwise - the direction of the circle
 	 */
-	public PIDAutoDrive(double speed, Direction direction, double distance, double startSpeedFactor,
+	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor,
 			double endSpeedFactor, double radius, boolean clockwise) {
-		this(speed, direction, distance, startSpeedFactor, endSpeedFactor);
+		this(driveTrain, speed, direction, distance, startSpeedFactor, endSpeedFactor);
 		onCurve = true;
 		deltaAngle = (distance * 180.0) / (radius * Math.PI); // just an offset for now
 		if (!clockwise) {
@@ -163,8 +167,8 @@ public class PIDAutoDrive extends GearheadsCommand {
 		 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
 		 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
 		 */
-		startPosition = Robot.driveTrain.getDistance();
-		startAngle = Robot.gyro.getAngle();
+		startPosition = driveTrain.getDistance();
+		startAngle = gyro.getAngle();
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive start", "position", startPosition, "angle", startAngle);
 		controller.enable();
 	}
@@ -188,7 +192,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 	}
 
 	private double distanceTravelled() {
-		double rawDelta = Robot.driveTrain.getDistance() - startPosition;
+		double rawDelta = driveTrain.getDistance() - startPosition;
 		return direction.isPositive() ? rawDelta : -rawDelta;
 	}
 	
@@ -250,7 +254,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		//new PrintOutEncoderValues(60,Robot.driveTrain.encoderPort,Robot.driveTrain.encoderStarboard);
+		//new PrintOutEncoderValues(60,driveTrain.encoderPort,driveTrain.encoderStarboard);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -274,7 +278,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		 * and would have one if we were correcting for an error when driving straight.
 		 */
 		Logger.info("Stopping... leaving lastThrottle=" + lastThrottle);
-		Robot.driveTrain.arcadeDrive(lastThrottle, 0.0);
+		driveTrain.arcadeDrive(lastThrottle, 0.0);
 	}
 
 	/**
@@ -304,7 +308,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		double distanceTravelled = distanceTravelled();
 		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
 		double expectedAngle = calcAngle(distanceTravelled);
-		double actualAngle = Robot.gyro.getAngle() - startAngle;
+		double actualAngle = gyro.getAngle() - startAngle;
 		/*
 		 * 3/22/2018 MT - 
 		 * PID is sending us a throttle value for the angle based on the direction 
@@ -326,7 +330,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 				"Throttle", newThrottle,
 				"PID Output", pidOutput
 				);
-		Robot.driveTrain.arcadeDrive(newThrottle, pidOutput);
+		driveTrain.arcadeDrive(newThrottle, pidOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 
@@ -342,10 +346,10 @@ public class PIDAutoDrive extends GearheadsCommand {
 		Logger.printLabelled(LogType.INFO, "PID linear stepping",
 				"TargetDistance", distance * direction.getMultiplier(),
 				"distance travelled", distanceTravelled,
-				"AngleError[now]", Robot.gyro.getAngle() - startAngle,
+				"AngleError[now]", gyro.getAngle() - startAngle,
 				"Throttle", newThrottle,
 				"PID Output", pidOutput);
-		Robot.driveTrain.arcadeDrive(newThrottle, pidOutput);
+		driveTrain.arcadeDrive(newThrottle, pidOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 }
