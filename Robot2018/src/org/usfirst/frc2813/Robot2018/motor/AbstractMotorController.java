@@ -151,7 +151,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		IMotorState stateBeforeResettingEncoders = getTargetState();
 		Length positionBeforeResettingEncoders = getCurrentPosition();
 		if(!changeState(MotorStateFactory.createDisabled(this))) {
-			Logger.info("Could not change state to disabled.  No resetting sensor position.");
+			Logger.error("Could not change state to disabled.  No resetting sensor position.");
 			return false;
 		}
 		if(!resetEncoderSensorPositionImpl(position)) {
@@ -160,23 +160,23 @@ public abstract class AbstractMotorController implements IMotorController {
 		}
 		switch(stateBeforeResettingEncoders.getOperation()) {
 		case CALIBRATING_SENSOR_IN_DIRECTION:
-			Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of manual calibrating sensor operation.");
+			Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of manual calibrating sensor operation.");
 			changeState(MotorStateFactory.createHoldingPosition(this));
 			break;
 		case DISABLED:
 			// Stay disabled, no further change required.
 			break;
 		case HOLDING_CURRENT_POSITION:
-			Logger.info("resetEncoderSensorPosition(" + position + ") is returning to holding operation after completion of auto-calibrating sensor operation.");
+			Logger.debug("resetEncoderSensorPosition(" + position + ") is returning to holding operation after completion of auto-calibrating sensor operation.");
 			changeState(MotorStateFactory.createHoldingPosition(this));
 			break;
 		case MOVING_IN_DIRECTION_AT_RATE:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetDirection();
 			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
-				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of auto-calibrating sensor operation.");
+				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of auto-calibrating sensor operation.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
-				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning back to moving away from the hardware limit after completion of auto-calibrating operation.");
+				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning back to moving away from the hardware limit after completion of auto-calibrating operation.");
 				changeState(stateBeforeResettingEncoders);
 			}
 			
@@ -184,10 +184,10 @@ public abstract class AbstractMotorController implements IMotorController {
 		case MOVING_TO_ABSOLUTE_POSITION:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetAbsolutePosition().getValue() > getCurrentPosition().getValue() ? Direction.FORWARD : Direction.REVERSE; 
 			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
-				Logger.error("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the absolute position is beyond the hardware limit.");
+				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the absolute position is beyond the hardware limit.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
-				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning back to move to absolute position after completion of auto-calibrating sensor operation.");
+				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning back to move to absolute position after completion of auto-calibrating sensor operation.");
 				changeState(MotorStateFactory.createMovingToAbsolutePosition(this, stateBeforeResettingEncoders.getTargetAbsolutePosition()));
 			}
 			break;
@@ -204,10 +204,10 @@ public abstract class AbstractMotorController implements IMotorController {
 			}
 // DEBUGGING
 			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
-				Logger.error("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the relative position was beyond the hardware limit.");
+				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the relative position was beyond the hardware limit.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
-				Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning back to move to an adjusted relative position after completion of auto-calibrating sensor operation: " + relative);
+				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning back to move to an adjusted relative position after completion of auto-calibrating sensor operation: " + relative);
 				changeState(relative);			
 			}
 			break;
