@@ -61,7 +61,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	/*
 	 * Now we can define a length unit representing one degree.
 	 */
-	public static final LengthUOM ArmDegrees = new LengthUOM("degree", "degrees", "deg", LengthUOM.CanonicalLengthUOM, DRIVE_INCHES_PER_ONE_DEGREE.getCanonicalValue());
+	public static final LengthUOM ArmDegrees = new LengthUOM("arm-degree", "arm-degrees", "arm-deg", LengthUOM.CanonicalLengthUOM, DRIVE_INCHES_PER_ONE_DEGREE.getCanonicalValue());
 	/*
 	 * Now let's figure out a length of drive inches per pulse 
 	 */
