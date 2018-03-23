@@ -2,7 +2,9 @@
 
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
+import org.usfirst.frc2813.logging.Logger;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -26,7 +28,9 @@ public final class DriveTrainOIDriveSync extends AbstractDriveTrainCommand {
 	@Override
 	protected void execute() {
 		super.execute();
-		driveTrain.arcadeDrive(joystick1, joystick2);
+		if(!DriverStation.getInstance().isAutonomous()) {
+			driveTrain.arcadeDrive(joystick1, joystick2);
+		}
 	}
 
 	/**
