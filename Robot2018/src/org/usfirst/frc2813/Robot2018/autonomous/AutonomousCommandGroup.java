@@ -112,7 +112,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Arm Position for holding high
 	 */
 	static final Length ARM_POSITION_HIGH = armDegrees(20);
-
+	
+	static final Length ARM_POSITION_SHOOT = armDegrees(90);
+	
 	/* ------------------------------------------------------------------------------------------------------
 	 * Helpers for changing sticky settings values used by add command helpers 
 	 * ------------------------------------------------------------------------------------------------------ */
@@ -384,6 +386,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void addArmMoveToHighPositionAsync() {
 		addArmMoveToPositionAsync(ARM_POSITION_HIGH);
 	}
+	
+	public void addArmMoveToShootingPositionAsync() {
+		addArmMoveToPositionAsync(ARM_POSITION_SHOOT);
+	}
 
 	/* ------------------------------------------------------------------------------------------------------
 	 * Helpers for adding Jaws commands
@@ -454,7 +460,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	public void addShootCubeSequence() {
 		addIntakeOutAsync();
-		addJawsOpenSync();
+		addDelayInSecondsSync(0.2);
 		addIntakeStopSync();
 	}
 	
