@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
 import org.usfirst.frc2813.logging.LogLevel;
@@ -78,15 +79,32 @@ class Test  {
 			boolean hitHardLimit = false;
 			boolean hitSoftLimit = false;
 			if(m.getTargetState().isCalibratingSensorInDirection() && m.getCurrentHardLimitSwitchStatus(m.getTargetDirection())) {
+				Logger.info("We think we are calibrating and hit the correct hard limit switch for " + m.getTargetDirection());
 				complete = true;
 				continue;
 			}
 			if(m.getTargetDirection() != null) {
 				hitHardLimit = m.getCurrentHardLimitSwitchStatus(m.getTargetDirection());
 				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(m.getTargetDirection());
+			} else if(m.getTargetState().getHasStartingAbsolutePosition() 
+					&& m.getTargetState().getHasTargetAbsolutePosition()
+					&& m.getTargetState().getStartingAbsolutePosition().getCanonicalValue() < m.getTargetState().getTargetAbsolutePosition().getCanonicalValue()) { 
+				hitHardLimit = m.getCurrentHardLimitSwitchStatus(Direction.FORWARD);
+				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(Direction.FORWARD);
+			} else if(m.getTargetState().getHasStartingAbsolutePosition() 
+					&& m.getTargetState().getHasTargetAbsolutePosition()
+					&& m.getTargetState().getStartingAbsolutePosition().getCanonicalValue() > m.getTargetState().getTargetAbsolutePosition().getCanonicalValue()) { 
+				hitHardLimit = m.getCurrentHardLimitSwitchStatus(Direction.REVERSE);
+				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(Direction.REVERSE);
 			} else {
+				Logger.info(m.getTargetState());
 				hitHardLimit = m.getCurrentHardLimitSwitchStatus(Direction.FORWARD) || m.getCurrentHardLimitSwitchStatus(Direction.REVERSE);
 				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(Direction.FORWARD) || m.getCurrentSoftLimitSwitchStatus(Direction.REVERSE);
+			}
+			if(m.getTargetState().getOperation() == MotorOperation.DISABLED) {
+				Logger.warning("WE GOT DISABLED.  THAT WAS UNEXPECTED.");
+				failed = true;
+//				continue;
 			}
 			if(m.getTargetDirection() != null && (hitHardLimit || hitSoftLimit)) {
 				if(hitHardLimit) {
@@ -115,7 +133,9 @@ class Test  {
 				}
 			}
 			lastSeen = m.getCurrentPosition();
-			if(m.getTargetState().isMovingToPosition() && m.getCurrentPositionErrorWithin(LengthUOM.Inches.create(0.001))) {
+			Length margin = m.getConfiguration().getNativeDisplayLengthUOM().create(0.001);
+			if(m.getTargetState().isMovingToPosition() && m.getCurrentPositionErrorWithin(margin)) {
+				Logger.info("We think we are within " + margin + " of target.  Actual error is " + m.getCurrentPositionError() + " position is " + m.getCurrentPosition());
 				complete = true;
 				continue;
 			}
@@ -135,42 +155,53 @@ class Test  {
 		Logger.info(" ");
 	}
 
-//	@org.junit.jupiter.api.Test
+	@org.junit.jupiter.api.Test
 	void test() {
 		try {
-//		ElevatorConfiguration.mathReport();
-//		ArmConfiguration.mathReport();
-//		Elevator.axisConfiguration.dumpDescription();
-		Motor m = new Motor(new ElevatorConfiguration());
-		Thread p = new TimerThread(new Periodic() { public void periodic() { m.periodic(); }});
-		p.start();
-		Thread.yield();
-//		Logger.setLoggingLevel(LogLevel.ERROR);
-		m.moveToAbsolutePosition(LengthUOM.Inches.create(10));
-		waitForCompletion(m);
-		m.moveToAbsolutePosition(LengthUOM.Inches.create(30));
-		waitForCompletion(m);
-		m.moveToAbsolutePosition(LengthUOM.Inches.create(5));
-		waitForCompletion(m);
-		m.moveToRelativePosition(Direction.FORWARD, LengthUOM.Inches.create(5));
-		waitForCompletion(m);
-		m.moveToRelativePosition(Direction.REVERSE, LengthUOM.Inches.create(5));
-		waitForCompletion(m);
-		m.moveToAbsolutePosition(LengthUOM.Inches.create(-1));
-		waitForCompletion(m);
-		m.moveToAbsolutePosition(LengthUOM.Inches.create(1000));
-		waitForCompletion(m);
-		m.calibrateSensorInDirection(Direction.REVERSE);
-		waitForCompletion(m);
-		m.moveInDirectionAtRate(Direction.FORWARD, RateUOM.FeetPerSecond.create(6));
-		waitForCompletion(m);
-//		Logger.setLoggingLevel(LogLevel.DEBUG);
-		m.moveInDirectionAtDefaultRate(Direction.REVERSE);
-		waitForCompletion(m);
-//		Logger.setLoggingLevel(LogLevel.INFO);
-		Logger.info("-----------------------------------------------------------");
-		Logger.info("ALL DONE.");
-		Logger.info("-----------------------------------------------------------");
+			Motor elevator = new Motor(new ElevatorConfiguration());
+			Motor arm = new Motor(new ArmConfiguration());
+			Thread p = new TimerThread(new Periodic() { public void periodic() { 
+				elevator.periodic();
+				arm.periodic();
+			}});
+			p.start();
+			Thread.yield();
+			// Logger.setLoggingLevel(LogLevel.ERROR);
+			Length ninety = arm.getConfiguration().getNativeDisplayLengthUOM().create(90);
+			// ARM
+			arm.moveToAbsolutePosition(ninety);
+			waitForCompletion(arm);
+			arm.calibrateSensorInDirection(Direction.REVERSE);
+			waitForCompletion(arm);
+			
+			// Elevator
+			elevator.moveToAbsolutePosition(LengthUOM.Inches.create(10));
+			waitForCompletion(elevator);
+			elevator.moveToAbsolutePosition(LengthUOM.Inches.create(30));
+			waitForCompletion(elevator);
+			elevator.moveToAbsolutePosition(LengthUOM.Inches.create(5));
+			waitForCompletion(elevator);
+			elevator.moveToRelativePosition(Direction.FORWARD, LengthUOM.Inches.create(5));
+			waitForCompletion(elevator);
+			elevator.moveToRelativePosition(Direction.REVERSE, LengthUOM.Inches.create(5));
+			waitForCompletion(elevator);
+			elevator.moveToAbsolutePosition(LengthUOM.Inches.create(-1));
+			waitForCompletion(elevator);
+			elevator.moveToAbsolutePosition(LengthUOM.Inches.create(1000));
+			waitForCompletion(elevator);
+			elevator.calibrateSensorInDirection(Direction.REVERSE);
+			waitForCompletion(elevator);
+			elevator.moveInDirectionAtRate(Direction.FORWARD, RateUOM.FeetPerSecond.create(6));
+			waitForCompletion(elevator);
+	//		Logger.setLoggingLevel(LogLevel.DEBUG);
+			elevator.moveInDirectionAtDefaultRate(Direction.REVERSE);
+			waitForCompletion(elevator);
+	//		Logger.setLoggingLevel(LogLevel.INFO);
+			Logger.info("ARM SENSOR TO DRIVE: " + (arm.getConfiguration().getNativeSensorLengthUOM().getCanonicalValue().getCanonicalValue() / arm.getConfiguration().getNativeMotorLengthUOM().getCanonicalValue().getCanonicalValue()));
+			Logger.info("ELEVATOR SENSOR TO DRIVE: " + (elevator.getConfiguration().getNativeSensorLengthUOM().getCanonicalValue().getCanonicalValue() / elevator.getConfiguration().getNativeMotorLengthUOM().getCanonicalValue().getCanonicalValue()));
+			Logger.info("-----------------------------------------------------------");
+			Logger.info("ALL DONE.");
+			Logger.info("-----------------------------------------------------------");
 		} catch(Throwable t) {
 			t.printStackTrace();
 		}
