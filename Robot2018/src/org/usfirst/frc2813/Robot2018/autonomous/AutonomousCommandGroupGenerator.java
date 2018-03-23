@@ -188,12 +188,6 @@ public class AutonomousCommandGroupGenerator {
 		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
 		autoCmdList.setHaveCube(true);
 		
-		// Tell the Elevator to go to the switch height, but don't wat for it.  It's low enough it's not a problem to start moving.
-		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
-
-		// Move the Arm down to the high position 
-		autoCmdList.addArmMoveToHighPositionAsync();
-
 		if (!Robot.gameData.isGameDataValid()) {
 			// Make a note of our lack of configuration 
 			Logger.error(this + ": No game data.");
@@ -268,6 +262,10 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition + " position and the Scale is at the " + scalePosition + " position.");
+			// Tell the Elevator to go to the switch height, but don't wat for it.  It's low enough it's not a problem to start moving.
+			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
+			// Move the Arm down to the high position 
+			autoCmdList.addArmMoveToHighPositionAsync();
 			if (useCurves) {
 				// An S curve. counterclockwise 1/8 turn followed by clockwise 3/8 turn leaves us
 				// clear of the switch and pointing down the alley between switch and scale
