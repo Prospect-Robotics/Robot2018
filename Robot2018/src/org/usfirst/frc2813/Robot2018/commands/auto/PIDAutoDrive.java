@@ -36,13 +36,34 @@ public class PIDAutoDrive extends GearheadsCommand {
 		public double pidGet() {
 			double angleTravelled = Robot.gyro.getAngle() - startAngle;
 			if (onCurve) {
-				angleTravelled -= deltaAngle;
+				// We subtract the angle we're expecting to be facing from the current angle, so that what is left is just the error, signed value  
+				angleTravelled -= calcAngle(distanceTravelled());
 			}
 			return angleTravelled;
 		}
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
-	private final PIDController controller = new PIDController(.05, 0.00, 0, m_source, this::usePIDOutput);
+	/*
+	 * NB: 3/22/2018 MT - Changed PID to P only (0.08).  
+	 * NOTES: 
+	 * 
+	 * 1.  The PID is controlling a % of maximum output power for rotation, so we have to generate a proportional value that is
+	 * much smaller than 1.0 but proportional to direction and magnitude of the error in our current gyroscope angle relative to 
+	 * the gyroscope angle when we started.
+	 * 
+	 * 2.  The goal is to get something that is "just enough" to compensate for the worst case performance anomaly -
+	 * in other words - we are dragging on the left right now so the output has to be just strong enough to counter that and no
+	 * stronger.  
+	 * 
+	 * 3.  Without knowing how throttle % and angle % are combined, the current loading and battery level, and the maximum
+	 * speed under those conditions - we really can't begin to calculate this value.  Fortunately, we just have to derived it 
+	 * empirically and it was pretty easy.  I just increased by .01 until it was tracking to within approximately 
+	 * +/- 1 degree through the arc.  
+	 * 
+	 * 4.  IF the robot gets much worse than it is now, this can be increased but you could always fix the damage. 
+	 */
+	
+	private final PIDController controller = new PIDController(0.08, 0.00, 0.0, m_source, this::usePIDOutput);
 
 	/**
 	 * These defaults give us values that won't slip. Ramps to speed up and slow down and a min speed which we can
@@ -61,6 +82,8 @@ public class PIDAutoDrive extends GearheadsCommand {
 	private double startAngle; // which may or may not be zero degrees.
 	private double deltaAngle; // for the turn version
 	private boolean onCurve;
+	private double lastThrottle = 0; // Last throttle we sent to the drive train
+	private boolean complete = false; // Have we completed the operation
 
 	/**
 	 * Use PID to drive in a straight line for a given distance.
@@ -72,7 +95,7 @@ public class PIDAutoDrive extends GearheadsCommand {
 		requires(Robot.driveTrain);
 		controller.setInputRange(-360, 360);
 		controller.setContinuous();
-		controller.setOutputRange(-180, 180);
+		controller.setOutputRange(-1.0, 1.0);
 		startSpeed = endSpeed = MIN_SPEED;
 		maxSpeed=speed;
 		this.direction = direction;
@@ -232,14 +255,26 @@ public class PIDAutoDrive extends GearheadsCommand {
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		return distanceTravelled() >= distance;
+		/* 
+		 * Keep track of whether we have finished, and ignore any PID outputs on a best effort basis.
+		 * It's highly probable that assigning to boolean complete will be atomic, though it's not 
+		 * guaranteed.  I didn't think it was worth adding a mutex here and in the PID callback. 
+		 */
+		return complete = (distanceTravelled() >= distance);
 	}
 
 	// Called once after isFinished returns true
 	protected void end() {
-		Logger.info("Stopping...");
 		controller.disable();
 		controller.reset();
+		/*
+		 * When we end, we are going to push the same throttle value that we calculated for the "end speed"
+		 * and ramped down to, but we're going to disable the turn.  The last PID output we sent to the 
+		 * controller before we reached our goal for curves will almost certainly have a non-zero rotation rate
+		 * and would have one if we were correcting for an error when driving straight.
+		 */
+		Logger.info("Stopping... leaving lastThrottle=" + lastThrottle);
+		Robot.driveTrain.arcadeDrive(lastThrottle, 0.0);
 	}
 
 	/**
@@ -248,6 +283,10 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 * @param pidOutput
 	 */
 	private void usePIDOutput(double pidOutput) {
+		// If the command is complete, ignore any extra PID output callbacks while we are shutting PID down.
+		if(complete) {
+			return;
+		}
 		if (onCurve) {
 			driveCurve(pidOutput);
 		}
@@ -263,32 +302,50 @@ public class PIDAutoDrive extends GearheadsCommand {
 	 */
 	private void driveCurve(double pidOutput) {
 		double distanceTravelled = distanceTravelled();
-		double newThrottle = calcThrottle(distanceTravelled);
-		double offsetAngle = calcAngle(distanceTravelled);
-		if (direction.isNegative()) {
-			newThrottle *= -1;
-		}
-
+		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
+		double expectedAngle = calcAngle(distanceTravelled);
+		double actualAngle = Robot.gyro.getAngle() - startAngle;
+		/*
+		 * 3/22/2018 MT - 
+		 * PID is sending us a throttle value for the angle based on the direction 
+		 * and magnitude of the error in our current angle relative to where we should
+		 * be at this distance/time.  The value is already properly signed to correct
+		 * the error.  We just need to pass it through to arcadeDrive.  Remember our
+		 * arcadeDrive function takes a negative number for counter-clockwise rotation
+		 * and a positive number for clockwise rotation.   
+		 * 
+		 * Added reporting of progress in rotation, and the error in angle at this position.
+		 */
 		Logger.printLabelled(LogType.INFO, "PID curve stepping",
-				"distance travelled", distanceTravelled,
-				"offset Angle", offsetAngle,
-				"New Throttle", newThrottle,
-				"PID Output", pidOutput);
-		Robot.driveTrain.arcadeDrive(newThrottle, ((pidOutput + offsetAngle) % 360.0));
+				"TargetDistance", distance * direction.getMultiplier(),
+				"CurrentDistance", distanceTravelled,
+				"TargetAngle[end]", deltaAngle,
+				"TargetAngle[now]", expectedAngle,
+				"ActualAngle[now]", actualAngle,
+				"AngleError[now]", expectedAngle - actualAngle,
+				"Throttle", newThrottle,
+				"PID Output", pidOutput
+				);
+		Robot.driveTrain.arcadeDrive(newThrottle, pidOutput);
+		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 
 	private void driveStraight(double pidOutput) {
 		double distanceTravelled = distanceTravelled();
-		double newThrottle = calcThrottle(distanceTravelled);
-		if (direction.isNegative()) {
-			newThrottle *= -1;
-		}
+		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
 
+		/*
+		 * 3/22/2018 MT - 
+		 * Added reporting of the error in the angle, so you can see how well PID is controlling angular 
+		 * drift from the angle at the start of the command.  Within +/- 1 degree seems to be adequate.
+		 */
 		Logger.printLabelled(LogType.INFO, "PID linear stepping",
+				"TargetDistance", distance * direction.getMultiplier(),
 				"distance travelled", distanceTravelled,
-				"New Throttle", newThrottle,
-				"PID Output", pidOutput,
-				"Angular Drift", Robot.gyro.getAngle() - startAngle);
+				"AngleError[now]", Robot.gyro.getAngle() - startAngle,
+				"Throttle", newThrottle,
+				"PID Output", pidOutput);
 		Robot.driveTrain.arcadeDrive(newThrottle, pidOutput);
+		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 }
