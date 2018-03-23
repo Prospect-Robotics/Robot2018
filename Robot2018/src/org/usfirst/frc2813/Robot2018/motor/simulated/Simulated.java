@@ -74,14 +74,22 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		return isHardLimitReached(direction);
 	}
 
-	private void setEncoderPosition(int pos) {
+	private synchronized void setEncoderPosition(int pos) {
 		debug("Setting sensor position.  Was " + encoderValue + " Now " + pos);
 		this.encoderValue = pos;
 	}
 
+	@Override
+	public final synchronized Length getCurrentPosition() {
+		if(!updating) {
+			updateEncoderPosition();
+		}
+		return configuration.getNativeSensorLengthUOM().create(encoderValue);
+	}
+
 	private IMotorState lastCompletedCommand = null; 
 	private boolean updating = false;
-	private void updateEncoderPosition() {
+	private synchronized void updateEncoderPosition() {
 		// Do not accidentally loop forever, but we do need getCurentPosition() to update if it's not being called indirectly by updateEncoderPosition
 		if(updating) {
 			return;
@@ -102,7 +110,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		Rate rate = getCurrentRate();
 		debug("Current Rate: " + rate);
 		// Determine starting position
-		Length start = currentState.getStartingAbsolutePosition();
+		Length start = getConfiguration().getNativeSensorLengthUOM().create(encoderValue);
 		// Determine the current time
 		long now = System.currentTimeMillis();
 		if(lastEncoderPositionUpdate == 0) {
@@ -152,6 +160,10 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		Length targetAbsolutePosition = currentState.getTargetAbsolutePosition();
 		if(targetAbsolutePosition != null) {
 			projectedAbsolutePosition = clampToLimit(targetDirection, targetAbsolutePosition /* limit */, projectedAbsolutePosition);
+			if(projectedAbsolutePosition.getCanonicalValue() == targetAbsolutePosition.getCanonicalValue()) {
+				warning("Target Position Reached.");
+				lastCompletedCommand = currentState;
+			}
 		}
 		debug("projectedAbsolutePosition: " + projectedAbsolutePosition);		
 		debug("Start=" + start + " CommandDistance=" + distanceWithSign + " Projected=" + projectedAbsolutePosition + " Target=" + targetAbsolutePosition);
@@ -189,12 +201,6 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 			setEncoderPosition(newEncoderValue);
 		}
 		updating = false;
-	}
-
-	@Override
-	public final Length getCurrentPosition() {
-		updateEncoderPosition();
-		return configuration.getNativeSensorLengthUOM().create(encoderValue);
 	}
 
 	@Override
@@ -280,7 +286,9 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 	 */
 	@Override
 	public void periodic() {
-		updateEncoderPosition();
+		if(!updating) {
+			updateEncoderPosition();
+		}
 		super.periodic(); // NB: Always update encoder position before calling superclass, which depends on simulated data!	
 	}
 
