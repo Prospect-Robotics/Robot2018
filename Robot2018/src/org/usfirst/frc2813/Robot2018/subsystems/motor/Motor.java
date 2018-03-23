@@ -17,6 +17,7 @@ import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonSRX;
 import org.usfirst.frc2813.Robot2018.motor.victor.VictorSPX;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
+import org.usfirst.frc2813.Robot2018.subsystems.StandaloneGearheadsSubsystem;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -53,19 +54,14 @@ import edu.wpi.first.wpilibj.PWMSpeedController;
  *    of the current target state, previous target state, etc. as those are redundant and 
  *    unnecessarily complicate things.
  *
- *  To run standalone tests, comment out "extends GearheadsSubsystem", then uncomment the block marked SIMULATION
+ *  To run standalone tests, change base class to StandaloneGearheadsSubsystem
+ *  
+ *  IMPORTANT: This motor class doesn't know about units used by the actual motor!! You should NEVER
+ *  be talking about pulses in here.  See the units adapter class which handles the translation layer!!!
  *
  */
 public final class Motor extends GearheadsSubsystem implements IMotor {
-/*
-	// BEGIN STANDALONE TESTING STUBS
-	public String getName() { return configuration.getName(); }
-	public void setName(String name) {  }
-	protected boolean encoderFunctional = true;
-	protected boolean emulated = true;
-	public boolean isEmulated() { return emulated; }
-	// END STANDALONE TESTING STUBS
-*/
+
 	/* ----------------------------------------------------------------------------------------------
 	 * Configuration
 	 * ---------------------------------------------------------------------------------------------- */
@@ -339,7 +335,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	@Override
 	public final Length getCurrentPosition() {
-		return toSubsystemUnits(getMotorController().getCurrentPosition());
+		return getMotorController().getCurrentPosition();
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -436,44 +432,15 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 		// See if there was any translation and report on the alterations (units typically)
 		if(!getControllerState().equals(proposedState)) {
-			Logger.info(this + " - Translation Occurred [Target: " + proposedState + " Controller: " + getControllerState()); 
+			Logger.info(this + " - Scaling Occurred [Target: " + proposedState + " Controller: " + getControllerState()); 
 		}
-		
+
 		Logger.debug(this + " state transition complete.  old: " + getTargetState() + " status: " + proposedState + ".");
 		Logger.debug(this + "] " + getDiagnostics());
 		this.previousState = this.currentState;
 		this.currentState = proposedState;
 		// Transition successful, save the state.
 		return true;
-	}
-
-	/* ----------------------------------------------------------------------------------------------
-	 * Units Helpers
-	 * ---------------------------------------------------------------------------------------------- */
-	
-	// Convert a length to sensor units
-	protected Length toSensorUnits(Length l) {
-		return l.convertTo(getConfiguration().getNativeSensorLengthUOM());
-	}
-	// Convert a length to motor units	
-	protected Length toMotorUnits(Length l) {
-		return l.convertTo(getConfiguration().getNativeMotorLengthUOM());
-	}	
-	// Convert a length to display units	
-	protected Length toSubsystemUnits(Length l) {
-		return l.convertTo(getConfiguration().getNativeDisplayLengthUOM());
-	}
-	// Convert a length to sensor units
-	protected Rate toSensorUnits(Rate l) {
-		return l.convertTo(getConfiguration().getNativeSensorRateUOM());
-	}
-	// Convert a length to motor units	
-	protected Rate toMotorUnits(Rate l) {
-		return l.convertTo(getConfiguration().getNativeMotorRateUOM());
-	}
-	// Convert a length to display units	
-	protected Rate toSubsystemUnits(Rate l) {
-		return l.convertTo(getConfiguration().getNativeDisplayRateUOM());
 	}
 
 	/**
