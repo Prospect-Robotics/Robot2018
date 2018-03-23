@@ -28,23 +28,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  * floating around.
  */
 public class RobotMap {
-	/**
-	 *  This is the FIRST interface to read the state of the field pieces.
-	 */
-	public static GameData gameData;
-
-	/**
-	 *  This is the sendable choose we use to read the robot start position from
-	 *  the drive station.
-	 */
-	public static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
-	static {
-		Logger.info("Autonomous Position Selector Creation");
-		positionSelector.addDefault("LEFT", Direction.LEFT);
-		positionSelector.addObject("CENTER", Direction.CENTER);
-		positionSelector.addObject("RIGHT", Direction.RIGHT);
-	}
-
 	/*
 	 *  Drive Train Subsystem
 	 */
@@ -92,10 +75,6 @@ public class RobotMap {
 	 */
 	@SuppressWarnings("deprecation")
 	public static void init() {
-
-		// Get the game setup data from the driver station
-		
-		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 
 		/* CAN BUS PORT SUMMARY
 		 * (1)  WPI_VictorSPX DriveTrain Port Master

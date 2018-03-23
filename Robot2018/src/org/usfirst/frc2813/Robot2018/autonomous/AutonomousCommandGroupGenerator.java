@@ -120,16 +120,19 @@ public class AutonomousCommandGroupGenerator {
 	public AutonomousCommandGroupGenerator() {
 		// Determine our game configuration
 		Direction robotStartingPosition = Robot.positionSelector.getSelected();
-		Direction nearSwitchPosition = RobotMap.gameData.getNearSwitchPosition();
-		Direction farSwitchPosition = RobotMap.gameData.getFarSwitchPosition();
-		Direction scalePosition = RobotMap.gameData.getScalePosition();
+		Direction nearSwitchPosition = Robot.gameData.getNearSwitchPosition();
+		Direction farSwitchPosition = Robot.gameData.getFarSwitchPosition();
+		Direction scalePosition = Robot.gameData.getScalePosition();
+		
+		// Read user choices about our strategy
+		boolean useCurves = Robot.autonomousSelectorCurves.getSelected() == Direction.ON;
 
 		/**
 		 * Determine our biased directions. 
 		 * @see getBiasedDirection 
 		 */
-		Direction left     = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitchPosition(), Direction.LEFT);
-		Direction right    = getBiasedDirection(robotStartingPosition, RobotMap.gameData.getNearSwitchPosition(), Direction.RIGHT);
+		Direction left     = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.LEFT);
+		Direction right    = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.RIGHT);
 
 		/*
 		 * Sanity check our biasing logic 
@@ -172,7 +175,7 @@ public class AutonomousCommandGroupGenerator {
 		// Move the Arm down to the high position 
 		autoCmdList.addArmMoveToHighPositionAsync();
 
-		if (!RobotMap.gameData.isGameDataValid()) {
+		if (!Robot.gameData.isGameDataValid()) {
 			// Make a note of our lack of configuration 
 			Logger.error(this + ": No game data.");
 			// Just cross the auto line
@@ -238,10 +241,18 @@ public class AutonomousCommandGroupGenerator {
 			 * robot.  If this isn't the case, the script will be run inverted.
 			 */
 			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the " + nearSwitchPosition + " position.");
-			autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
-			autoCmdList.addQuickTurnSync(left, 45);
-			autoCmdList.addDriveForwardSync(feet(6), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
-			autoCmdList.addQuickTurnSync(right, 45);
+			if (useCurves) {
+				// An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
+				Length radius = feet(3);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+			}
+			else {
+				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
+				autoCmdList.addQuickTurnSync(left, 45);
+				autoCmdList.addDriveForwardSync(feet(6), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
+				autoCmdList.addQuickTurnSync(right, 45);
+			}
 			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
 			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...

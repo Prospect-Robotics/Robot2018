@@ -87,6 +87,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	static final double TRANSITION_SPEED_STOP = 0.0;
 	/**
+	 * Full speed ahead! Only transition with this if tangents line up
+	 */
+	static final double TRANSITION_SPEED_FULL = 1.0;
+	/**
 	We needed the ability to scale the distances involved for "mini testing" 
 	when we don't have sufficient surface area for testing.  
 	This should really be coming from a sendable chooser.
@@ -214,9 +218,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 	/**
 	 * Add a command for driving on a circular path for a set distance, with a desired speed at the end of the movement.
+	 * @param direction - forward or backward
+	 * @param distance - along the curve.
+	 * @param radius - radius of circular path
+	 * @param rotation - clockwise or counterclockwise
+	 * @param endSpeed - speed coming out this command
 	 */
-	private void addCurveCommandSync(Direction direction, Length distance, double radius, boolean clockwise, double endSpeed) {
-		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed, radius, clockwise));
+	private void addCurveCommandSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
+		addSequential(new PIDAutoDrive(driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
+				endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 		currentSpeed = endSpeed;
 	}
 	/**
@@ -224,16 +234,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * end of the movement.
 	 * @see addCurveCommandSync
 	 */
-	public void addCurveForwardSync(Length distance, double radius, boolean clockwise, double endSpeed) {
-		addCurveCommandSync(Direction.FORWARD, distance, radius, clockwise, endSpeed);
+	public void addCurveForwardSync(Length distance, Length radius, Direction rotation, double endSpeed) {
+		addCurveCommandSync(Direction.FORWARD, distance, radius, rotation, endSpeed);
 	}
 	/**
 	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
 	 * end of the movement.
 	 * @see addCurveCommandSync
 	 */
-	public void addCurveBackwardSync(Length distance, double radius, boolean clockwise, double endSpeed) {
-		addCurveCommandSync(Direction.BACKWARD, distance, radius, clockwise, endSpeed);
+	public void addCurveBackwardSync(Length distance, Length radius, Direction rotation, double endSpeed) {
+		addCurveCommandSync(Direction.BACKWARD, distance, radius, rotation, endSpeed);
 	}
 	/**
 	 * Create a command to spin in place, until we reach a specific *relative* angle.  Will turn in either direction

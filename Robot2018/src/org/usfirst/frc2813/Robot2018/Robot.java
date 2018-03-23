@@ -25,6 +25,7 @@ import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -39,12 +40,34 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * the project.
  */
 public class Robot extends TimedRobot {
+	/**
+	 *  This is the FIRST interface to read the state of the field pieces.
+	 */
+	public static GameData gameData;
+
+	/**
+	 *  This is the sendable choose we use to read the robot start position from
+	 *  the drive station.
+	 */
+	public static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
+	static {
+		Logger.info("Autonomous Position Selector Creation");
+		positionSelector.addDefault("LEFT", Direction.LEFT);
+		positionSelector.addObject("CENTER", Direction.CENTER);
+		positionSelector.addObject("RIGHT", Direction.RIGHT);
+	}
+	public static final SendableChooser<Direction> autonomousSelectorCurves = new SendableChooser<>();
+	static {
+		Logger.info("Autonomous strategy Option: CURVED PATHING");
+		autonomousSelectorCurves.addDefault("Curves", Direction.ON);
+		autonomousSelectorCurves.addDefault("Angles", Direction.OFF);
+	}
+
 	public static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();//Model # of gyro connected
 
 	public static AutonomousCommandGroup autonomousCommand;
 	public static AutonomousCommandGroupGenerator autoCmdGenerator;
 
-	public static SendableChooser<Direction> positionSelector;
 	public static OI oi;
 	public static DriveTrain driveTrain;
 	public static Motor elevator;
@@ -91,8 +114,14 @@ public class Robot extends TimedRobot {
 		ratchet = new Solenoid(new RatchetConfiguration(), RobotMap.ratchetSolenoid);
 		climbingBar = new Solenoid(new ClimbingBarConfiguration(), RobotMap.climbingBarSolenoid);
 
-		positionSelector = RobotMap.positionSelector;
+		// Get the game setup data from the driver station
+		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
+
+		// Ask the Gearheads what position the robot is in
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
+
+		// As the Gearheads how they want autonomous to work
+		SmartDashboard.putData("Do you want autonomous to use curves?", autonomousSelectorCurves);
 
 		// OI must be constructed after subsystems. If the OI creates Commands
 		//(which it very likely will), subsystems are not guaranteed to be
