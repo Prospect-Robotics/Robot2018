@@ -118,6 +118,7 @@ public class AutonomousCommandGroupGenerator {
 	 * on the Smart Dashboard to decide which sequence to run.
 	 */
 	public AutonomousCommandGroupGenerator() {
+		Length radius;  // scratch pad for curves
 		// Determine our game configuration
 		Direction robotStartingPosition = Robot.positionSelector.getSelected();
 		Direction nearSwitchPosition = Robot.gameData.getNearSwitchPosition();
@@ -128,11 +129,29 @@ public class AutonomousCommandGroupGenerator {
 		boolean useCurves = Robot.autonomousSelectorCurves.getSelected() == Direction.ON;
 
 		/**
-		 * Determine our biased directions. 
+		 * Determine our biased directions. Assume if you're on a side, it's left and if you're in the center the
+		 * switch will be to the left. This reduces the complexity of our choices.
+		 * 
+		 * NOTE: This only allows us to interact with the switch when we start in the middle and only with the
+		 * scale otherwise. If we want to do both, we will have to split off two directional biases. Us relative
+		 * to swtich and us relative to scale.
 		 * @see getBiasedDirection 
 		 */
-		Direction left     = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.LEFT);
-		Direction right    = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.RIGHT);
+		Direction left  = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.LEFT);
+		Direction right = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.RIGHT);
+
+		/**
+		 * We similarly have a biased rotation.
+		 */
+		Direction clockwise, counterclockwise;
+		if (left == Direction.LEFT) {
+			clockwise = Direction.CLOCKWISE;
+			counterclockwise = Direction.COUNTERCLOCKWISE;
+		}
+		else {
+			clockwise = Direction.COUNTERCLOCKWISE;
+			counterclockwise = Direction.CLOCKWISE;			
+		}
 
 		/*
 		 * Sanity check our biasing logic 
@@ -218,13 +237,29 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			// from far side we cross over between switch and scale and place block on scale
 			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition + " position and the Scale is at the " + scalePosition + " position.");
-			autoCmdList.addDriveForwardSync(feet(14), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-			autoCmdList.addQuickTurnSync(right, 90);
-			autoCmdList.addDriveForwardSync(feet(15), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-			autoCmdList.addQuickTurnSync(left, 90);
-			autoCmdList.addDriveForwardSync(feet(8), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
-			autoCmdList.addQuickTurnSync(left, 90);
+			if (useCurves) {
+				// An S curve. counterclockwise 1/8 turn followed by clockwise 3/8 turn leaves us
+				// clear of the switch and pointing down the alley between switch and scale
+				radius = feet(5);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/4), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);				
+				autoCmdList.addCurveForwardSync(radius.multiply(3*Math.PI/4), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				// now down the alley half way, then slow down and raise the elevator as we continue
+				autoCmdList.addDriveForwardSync(feet(14), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
+				// a bit more forward and then counterclockwise toward the scale
+				autoCmdList.addDriveForwardSync(feet(5), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				radius = feet(3);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+			}
+			else {
+				autoCmdList.addDriveForwardSync(feet(14), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addQuickTurnSync(right, 90);
+				autoCmdList.addDriveForwardSync(feet(15), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addQuickTurnSync(left, 90);
+				autoCmdList.addDriveForwardSync(feet(8), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
+				autoCmdList.addQuickTurnSync(left, 90);
+			}
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
 			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
@@ -242,15 +277,19 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the " + nearSwitchPosition + " position.");
 			if (useCurves) {
-				// An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
-				Length radius = feet(3);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				/**
+				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
+				 * The distance to the scale less our length is how far we need to move forward. This S curve does that in 2 arcs, so set
+				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
+				 */
+				radius = inches((140-46)/2);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			}
 			else {
 				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
 				autoCmdList.addQuickTurnSync(left, 45);
-				autoCmdList.addDriveForwardSync(feet(6), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
+				autoCmdList.addDriveForwardSync(inches(121), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
 				autoCmdList.addQuickTurnSync(right, 45);
 			}
 			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
