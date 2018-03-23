@@ -23,16 +23,16 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	// Pulses per revolution
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096.0;
-	private static final double SENSOR_TO_DRIVE = (36.0/30.0)*100.0;
+	private static final double SENSOR_TO_DRIVE_DIVISOR = (36.0/30.0)*100.0; // 120:1
 
 	// Motor constants
 	private static final double    MAX_ENCODER_RPMS_UNLOADED             = 18700;
-	private static final double    MAX_ENCODER_RPMS_UNLOADED_GEARED_DOWN = MAX_ENCODER_RPMS_UNLOADED / SENSOR_TO_DRIVE;
+	private static final double    MAX_ENCODER_RPMS_UNLOADED_GEARED_DOWN = MAX_ENCODER_RPMS_UNLOADED / SENSOR_TO_DRIVE_DIVISOR;
 	/*
 	 * Here we are taking the number of sensor pulses per rev and multiplying that by the ratio of sensor pulses per drive rotation.  
 	 * This assumes it's scaling up. If not the SENSOR_TO_DRIVE should be a (1/ratio). 
 	 */
-	private static final double PULSES_PER_DRIVE_REVOLUTION   = (PULSES_PER_ENCODER_REVOLUTION * SENSOR_TO_DRIVE);
+	private static final double PULSES_PER_DRIVE_REVOLUTION   = (PULSES_PER_ENCODER_REVOLUTION * SENSOR_TO_DRIVE_DIVISOR);
 
 	/*
 	 * Here we are making up an arbitrary radius - so we have a way to map pulses and degrees to a unit of length.
@@ -161,7 +161,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			MAXIMUM_RATE, 							// maximumForwardRate
 			MINIMUM_RATE,  							// minimumReverseRate
 			MAXIMUM_RATE, 							// maximumReverseRate
-			Double.valueOf(SENSOR_TO_DRIVE),    	// sensorToDriveScale
+			Double.valueOf(1/SENSOR_TO_DRIVE_DIVISOR), // sensorToDriveMultiplier
 			MAXIMUM_POSITION_DEGREES,        		// forwardLimit
 			MINIMUM_POSITION_DEGREES,         		// reverseLimit
 			null,                               	// forwardHardLimitSwitchNormal
