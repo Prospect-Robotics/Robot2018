@@ -182,8 +182,8 @@ public class AutonomousCommandGroupGenerator {
 		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
 		 * the auto script is a robot-safety critical feature. 
 		 */
-		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
-		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
+//		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
+//		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
 
 		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
 		autoCmdList.setHaveCube(true);
