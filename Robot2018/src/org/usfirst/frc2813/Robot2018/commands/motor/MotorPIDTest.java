@@ -15,7 +15,7 @@ import org.usfirst.frc2813.units.values.Length;
 public final class MotorPIDTest extends AbstractMotorCommand {
 	private final Length minHeight; 
 	private final Length maxHeight;
-	private final Length MARGIN_OF_ERROR = LengthUOM.Inches.create(0.5);
+	private final Length marginOfError;
 
 	private Direction targetDirection = Direction.REVERSE;
 	private Length targetPosition = LengthUOM.Inches.create(0);
@@ -24,6 +24,7 @@ public final class MotorPIDTest extends AbstractMotorCommand {
 		super(motor, true);
 		this.minHeight = minHeight;
 		this.maxHeight = maxHeight;
+		this.marginOfError = motor.getConfiguration().getNativeDisplayLengthUOM().create(0.5); // NB: This is a hack
 		setName(toString());
 	}
 
@@ -34,7 +35,7 @@ public final class MotorPIDTest extends AbstractMotorCommand {
 	}
 
 	protected void execute() {
-		if(motor.getCurrentPositionErrorWithin(MARGIN_OF_ERROR)) {
+		if(motor.getCurrentPositionErrorWithin(this.marginOfError)) {
 			targetDirection = targetDirection.getInverse();
 			Logger.info("REVERSING.  GOING " + targetDirection + " @ " + motor.getCurrentPosition() + " Error " + motor.getCurrentPositionError() + " Goal " + targetPosition);
 			Length targetPosition = targetDirection.equals(Direction.FORWARD) ? minHeight : maxHeight;
