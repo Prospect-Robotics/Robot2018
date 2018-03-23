@@ -1,9 +1,14 @@
 package org.usfirst.frc2813.Robot2018.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
+import org.usfirst.frc2813.logging.LogLevel;
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
+import org.usfirst.frc2813.units.values.Value;
 
 /*
  * This guy handles scaling of position and rate values based on gearing rations,
@@ -11,6 +16,7 @@ import org.usfirst.frc2813.units.values.Rate;
  */
 public class MotorControllerUnitConversionAdapter implements IMotorController {
 
+	private final static LogType logLevel = LogType.DEBUG;
 	private final IMotorConfiguration configuration;
 	private final IMotorController   controller;
 	
@@ -30,45 +36,66 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 
 	@Override
 	public IMotorState getTargetState() {
-		return fromSensor(controller.getTargetState());
+		return toDisplay(controller.getTargetState());
 	}
 
 	@Override
 	public IMotorState getPreviousTargetState() {
-		return fromSensor(controller.getPreviousTargetState());
+		return toDisplay(controller.getPreviousTargetState());
+	}
+	
+	public void error(String function, Object...objects) {
+		Logger.printLabelled(logLevel, getClass().getSimpleName() + "." + function + " ", objects);
+		(new Throwable()).printStackTrace();
+	}
+	
+	public void log(String function, Object...objects) {
+		Logger.printLabelled(logLevel, getClass().getSimpleName() + "." + function + " ", objects);
 	}
 
 	@Override
 	public boolean moveToAbsolutePosition(Length position) {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return controller.moveToAbsolutePosition(toSensorUnitsScalePhase(position));
+		Length newPosition = adjustPhase(toSensorUnitsNoPhaseCorrection(position));
+		log("moveToAbsolutePosition", "converted " + position + " to " + newPosition);
+		return controller.moveToAbsolutePosition(newPosition);
 	}
 
 	@Override
 	public boolean resetEncoderSensorPosition(Length position) {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return controller.resetEncoderSensorPosition(toSensorUnitsScalePhase(position));
+		Length newPosition = adjustPhase(toSensorUnitsNoPhaseCorrection(position));
+		log("resetEncoderSensorPosition", "converted " + position + " to " + newPosition);
+		return controller.resetEncoderSensorPosition(newPosition);
 	}
 	
 	@Override
-	public boolean calibrateSensorInDirection(Direction directio) {
-		return controller.calibrateSensorInDirection(directio);
+	public boolean calibrateSensorInDirection(Direction direction) {
+		Direction newDirection = adjustPhase(direction);
+		log("calibrateSensorInDirection", "converted " + direction + " to " + newDirection);
+		return controller.calibrateSensorInDirection(newDirection);
 	}
 
 	@Override
 	public boolean moveToRelativePosition(Direction direction, Length relativeDistance) {
 		// [RELATIVE] Must adjust direction separately, then adjust relative value for units and scale
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return controller.moveToRelativePosition(adjustPhase(direction), toSensorUnitsScale(relativeDistance));
+		Direction newDirection = adjustPhase(direction);
+		Length newRelativeDistance = toSensorUnitsNoPhaseCorrection(relativeDistance);
+		log("moveToRelativePosition", "converted {" + direction + "," + relativeDistance + "} to {" + newDirection + "," + newRelativeDistance + "}");
+		return controller.moveToRelativePosition(newDirection, newRelativeDistance);
 	}
 
 	@Override
 	public Length getCurrentPosition() {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return fromSensorUnitsScalePhase(controller.getCurrentPosition());
+		Length position = controller.getCurrentPosition();
+		Length newPosition = adjustPhase(fromSensorUnitsNoPhaseCorrection(position));
+		log("getCurrentPosition", "converted " + position + " to " + newPosition);
+		return newPosition;
 	}
 
 	@Override
@@ -82,42 +109,58 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	}
 
 	@Override
-	public boolean moveInDirectionAtRate(Direction direction, Rate rate) {
+	public boolean moveInDirectionAtRate(Direction direction, Rate rate) {		
 		// [RELATIVE] Must adjust direction separately, then adjust relative value for units and scale
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return controller.moveInDirectionAtRate(adjustPhase(direction), toSensorUnitsScale(rate));
+		Direction newDirection = adjustPhase(direction);
+		Rate newRate = toSensorUnitsNoPhaseCorrection(rate);
+		log("moveInDirectionAtRate", "converted {" + direction + "," + rate + "} to {" + newDirection + "," + newRate + "}");
+		return controller.moveInDirectionAtRate(newDirection, newRate);
 	}
 
 	@Override
 	public boolean moveInDirectionAtDefaultRate(Direction direction) {
 		// [RELATIVE] Must adjust direction
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return controller.moveInDirectionAtDefaultRate(adjustPhase(direction));
+		Direction newDirection = adjustPhase(direction);
+		log("moveInDirectionAtDefaultRate", "converted " + direction + " to " + newDirection);
+		return controller.moveInDirectionAtDefaultRate(newDirection);
 	}
 
 	@Override
-	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
+	public boolean getCurrentHardLimitSwitchStatus(Direction direction) {
 		// [RELATIVE] Must adjust direction
-		return controller.getCurrentHardLimitSwitchStatus(adjustPhase(switchDirection));
+		Direction newDirection = adjustPhase(direction);
+		log("getCurrentHardLimitSwitchStatus", "converted " + direction + " to " + newDirection);
+		return controller.getCurrentHardLimitSwitchStatus(newDirection);
 	}
 
 	@Override
 	public Rate getCurrentRate() {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
-		return fromSensorUnitsScalePhase(controller.getCurrentRate());
+		Rate rate = controller.getCurrentRate();
+		Rate newRate = adjustPhase(fromSensorUnitsNoPhaseCorrection(rate));
+		log("getCurrentRate", "converted " + rate + " to " + newRate);
+		return newRate;
 	}
 
 	@Override
 	public Length getCurrentPositionError() {
 		// [ABSOLUTE] Must adjust units, scale and phase
-		return fromSensorUnitsScalePhase(controller.getCurrentPositionError());
+		Length error = controller.getCurrentPositionError();
+		Length newError = adjustPhase(fromSensorUnitsNoPhaseCorrection(error));
+		log("getCurrentPositionError", "converted " + error + " to " + newError);
+		return newError;
 	}
 
 	@Override
 	public Rate getCurrentRateError() {
 		// [ABSOLUTE] Must adjust units, scale and phase
-		return fromSensorUnitsScalePhase(controller.getCurrentRateError());
+		Rate rate = controller.getCurrentRateError();
+		Rate newRate = adjustPhase(fromSensorUnitsNoPhaseCorrection(rate));
+		log("getCurrentRateError", "converted " + rate + " to " + newRate);
+		return newRate;
 	}
 
 	@Override
@@ -126,7 +169,9 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 			throw new IllegalArgumentException("Margin of error is +/- an absolute value and should not be negative."); 
 		}
 		// [RELATIVE] Must adjust units, scale
-		return controller.getCurrentRateErrorWithin(toSensorUnitsScale(marginOfError).getAbsoluteValue());
+		Rate newMarginOfError = toSensorUnitsNoPhaseCorrection(marginOfError).getAbsoluteValue();
+		log("getCurrentRateErrorWithin", "converted " + marginOfError + " to " + newMarginOfError);
+		return controller.getCurrentRateErrorWithin(newMarginOfError);
 	}
 
 	@Override
@@ -135,7 +180,9 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 			throw new IllegalArgumentException("Margin of error is +/- an absolute value and should not be negative."); 
 		}
 		// [RELATIVE] Must adjust units, scale
-		return controller.getCurrentPositionErrorWithin(toSensorUnitsScale(marginOfError).getAbsoluteValue());
+		Length newMarginOfError = toSensorUnitsNoPhaseCorrection(marginOfError).getAbsoluteValue();
+		log("getCurrentPositionErrorWithin", "converted " + marginOfError + " to " + newMarginOfError);
+		return controller.getCurrentPositionErrorWithin(newMarginOfError);
 	}
 
 	@Override
@@ -177,109 +224,93 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	 * Helpers
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	// Convert a length to sensor units
-	protected Length toSensorUnits(Length l) {
-		return l.convertTo(configuration.getNativeSensorLengthUOM());
-	}
-	// Convert a length to motor units	
-	protected Length toMotorUnits(Length l) {
-		return l.convertTo(configuration.getNativeMotorLengthUOM());
-	}	
-	// Convert a length to display units	
-	protected Length toSubsystemUnits(Length l) {
-		return l.convertTo(configuration.getNativeDisplayLengthUOM());
-	}
-	// Convert a length to sensor units
-	protected Rate toSensorUnits(Rate l) {
-		return l.convertTo(configuration.getNativeSensorRateUOM());
-	}
-	// Convert a length to motor units	
-	protected Rate toMotorUnits(Rate l) {
-		return l.convertTo(configuration.getNativeMotorRateUOM());
-	}
-	// Convert a length to display units	
-	protected Rate toSubsystemUnits(Rate l) {
-		return l.convertTo(configuration.getNativeDisplayRateUOM());
-	}
-
-	private final double phaseAdjustment() {
-		double a = 1.0;
+	private final double getPhaseMultiplier() {
+		double v = 1.0;
 		if(configuration.getMotorPhaseIsReversed() && !controller.supportsMotorInversion()) {
-			a *= -1;
+			v *= -1.0;
 		}
 		if(configuration.getSensorPhaseIsReversed() && !controller.supportsSensorInversion()) {
-			a *= -1;
+			v *= -1.0;
 		}
-		return a;
+		return v;
 	}
 
-	private final Direction adjustPhase(Direction d) {
-		Direction a = d;
+	private final Rate   adjustPhase(Rate v) { return v.multiply(getPhaseMultiplier()); }
+
+	private final Length adjustPhase(Length v) { return v.multiply(getPhaseMultiplier()); }
+
+	private final Direction adjustPhase(Direction v) {
 		if(configuration.getMotorPhaseIsReversed() && !controller.supportsMotorInversion()) {
-			a = a.getInverse();
+			v = v.getInverse();
 		}
 		if(configuration.getSensorPhaseIsReversed() && !controller.supportsSensorInversion()) {
-			a = a.getInverse();
+			v = v.getInverse();
 		}
-		return a;
+		return v;
+	}
+	/**
+	 * Validation helper.  Validate that the value is NOT a sensor 
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+	private final void validateValueIsNotASensorValue(String title, Value value) {
+		UOM sensorUOM = (value instanceof org.usfirst.frc2813.units.values.Rate) ? configuration.getNativeSensorRateUOM() : configuration.getNativeSensorLengthUOM();
+		if(value.getUOM().equals(sensorUOM)) {
+			Logger.printLabelled(LogType.ERROR, title, "ERROR: We do not want " + value.getUOM() + "!");
+		}
 	}
 
-	private final IMotorState fromSensor(IMotorState motorState) {
-		return motorState.convertTo(
-				configuration.getNativeDisplayLengthUOM(), 
-				configuration.getNativeDisplayRateUOM(),
-				phaseAdjustment() != 1.0 ? true : false
-				);
+	/**
+	 * Validation helper.  Validate that we did or did not get the units we expected. 
+	 */
+	private final void validateValueIsASensorValue(String title, Value value) {
+		UOM sensorUOM = (value instanceof org.usfirst.frc2813.units.values.Rate) ? configuration.getNativeSensorRateUOM() : configuration.getNativeSensorLengthUOM();
+		if(!value.getUOM().equals(sensorUOM)) {
+			Logger.printLabelled(LogType.ERROR, title, "ERROR: Expected " + sensorUOM + " but got " + value.getUOM() + ".");
+		}
+	}
+	/**
+	 * Converts v to sensor units, multiplies by the sensor to drive scaling factor (gearing), and converts to subsystem units.
+	 */
+	private final Length toDisplayUnits(Length v) {
+		validateValueIsASensorValue("scaleSensorToDrive", v);
+		return v
+				.convertTo(configuration.getNativeDisplayLengthUOM()); // convert to display units
 	}
 
-	private final Length toControllerUnits(Length v) {
-		return toSensorUnits(v);
+	/**
+	 * Converts v to sensor units, multiplies by the sensor to drive scaling factor (gearing), and converts to subsystem units.
+	 */
+	private final Rate toDisplayUnits(Rate v) {
+		validateValueIsASensorValue("scaleSensorToDrive", v);
+		return 
+				v
+				.convertTo(configuration.getNativeDisplayRateUOM()); // scale for gearing ratio
 	}
-	
-	private final Length fromControllerUnits(Length v) {
-		return toSubsystemUnits(v);
+
+	/**
+	 * Converts v to sensor units, multiplies by the sensor to drive scaling factor (gearing), and converts to subsystem units.
+	 */
+	private final Length toSensor(Length v) {
+		validateValueIsNotASensorValue("scaleDriveToSensor", v);
+		return v
+				.convertTo(configuration.getNativeSensorLengthUOM()) // convert to sensor units
+				;
 	}
-	
-	private final Rate toControllerUnits(Rate v) {
-		return toSensorUnits(v);
+
+	private final Rate toSensor(Rate v) {
+		validateValueIsNotASensorValue("scaleDriveToSensor", v);
+		return v
+				.convertTo(configuration.getNativeSensorRateUOM()) // convert to sensor units
+				;
 	}
-	
-	private final Rate fromControllerUnits(Rate v) {
-		return toSubsystemUnits(v);
-	}
-	
-	private final Length toSensorUnitsScale(Length v) {
-		return toControllerUnits(v).divide(configuration.getSensorToDriveScalingFactor());
-	}
-	
-	private final Length fromSensorUnitsScale(Length v) {
-		return fromControllerUnits(v).multiply(configuration.getSensorToDriveScalingFactor());
-	}
-	
-	private final Rate toSensorUnitsScale(Rate v) {
-		return toControllerUnits(v).divide(configuration.getSensorToDriveScalingFactor());
-	}
-	
-	private final Rate fromSensorUnitsScale(Rate v) {
-		return fromControllerUnits(v).multiply(configuration.getSensorToDriveScalingFactor());
-	}
-	
-	private final Length toSensorUnitsScalePhase(Length v) {
-		return toSensorUnitsScale(v).multiply(phaseAdjustment());
-	}
-	
-	private final Length fromSensorUnitsScalePhase(Length v) {
-		return fromSensorUnitsScale(v).multiply(phaseAdjustment());
-	}
-	
-	@SuppressWarnings("unused")
-	private final Rate toSensorUnitsScalePhase(Rate v) {
-		return toSensorUnitsScale(v).multiply(phaseAdjustment());
-	}
-	
-	private final Rate fromSensorUnitsScalePhase(Rate v) {
-		return fromSensorUnitsScale(v).multiply(phaseAdjustment());
-	}
+	/** Alias for scaleSensorToDrive */
+	private final Length toSensorUnitsNoPhaseCorrection(Length v) { return toSensor(v); }
+	/** Alias for scaleSEnsorToDrive */
+	private final Rate toSensorUnitsNoPhaseCorrection(Rate v) { return toSensor(v); }
+	/** Alias for scaleDriveToSensor */
+	private final Length fromSensorUnitsNoPhaseCorrection(Length v) { return toDisplayUnits(v); }
+	/** Alias for secaleSensorToDrive */
+	private final Rate fromSensorUnitsNoPhaseCorrection(Rate v) { return toDisplayUnits(v); }
 
 	@Override
 	public void periodic() {
@@ -294,5 +325,9 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
 		return controller.getCurrentSoftLimitSwitchStatus(switchDirection);
+	}
+	
+	protected IMotorState toDisplay(IMotorState motorState) {
+		return motorState.convertTo(getConfiguration().getNativeDisplayLengthUOM(), getConfiguration().getNativeDisplayRateUOM(), getPhaseMultiplier() != 1.0);
 	}
 }
