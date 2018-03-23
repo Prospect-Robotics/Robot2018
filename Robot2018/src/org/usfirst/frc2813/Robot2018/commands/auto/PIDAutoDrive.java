@@ -25,13 +25,20 @@ public class PIDAutoDrive extends GearheadsCommand {
 			return PIDSourceType.kDisplacement;
 		}
 
+		/**
+		 * This is the main pid reader routine. It provides the current angle relative to expected.
+		 * This is a value in degrees, centered around 0. Theoretically this could be shifted up by
+		 * 180 degrees so it could be taken modulo 360 and then shifted back down. This would give
+		 * us an absolute angle +- 180 degrees. However, if the PID is working at all, we never
+		 * expect large numbers.
+		 */
 		@Override
 		public double pidGet() {
 			double angleTravelled = Robot.gyro.getAngle() - startAngle;
 			if (onCurve) {
 				angleTravelled -= deltaAngle;
 			}
-			return angleTravelled % 360.0;
+			return angleTravelled;
 		}
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
