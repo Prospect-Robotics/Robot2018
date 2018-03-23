@@ -235,6 +235,21 @@ public class AutonomousCommandGroupGenerator {
 				radius = inches((140-46)/2);
 				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+/*
+This is what Jack was working on Thursday, and it placed the cube on the right side of the switch, which I think is wrong...
+but I wanted to capture it in case we wanted to refer to it.  Once this routine is tested and finished I expect this comment
+and all the non-curve paths will go away.
+
+We do need to decide if fallback non-curves is something to maintain in case an encoder fails.
+  
+autoCmdList.addCurveForwardSync(LengthUOM.Feet.create(5), LengthUOM.Feet.create(5.00), true,  1.0);
+autoCmdList.addCurveForwardSync(LengthUOM.Feet.create(5), LengthUOM.Feet.create(5.00), false, 0.0);
+autoCmdList.addArmMoveToHighPositionAsync();
+autoCmdList.addArmWaitForTargetPositionSync();
+autoCmdList.addArmMoveToShootingPositionAsync();
+autoCmdList.addArmWaitForTargetPositionSync();
+autoCmdList.addShootCubeSequence();
+ */
 			}
 			else {
 				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
