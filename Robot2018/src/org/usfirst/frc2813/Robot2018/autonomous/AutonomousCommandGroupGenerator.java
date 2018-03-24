@@ -126,7 +126,7 @@ public class AutonomousCommandGroupGenerator {
 		return 2 * curveRadius * (1 - Math.cos(Math.toRadians(degrees)));
 	}
 	double sCurveForwardShift(double curveRadius, double degrees) {
-		return 2 * curveRadius * (1 - Math.sin(Math.toRadians(degrees)));
+		return 2 * curveRadius * (Math.sin(Math.toRadians(degrees)));
 	}
 	/**
 	 * Build a command sequence to be run during the Autonomous 15 second period.
