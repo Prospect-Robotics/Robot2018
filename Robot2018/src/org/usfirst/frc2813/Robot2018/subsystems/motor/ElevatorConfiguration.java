@@ -153,7 +153,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|IMotorConfiguration.Reverse
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
-//					|IMotorConfiguration.Disconnected // NB: WARNING !!
+					|IMotorConfiguration.Disconnected // NB: WARNING !!
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM
