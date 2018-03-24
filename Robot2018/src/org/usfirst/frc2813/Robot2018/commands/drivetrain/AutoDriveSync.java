@@ -122,10 +122,10 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 */
 	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
 		this(driveTrain, speed, direction, distance);
-		startSpeed += MAX_SPEED * startSpeedFactor;
+		startSpeed += (MAX_SPEED - MIN_SPEED) * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
 
-		endSpeed += MAX_SPEED * endSpeedFactor;
+		endSpeed += (MAX_SPEED - MIN_SPEED) * endSpeedFactor;
 		decelRamp *= 1 - endSpeedFactor;
 	}
 
@@ -282,8 +282,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	}
 
 	/**
-	 * This is the pid callback. It provides out angle adjustment. Call
-	 * the appropriate drive routine based on state - curve or straight.
+	 * This is the pid callback. It provides out angle adjustment.
 	 * @param pidOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source) 
 	 */
 	private void usePIDOutput(double pidOutput) {
@@ -291,50 +290,6 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		if(complete) {
 			return;
 		}
-		if (onCurve) {
-			driveCurve(pidOutput);
-		}
-		else {
-			driveStraight(pidOutput);
-		}
-	}
-
-	/**
-	 * This routine takes PID output for the line PID thinks we are on and
-	 * adjusts for our current angle.
-	 * @param pidOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source) 
-	 */
-	private void driveCurve(double pidOutput) {
-		double distanceTravelled = distanceTravelled();
-		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
-		double expectedAngle = calcAngle(distanceTravelled);
-		double actualAngle = gyro.getAngle() - startAngle;
-		/*
-		 * 3/22/2018 MT - 
-		 * PID is sending us a throttle value for the angle based on the direction 
-		 * and magnitude of the error in our current angle relative to where we should
-		 * be at this distance/time.  The value is already properly signed to correct
-		 * the error.  We just need to pass it through to arcadeDrive.  Remember our
-		 * arcadeDrive function takes a negative number for counter-clockwise rotation
-		 * and a positive number for clockwise rotation.   
-		 * 
-		 * Added reporting of progress in rotation, and the error in angle at this position.
-		 */
-		Logger.printLabelled(LogType.INFO, "PID curve stepping",
-				"TargetDistance", distance * direction.getMultiplier(),
-				"CurrentDistance", distanceTravelled,
-				"TargetAngle[end]", deltaAngle,
-				"TargetAngle[now]", expectedAngle,
-				"ActualAngle[now]", actualAngle,
-				"AngleError[now]", expectedAngle - actualAngle,
-				"Throttle", newThrottle,
-				"PID Output", pidOutput
-				);
-		driveTrain.arcadeDrive(newThrottle * 0.6, pidOutput);
-		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
-	}
-
-	private void driveStraight(double pidOutput) {
 		double distanceTravelled = distanceTravelled();
 		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
 
@@ -349,7 +304,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 				"AngleError[now]", gyro.getAngle() - startAngle,
 				"Throttle", newThrottle,
 				"PID Output", pidOutput);
-		driveTrain.arcadeDrive(newThrottle * 0.6, pidOutput);
+		driveTrain.arcadeDrive(newThrottle, pidOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 }
