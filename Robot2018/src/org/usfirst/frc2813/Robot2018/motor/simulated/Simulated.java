@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.motor.simulated;
 
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
-import org.usfirst.frc2813.Robot2018.motor.ISimulatedMotorController;
+import org.usfirst.frc2813.Robot2018.motor.IMotorController;
 import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
@@ -19,7 +19,7 @@ import org.usfirst.frc2813.units.values.Time;
  * A wrapper class to handle an SRX Talon motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
  * if you need a translation layer.  
  */
-public final class Simulated extends AbstractMotorController implements ISimulatedMotorController {
+public final class Simulated extends AbstractMotorController implements IMotorController {
 
 	/* ----------------------------------------------------------------------------------------------
 	 * State
