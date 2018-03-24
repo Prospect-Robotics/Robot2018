@@ -247,6 +247,17 @@ public class AutonomousCommandGroup extends CommandGroup {
 		addCurveCommandSync(Direction.BACKWARD, distance, radius, rotation, endSpeed);
 	}
 	/**
+	 * Add a command for driving on a circular path for a set number of degrees, with a desired speed at the end of the movement.
+	 * @param direction - forward or backward
+	 * @param degrees - along the curve.
+	 * @param radius - radius of circular path
+	 * @param rotation - clockwise or counterclockwise
+	 * @param endSpeed - speed coming out this command
+	 */
+	public void addCurveDegreesSync(Direction direction, Length degrees, Length radius, Direction rotation, double endSpeed) {
+		addCurveCommandSync(direction, radius.multiply(2*Math.PI/360).multiply(degrees), radius, rotation, endSpeed);
+	}
+	/**
 	 * Create a command to spin in place, until we reach a specific *relative* angle.  Will turn in either direction
 	 * until that relative angle is hit, accounting for any overshoot by reversing direction for smaller and smaller
 	 * moves until the target is it.  Right now QuickTurnCommand doesn't have PID, but continues until it gets close
