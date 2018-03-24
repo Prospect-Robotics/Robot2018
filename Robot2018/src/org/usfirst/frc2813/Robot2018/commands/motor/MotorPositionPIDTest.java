@@ -12,7 +12,7 @@ import org.usfirst.frc2813.units.values.Length;
  * Move motor in given direction until interrupted.
  * Hold current position with PID when interrupted. 
  */
-public final class MotorPIDTest extends AbstractMotorCommand {
+public final class MotorPositionPIDTest extends AbstractMotorCommand {
 	private final Length minHeight; 
 	private final Length maxHeight;
 	private final Length marginOfError;
@@ -20,7 +20,7 @@ public final class MotorPIDTest extends AbstractMotorCommand {
 	private Direction targetDirection = Direction.REVERSE;
 	private Length targetPosition = LengthUOM.Inches.create(0);
 	
-	public MotorPIDTest(Motor motor, Length minHeight, Length maxHeight) {
+	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight) {
 		super(motor, true);
 		this.minHeight = minHeight;
 		this.maxHeight = maxHeight;
