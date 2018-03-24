@@ -122,10 +122,10 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 */
 	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
 		this(driveTrain, speed, direction, distance);
-		startSpeed += MAX_SPEED * (1 - startSpeedFactor);
+		startSpeed += MAX_SPEED * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
 
-		endSpeed += MAX_SPEED * (1 - endSpeedFactor);
+		endSpeed += MAX_SPEED * endSpeedFactor;
 		decelRamp *= 1 - endSpeedFactor;
 	}
 
