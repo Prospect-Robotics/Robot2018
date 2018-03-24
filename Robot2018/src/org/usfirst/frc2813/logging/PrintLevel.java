@@ -21,15 +21,21 @@ enum PrintLevel {
 	WARNING {
 		@Override
 		void print(String content) {
-			DriverStation.reportWarning(content,false);
-			//System.out.println(content);
+			try {
+				DriverStation.reportWarning(content,false);
+			} catch(Throwable t) {
+				System.out.println(content);
+			}
 		}
 	},
 	ERROR {
 		@Override
 		void print(String content) {
-			DriverStation.reportError(content,false);
-			//System.out.println(content);
+			try {
+				DriverStation.reportError(content,false);
+			} catch(Throwable t) {
+				System.out.println(content);
+			}
 		}
 	};
 	abstract void print(String content);
