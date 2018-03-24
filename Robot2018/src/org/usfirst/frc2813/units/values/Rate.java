@@ -49,4 +49,17 @@ public class Rate extends Value<RateUOM,Rate> {
 	public LengthUOM getLengthUOM() {
 		return getUOM().getLengthUOM();
 	}
+	/**
+	 * Clamp a rate to a limit range
+	 */
+	public static Rate clampToLimit(Rate lowerLimit, Rate upperLimit, Rate input) {
+		Rate r = input;
+		if(upperLimit != null && input.getCanonicalValue() > upperLimit.getCanonicalValue()) {
+			r = upperLimit;
+		} 
+		if(lowerLimit != null && input.getCanonicalValue() < lowerLimit.getCanonicalValue()) {
+			r = lowerLimit;
+		}
+		return r;
+	}
 }

@@ -154,7 +154,7 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		// OK, see where PID would have stopped us
 		Length targetAbsolutePosition = currentState.getTargetAbsolutePosition();
 		if(targetAbsolutePosition != null) {
-			projectedAbsolutePosition = clampToLimit(targetDirection, targetAbsolutePosition /* limit */, projectedAbsolutePosition);
+			projectedAbsolutePosition = Length.clampToLimit(targetDirection, targetAbsolutePosition /* limit */, projectedAbsolutePosition);
 			if(projectedAbsolutePosition.getCanonicalValue() == targetAbsolutePosition.getCanonicalValue()) {
 				warning("Target Position Reached.");
 				lastCompletedCommand = currentState;
@@ -164,23 +164,23 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 		debug("Start=" + start + " CommandDistance=" + distanceWithSign + " Projected=" + projectedAbsolutePosition + " Target=" + targetAbsolutePosition);
 		// Next, see if a soft limit would have stopped us.
 		Length softLimit = null;
-		if(getHasSoftLimit(targetDirection) && isLimitReached(targetDirection, softLimit = getSoftLimit(targetDirection), projectedAbsolutePosition)) {
+		if(getHasSoftLimit(targetDirection) && Length.isLimitReached(targetDirection, softLimit = getSoftLimit(targetDirection), projectedAbsolutePosition)) {
 			warning("Soft Limit Reached.  Clamping to " + softLimit + ".");
-			projectedAbsolutePosition = clampToLimit(targetDirection, softLimit, projectedAbsolutePosition);
+			projectedAbsolutePosition = Length.clampToLimit(targetDirection, softLimit, projectedAbsolutePosition);
 			lastCompletedCommand = currentState;
 		}
 		// Next, see if a hard limit would have stopped us.
 		Length hardLimit = null;
-		if(getHasHardLimit(targetDirection) && isLimitReached(targetDirection, hardLimit = getHardLimit(targetDirection), projectedAbsolutePosition)) {
+		if(getHasHardLimit(targetDirection) && Length.isLimitReached(targetDirection, hardLimit = getHardLimit(targetDirection), projectedAbsolutePosition)) {
 			warning("Hard Limit Reached.  Clamping to " + hardLimit + ".");
-			projectedAbsolutePosition = clampToLimit(targetDirection, hardLimit, projectedAbsolutePosition);
+			projectedAbsolutePosition = Length.clampToLimit(targetDirection, hardLimit, projectedAbsolutePosition);
 			resetEncoderFromHardLimit = targetDirection.isPositive() ? configuration.getForwardHardLimitSwitchResetsEncoder() : configuration.getReverseHardLimitSwitchResetsEncoder();
 			lastCompletedCommand = currentState;
 		}
 		// Lastly, did we break the robot?
 		Length physicalLimit = getPhysicalLimit(targetDirection);
-		if(isLimitExceeded(targetDirection, physicalLimit, projectedAbsolutePosition)) {
-			projectedAbsolutePosition = clampToLimit(targetDirection, getPhysicalLimit(targetDirection), projectedAbsolutePosition);
+		if(Length.isLimitExceeded(targetDirection, physicalLimit, projectedAbsolutePosition)) {
+			projectedAbsolutePosition = Length.clampToLimit(targetDirection, getPhysicalLimit(targetDirection), projectedAbsolutePosition);
 			lastCompletedCommand = currentState;
 			error(this + ": KABOOM!  You just broke the robot.  Moved " + targetDirection + " beyond " + physicalLimit + " and broke the hardware.  Projected=" + projectedAbsolutePosition);
 		}
@@ -213,8 +213,8 @@ public final class Simulated extends AbstractMotorController implements ISimulat
 				debug("configuration.getDefaultRate(): " + configuration.getDefaultRate());
 				rate = toSensorUnits(configuration.getDefaultRate());
 			}
-			clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
-			clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
+			Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
+			Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
 			debug("VELOCITY RATE: " + rate);
 			break;
 		case DISABLED:

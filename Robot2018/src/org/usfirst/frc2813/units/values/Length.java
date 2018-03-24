@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.units.values;
 
+import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 
 /*
@@ -20,5 +21,31 @@ public class Length extends Value<LengthUOM,Length> {
 	// Used by superclass as a factory
 	protected Length create(LengthUOM uom, double value) {
 		return new Length(uom, value);
+	}
+	/**
+	 * Shortcut to see if position exceeds limit
+	 */
+	public static boolean isLimitExceeded(Direction direction, Length limit, Length position) {
+		if(direction.isPositive()) {
+			return position.getCanonicalValue() > limit.getCanonicalValue(); 
+		} else {
+			return position.getCanonicalValue() < limit.getCanonicalValue();
+		}
+	}
+	/**
+	 * Shortcut to see if position meets or exceeds limit
+	 */
+	public static boolean isLimitReached(Direction direction, Length limit, Length position) {
+		if(direction.isPositive()) {
+			return position.getCanonicalValue() >= limit.getCanonicalValue(); 
+		} else {
+			return position.getCanonicalValue() <= limit.getCanonicalValue();
+		}
+	}
+	/**
+	 * Clamp a length to a limit
+	 */
+	public static Length clampToLimit(Direction direction, Length limit, Length input) {
+		return Length.isLimitExceeded(direction, limit, input) ? limit : input;
 	}
 }

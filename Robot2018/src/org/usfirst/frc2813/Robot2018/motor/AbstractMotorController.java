@@ -697,81 +697,39 @@ public abstract class AbstractMotorController implements IMotorController {
 		return null;
 	}
 
-	/**
-	 * Shortcut to see if position exceeds limit
-	 */
-	protected static boolean isLimitExceeded(Direction direction, Length limit, Length position) {
-		if(direction.isPositive()) {
-			return position.getCanonicalValue() > limit.getCanonicalValue(); 
-		} else {
-			return position.getCanonicalValue() < limit.getCanonicalValue();
-		}
-	}
-
-	/**
-	 * Shortcut to see if position meets or exceeds limit
-	 */
-	protected static boolean isLimitReached(Direction direction, Length limit, Length position) {
-		if(direction.isPositive()) {
-			return position.getCanonicalValue() >= limit.getCanonicalValue(); 
-		} else {
-			return position.getCanonicalValue() <= limit.getCanonicalValue();
-		}
-	}
-
-	/**
-	 * Clamp a length to a limit
-	 */
-	protected static Length clampToLimit(Direction direction, Length limit, Length input) {
-		return isLimitExceeded(direction, limit, input) ? limit : input;
-	}
-	/**
-	 * Clamp a rate to a limit range
-	 */
-	protected static Rate clampToLimit(Rate lowerLimit, Rate upperLimit, Rate input) {
-		Rate r = input;
-		if(upperLimit != null && input.getCanonicalValue() > upperLimit.getCanonicalValue()) {
-			r = upperLimit;
-		} 
-		if(lowerLimit != null && input.getCanonicalValue() < lowerLimit.getCanonicalValue()) {
-			r = lowerLimit;
-		}
-		return r;
-	}
-
 	@Override
 	public boolean isHardLimitExceeded(Direction direction) {
-		return getHasHardLimit(direction) && isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition());
+		return getHasHardLimit(direction) && Length.isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition());
 	}
 	@Override
 	public boolean isHardLimitReached(Direction direction) {
-		return getHasHardLimit(direction) && isLimitReached(direction, getHardLimit(direction), getCurrentPosition());
+		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition());
 	}
 	@Override
 	public boolean isHardLimitNeedingCalibration(Direction direction) {
-		return getHasHardLimit(direction) && isLimitReached(direction, getHardLimit(direction), getCurrentPosition()) 
+		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition()) 
 				&& !getCurrentHardLimitSwitchStatus(direction);
 	}
 	@Override
 	public boolean isSoftLimitExceeded(Direction direction) {
-		return getHasSoftLimit(direction) && isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
+		return getHasSoftLimit(direction) && Length.isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
 	}
 	@Override
 	public boolean isSoftLimitReached(Direction direction) {
-		return getHasSoftLimit(direction) && isLimitReached(direction, getSoftLimit(direction), getCurrentPosition());
+		return getHasSoftLimit(direction) && Length.isLimitReached(direction, getSoftLimit(direction), getCurrentPosition());
 	}
 	@Override
 	public boolean isPhysicalLimitExceeded(Direction direction) {
-		return isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition());
+		return Length.isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition());
 	}
 	@Override
 	public boolean isPhysicalLimitReached(Direction direction) {
-		return isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition());
+		return Length.isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition());
 	}
 	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
 		if(getHasSoftLimit(direction)) {
-			return isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
+			return Length.isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
 		}
 		return false;
 	}
