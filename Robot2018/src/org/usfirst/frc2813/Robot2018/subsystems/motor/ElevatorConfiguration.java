@@ -36,7 +36,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
 
 	// Software Settings
-	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(12); // TBD
+	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(4); // TBD
 
 	// Hardware Inputs
 	private static final Length SHAFT_DIAMETER                = LengthUOM.Inches.create(1.25);
@@ -153,7 +153,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|IMotorConfiguration.Reverse
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
-					|IMotorConfiguration.Disconnected // NB: WARNING !!
+//					|IMotorConfiguration.Disconnected // NB: WARNING !!
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
 			ElevatorSRXMotorPulses,             // nativeMotorLengthUOM
@@ -176,7 +176,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			Boolean.TRUE,                       // reverseHardLimitSwitchResetsEncoder
 			MAXIMUM_POSITION_INCHES.subtract(SAFETY_MARGIN_INCHES),        // forwardSoftLimit - set to 4" below the end of the physical range 
 			null,                               // reverseSoftLimit // NB: This is the correct value when hardware limit is fixed
-			RateUOM.InchesPerSecond.create(12), // defaultRate
+			DEFAULT_SPEED_INCHES_PER_SECOND, // defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ElevatorSRXMotorPercentageRate,      // percentageRate
 			null, // remoteForwardHardLimitSwitchSource
