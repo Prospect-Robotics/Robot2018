@@ -25,6 +25,12 @@ import org.usfirst.frc2813.units.values.Length;
  */
 class Test  {
 	static final int PERIODIC_INTERVAL = 250;
+
+	//@org.junit.jupiter.api.Test
+	public void test() {
+		runTest();
+	}
+	
 	
 	interface Periodic {
 		void periodic();
@@ -155,8 +161,7 @@ class Test  {
 		Logger.info(" ");
 	}
 
-	@org.junit.jupiter.api.Test
-	void test() {
+	void runTest() {
 		try {
 			Motor elevator = new Motor(new ElevatorConfiguration());
 			Motor arm = new Motor(new ArmConfiguration());
