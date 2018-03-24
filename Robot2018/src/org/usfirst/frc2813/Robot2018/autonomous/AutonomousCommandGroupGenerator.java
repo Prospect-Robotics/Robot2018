@@ -177,25 +177,25 @@ public class AutonomousCommandGroupGenerator {
 		verifyDirections();
 		
 		/**
-		 * Define some handy measurements.
+		 * Define some handy measurements. Define as double in implied inches. Doing math with groups of Length is TOO PAINFUL!
 		 */
 		// robot dimensions with and without bumpers
-		Length robotWheelbaseWidth = inches(33);
-		Length robotWheelbaseLength = inches(46);
-		Length robotBumperWidth = robotWheelbaseWidth.add(4);
-		Length robotBumperLength = robotWheelbaseLength.add(4);
+		double robotWheelbaseWidth = 33;
+		double robotWheelbaseLength = 46;
+		double robotBumperWidth = robotWheelbaseWidth + 4;
+		double robotBumperLength = robotWheelbaseLength + 4;
 
 		// field dimensions near to far
-		Length backWallToSwitch = inches(140);
-		Length switchDeth = inches(56);
-		Length switchToScake = inches(65);
-		Length scalePlatformDepth = inches(125);
-		
+		double backWallToSwitch = 140;
+		double switchDeth = 56;
+		double switchToScake = 65;
+		double scalePlatformDepth = 125;
+
 		// dimensions side to side
-		Length sideWallToFirstRobotStartPosition = inches(29.69);
-		Length backWallWidth = inches(264);
-		Length switchWidth = inches(152.88);
-		
+		double sideWallToFirstRobotStartPosition = 29.69;
+		double backWallWidth = 264;
+		double switchWidth = 152.88;
+
 		/*
 		 * Make a note that we are generating the sequence now, and capture the settings.
 		 * This is very important because only a robot code reset will re-initialize the auto sequence and merely 
@@ -252,7 +252,17 @@ public class AutonomousCommandGroupGenerator {
 				 * back so we end up straight, but closer to the wall so that we can approach the scale from the side.
 				 * WARNING! We are less than 30 inches from the wall
 				 */
-				radius = feet(5);
+				// shallow S curve takes us 17.5 inches to the side and 89.9 inches forward
+				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+
+				double distanceTravelled = 89.9;
+				double distanceRemaining = backWallToSwitch + switchDeth + switchToScake + scalePlatformDepth / 2 - robotWheelbaseLength / 2 - distanceTravelled;
+				
+				// FIXME! Finish path! Rough plan is to plan a curve clockwise by 90 degrees, radius of our distance to scale. Subtract that
+				// radius from distanceRemaining (since we travel equally forward and to the side when curving 90 degrees) and split
+				// that distance into part A at full speed, then raise elevator, then part B at safe elevator up speed, then finally
+				// do the turn.				
 			}
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.addDriveForwardSync(feet(24), AutonomousCommandGroup.TRANSITION_SPEED_STOP);

@@ -280,8 +280,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * @param rotation - clockwise or counterclockwise
 	 * @param endSpeed - speed coming out this command
 	 */
-	public void addCurveDegreesSync(Direction direction, Length degrees, Length radius, Direction rotation, double endSpeed) {
-		addCurveCommandSync(direction, radius.multiply(2*Math.PI/360).multiply(degrees), radius, rotation, endSpeed);
+	public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
+		addCurveCommandSync(direction, radius.multiply(2*Math.PI*degrees/360), radius, rotation, endSpeed);
 	}
 	/**
 	 * Create a command to spin in place, until we reach a specific *relative* angle.  Will turn in either direction
