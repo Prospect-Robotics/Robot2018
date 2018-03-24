@@ -88,29 +88,35 @@ public class AutonomousCommandGroupGenerator {
 		verify(Direction.CENTER, Direction.RIGHT, Direction.LEFT,   Direction.RIGHT); // goal on right, invert logic
 		verify(Direction.CENTER, Direction.RIGHT, Direction.RIGHT,  Direction.LEFT);  // goal on right, invert logic
 	}
-	
-	/*
+	/**
 	 * Give ourselves a name for debugging
 	 */
 	public String toString() {
 		return "AutonymousCodeGenerator";
 	}
-	
-	/*
+	/**
 	 * Helper to create a length in inches, scaled appropriately
 	 */
 	Length inches(double inches) {
 		return AutonomousCommandGroup.inches(inches);
 	}
-	
-	/*
+	/**
 	 * Helper to create a length in feet, scaled appropriately
 	 * Package scoped on purpose
 	 */
 	Length feet(double feet) {
 		return AutonomousCommandGroup.feet(feet);
 	}
-
+	/**
+	 * Helpers for using S curves to offset our position. If you travel the same amount around two circles
+	 * of opposite rotation, you end up pointed the same way, but offset diagonally
+	 */
+	double sCurveSideShift(double curveRadius, double degrees) {
+		return curveRadius * 2 - Math.cos(degrees);
+	}
+	double sCurveForwardShift(double curveRadius, double degrees) {
+		return curveRadius * 2 - Math.sin(degrees);
+	}
 	/**
 	 * Build a command sequence to be run during the Autonomous 15 second period.
 	 * 
@@ -157,6 +163,27 @@ public class AutonomousCommandGroupGenerator {
 		 * Sanity check our biasing logic 
 		 */
 		verifyDirections();
+		
+		/**
+		 * Define some handy measurements.
+		 */
+		// robot dimensions with and without bumpers
+		Length robotWheelbaseWidth = inches(33);
+		Length robotWheelbaseLength = inches(46);
+		Length robotBumperWidth = robotWheelbaseWidth.add(4);
+		Length robotBumperLength = robotWheelbaseLength.add(4);
+
+		// field dimensions near to far
+		Length backWallToSwitch = inches(140);
+		Length switchDeth = inches(56);
+		Length switchToScake = inches(65);
+		Length scalePlatformDepth = inches(125);
+		
+		// dimensions side to side
+		Length sideWallToFirstRobotStartPosition = inches(29.69);
+		Length backWallWidth = inches(264);
+		Length switchWidth = inches(152.88);
+		
 		/*
 		 * Make a note that we are generating the sequence now, and capture the settings.
 		 * This is very important because only a robot code reset will re-initialize the auto sequence and merely 
@@ -187,23 +214,33 @@ public class AutonomousCommandGroupGenerator {
 
 		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
 		autoCmdList.setHaveCube(true);
-		
+
+		/**
+		 * Here begins the autonomous decision tree in which we consider our starting position and the configurations
+		 * of switch and scale. We make these decisions in such a way as to cluster symmetric paths and use variables
+		 * to handle them together. We bias to the left, meaning if we start on the left or right, we write all paths
+		 * as if we are on the left. If we are in the center, we write paths as if we are are moving to the left.
+		 */
 		if (!Robot.gameData.isGameDataValid()) {
-			// Make a note of our lack of configuration 
+			/**
+			 * We have failed to read the field setup. The only safe option is to drive forward 5 feet and stop.
+			 */
 			Logger.error(this + ": No game data.");
-			// Just cross the auto line
 			autoCmdList.addDriveForwardSync(feet(5), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			// NB: We still have a cube, so don't call setHaveCube here.
 		} 
 		else if (robotStartingPosition.equals(scalePosition)) {
-			/*
-    		 * If the robot and the scale are on the same side, 
-    		 * drive forward and drop a cube into the scale from the end.
-    		 * 
-			 * NB: We write this script as if the robot and scale are both on the left,
-			 * it will also be used inverted for when the robot and scale are both on the right.
+			/**
+			 * The robot and the scale are on the same side. Drive forward and approach the scale from the side.
 			 */
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
+			if (useCurves) {
+				/**
+				 * The scale is straight ahead. Deflect towards the wall and back so we end up straight, but closer
+				 * to the wall so that we can approach the scale from the side.
+				 */
+				radius = feet(5);
+			}
 			// we are on the same side as the scale. Leave switch for team mates
 			autoCmdList.addDriveForwardSync(feet(24), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			// Start raising elevator while we are turning...
@@ -219,9 +256,6 @@ public class AutonomousCommandGroupGenerator {
 			/*
 			 * If the robot is in the center, we're going to drop a cube into the switch
 			 * on the correct side.  
-    		 *
-    		 * NB: Make sure there isn't another robot crossing your path before you pick this.
-    		 * 
 			 * NB: We write this script as if the our switch is active to the left of the  
 			 * robot.  If this isn't the case, the script will be run inverted.
 			 */
