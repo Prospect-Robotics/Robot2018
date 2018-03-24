@@ -1,9 +1,8 @@
 package org.usfirst.frc2813.units.uom;
 
-import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
+import static org.junit.jupiter.api.Assertions.fail;
 
-//import static org.junit.jupiter.api.Assertions.*;
-//import org.junit.jupiter.api.Test;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 
 /*
  * NB: This is a JUnit Test but junit classes aren't available on the target, causing the build to fail
@@ -11,7 +10,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
  */
 class TestUOM {
 
-//	@org.junit.jupiter.api.Test
+	@org.junit.jupiter.api.Test
 	void test() {
 		try
 		{
@@ -20,7 +19,7 @@ class TestUOM {
 			UOM.dumpUnitsOfMeasure();
 		} catch(Throwable t) {
 			t.printStackTrace();
-//			fail("Unexpected exception");
+			fail("Unexpected exception");
 		}
 	}
 

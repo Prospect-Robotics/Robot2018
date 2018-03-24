@@ -2,8 +2,6 @@ package org.usfirst.frc2813.Robot2018.subsystems.motor;
 
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
-import org.usfirst.frc2813.Robot2018.motor.state.MotorState;
-import org.usfirst.frc2813.logging.LogLevel;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -26,7 +24,7 @@ import org.usfirst.frc2813.units.values.Length;
 class Test  {
 	static final int PERIODIC_INTERVAL = 250;
 
-	//@org.junit.jupiter.api.Test
+	@org.junit.jupiter.api.Test
 	public void test() {
 		runTest();
 	}
@@ -69,12 +67,13 @@ class Test  {
 	private static IMotorState lastAnnounced = null;
 	private static Length lastSeen = null;
 	void waitForCompletion(Motor m) {
+		IMotorState targetState = m.getTargetState();
 		long startTime = System.currentTimeMillis();
 		boolean failed = false;
 		boolean complete = false;
 		while(!failed && !complete) {
-			if(lastAnnounced != m.getTargetState()) {
-				lastAnnounced = m.getTargetState();
+			if(lastAnnounced != targetState) {
+				lastAnnounced = targetState;
 				Logger.info(" ");
 				Logger.info(" ");
 				Logger.info("-----------------------------------------------------------");
@@ -84,35 +83,35 @@ class Test  {
 			Logger.info(m.getDiagnostics());
 			boolean hitHardLimit = false;
 			boolean hitSoftLimit = false;
-			if(m.getTargetState().isCalibratingSensorInDirection() && m.getCurrentHardLimitSwitchStatus(m.getTargetDirection())) {
-				Logger.info("We think we are calibrating and hit the correct hard limit switch for " + m.getTargetDirection());
+			if(targetState.isCalibratingSensorInDirection() && m.getCurrentHardLimitSwitchStatus(targetState.getTargetDirection())) {
+				Logger.info("We think we are calibrating and hit the correct hard limit switch for " + targetState.getTargetDirection());
 				complete = true;
 				continue;
 			}
-			if(m.getTargetDirection() != null) {
-				hitHardLimit = m.getCurrentHardLimitSwitchStatus(m.getTargetDirection());
-				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(m.getTargetDirection());
-			} else if(m.getTargetState().getHasStartingAbsolutePosition() 
-					&& m.getTargetState().getHasTargetAbsolutePosition()
-					&& m.getTargetState().getStartingAbsolutePosition().getCanonicalValue() < m.getTargetState().getTargetAbsolutePosition().getCanonicalValue()) { 
+			if(targetState.getTargetDirection() != null) {
+				hitHardLimit = m.getCurrentHardLimitSwitchStatus(targetState.getTargetDirection());
+				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(targetState.getTargetDirection());
+			} else if(targetState.getHasStartingAbsolutePosition() 
+					&& targetState.getHasTargetAbsolutePosition()
+					&& targetState.getStartingAbsolutePosition().getCanonicalValue() < targetState.getTargetAbsolutePosition().getCanonicalValue()) { 
 				hitHardLimit = m.getCurrentHardLimitSwitchStatus(Direction.FORWARD);
 				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(Direction.FORWARD);
-			} else if(m.getTargetState().getHasStartingAbsolutePosition() 
-					&& m.getTargetState().getHasTargetAbsolutePosition()
-					&& m.getTargetState().getStartingAbsolutePosition().getCanonicalValue() > m.getTargetState().getTargetAbsolutePosition().getCanonicalValue()) { 
+			} else if(targetState.getHasStartingAbsolutePosition() 
+					&& targetState.getHasTargetAbsolutePosition()
+					&& targetState.getStartingAbsolutePosition().getCanonicalValue() > targetState.getTargetAbsolutePosition().getCanonicalValue()) { 
 				hitHardLimit = m.getCurrentHardLimitSwitchStatus(Direction.REVERSE);
 				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(Direction.REVERSE);
 			} else {
-				Logger.info(m.getTargetState());
+				Logger.info(targetState);
 				hitHardLimit = m.getCurrentHardLimitSwitchStatus(Direction.FORWARD) || m.getCurrentHardLimitSwitchStatus(Direction.REVERSE);
 				hitSoftLimit = m.getCurrentSoftLimitSwitchStatus(Direction.FORWARD) || m.getCurrentSoftLimitSwitchStatus(Direction.REVERSE);
 			}
-			if(m.getTargetState().getOperation() == MotorOperation.DISABLED) {
+			if(targetState.getOperation() == MotorOperation.DISABLED) {
 				Logger.warning("WE GOT DISABLED.  THAT WAS UNEXPECTED.");
 				failed = true;
 //				continue;
 			}
-			if(m.getTargetDirection() != null && (hitHardLimit || hitSoftLimit)) {
+			if(targetState.getTargetDirection() != null && (hitHardLimit || hitSoftLimit)) {
 				if(hitHardLimit) {
 					Logger.warning("MOVE HIT HARD LIMIT SWITCH.");
 				}
@@ -140,7 +139,7 @@ class Test  {
 			}
 			lastSeen = m.getCurrentPosition();
 			Length margin = m.getConfiguration().getNativeDisplayLengthUOM().create(0.001);
-			if(m.getTargetState().isMovingToPosition() && m.getCurrentPositionErrorWithin(margin)) {
+			if(targetState.isMovingToPosition() && m.getCurrentPositionErrorWithin(margin)) {
 				Logger.info("We think we are within " + margin + " of target.  Actual error is " + m.getCurrentPositionError() + " position is " + m.getCurrentPosition());
 				complete = true;
 				continue;
