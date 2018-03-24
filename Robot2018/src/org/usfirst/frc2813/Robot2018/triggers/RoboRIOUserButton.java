@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.subsystems.user;
+package org.usfirst.frc2813.Robot2018.triggers;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.buttons.Button;

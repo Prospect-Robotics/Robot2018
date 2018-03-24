@@ -13,7 +13,7 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorVelocityPIDTest;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitchSync;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPositionSync;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
-import org.usfirst.frc2813.Robot2018.subsystems.user.RoboRIOUserButton;
+import org.usfirst.frc2813.Robot2018.triggers.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 
