@@ -313,6 +313,7 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 	 * being used, the F term should be set to 1 over the maximum speed for the
 	 * output measured in setpoint units per this controller's update period (see
 	 * the default period in this class's constructor).
+	 * @return The feed forward value for the PID algorithm 
 	 */
 	protected double calculateFeedForward() {
 		if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
@@ -842,6 +843,7 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 
 	/**
 	 * Set the enabled state of the PIDController.
+	 * @param enable true or false
 	 */
 	public void setEnabled(boolean enable) {
 		if (enable) {

@@ -23,7 +23,7 @@ public final class MotorMoveToAbsolutePositionAsync extends AbstractMotorInstant
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && motor.getTargetPosition() == position) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && motor.getTargetState().getTargetAbsolutePosition() == position) {
 			if(!isDefaultCommand()) {
 				Logger.printFormat(LogType.INFO,"%s NOT telling %s to move to %s, it's already doing that.",this,motor,position);
 			}

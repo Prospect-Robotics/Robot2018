@@ -23,7 +23,7 @@ public final class MotorCalibrateSensorAsync extends AbstractMotorInstantCommand
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(motor.getTargetState().getOperation() == MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION && motor.getTargetDirection() == direction) {
+		if(motor.getTargetState().getOperation() == MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION && motor.getTargetState().getTargetDirection() == direction) {
 			if(!isDefaultCommand()) {
 				Logger.printFormat(LogType.INFO,"%s NOT telling %s to calibrate the sensor in  to %s, it's already doing that.",this,motor,direction);
 			}

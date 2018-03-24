@@ -3,8 +3,6 @@
 package org.usfirst.frc2813.Robot2018;
 
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DifferentialDriveWithBlocking;
-import org.usfirst.frc2813.logging.Logger;
-import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -13,13 +11,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 //import edu.wpi.first.wpilibj.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into

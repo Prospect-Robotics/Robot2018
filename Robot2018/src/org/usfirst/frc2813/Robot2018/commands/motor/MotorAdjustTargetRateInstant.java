@@ -25,7 +25,7 @@ public final class MotorAdjustTargetRateInstant extends AbstractMotorInstantComm
 	// Called once when the command executes
 	protected void initialize() {
 		super.initialize();
-		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetSpeed() == targetRate) {
+		if(motor.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE && motor.getTargetState().getTargetRate() == targetRate) {
 			if(!isDefaultCommand()) {
 				Logger.printFormat(LogType.INFO,"%s NOT telling %s to change target rate to %s, it's already moving at that speed.",this,motor,targetRate);
 			}

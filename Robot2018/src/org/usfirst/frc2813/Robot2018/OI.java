@@ -61,6 +61,7 @@ public class OI {
 	public Joystick joystick1, joystick2, buttonPanel;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 
+	@SuppressWarnings("unused")
 	public OI() {
 		/*
 		 * BUTTON PANEL BUTTONS:

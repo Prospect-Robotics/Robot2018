@@ -1,12 +1,8 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
-import org.usfirst.frc2813.units.uom.LengthUOM;
-import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
 /**
@@ -20,6 +16,9 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 	
 	/**
 	 * Run a velocity test between limits (hard and/or soft) at the specified velocity  
+	 * @param motor The motor to be tested
+	 * @param continuousRotation Whether the motor has continuous rotation or not
+	 * @param targetRate the target rate for testing
 	 */
 	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate) {
 		super(motor, true);
@@ -30,6 +29,8 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 
 	/**
 	 * Run a velocity test between limits (hard and/or soft) at the default velocity
+	 * @param motor The motor to be tested
+	 * @param continuousRotation Whether the motor has continuous rotation or not
 	 */
 	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation) {
 		this(motor, continuousRotation, motor.getConfiguration().getDefaultRate());
@@ -38,6 +39,7 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 	/**
 	 * Run a velocity test between limits (hard and/or soft) at the default velocity, assuming NO continuous rotation
 	 * for safety reasons.
+	 * @param motor The motor to be tested
 	 */
 	public MotorVelocityPIDTest(Motor motor) {
 		this(motor, false, motor.getConfiguration().getDefaultRate());
@@ -64,6 +66,7 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 		motor.moveInDirectionAtRate(targetDirection, targetRate);
 	}
 
+	@Override
 	protected void execute() {
 		if((motor.getHasHardLimit(targetDirection) && motor.getCurrentHardLimitSwitchStatus(targetDirection))
 		|| (motor.getHasSoftLimit(targetDirection) && motor.isSoftLimitReached(targetDirection))) {
@@ -89,6 +92,7 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 		motor.holdCurrentPosition();
 	}
 
+	@Override
     public String toString() {
         return getClass().getSimpleName() + "(" + motor + ", continuousRotation=" + continuousRotation + ", targetRate=" + targetRate + ")";
     }

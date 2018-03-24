@@ -19,13 +19,13 @@ public enum LogLevel {
 	DEBUG(LogType.values()),
 	
 	/**
-	 * <p>Prints logs of type {@link LogType#INFO info}, {@link LogType#WARNING warning}, & {@link LogType#ERROR error}.</p>
+	 * <p>Prints logs of type {@link LogType#INFO info}, {@link LogType#WARNING warning}, &amp; {@link LogType#ERROR error}.</p>
 	 * <p>Does not print logs of type {@link LogType#DEBUG debug}.</p>
 	 */
 	INFO(LogType.INFO, LogType.WARNING, LogType.ERROR),
 	
 	/**
-	 * <p>Prints logs of type {@link LogType#WARNING warning} & {@link LogType#ERROR error}.</p>
+	 * <p>Prints logs of type {@link LogType#WARNING warning} &amp; {@link LogType#ERROR error}.</p>
 	 * <p>Does not print logs of type {@link LogType#DEBUG debug} or {@link LogType#INFO info}.</p>
 	 */
 	ISSUE(LogType.WARNING, LogType.ERROR),

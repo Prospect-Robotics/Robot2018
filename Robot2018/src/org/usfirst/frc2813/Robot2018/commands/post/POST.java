@@ -21,7 +21,7 @@ public class POST extends CommandGroup {
 
 	/**
 	 * FIXME! POST all of our subsystems, not just drivetrain
-	 * @param runAfterPOST
+	 * @param runAfterPOST a command to run after post completes
 	 */
 	public POST(Command runAfterPOST) {
 		afterPOST = Optional.ofNullable(runAfterPOST);
