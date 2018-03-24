@@ -4,10 +4,7 @@ import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.IMotorController;
-import org.usfirst.frc2813.Robot2018.motor.ISimulatedMotorController;
-import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorControllerUnitConversionAdapter;
-import org.usfirst.frc2813.Robot2018.motor.SimulatedMotorControllerUnitConversionAdapter;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.pwm.PWM;
 import org.usfirst.frc2813.Robot2018.motor.pwm.PWMWithEncoder;
@@ -17,7 +14,6 @@ import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonSRX;
 import org.usfirst.frc2813.Robot2018.motor.victor.VictorSPX;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
-import org.usfirst.frc2813.Robot2018.subsystems.StandaloneGearheadsSubsystem;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -68,21 +64,23 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	
 	private final IMotorConfiguration configuration;
 	private final IMotorController hardwareController;
-	private final ISimulatedMotorController simulatedController;
+	private final IMotorController simulatedController;
 	private IMotorState currentState;
 	private IMotorState previousState;
 	
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
-	
+
 	/**
 	 * Create a motor subsystem with a VictorSPX
+	 * @param configuration The motor configuration specifying how this subsystem shall behave
+	 * @param victorSPX The CTRE Victor SPX to be managed 
 	 */
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX victorSPX) {
 		this.configuration = configuration;
 		this.hardwareController  = new MotorControllerUnitConversionAdapter(configuration, new VictorSPX(configuration, victorSPX));
-		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
+		this.simulatedController = new MotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = this.previousState = MotorStateFactory.createDisabled(this);
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
@@ -91,11 +89,13 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	/**
 	 * Create a motor subsystem with a TalonSRX
+	 * @param configuration The motor configuration specifying how this subsystem shall behave
+	 * @param talonSRX The CTRE Talon SRX to be managed 
 	 */
 	public Motor(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.TalonSRX talonSRX) {
 		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new TalonSRX(configuration, talonSRX));
-		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
+		this.simulatedController = new MotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
@@ -103,11 +103,13 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	/**
 	 * Create a motor subsystem with a PWM speed controller only
+	 * @param configuration The motor configuration specifying how this subsystem shall behave
+	 * @param speedController The PWM speed controller to be used 
 	 */
 	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController) {
 		this.configuration = configuration;
 		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWM(configuration, speedController));
-		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
+		this.simulatedController = new MotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
@@ -115,11 +117,14 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	/**
 	 * Create a motor subsystem with a PWM and an encoder
+	 * @param configuration The motor configuration specifying how this subsystem shall behave
+	 * @param speedController The PWM speed controller to be used 
+	 * @param encoder The encoder to be used 
 	 */
-	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController, Encoder sensor) {
+	public Motor(IMotorConfiguration configuration, PWMSpeedController speedController, Encoder encoder) {
 		this.configuration = configuration;
-		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWMWithEncoder(configuration, speedController, sensor));
-		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
+		this.hardwareController = new MotorControllerUnitConversionAdapter(configuration, new PWMWithEncoder(configuration, speedController, encoder));
+		this.simulatedController = new MotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
@@ -127,11 +132,12 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 
 	/**
 	 * Create a motor subsystem with a simulated motor controller
+	 * @param configuration The motor configuration specifying how this subsystem shall behave
 	 */
 	public Motor(IMotorConfiguration configuration) {
 		this.configuration = configuration;
 		this.hardwareController = null;
-		this.simulatedController = new SimulatedMotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
+		this.simulatedController = new MotorControllerUnitConversionAdapter(configuration, new Simulated(configuration));
 		this.currentState = MotorStateFactory.createDisabled(this);
 		this.previousState = MotorStateFactory.createDisabled(this);
 		configure();
@@ -192,7 +198,11 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public IMotorState getPreviousTargetState() {
 		return previousState;
 	}
-	
+
+	/**
+	 * Get the motor controller driven by this subsystem
+	 * @return the motor controller interface 
+	 */
 	private IMotorController getMotorController() {
 		if(isEmulated()) {
 			return simulatedController;
@@ -208,45 +218,35 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	
 	/**
 	 * Get the controller's target state
-	 * @see IMotorController.getTargetState()
+	 * @see IMotorController#getTargetState()
+	 * @return the controller's target state (current command) 
 	 */
-	public IMotorState getControllerState() {
+	protected IMotorState getControllerTargetState() {
 		return getMotorController().getTargetState();
 	}
 	/**
 	 * Get the controller's previous target state
-	 * @see IMotorController.getPreviousTargetState()
+	 * @see IMotorController#getPreviousTargetState()
+	 * @return the controller's previous target state (current command) 
 	 */
-	public IMotorState getControllerPreviousTargetState() {
+	protected IMotorState getControllerPreviousTargetState() {
 		return getMotorController().getPreviousTargetState();
 	}
-	// What is the state of the limit switch (if applicable)
+
+	@Override
 	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
 		return getMotorController().getCurrentHardLimitSwitchStatus(switchDirection);
 	}
-	// Returns the speed if we are moving, otherwise null
-	public final Rate getTargetSpeed() {
-		return getTargetState().getTargetRate();
-	}
-	// Returns the position if we are moving, otherwise null.
-	public final Length getTargetPosition() {
-		return getTargetState().getTargetAbsolutePosition();
-	}
-	// Returns the direction if we are moving in a direction (NOT holding a position or moving to a position!)
-	public final Direction getTargetDirection() {
-		return getTargetState().getTargetDirection();
-	}
-	// What's my name?
+
+	@Override
 	public final String toString() {
 		return getConfiguration().getName();
 	}
-	/*
-	 * Dump our state
-	 */
+	@Override
 	public void dumpDiagnostics() {
 		Logger.info(getDiagnostics());
 	}
-
+	@Override
 	public String getDiagnostics() {
 		return String.format("%s - [%s @ %s] [%s]", this, getTargetState(), getCurrentPosition(), getMotorController().getDiagnostics());
 	}
@@ -254,21 +254,21 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 * Subsystem API
 	 * ---------------------------------------------------------------------------------------------- */
 
-	// Load default command, if configured
+	@Override
 	public final void initDefaultCommand() {
 		// Set to hold position by default
 		if(getConfiguration().getDefaultCommandFactory() != null) {
 			GearheadsCommand c = getConfiguration().getDefaultCommandFactory().createCommand(this);
 			if(c != null) {
-//				setDefaultCommand(c);
+				setDefaultCommand(c);
 				c.setIsDefaultCommand(true);
 			}
 		}
 	}
 
-	// Periodic
-	public final void periodic() {
-//		super.periodic();
+	@Override
+	public void periodic() {
+		super.periodic();
 		if(isRobotEnabled()) {
 			getMotorController().periodic();
 		}
@@ -354,8 +354,11 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		getMotorController().configure();
 	}
 
-	// Guards for state transitions, called by changeState
-	// IMPORTANT: Do not call directly	
+	/** Guards for state transitions, called by changeState
+	 * IMPORTANT: Do not call directly
+	 * @param proposedState The next operating being requested
+	 * @return true if it's ok to transition to the next state/command, false to block it.  
+	 */	
 	protected boolean isStateTransitionAllowed(IMotorState proposedState) {
 		if (proposedState.equals(getTargetState()) && proposedState.getOperation() != MotorOperation.DISABLED) {
 			Logger.printFormat(LogType.WARNING, "bug in code: Transitioning from %s state to %s state.", getTargetState(), proposedState);
@@ -365,8 +368,12 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		return true;
 	}
 	
-	// Execute for state transitions, called by changeState.  
-	// IMPORTANT: Do not call directly	
+	/**
+	 * Execute for state transitions, called by changeState.  
+  	 * IMPORTANT: Do not call directly	
+	 * @param proposedState The next operating being requested
+	 * @return true if we transitioned to the next state/command, false if it failed.  
+	 */	
 	protected boolean executeTransition(IMotorState proposedState) {
 		// Check that state change is actually changing something. If so, do it.
 		Logger.info(this + " entering " + proposedState);
@@ -396,16 +403,18 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		return true;
 	}
 	/**
-	 * All device change come through here first.
-	 * Log request
-	 * Validate the actual actually changes something
-	 * make the change
-	 * flush old state so we do not get confused next time
+	 * All device change come through here first.  This is a very high level sanity check
+	 * to short-circuit wasted time and effort.  Most of the functionality is in the 
+	 * MotorController base class.
 	 * 
-	 * @param newState
-	 * NOTE: state variables other than the state enum are already updated,
-	 * with the old state in oldSpeed, oldPosition and oldDirection
-	 * @return true if state change occurred
+	 * - We log the request
+	 * - We validate that something is allowed transition
+	 * - We validate that this is actually a change in command/operation/parameter
+	 * - We make the change
+	 * - We update our record of the current and previous state
+	 * 
+	 * @param proposedState The next operating being requested
+	 * @return true if state transition happened
 	 */
 	protected boolean changeState(IMotorState proposedState) {
 		Logger.printFormat(LogType.DEBUG, "%s changeState requested: encoderFunctional: %s, current: %s, proposed: %s", this, encoderFunctional, getTargetState(), proposedState);
@@ -433,8 +442,8 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		}
 
 		// See if there was any translation and report on the alterations (units typically)
-		if(!getControllerState().equals(proposedState)) {
-			Logger.info(this + " - Scaling Occurred [Target: " + proposedState + " Controller: " + getControllerState()); 
+		if(!getControllerTargetState().equals(proposedState)) {
+			Logger.info(this + " - Scaling Occurred [Target: " + proposedState + " Controller: " + getControllerTargetState()); 
 		}
 
 		Logger.debug(this + " state transition complete.  old: " + getTargetState() + " status: " + proposedState + ".");
@@ -445,45 +454,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		return true;
 	}
 
-	/**
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentRate()
-	 */
-	@Override 
-	public Rate getCurrentRate() {
-		return getMotorController().getCurrentRate();
-	}
-
-	/*
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentPositionError()
-	 */
-	@Override
-	public Length getCurrentPositionError() {
-		return getMotorController().getCurrentPositionError();
-	}
-
-	/*
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentRateError()
-	 */
-	@Override
-	public Rate getCurrentRateError() {
-		return getMotorController().getCurrentRateError();
-	}
-
-	/**
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentRateErrorWithin(Rate)
-	 */
-	@Override
-	public boolean getCurrentRateErrorWithin(Rate marginOfError) {
-		return getMotorController().getCurrentRateErrorWithin(marginOfError);
-	}
-
-	/**
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#getCurrentPositionErrorWithin(Length)
-	 */
-	@Override
-	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
-		return getMotorController().getCurrentPositionErrorWithin(marginOfError);
-	}
+	
 	private static final long DISPLAY_INTERVAL = 2500;
 	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
 	private void dumpSubsystemStatusAtIntervals() {
@@ -492,11 +463,35 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			Logger.info("[[PERIODIC]] " + getDiagnostics());
 		}
 	}
-	
-	public boolean isDisconnected() {
-		return configuration.hasAll(IMotorConfiguration.Disconnected);
+
+	@Override 
+	public Rate getCurrentRate() {
+		return getMotorController().getCurrentRate();
 	}
 
+	@Override
+	public Length getCurrentPositionError() {
+		return getMotorController().getCurrentPositionError();
+	}
+
+	@Override
+	public Rate getCurrentRateError() {
+		return getMotorController().getCurrentRateError();
+	}
+
+	@Override
+	public boolean getCurrentRateErrorWithin(Rate marginOfError) {
+		return getMotorController().getCurrentRateErrorWithin(marginOfError);
+	}
+
+	@Override
+	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
+		return getMotorController().getCurrentPositionErrorWithin(marginOfError);
+	}
+	@Override
+	public boolean isDisconnected() {
+		return getConfiguration().hasAll(IMotorConfiguration.Disconnected);
+	}
 	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
 		return getMotorController().getCurrentSoftLimitSwitchStatus(switchDirection);
