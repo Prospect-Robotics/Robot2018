@@ -269,7 +269,9 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	// Periodic
 	public final void periodic() {
 //		super.periodic();
-		getMotorController().periodic();
+		if(isRobotEnabled()) {
+			getMotorController().periodic();
+		}
 		dumpSubsystemStatusAtIntervals();
 	}
 

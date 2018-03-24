@@ -566,12 +566,10 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	@Override
 	public void periodic() {
-		if(DriverStation.getInstance().isEnabled()) {
-			autoResetSensorPositionIfNecessary();
-			updatePIDProfileSlotForCurrentState();
-			checkOperationComplete();
-			checkForLimitErrors();
-		}
+		autoResetSensorPositionIfNecessary();
+		updatePIDProfileSlotForCurrentState();
+		checkOperationComplete();
+		checkForLimitErrors();
 	}
 
 	@Override
