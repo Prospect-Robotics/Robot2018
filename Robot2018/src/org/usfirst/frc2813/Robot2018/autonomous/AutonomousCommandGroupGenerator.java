@@ -123,10 +123,10 @@ public class AutonomousCommandGroupGenerator {
 	 * of opposite rotation, you end up pointed the same way, but offset diagonally
 	 */
 	double sCurveSideShift(double curveRadius, double degrees) {
-		return curveRadius * 2 - Math.cos(degrees);
+		return 2 * curveRadius * (1 - Math.cos(Math.toRadians(degrees)));
 	}
 	double sCurveForwardShift(double curveRadius, double degrees) {
-		return curveRadius * 2 - Math.sin(degrees);
+		return 2 * curveRadius * (1 - Math.sin(Math.toRadians(degrees)));
 	}
 	/**
 	 * Build a command sequence to be run during the Autonomous 15 second period.
@@ -248,8 +248,9 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			if (useCurves) {
 				/**
-				 * The scale is straight ahead. Deflect towards the wall and back so we end up straight, but closer
-				 * to the wall so that we can approach the scale from the side.
+				 * The scale is straight ahead, but we want to approach from the side. Deflect towards the wall and
+				 * back so we end up straight, but closer to the wall so that we can approach the scale from the side.
+				 * WARNING! We are less than 30 inches from the wall
 				 */
 				radius = feet(5);
 			}
