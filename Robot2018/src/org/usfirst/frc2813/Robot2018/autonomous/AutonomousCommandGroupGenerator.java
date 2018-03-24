@@ -180,23 +180,26 @@ public class AutonomousCommandGroupGenerator {
 		 * Define some handy measurements. Define as double in implied inches. Doing math with groups of Length is TOO PAINFUL!
 		 */
 		// robot dimensions with and without bumpers
-		double robotWheelbaseWidth = 33;
-		double robotWheelbaseLength = 46;
-		double robotBumperWidth = robotWheelbaseWidth + 4;
-		double robotBumperLength = robotWheelbaseLength + 4;
+		double bumperThickness = 3.25;
+		double robotWheelbaseWidth = 31;
+		double robotWheelbaseLength = 20;
+		double robotBumperWidth = robotWheelbaseWidth + bumperThickness;
+		double robotBumperLength = robotWheelbaseLength + bumperThickness;
 
 		// field dimensions near to far
 		double backWallToSwitch = 140;
-		double switchDeth = 56;
-		double switchToScake = 65;
+		double switchDepth = 56;
+		double switchToScale = 65;
 		double scalePlatformDepth = 125;
 
 		// dimensions side to side
-		double sideWallToFirstRobotStartPosition = 29.69;
 		double backWallWidth = 264;
+		double fieldWidth = 323.38;
+		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
 		double switchWidth = 152.88;
+		double scaleWidth = 180.24;
 
-		/*
+		/**
 		 * Make a note that we are generating the sequence now, and capture the settings.
 		 * This is very important because only a robot code reset will re-initialize the auto sequence and merely 
 		 * disabling and re-enabling the robot will re-run the sequence without re-initializing.
@@ -256,8 +259,8 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 
-				double distanceTravelled = 89.9;
-				double distanceRemaining = backWallToSwitch + switchDeth + switchToScake + scalePlatformDepth / 2 - robotWheelbaseLength / 2 - distanceTravelled;
+				double distanceTravelled = sCurveForwardShift(10*12, 22);
+				double distanceRemaining = backWallToSwitch + switchDepth + switchToScale + scalePlatformDepth / 2 - robotWheelbaseLength / 2 - distanceTravelled;
 				
 				// FIXME! Finish path! Rough plan is to plan a curve clockwise by 90 degrees, radius of our distance to scale. Subtract that
 				// radius from distanceRemaining (since we travel equally forward and to the side when curving 90 degrees) and split
