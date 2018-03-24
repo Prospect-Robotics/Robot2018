@@ -547,7 +547,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * the field.
 		 */
 		addElevatorWaitForTargetPositionSync();
-		addDropCubeSequenceSync();
+		addShootCubeSequence();
 		if(returnToPlacementHeightAsync) {
 			addElevatorMoveToPlacementHeightAsync(target);
 		}
