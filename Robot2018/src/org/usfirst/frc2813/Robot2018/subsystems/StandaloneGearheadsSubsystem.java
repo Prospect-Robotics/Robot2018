@@ -59,4 +59,53 @@ public class StandaloneGearheadsSubsystem {
 	 */
 	public void periodic() {
 	}
+
+	/**
+	 * I just call periodic on something every 100ms
+	 */
+	public static class PeriodicTimerThread extends Thread {
+		private static final int PERIODIC_INTERVAL = 250;
+		private long lastRun = System.currentTimeMillis();
+		private final StandaloneGearheadsSubsystem target;
+		PeriodicTimerThread(StandaloneGearheadsSubsystem target) {
+			this.target = target;
+		}
+		
+		public void run() {
+			while(true) {
+				try {
+					long now = System.currentTimeMillis();
+					if((now - lastRun) >= PERIODIC_INTERVAL) {
+						target.periodic();
+						lastRun = now;
+					}
+					try {
+						Thread.sleep(PERIODIC_INTERVAL/10);
+					} catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+				} catch(Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private PeriodicTimerThread notifier = null;
+	
+	public synchronized void startPeriodic() {
+		if(notifier != null) {
+			throw new IllegalStateException("Periodic timer is already running.");
+		}
+		this.notifier = new PeriodicTimerThread(this);
+		notifier.start();
+	}
+	
+	public synchronized void stopPeriodic() {
+		if(notifier == null) {
+			throw new IllegalStateException("Periodic timer is already terminated.");
+		}
+		notifier.interrupt();
+		notifier = null;
+	}
 }
