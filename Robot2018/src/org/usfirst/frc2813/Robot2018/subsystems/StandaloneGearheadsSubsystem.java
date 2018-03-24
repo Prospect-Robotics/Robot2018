@@ -29,4 +29,8 @@ public class StandaloneGearheadsSubsystem {
 	public void enableEmulator() {
 		// Doesn't do anything
 	}
+	
+	public boolean isRobotEnabled() {
+		return true;
+	}
 }

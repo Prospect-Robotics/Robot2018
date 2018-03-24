@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.subsystems;
 
 import org.usfirst.frc2813.logging.Logger;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
@@ -34,5 +35,12 @@ public abstract class GearheadsSubsystem extends Subsystem {
 	 */
 	public void disableEmulator() {
 		_isEmulated = false;
+	}
+	
+	/**
+	 * Short cut for determining if the robot is enabled.  I need this 
+	 */
+	public boolean isRobotEnabled() {
+		return DriverStation.getInstance().isEnabled();
 	}
 }
