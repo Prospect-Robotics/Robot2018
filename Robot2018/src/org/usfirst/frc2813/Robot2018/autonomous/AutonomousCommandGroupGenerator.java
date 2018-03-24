@@ -286,12 +286,12 @@ public class AutonomousCommandGroupGenerator {
 				 */
 				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
 				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
-				autoCmdList.addDriveForwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 35.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 35.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addDriveForwardSync(inches(switchToScale - 6*12), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
-				autoCmdList.addDriveForwardSync(inches(5*12), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				autoCmdList.addDriveBackwardSync(inches(5*12), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 				// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
 				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
 			}
