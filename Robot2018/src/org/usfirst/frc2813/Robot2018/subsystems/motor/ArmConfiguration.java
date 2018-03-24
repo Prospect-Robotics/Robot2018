@@ -42,7 +42,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	 * 
 	 * TODO: I don't think it's really 12.
 	 */
-	private static final Length LENGTH_OF_DRIVE_AXIS_TO_ARM_END  = LengthUOM.Inches.create(0.5);
+	private static final Length LENGTH_OF_DRIVE_AXIS_TO_ARM_END  = LengthUOM.Inches.create(100);
 	/*
 	 * To find the 'arc length' we will use as a reference in mapping angular distance to linear distance,
 	 * we will take the 'arc length' of a complete circle of radius RADIUS_DRIVE_AXIS_TO_ARM_END.
@@ -94,9 +94,9 @@ public class ArmConfiguration extends MotorConfiguration{
 	public static final RateUOM   ArmSRXEncoderRPS       = new RateUOM(ArmSRXEncoderRevolution, TimeUOM.Seconds, RateUOM.CanonicalRateUOMForMovement, "Arm-revs/second");
 
 	// Constants used for configuration
-	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(90); // TBD
+	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(10); // TBD
 	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0);
-	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(130);
+	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(110);
 	private static final Rate   MINIMUM_RATE = ArmDegreesPerSecond.create(0);
 	private static final Rate   MAXIMUM_RATE = ArmDegreesPerSecond.create(90);
 	
@@ -122,8 +122,8 @@ public class ArmConfiguration extends MotorConfiguration{
 	public static List<PIDConfiguration> createPidConfigurations() {
 		List<PIDConfiguration> pidConfigurations = new ArrayList<PIDConfiguration>();
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.HoldingPosition, 0.015, 0.0, 0.01, 0.0));
-		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingToPosition, 0.02, 0.0, 0.01, 20.0));
-		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingAtVelocity, 0.02, 0.0, 0.01, 20.0));
+		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingToPosition, 0.02, 0.0, 0.01, 0.0));
+		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingAtVelocity, 0.03, 0.0, 0.02, 1.0));
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.ProfileSlot3, 0.0, 0.0, 0.0, 0.0));
 		return Collections.unmodifiableList(pidConfigurations);
 	}
