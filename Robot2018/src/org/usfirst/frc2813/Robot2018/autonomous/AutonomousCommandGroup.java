@@ -107,6 +107,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT = inches(60);
 	/**
+	 * Elevator height for shooting cubes on the scale when robot backwards
+	 */
+	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT = inches(60);
+	/**
 	 * Elevator height for placing cubes on the switch
 	 */
 	static final Length ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT = inches(24);
@@ -120,6 +124,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	static final Length ARM_POSITION_HIGH = armDegrees(20);
 	
 	static final Length ARM_POSITION_SHOOT = armDegrees(90);
+	/**
+	 * Arm Position for shooting over head
+	 */
+	static final Length ARM_POSITION_INVERTED_SHOOT = armDegrees(50);
 	
 	/* ------------------------------------------------------------------------------------------------------
 	 * Helpers for changing sticky settings values used by add command helpers 
@@ -190,9 +198,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 			return ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT;
 		case SWITCH:
 			return ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT;
-		default:
-			throw new IllegalArgumentException("Unsuported target: " + target);
+		case SCALE_INVERTED:
+			return ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT;
 		}
+		return null; // all enum cases handled
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
@@ -421,16 +430,20 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void addArmMoveToLevelPositionAsync() {
 		addArmMoveToPositionAsync(ARM_POSITION_FOR_LEVEL);
 	}
-	
+
 	/**
 	 * Move the arm to the "high" position, but do not wait.
 	 */
 	public void addArmMoveToHighPositionAsync() {
 		addArmMoveToPositionAsync(ARM_POSITION_HIGH);
 	}
-	
+
 	public void addArmMoveToShootingPositionAsync() {
 		addArmMoveToPositionAsync(ARM_POSITION_SHOOT);
+	}
+
+	public void addArmMoveToOverHeadShootingPositionAsync() {
+		addArmMoveToPositionAsync(ARM_POSITION_INVERTED_SHOOT);
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
