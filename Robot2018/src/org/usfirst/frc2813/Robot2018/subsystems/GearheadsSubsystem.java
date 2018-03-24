@@ -38,7 +38,8 @@ public abstract class GearheadsSubsystem extends Subsystem {
 	}
 	
 	/**
-	 * Short cut for determining if the robot is enabled.  I need this 
+	 * Short cut for determining if the robot is enabled.  I need this
+	 * @return true if the robot is enabled. 
 	 */
 	public boolean isRobotEnabled() {
 		return DriverStation.getInstance().isEnabled();

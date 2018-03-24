@@ -11,6 +11,7 @@ public class DriveTrainResetEncodersInstant extends AbstractDriveTrainInstantCom
 	/**
 	 * Reset the DriveTrain encoders
 	 * Whatever is already running may be using the encoders... so require the subsystem.
+	 * @param driveTrain The driveTrain subsystem to reset.
 	 */
     public DriveTrainResetEncodersInstant(DriveTrain driveTrain) {
         super(driveTrain, true /* require subsystem */);

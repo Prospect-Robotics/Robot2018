@@ -88,6 +88,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 
 	/**
 	 * Use PID to drive in a straight line for a given distance.
+	 * @param driveTrain - the drivetrain subsystem
 	 * @param speed - the peak speed. We ramp up to this
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
@@ -112,6 +113,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 * Adjust our start/stop ramps and start power so that we effectively start and stop at
 	 * the given ratio of the normal speed. So, if you want to end at 20% speed, set
 	 * endingSpeedFactor to 0.2. Then your next command should set startSpeedFactor to 0.2
+	 * @param driveTrain - the drivetrain subsystem
 	 * @param speed - the peak speed. We ramp up to this
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
@@ -129,6 +131,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 
 	/**
 	 * Use PID to drive along a circular path for a given distance.
+	 * @param driveTrain - the drivetrain subsystem
 	 * @param speed - the peak speed. We ramp up to this
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
@@ -191,7 +194,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 
 	private double distanceTravelled() {
 		double rawDelta = driveTrain.getDistance() - startPosition;
-		return direction.isPositive() ? rawDelta : -rawDelta;
+		return rawDelta * direction.getMultiplierAsDouble();
 	}
 	
 	/**
@@ -200,8 +203,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 * Then interpolate in the last bit
 	 * Then the first bit.
 	 * All else is full speed ahead!
-	 *
-	 * @param distanceTravelled
+	 * @param distanceTravelled How far has the robot moved.  driveTrain.getDistance() suggests this is in feet.
 	 * @return desired speed between MIN_SPEED and maxSpeed
 	 */
 	private double calcThrottle(double distanceTravelled) {
@@ -237,7 +239,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 
 	/**
 	 * interpolate our desired angle offset by interpolating 0..deltaAngle
-	 * @param distanceTravelled
+	 * @param distanceTravelled How far has the robot moved.  driveTrain.getDistance() suggests this is in feet.
 	 * @return desired offset from startAngle
 	 */
 	private double calcAngle(double distanceTravelled) {
@@ -282,7 +284,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	/**
 	 * This is the pid callback. It provides out angle adjustment. Call
 	 * the appropriate drive routine based on state - curve or straight.
-	 * @param pidOutput
+	 * @param pidOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source) 
 	 */
 	private void usePIDOutput(double pidOutput) {
 		// If the command is complete, ignore any extra PID output callbacks while we are shutting PID down.
@@ -300,7 +302,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	/**
 	 * This routine takes PID output for the line PID thinks we are on and
 	 * adjusts for our current angle.
-	 * @param pidOutput
+	 * @param pidOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source) 
 	 */
 	private void driveCurve(double pidOutput) {
 		double distanceTravelled = distanceTravelled();

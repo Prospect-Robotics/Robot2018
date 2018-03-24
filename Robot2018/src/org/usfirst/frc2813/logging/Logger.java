@@ -146,7 +146,7 @@ public class Logger {
 	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
 	 * {@link LogType#ALWAYS ALWAYS}
 	 * 
-	 * @param objects
+	 * @param objects stuff to print
 	 * @see #print(LogType, Object...)
 	 */
 	public static void always(Object... objects) {
@@ -157,7 +157,7 @@ public class Logger {
 	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
 	 * {@link LogType#DEBUG DEBUG}
 	 * 
-	 * @param objects
+	 * @param objects stuff to print
 	 * @see #print(LogType, Object...)
 	 */
 	public static void debug(Object... objects) {
@@ -168,7 +168,7 @@ public class Logger {
 	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
 	 * {@link LogType#INFO INFO}
 	 * 
-	 * @param objects
+	 * @param objects stuff to print
 	 * @see #print(LogType, Object...)
 	 */
 	public static void info(Object... objects) {
@@ -179,7 +179,7 @@ public class Logger {
 	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
 	 * {@link LogType#WARNING WARNING}
 	 * 
-	 * @param objects
+	 * @param objects stuff to print
 	 * @see #print(LogType, Object...)
 	 */
 	public static void warning(Object... objects) {
@@ -190,7 +190,7 @@ public class Logger {
 	 * Version of {@link #print(LogType, Object...)} with a {@link LogType} of
 	 * {@link LogType#ERROR ERROR}
 	 * 
-	 * @param objects
+	 * @param objects stuff to print
 	 * @see #print(LogType, Object...)
 	 */
 	public static void error(Object... objects) {

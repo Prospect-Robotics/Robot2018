@@ -36,6 +36,7 @@ public class GameData {
 
 	/**
 	 * Is the game data valid?
+	 * @return true if the gamedata is valid, false otherwise.
 	 */
 	public boolean isGameDataValid() {
 		return isGameDataValid;

@@ -132,8 +132,8 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	/**
 	 * arcadeDrive for use in OI
-	 * @param joystick1
-	 * @param joystickIgnored
+	 * @param joystick1 The joystick to use for linear throttle and angular throttle
+	 * @param joystickIgnored We don't use this one in arcadeDrive
 	 */
 	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
 		/*
@@ -170,7 +170,7 @@ public class DriveTrain extends GearheadsSubsystem {
 	static boolean sentEncoderWarnings = false;
 	/**
 	 * Return the distance the robot has traveled in feet since the last call to
-	 * {@link #reset Robot.driveTrain.reset()}, or robot program start, whichever
+	 * driveTrain.reset(), or robot program start, whichever
 	 * was later. If the robot drove backwards, the value returned will be negative.
 	 * If the robot spins in place, the value will not change.
 	 *
@@ -226,6 +226,7 @@ public class DriveTrain extends GearheadsSubsystem {
 	
 	/**
 	 * Set the gear shifter into high or low gear
+	 * @param gear The gear to shift to.
 	 */
 	public void setGearShift(Direction gear) {
 		this.gearShift.setTargetPosition(gear);

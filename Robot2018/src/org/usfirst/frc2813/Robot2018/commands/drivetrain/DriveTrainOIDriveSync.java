@@ -2,7 +2,6 @@
 
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
-import org.usfirst.frc2813.logging.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;

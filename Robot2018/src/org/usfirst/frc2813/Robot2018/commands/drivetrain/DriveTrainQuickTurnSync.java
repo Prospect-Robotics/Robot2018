@@ -57,7 +57,7 @@ public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
 	}
 
 	/**
-	 * Distance from target in absolute value (how severe is the error)
+	 * @return offset in degrees from the target angle as an absolute value (how severe is the error)
 	 */
 	private double getErrorMagnitudeInDegrees() {
 		return Math.abs(getErrorInDegrees());
@@ -66,9 +66,9 @@ public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
 	/**
 	 * Calculate throttle given degrees from target, based on the error magnitude,
 	 * which logically cannot be less than 0 or greather than 360, or else things have gone sideways indeed.
-	 * @param degreesToGo The magnitude of the error in degrees from the goal
+	 * @param errorMagnitudeInDegrees The magnitude of the error in degrees from the goal
 	 * @param throttle the rate 0.0-1.0 for percentage of maximum speed
-	 * @return
+	 * @return The correct throttle to use based on a ramp up/down interpolated from the calculations we made for the turn profile
 	 */
 	private static double calcThrottle(double errorMagnitudeInDegrees, double throttle) {
 		if (errorMagnitudeInDegrees < MIN_DEG) {//if at correct location, stop

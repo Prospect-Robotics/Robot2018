@@ -9,12 +9,8 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
-import org.usfirst.frc2813.units.values.Value;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-
-import edu.wpi.first.wpilibj.DriverStation;
 
 public abstract class AbstractMotorController implements IMotorController {
 	
@@ -293,6 +289,7 @@ public abstract class AbstractMotorController implements IMotorController {
 	/**
 	 * All changes to state are done here, and recorded here.
 	 * Optionally reported to the log here.
+	 * @param motorState The state we want to change to
 	 */
 	protected final boolean changeState(IMotorState motorState) {
 		Logger.printFormat(LogType.DEBUG, "%s Changing state from %s to %s.", this, currentState, motorState);
@@ -360,28 +357,36 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Units Helpers
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	// Convert a length to sensor units
-	protected final Length toSensorUnits(Length l) {
-		return l == null ? null : configuration.getNativeSensorLengthUOM().create(l.convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
+	/** 
+	 * Unit conversion	
+	 * @param v the value to convert
+	 * @return The converted value.
+	 */
+	protected final Length toSensorUnits(Length v) {
+		return v == null ? null : configuration.getNativeSensorLengthUOM().create(v.convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
 	}
-//	// Convert a length to motor units	
-//	protected final Length toMotorUnits(Length l) {
-//		return l == null ? null : l.convertTo(configuration.getNativeMotorLengthUOM());
-//	}	
-	// Convert a length to display units	
-	protected final Length toSubsystemUnits(Length l) {
-		return l == null ? null : l.convertTo(configuration.getNativeDisplayLengthUOM());
+	/** 
+	 * Unit conversion	
+	 * @param v the value to convert
+	 * @return The converted value.
+	 */
+	protected final Length toDisplayUnits(Length v) {
+		return v == null ? null : v.convertTo(configuration.getNativeDisplayLengthUOM());
 	}
-	// Convert a length to sensor units
-	protected final Rate toSensorUnits(Rate r) {
-		return r == null ? null : configuration.getNativeSensorRateUOM().create(r.convertTo(configuration.getNativeSensorRateUOM()).getValueAsInt());
+	/** 
+	 * Unit conversion	
+	 * @param v the value to convert
+	 * @return The converted value.
+	 */
+	protected final Rate toSensorUnits(Rate v) {
+		return v == null ? null : configuration.getNativeSensorRateUOM().create(v.convertTo(configuration.getNativeSensorRateUOM()).getValueAsInt());
 	}
-//	// Convert a length to motor units	
-//	protected final Rate toMotorUnits(Rate r) {
-//		return r == null ? null : r.convertTo(configuration.getNativeMotorRateUOM());
-//	}
-	// Convert a length to display units	
-	protected final Rate toSubsystemUnits(Rate r) {
+	/** 
+	 * Unit conversion	
+	 * @param v the value to convert
+	 * @return The converted value.
+	 */
+	protected final Rate toDisplayUnits(Rate r) {
 		return r == null ? null : r.convertTo(configuration.getNativeDisplayRateUOM());
 	}
 	
@@ -389,29 +394,68 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Interface To Subclasses
 	 * ---------------------------------------------------------------------------------------------- */
 	
+	/**
+	 * Call the subclass to do the actual sensor position setting
+	 * @param sensorPosition The new sensor value
+	 * @return true if reset works, false otherwise.
+	 */
 	protected abstract boolean resetEncoderSensorPositionImpl(Length sensorPosition);
+	/**
+	 * Call the subclass to do the actual execution of the state transition
+	 * @param proposedState The state to transition to
+	 * @return true if execute works, false otherwise.
+	 */
 	protected abstract boolean executeTransition(IMotorState proposedState);
+	/**
+	 * What PID profile are we running
+	 * @return What PID profile are we running
+	 */
 	protected abstract PIDProfileSlot getPIDProfileSlot();
+	/**
+	 * Call the subclass to change PID profile slots as we transition between moving and holding.
+	 * @param profileSlot The PID profile to transition to
+	 * @return true if update works, false otherwise.
+	 */
 	protected abstract boolean setPIDProfileSlot(PIDProfileSlot profileSlot);
 	
+	@Override
 	public String toString() {
 		return getName();
 	}
 	
+	/**
+	 * Helper to get the forward limit in sensor units.
+	 * @return the limit in sensor units
+	 */
 	public Length getForwardLimit() {
 		return toSensorUnits(configuration.getForwardLimit());
 	}
+	/**
+	 * Helper to get the reverse limit in sensor units.
+	 * @return the limit in sensor units
+	 */
 	public Length getReverseLimit() {
 		return toSensorUnits(configuration.getReverseLimit());
 	}
+	/**
+	 * Helper to get the forward soft limit in sensor units.
+	 * @return the limit in sensor units
+	 */
 	public Length getForwardSoftLimit() {
 		return toSensorUnits(configuration.getForwardSoftLimit());
 	}
+	/**
+	 * Helper to get the reverse soft limit in sensor units.
+	 * @return the limit in sensor units
+	 */
 	public Length getReverseSoftLimit() {
 		return toSensorUnits(configuration.getReverseSoftLimit());
 	}
 	protected static int SENSOR_RESET_TOLERANCE_PULSES = 50;
-	// Returns true if we zeroed and are now holding position at zero
+	/** 
+	 * Returns true if we zeroed and are now holding position at zero
+	 * @return true/false
+	 */
 	protected boolean autoResetSensorPositionIfNecessary() {
 		boolean resetEncoders = false;
 		// Do we need to handle forward limit
@@ -459,8 +503,10 @@ public abstract class AbstractMotorController implements IMotorController {
 	/**
 	 * Determine the appropriate PID profile for the state specified, taking into account
 	 * current hardware values.
+	 * @param The state to check and determine an appropriate PID profile slot
+	 * @return The appropriate PID profile slot
 	 */
-	protected PIDProfileSlot getAppropriatePIDProfileSlot(IMotorState state) {
+	protected static PIDProfileSlot getAppropriatePIDProfileSlot(IMotorState state) {
 		switch(state.getOperation()) {
 		case HOLDING_CURRENT_POSITION:
 		case DISABLED:
@@ -482,6 +528,7 @@ public abstract class AbstractMotorController implements IMotorController {
 
 	/**
 	 * Determine the appropriate PID profile for the current operation and motor state
+	 * @return The appropriate PID profile slot
 	 */
 	protected PIDProfileSlot getAppropriatePIDProfileSlotForCurrentState() {
 		return getAppropriatePIDProfileSlot(getTargetState());
@@ -506,10 +553,10 @@ public abstract class AbstractMotorController implements IMotorController {
 	
 	/**
 	 * Display a value in both sensor and display units for debugging
-	 * @return 
+	 * @return a display string showing the sensor and "subsystem" units. 
 	 */
 	private String bothUnits(Length v) {
-		return toSensorUnits(v) + " (or " + toSubsystemUnits(v) + ")";
+		return toSensorUnits(v) + " (or " + toDisplayUnits(v) + ")";
 	}
 
 	/**

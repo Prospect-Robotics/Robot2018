@@ -102,46 +102,56 @@ public enum Direction{
 	}
 	
 	/**
-	 * Get the logical multiplier.  POSITIVE x1, NEGATIVE x-1, NEUTRAL x0
+	 * Get the logical multiplier for applying this direction to a value.  Makes code more concise.
+	 * Example: return angle * direction.getMultiplierAsDouble() instead of if(direction.isPositive()) { return angle * 1; } else { return angle * -1; }
+	 * @return Return -1.0, 0.0 or 1.0 depending on whether we're negative, neutral or positive. 
 	 */
 	public double getMultiplierAsDouble() {
 		return canonicalDirection.value;
 	}
 	/**
-	 * Get the logical multiplier.  POSITIVE x1, NEGATIVE x-1, NEUTRAL x0
+	 * Get the logical multiplier for applying this direction to a value.  Makes code more concise.
+	 * Example: return angle * direction.getMultiplier() instead of if(direction.isPositive()) { return angle * 1; } else { return angle * -1; }
+	 * @return Return -1, 0 or 1 depending on whether we're negative, neutral or positive. 
 	 */
 	public int getMultiplier() {
 		return canonicalDirection.value;
 	}
 	/**
 	 * Is this a neutral direction
+	 * @return Does this direction indicate a tri-state value of "don't care" or "floating"
 	 */
 	public boolean isNeutral() {
 		return canonicalDirection == Canonical.NEUTRAL;
 	}
 	/**
 	 * Is this a positive direction
+	 * @return true if the direction is associated with "positive" direction
 	 */
 	public boolean isPositive() {
 		return canonicalDirection == Canonical.POSITIVE;
 	}
 	/**
 	 * Is this a negative direction
+	 * @return true if the direction is associated with "negative" direction
 	 */
 	public boolean isNegative() {
 		return canonicalDirection == Canonical.NEGATIVE;
 	}
 	/**
 	 * Two directions are equal if they are the same or have the same canonical representation
+	 * @param other The other Direction to compare with
+	 * @return true if the direction is associated with "positive" direction
 	 */
 	public boolean equals(Direction other) {
 		return other.canonicalDirection == this.canonicalDirection;
 	}
-	/*
-	 * If we know which value is the preferred logical inverse i.e. up -> down, return it.
+	/**
+	 * If we know which value is the preferred logical inverse i.e. up to down, return it.
 	 * Some cases are ambiguous but the idea is clearer debug messages and behaving logically.  
 	 * Otherwise returns the canonical value for the inverse.
 	 * Neutral directions always return themselves.
+	 * @return the logically opposite alias for the direction.  What the human expects.  UP goes to DOWN, not NEGATIVE, etc. 
 	 */
 	public Direction getInverse() {
 		// No logical inverses for neutral
