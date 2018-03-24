@@ -329,8 +329,8 @@ public class AutonomousCommandGroupGenerator {
 				 */
 				// FIXME!! need to make this more than 90 to get far enough to the side
 				double distanceToSwitch = backWallToSwitch - robotBumperLength;
-				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(distanceToSwitch/2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
-				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(distanceToSwitch/2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
+				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(distanceToSwitch/2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
+				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(distanceToSwitch/2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
 				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			}
 			else {
