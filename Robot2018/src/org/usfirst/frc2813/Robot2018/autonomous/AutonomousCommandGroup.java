@@ -2,10 +2,10 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncodersInstant;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyroInstant;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinAsync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeStopInstant;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensorAsync;
@@ -16,6 +16,7 @@ import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -29,11 +30,11 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * 
  * Naming Conventions For adding individual Commands:
  * 
- * add<device><action><Async|Sync>
+ * {@literal add<device><action><Async|Sync>}
  * 
  * Naming Conventions for adding command sequences:
  *  
- * add<Goal>Sequence<Sync|Async>:
+ * {@literal add<Goal>Sequence<Sync|Async>}
  * 
  *     where *Async means that the command doesn't finish what it started and you better make sure it's 
  *     done later in your script.
@@ -57,6 +58,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	/**
 	 * This is the sticky setting to be used for all subsequent commands created for driving in an arc. 
 	 */
+	@SuppressWarnings("unused")
 	private double curveSpeed = 0.4;
 	/**
 	 * This is the sticky setting for the last speed as we came out of a move.
@@ -69,6 +71,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	@SuppressWarnings("unused")
 	private boolean haveCube = true;
+	
+	/**
+	 * Just a shortcut so we can refer to ArmDegrees easily
+	 */
+	static LengthUOM ArmDegrees = ArmConfiguration.ArmDegrees;
 
 	/* ------------------------------------------------------------------------------------------------------
 	 * Constants
@@ -120,24 +127,28 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	/**
 	 * Set the sticky setting for the speed for drive speed.  This value will be used for all subsequent commands created for driving forwards.
+	 * @param driveSpeed Percentage of output power {-1.0..1.0} 
 	 */
 	public void setDriveSpeed(double driveSpeed) { 
 		this.driveSpeed = driveSpeed; 
 	}
 	/**
 	 * Set the sticky setting for the speed for turning.  This value will be used for all subsequent commands created for turning.
+	 * @param turnSpeed Percentage of output power {-1.0..1.0} 
 	 */
 	public void setTurnSpeed(double turnSpeed) { 
 		this.turnSpeed = turnSpeed;
 	}
 	/**
 	 * Set the sticky setting for the speed for taking curves.  This value will be used for all subsequent commands created for curved movement.
+	 * @param curveSpeed Percentage of output power {-1.0..1.0} 
 	 */
 	public void setCurveSpeed(double curveSpeed) { 
 		this.curveSpeed = curveSpeed; 
 	}
 	/**
 	 * Set the sticky hint about whether we have a cube or not, which can help us scale back our speed to keep it.
+	 * @param haveCube true/false 
 	 */
 	public void setHaveCube(boolean haveCube) { 
 		this.haveCube = haveCube; 
@@ -163,7 +174,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 	
 	static Length armDegrees(double degrees) {
-		return ArmConfiguration.ArmDegrees.create(degrees);
+		return ArmDegrees.create(degrees);
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
@@ -197,7 +208,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 	/**
 	 * Add a command for driving forward for a set distance, with a desired speed at the end of the movement.
-	 * TODO: This is going to be the new default.
+	 * @param direction The direction to drive
+	 * @param distance The distance to drive
+	 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
+	 * 
 	 */
 	private void addDriveCommandSync(Direction direction, Length distance, double endSpeed) {
 		addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
@@ -205,14 +219,18 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 	/**
 	 * Add a command for driving forward for the indicated distance, with a desired speed at the end of the movement.
-	 * @see addDriveCommand
+	 * @see AutonomousCommandGroup#addDriveCommandSync(Direction, Length, double)
+	 * @param distance The distance to drive
+	 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 	 */
 	public void addDriveForwardSync(Length distance, double endSpeed) {
 		addDriveCommandSync(Direction.FORWARD, distance, endSpeed);
 	}
 	/**
 	 * Add a command for driving reverse for the indicated distance, with a desired speed at the end of the movement.
-	 * @see addDriveCommand
+	 * @see AutonomousCommandGroup#addDriveCommandSync(Direction, Length, double)
+	 * @param distance The distance to drive
+	 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 	 */
 	public void addDriveBackwardSync(Length distance, double endSpeed) {
 		addDriveCommandSync(Direction.BACKWARD, distance, endSpeed);
@@ -234,6 +252,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
 	 * end of the movement.
 	 * @see addCurveCommandSync
+	 * @param distance - along the curve.
+	 * @param radius - radius of circular path
+	 * @param rotation - clockwise or counterclockwise
+	 * @param endSpeed - speed coming out this command
 	 */
 	public void addCurveForwardSync(Length distance, Length radius, Direction rotation, double endSpeed) {
 		addCurveCommandSync(Direction.FORWARD, distance, radius, rotation, endSpeed);
@@ -242,6 +264,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
 	 * end of the movement.
 	 * @see addCurveCommandSync
+	 * @param distance - along the curve.
+	 * @param radius - radius of circular path
+	 * @param rotation - clockwise or counterclockwise
+	 * @param endSpeed - speed coming out this command
 	 */
 	public void addCurveBackwardSync(Length distance, Length radius, Direction rotation, double endSpeed) {
 		addCurveCommandSync(Direction.BACKWARD, distance, radius, rotation, endSpeed);
@@ -262,9 +288,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * until that relative angle is hit, accounting for any overshoot by reversing direction for smaller and smaller
 	 * moves until the target is it.  Right now QuickTurnCommand doesn't have PID, but continues until it gets close
 	 * enough.
+	 * @param direction - left or right
+	 * @param relativeAngle - how many degrees to turn
 	 */
-	public void addQuickTurnSync(Direction direction, double relativeAgle) {
-		addSequential(new DriveTrainQuickTurnSync(Robot.driveTrain, direction, relativeAgle, turnSpeed));
+	public void addQuickTurnSync(Direction direction, double relativeAngle) {
+		addSequential(new DriveTrainQuickTurnSync(Robot.driveTrain, direction, relativeAngle, turnSpeed));
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
@@ -298,6 +326,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	/**
 	 * Move the elevator to the indicated position.  Does not wait for completion.
+	 * @param position The absolute position to move the elevator to, relative to the lower limit switch.
 	 */
 	public void addElevatorMoveToPositionAsync(Length position) {
 		/**
@@ -310,6 +339,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 	/*
 	 * Start the elevator moving in the background
+	 * @param target Which scale or switch are we going for
 	 */
 	public void addElevatorMoveToPlacementHeightAsync(PlacementTargetType target) {
 		addElevatorMoveToPositionAsync(getPlacementHeight(target));
@@ -360,17 +390,19 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	/**
 	 * Move the arm to the indicated position.  Does not wait for completion.
+	 * @param armDegrees The number of ARM degrees.
+	 * @see ArmConfiguration#ArmDegrees
 	 */
-	public void addArmMoveToPositionAsync(Length position) {
+	public void addArmMoveToPositionAsync(Length armDegrees) {
 		if(!Robot.arm.isDisconnected())
-			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, position));
+			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, armDegrees));
 	}
 
 	/**
-	 * Move the arm In. 
+	 * Move the arm In to the home position 
 	 */
 	public void addArmMoveInAsync() {
-		addArmMoveToPositionAsync(LengthUOM.Inches.create(0));
+		addArmMoveToPositionAsync(armDegrees(0));
 	}
 
 	/**
@@ -378,9 +410,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * TODO: This should be moving to within a tolerance in ArmDegrees, not inches.
 	 */
 	public void addArmWaitForTargetPositionSync() {
-		// Wait for Arm to reach it's destination to within +/- one half inch.
+		// Wait for Arm to reach it's destination to within 5 degrees
 		if(!Robot.arm.isDisconnected())
-			addSequential(new MotorWaitForTargetPositionSync(Robot.arm, LengthUOM.Inches.create(0.5)));
+			addSequential(new MotorWaitForTargetPositionSync(Robot.arm, armDegrees(5.0)));
 	}
 
 	/**
@@ -450,6 +482,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	/**
 	 * Add a delay in seconds
+	 * @param seconds to delay
 	 */
 	public void addDelayInSecondsSync(double seconds) {
 		addSequential(new TimedCommand(seconds));
@@ -486,6 +519,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	/**
 	 * Add a "deliver" sequence tailored towards target.  Elevator may still be returning to placement height at the end
+	 * @param target where we want to place the cube
+	 * @param returnToPlacementHeightAsync do we want to go back to placement height afterwards?
 	 */
 	public void addDeliverCubeSequenceSync(PlacementTargetType target, boolean returnToPlacementHeightAsync) {
 		/*
