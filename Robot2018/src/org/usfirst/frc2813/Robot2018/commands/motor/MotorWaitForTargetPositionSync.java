@@ -16,6 +16,9 @@ public final class MotorWaitForTargetPositionSync extends AbstractMotorCommand {
 		this.allowableError = allowableError;
 		setName(toString());
 	}
+	public MotorWaitForTargetPositionSync(Motor motor) {
+		this(motor, motor.getConfiguration().getNativeDisplayLengthUOM().create(0.5));
+	}
 
 	@Override
 	protected void initialize() {
@@ -28,13 +31,17 @@ public final class MotorWaitForTargetPositionSync extends AbstractMotorCommand {
 				Logger.printFormat(LogType.INFO,"%s NOT waiting pointlessly for %s to reach position, it's already done that.",this,motor);
 			}
 		}
-		setInterruptible(true);
 	}
 
 	@Override
 	protected boolean isFinished() {
 		// NB: If there's no target position (absolute or relative), this will always return true.
-		return motor.getCurrentPositionErrorWithin(allowableError);
+		boolean finished = motor.getCurrentPositionErrorWithin(allowableError);
+		// NB: If the motor is moving to a position (relative or absolute)
+		if(!finished) {
+			Logger.printFormat(LogType.INFO,"%s waiting for %s to reach %s within +/- %s.",this,motor,motor.getTargetState().getTargetAbsolutePosition(), allowableError);
+		}
+		return finished;
 	}
 
     public String toString() {
