@@ -2,7 +2,6 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
@@ -35,14 +34,18 @@ public class AutonomousCommandGroupGenerator {
 	 * ROBOT       NEAR_SWITCH GOAL_DIRECTION    RESULT
 	 * ----------- ----------- -----------       ------------
 	 * 
-	 * LEFT        <any>       <any>             <unchanged>
+	 * LEFT        any         any               unchanged
 	 * 
-	 * RIGHT       <any>       <any>             <reversed>
+	 * RIGHT       any         any               reversed
 
-	 * NEUTRAL     <any>       LEFT              <unchanged>        
-	 * NEUTRAL     <any>       RIGHT             <reversed>         
+	 * NEUTRAL     any         LEFT              unchanged        
+	 * NEUTRAL     any         RIGHT             reversed         
 	 * 
 	 * @see SCRIPT_BIAS
+	 * @param startingPosition The starting placement of the robot, LEFT/CENTER/RIGHT
+	 * @param nearSwitchPosition The location of our platform on the near switch
+	 * @param referenceDirection The reference direction form our left hand oriented script
+	 * @return The adjusted direction 
 	 */
 	private static Direction getBiasedDirection(Direction startingPosition, Direction nearSwitchPosition, Direction referenceDirection) {
 		
@@ -57,6 +60,10 @@ public class AutonomousCommandGroupGenerator {
 
 	/**
 	 * This is a built-in unit test function for verifying that we get the correct output from our expectations
+	 * @param startingPosition The starting placement of the robot, LEFT/CENTER/RIGHT
+	 * @param nearSwitchPosition The location of our platform on the near switch
+	 * @param referenceDirection The reference direction form our left hand oriented script
+	 * @param expected The expected output
 	 * @see getBiasedDirection
 	 * @see SCRIPT_BIAS
 	 */
@@ -96,6 +103,8 @@ public class AutonomousCommandGroupGenerator {
 	}
 	/**
 	 * Helper to create a length in inches, scaled appropriately
+	 * @param inches A value in inches in double to wrap in a Length
+	 * @return A length
 	 */
 	Length inches(double inches) {
 		return AutonomousCommandGroup.inches(inches);
@@ -103,6 +112,8 @@ public class AutonomousCommandGroupGenerator {
 	/**
 	 * Helper to create a length in feet, scaled appropriately
 	 * Package scoped on purpose
+	 * @param A value in feet to wrap in a Length
+	 * @return A length
 	 */
 	Length feet(double feet) {
 		return AutonomousCommandGroup.feet(feet);
@@ -123,6 +134,7 @@ public class AutonomousCommandGroupGenerator {
 	 * This code uses the gameData from the driver station and a sendable chooser 
 	 * on the Smart Dashboard to decide which sequence to run.
 	 */
+	@SuppressWarnings("unused")
 	public AutonomousCommandGroupGenerator() {
 		Length radius;  // scratch pad for curves
 		// Determine our game configuration
