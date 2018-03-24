@@ -14,6 +14,8 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitchS
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPositionSync;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.UOM;
@@ -253,6 +255,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * @param endSpeed - speed coming out this command
 	 */
 	private void addCurveCommandSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
+		Logger.printLabelled(LogType.INFO, "AUTO ADD CURVE XYZZY[", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
 		addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 				endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 		currentSpeed = endSpeed;
