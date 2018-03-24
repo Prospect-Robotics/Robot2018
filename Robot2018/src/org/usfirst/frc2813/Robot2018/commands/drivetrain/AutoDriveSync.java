@@ -330,7 +330,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 				"Throttle", newThrottle,
 				"PID Output", pidOutput
 				);
-		driveTrain.arcadeDrive(newThrottle, pidOutput);
+		driveTrain.arcadeDrive(newThrottle * 0.6, pidOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 
@@ -349,7 +349,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 				"AngleError[now]", gyro.getAngle() - startAngle,
 				"Throttle", newThrottle,
 				"PID Output", pidOutput);
-		driveTrain.arcadeDrive(newThrottle, pidOutput);
+		driveTrain.arcadeDrive(newThrottle * 0.6, pidOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 }

@@ -328,12 +328,38 @@ public class AutonomousCommandGroupGenerator {
 				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
 				 */
 				// FIXME!! need to make this more than 90 to get far enough to the side
-				double distanceToSwitch = backWallToSwitch - robotBumperLength;
+				double distanceToSwitch = backWallToSwitch - robotBumperLength - 12;
+				double sidewaysDistance = (scaleWidth - robotBumperWidth) / 2;
+				autoCmdList.addDriveForwardSync(inches(distanceToSwitch - sidewaysDistance), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(distanceToSwitch/2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(distanceToSwitch/2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
 				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			}
 			else {
+				/**
+				 *  FIXME! still cut and paste. Not for this case
+				 *  Start backwards at ends. This branch has scale on oppos side.
+				 *  1. drive forward until our far end aligns with far edge of switch
+				 *  2. slow S curve to align with scale front
+				 *  3. 6 feet before we get there, raise the elevator
+				 *  4. proceed more slowly to the target
+				 *  5. deliver cube backwards
+				 */
+				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
+				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
+				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				autoCmdList.addDriveForwardSync(inches(switchToScale - 6*12), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				autoCmdList.addDriveBackwardSync(inches(5*12), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
+				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
+
+				
+				
+				
+				
 				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
 				autoCmdList.addQuickTurnSync(left, 45);
 				autoCmdList.addDriveForwardSync(inches(121), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
