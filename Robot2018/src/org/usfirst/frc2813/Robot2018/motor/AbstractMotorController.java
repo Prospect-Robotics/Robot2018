@@ -9,9 +9,12 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
+import org.usfirst.frc2813.units.values.Value;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+
+import edu.wpi.first.wpilibj.DriverStation;
 
 public abstract class AbstractMotorController implements IMotorController {
 	
@@ -21,6 +24,9 @@ public abstract class AbstractMotorController implements IMotorController {
 
 	// Motor configuration data
 	protected final IMotorConfiguration configuration;
+	
+	protected final LogType autoCalibrationLogLevelForDebugOutput = LogType.INFO;
+	protected final LogType autoCalibrationLogLevelForInfoOutput = LogType.INFO;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * Constants
@@ -147,36 +153,37 @@ public abstract class AbstractMotorController implements IMotorController {
 			return true;
 		}
 		Direction directionOfTravel; 
-		Logger.info("resetEncoderSensorPosition to " + position + ".");
+		Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition to " + position + ".");
 		IMotorState stateBeforeResettingEncoders = getTargetState();
 		Length positionBeforeResettingEncoders = getCurrentPosition();
 		if(!changeState(MotorStateFactory.createDisabled(this))) {
-			Logger.error("Could not change state to disabled.  No resetting sensor position.");
+			Logger.print(autoCalibrationLogLevelForDebugOutput, this + " could not change state to disabled.  No resetting sensor position.");
 			return false;
 		}
 		if(!resetEncoderSensorPositionImpl(position)) {
-			Logger.error("Failed to reset encoders.  Leaving motor disabled.  Expected " + position + " but got " + getCurrentPosition());
+			Logger.print(autoCalibrationLogLevelForDebugOutput, this + " failed to reset encoders.  Leaving motor disabled.  Expected " + position + " but got " + getCurrentPosition());
 			return false;
 		}
 		switch(stateBeforeResettingEncoders.getOperation()) {
 		case CALIBRATING_SENSOR_IN_DIRECTION:
-			Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of manual calibrating sensor operation.");
+			Logger.print(autoCalibrationLogLevelForDebugOutput, this +" resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of manual calibrating sensor operation.");
 			changeState(MotorStateFactory.createHoldingPosition(this));
 			break;
 		case DISABLED:
 			// Stay disabled, no further change required.
+			Logger.print(autoCalibrationLogLevelForDebugOutput, this + "already disabled.  No return.");
 			break;
 		case HOLDING_CURRENT_POSITION:
-			Logger.debug("resetEncoderSensorPosition(" + position + ") is returning to holding operation after completion of auto-calibrating sensor operation.");
+			Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is returning to holding operation after completion of auto-calibrating sensor operation.");
 			changeState(MotorStateFactory.createHoldingPosition(this));
 			break;
 		case MOVING_IN_DIRECTION_AT_RATE:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetDirection();
 			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
-				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of auto-calibrating sensor operation.");
+				Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning to holding operation after completion of auto-calibrating sensor operation.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
-				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning back to moving away from the hardware limit after completion of auto-calibrating operation.");
+				Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning back to moving away from the hardware limit after completion of auto-calibrating operation.");
 				changeState(stateBeforeResettingEncoders);
 			}
 			
@@ -184,30 +191,24 @@ public abstract class AbstractMotorController implements IMotorController {
 		case MOVING_TO_ABSOLUTE_POSITION:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetAbsolutePosition().getValue() > getCurrentPosition().getValue() ? Direction.FORWARD : Direction.REVERSE; 
 			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
-				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the absolute position is beyond the hardware limit.");
+				Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the absolute position is beyond the hardware limit.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
-				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning back to move to absolute position after completion of auto-calibrating sensor operation.");
+				Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning back to move to absolute position after completion of auto-calibrating sensor operation.");
 				changeState(MotorStateFactory.createMovingToAbsolutePosition(this, stateBeforeResettingEncoders.getTargetAbsolutePosition()));
 			}
 			break;
 		case MOVING_TO_RELATIVE_POSITION:
 			directionOfTravel = stateBeforeResettingEncoders.getTargetAbsolutePosition().getValue() > getCurrentPosition().getValue() ? Direction.FORWARD : Direction.REVERSE;
-			Logger.info("resetEncoderSensorPosition(" + position + ") is transitioning to an adjusted relative position.");
+			Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning to an adjusted relative position.");
 			// NB: 
 			Length adjustedRelativePosition = stateBeforeResettingEncoders.getTargetRelativeDistance().add(positionBeforeResettingEncoders.subtract(position));
-// DEBUGGING
 			IMotorState relative = MotorStateFactory.createMovingToRelativePosition(this, stateBeforeResettingEncoders.getTargetDirection(), adjustedRelativePosition);
-			IMotorState absolute = MotorStateFactory.createMovingToAbsolutePosition(this, stateBeforeResettingEncoders.getTargetAbsolutePosition());
-			if(!relative.equals(absolute)) {
-				Logger.error("Relative and absolute commands calculated did not match!");
-			}
-// DEBUGGING
 			if(getCurrentHardLimitSwitchStatus(directionOfTravel)) {
-				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the relative position was beyond the hardware limit.");
+				Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning to holding position, as the relative position was beyond the hardware limit.");
 				changeState(MotorStateFactory.createHoldingPosition(this));
 			} else {
-				Logger.debug("resetEncoderSensorPosition(" + position + ") is transitioning back to move to an adjusted relative position after completion of auto-calibrating sensor operation: " + relative);
+				Logger.print(autoCalibrationLogLevelForDebugOutput, this + " resetEncoderSensorPosition(" + position + ") is transitioning back to move to an adjusted relative position after completion of auto-calibrating sensor operation: " + relative);
 				changeState(relative);			
 			}
 			break;
@@ -363,10 +364,10 @@ public abstract class AbstractMotorController implements IMotorController {
 	protected final Length toSensorUnits(Length l) {
 		return l == null ? null : configuration.getNativeSensorLengthUOM().create(l.convertTo(configuration.getNativeSensorLengthUOM()).getValueAsInt());
 	}
-	// Convert a length to motor units	
-	protected final Length toMotorUnits(Length l) {
-		return l == null ? null : l.convertTo(configuration.getNativeMotorLengthUOM());
-	}	
+//	// Convert a length to motor units	
+//	protected final Length toMotorUnits(Length l) {
+//		return l == null ? null : l.convertTo(configuration.getNativeMotorLengthUOM());
+//	}	
 	// Convert a length to display units	
 	protected final Length toSubsystemUnits(Length l) {
 		return l == null ? null : l.convertTo(configuration.getNativeDisplayLengthUOM());
@@ -375,10 +376,10 @@ public abstract class AbstractMotorController implements IMotorController {
 	protected final Rate toSensorUnits(Rate r) {
 		return r == null ? null : configuration.getNativeSensorRateUOM().create(r.convertTo(configuration.getNativeSensorRateUOM()).getValueAsInt());
 	}
-	// Convert a length to motor units	
-	protected final Rate toMotorUnits(Rate r) {
-		return r == null ? null : r.convertTo(configuration.getNativeMotorRateUOM());
-	}
+//	// Convert a length to motor units	
+//	protected final Rate toMotorUnits(Rate r) {
+//		return r == null ? null : r.convertTo(configuration.getNativeMotorRateUOM());
+//	}
 	// Convert a length to display units	
 	protected final Rate toSubsystemUnits(Rate r) {
 		return r == null ? null : r.convertTo(configuration.getNativeDisplayRateUOM());
@@ -425,10 +426,10 @@ public abstract class AbstractMotorController implements IMotorController {
 					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() < getTargetState().getStartingAbsolutePosition().getCanonicalValue())
 				)
 				{
-					Logger.info(this + " forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.");
+					Logger.print(autoCalibrationLogLevelForInfoOutput, this + " forward limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.");
 					return false;
 				}
-				Logger.info(this + " forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + "."); 
+				Logger.print(autoCalibrationLogLevelForInfoOutput, this + " forward limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getForwardLimit() + "."); 
 				resetEncoders = resetEncoderSensorPosition(getForwardLimit());
 			}
 		}
@@ -444,10 +445,10 @@ public abstract class AbstractMotorController implements IMotorController {
 					|| /* moving to absolute position in reverse */ (getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && getTargetState().getTargetAbsolutePosition().getCanonicalValue() > getTargetState().getStartingAbsolutePosition().getCanonicalValue())
 				)
 				{
-					Logger.info(this + " reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.");
+					Logger.print(autoCalibrationLogLevelForInfoOutput, this + " reverse limit switch encountered and position is not the limit, but we're moving away from the limit, so we are leaving it alone.");
 					return false;
 				}
-				Logger.info(this + " reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + "."); 
+				Logger.print(autoCalibrationLogLevelForInfoOutput, this + " reverse limit switch encountered and position is not the limit.  Changing sensor value from " + getCurrentPosition() + " to " + getReverseLimit() + "."); 
 				resetEncoders = resetEncoderSensorPosition(getReverseLimit());
 			}
 		}
@@ -502,50 +503,89 @@ public abstract class AbstractMotorController implements IMotorController {
 			setPIDProfileSlot(correctPIDProfileSlot);
 		}
 	}
+	
+	/**
+	 * Display a value in both sensor and display units for debugging
+	 * @return 
+	 */
+	private String bothUnits(Length v) {
+		return toSensorUnits(v) + " (or " + toSubsystemUnits(v) + ")";
+	}
 
 	/**
 	 * For any operation that can 'finish' and we change states automatically, this is the place to put the checks
 	 */
-	public void checkOperationComplete() {
+	private void checkOperationComplete() {
 		/*
 		 * The only command that ever "completes" is calibration
-		 */
-		if(getTargetState().getOperation().equals(MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION) && isHardLimitReached(getTargetState().getTargetDirection())) {
-			Logger.info(this + " sensor calibration completed.  Switching to holding position.");
+		 */		
+		Direction targetDirection = getTargetState().getTargetDirection();
+		if(getTargetState().getOperation().equals(MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION) && getCurrentHardLimitSwitchStatus(targetDirection)) {
 			changeState(MotorStateFactory.createHoldingPosition(this));
 		}
 	}
-	
 	/*
-	 * We will change behavior as we reach our target...
-	 * @see org.usfirst.frc2813.Robot2018.motor.IMotor#periodic()
+	 * Check the indicated hard limit switch and report if it needs calibration
 	 */
+	private void checkForHardLimitError(Direction targetDirection) {
+		if(isHardLimitNeedingCalibration(targetDirection)) {
+			Logger.warning(this + " WARNING WARNING WARNING - " + targetDirection + " HARD LIMIT has drifted.  We're past the limit, but the switch is not active.  Limit: " + bothUnits(getHardLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
+		}
+		/* NB: We check for sensor is active, but sensor position != 0 elsewhere.  It can actually have a range.  We keep setting to zero until the motor
+		       moves away from the limit switch.  There may be a range of sensor positions that still trigger the switch.  So we can't just check to see if it's 
+		       position == "the limit", we do that another way.  See autoResetSensorPositionIfNecessary
+		*/
+	}
+	/*
+	 * Check the indicated hard limit switch and report if it needs calibration
+	 */
+	private void checkForSoftLimitError(Direction targetDirection) {
+		if(isSoftLimitExceeded(targetDirection)) {
+			Logger.warning(this + " WARNING WARNING WARNING - " + targetDirection + " soft limit has been exceeded.  Limit: " + bothUnits(getSoftLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
+		}
+	}
+	/*
+	 * Check the indicated specified limit has been exceeded
+	 */
+	private void checkForPhysicalLimitError(Direction targetDirection) {
+		if(isPhysicalLimitExceeded(targetDirection)) {
+			Logger.warning(this + " WARNING WARNING WARNING - " + targetDirection + " configured limit has been exceeded.  Update the limits.  Limit: " + bothUnits(getPhysicalLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
+		}
+	}
+	/*
+	 * Check if either direction has a sensor calibration issue
+	 */
+	private void checkForLimitErrors() {
+		checkForHardLimitError(Direction.FORWARD);
+		checkForHardLimitError(Direction.REVERSE);
+		checkForSoftLimitError(Direction.FORWARD);
+		checkForSoftLimitError(Direction.REVERSE);
+		checkForPhysicalLimitError(Direction.FORWARD);
+		checkForPhysicalLimitError(Direction.REVERSE);
+	}
+	
 	@Override
 	public void periodic() {
-		autoResetSensorPositionIfNecessary();
-		updatePIDProfileSlotForCurrentState();
-		checkOperationComplete();
+		if(DriverStation.getInstance().isEnabled()) {
+			autoResetSensorPositionIfNecessary();
+			updatePIDProfileSlotForCurrentState();
+			checkOperationComplete();
+			checkForLimitErrors();
+		}
 	}
 
-	/**
-	 * Short cut for exposing a configuration setting for disabling hardware 	 
-	 */
 	@Override
 	public boolean isDisconnected() {
 		return getConfiguration().hasAll(IMotorConfiguration.Disconnected);
 	}
 	
-	/**
-	 * Get the physical limit of the hardware
-	 */
-	protected Length getPhysicalLimit(Direction direction) {
+	@Override
+	public Length getPhysicalLimit(Direction direction) {
 		return direction.isPositive() ? getForwardLimit() : getReverseLimit();
 	}
 
-	/**
-	 * Do we have a hard limit in the indicated direction 
-	 */
-	protected boolean getHasHardLimit(Direction direction) {
+	@Override
+	public boolean getHasHardLimit(Direction direction) {
 		if(direction.isPositive()) {
 			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition) 
 					&& configuration.hasAny(IMotorConfiguration.LocalForwardHardLimitSwitch|IMotorConfiguration.RemoteForwardHardLimitSwitch)
@@ -558,10 +598,8 @@ public abstract class AbstractMotorController implements IMotorController {
 		}
 	}
 
-	/**
-	 * Do we have a soft limit in the indicated direction 
-	 */
-	protected boolean getHasSoftLimit(Direction direction) {
+	@Override
+	public boolean getHasSoftLimit(Direction direction) {
 		if(direction.isPositive()) {
 			return configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch); 
 		} else {
@@ -569,63 +607,45 @@ public abstract class AbstractMotorController implements IMotorController {
 		}
 	}
 	
-	/**
-	 * Get the soft limit switch position for the given direction, or null if we don't have one.
-	 * @see getHasSoftLimit 
-	 */
-	protected Length getSoftLimit(Direction direction) {
+	@Override
+	public Length getSoftLimit(Direction direction) {
 		if(getHasSoftLimit(direction)) {
 			return direction.isPositive() ? getForwardSoftLimit() : getReverseSoftLimit();
 		}
 		return null;
 	}
 
-	/**
-	 * Get the minimum forward rate, in the pulses (and rounded)
-	 */
-	protected Rate getMinimumForwardRate() {
+	@Override
+	public Rate getMinimumForwardRate() {
 		return toSensorUnits(configuration.getMinimumForwardRate());
 	}
-	/**
-	 * Get the maximum forward rate, in the pulses (and rounded)
-	 */
-	protected Rate getMaximumForwardRate() {
+	@Override
+	public Rate getMaximumForwardRate() {
 		return toSensorUnits(configuration.getMaximumForwardRate());
 	}
-	/**
-	 * Get the maximum reverse rate, in the pulses (and rounded)
-	 */
-	protected Rate getMaximumReverseRate() {
+	@Override
+	public Rate getMaximumReverseRate() {
 		return toSensorUnits(configuration.getMaximumReverseRate());
 	}
-	/**
-	 * Get the maximum forward rate, in the pulses (and rounded)
-	 */
-	protected Rate getMinimumReverseRate() {
+	@Override
+	public Rate getMinimumReverseRate() {
 		return toSensorUnits(configuration.getMinimumReverseRate());
 	}
-	/**
-	 * Get the maximum rate, in the pulses (and rounded)
-	 */
-	protected Rate getMaximumRate(Direction direction) {
+	@Override
+	public Rate getMaximumRate(Direction direction) {
 		return direction.isPositive()
 				? getMaximumForwardRate()
 				: getMaximumReverseRate();
 	}
-	/**
-	 * Get the minimum rate, in the pulses (and rounded)
-	 */
-	protected Rate getMinimumRate(Direction direction) {
+	@Override
+	public Rate getMinimumRate(Direction direction) {
 		return direction.isPositive()
 				? getMinimumForwardRate()
 				: getMinimumReverseRate();
 	}
 	
-	/**
-	 * Get the hard limit switch position for the given direction, or null if we don't have one.
-	 * @see getHasHardLimit 
-	 */
-	protected Length getHardLimit(Direction direction) {
+	@Override
+	public Length getHardLimit(Direction direction) {
 		if(getHasHardLimit(direction)) {
 			return direction.isPositive() ? getForwardLimit() : getReverseLimit(); 
 		}
@@ -674,56 +694,45 @@ public abstract class AbstractMotorController implements IMotorController {
 		return r;
 	}
 
-	/**
-	 * Shortcut - do we have a hard limit in the indicated direction that we have exceeded?
-	 */
-	protected boolean isHardLimitExceeded(Direction direction) {
+	@Override
+	public boolean isHardLimitExceeded(Direction direction) {
 		return getHasHardLimit(direction) && isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition());
 	}
-
-	/**
-	 * Shortcut - do we have a hard limit in the indicated direction that we have reached?
-	 */
-	protected boolean isHardLimitReached(Direction direction) {
+	@Override
+	public boolean isHardLimitReached(Direction direction) {
 		return getHasHardLimit(direction) && isLimitReached(direction, getHardLimit(direction), getCurrentPosition());
 	}
-
-	/**
-	 * Shortcut - do we have a soft limit in the indicated direction that we have exceeded?
-	 */
-	protected boolean isSoftLimitExceeded(Direction direction) {
+	@Override
+	public boolean isHardLimitNeedingCalibration(Direction direction) {
+		return getHasHardLimit(direction) && isLimitReached(direction, getHardLimit(direction), getCurrentPosition()) 
+				&& !getCurrentHardLimitSwitchStatus(direction);
+	}
+	@Override
+	public boolean isSoftLimitExceeded(Direction direction) {
 		return getHasSoftLimit(direction) && isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
 	}
-
-	/**
-	 * Shortcut - do we have a soft limit in the indicated direction that we have reached?
-	 */
-	protected boolean isSoftLimitReached(Direction direction) {
+	@Override
+	public boolean isSoftLimitReached(Direction direction) {
 		return getHasSoftLimit(direction) && isLimitReached(direction, getSoftLimit(direction), getCurrentPosition());
 	}
-
-	/**
-	 * Shortcut - do we have a soft limit in the indicated direction that we have exceeded?
-	 */
-	protected boolean isPhysicalLimitExceeded(Direction direction) {
+	@Override
+	public boolean isPhysicalLimitExceeded(Direction direction) {
 		return isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition());
 	}
-
-	/**
-	 * Shortcut - do we have a soft limit in the indicated direction that we have reached?
-	 */
-	protected boolean isPhysicalLimitReached(Direction direction) {
+	@Override
+	public boolean isPhysicalLimitReached(Direction direction) {
 		return isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition());
 	}
-	/**
-	 * Get the soft limit switch status.  Returns false if we don't have one.
-	 * NOTE: Most motor controllers don't have an accessor to tell you if they stopped
-	 * because of a limit switch, this is strictly based on position calculations. 
-	 */
+	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
 		if(getHasSoftLimit(direction)) {
 			return isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
 		}
 		return false;
 	}
+	@Override
+	public boolean getHasHardOrSoftLimit(Direction direction) {
+		return getHasHardLimit(direction) || getHasSoftLimit(direction);
+	}
+	
 }

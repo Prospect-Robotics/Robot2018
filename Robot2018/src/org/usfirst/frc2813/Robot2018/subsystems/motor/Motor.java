@@ -499,4 +499,80 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
 		return getMotorController().getCurrentSoftLimitSwitchStatus(switchDirection);
 	}
+	@Override
+	public Length getPhysicalLimit(Direction direction) {
+		return getMotorController().getPhysicalLimit(direction);
+	}
+	@Override
+	public boolean getHasHardLimit(Direction direction) {
+		return getMotorController().getHasHardLimit(direction);
+	}
+	@Override
+	public boolean getHasHardOrSoftLimit(Direction direction) {
+		return getMotorController().getHasHardOrSoftLimit(direction);
+	}
+	@Override
+	public boolean getHasSoftLimit(Direction direction) {
+		return getMotorController().getHasSoftLimit(direction);
+	}
+	@Override
+	public Length getSoftLimit(Direction direction) {
+		return getMotorController().getSoftLimit(direction);
+	}
+	@Override
+	public Rate getMinimumForwardRate() {
+		return getMotorController().getMinimumForwardRate();
+	}
+	@Override
+	public Rate getMaximumForwardRate() {
+		return getMotorController().getMaximumForwardRate();
+	}
+	@Override
+	public Rate getMaximumReverseRate() {
+		return getMotorController().getMaximumReverseRate();
+	}
+	@Override
+	public Rate getMinimumReverseRate() {
+		return getMotorController().getMinimumReverseRate();
+	}
+	@Override
+	public Rate getMaximumRate(Direction direction) {
+		return getMotorController().getMaximumRate(direction);
+	}
+	@Override
+	public Rate getMinimumRate(Direction direction) {
+		return getMotorController().getMinimumRate(direction);
+	}
+	@Override
+	public Length getHardLimit(Direction direction) {
+		return getMotorController().getHardLimit(direction);
+	}
+	@Override
+	public boolean isHardLimitExceeded(Direction direction) { 
+		return getMotorController().isHardLimitExceeded(direction); 
+	}
+	@Override
+	public boolean isHardLimitReached(Direction direction) { 
+		return getMotorController().isHardLimitReached(direction); 
+	}
+	@Override
+	public boolean isHardLimitNeedingCalibration(Direction direction) { 
+		return getMotorController().isHardLimitNeedingCalibration(direction); 
+	}
+	@Override
+	public boolean isSoftLimitExceeded(Direction direction) { 
+		return getMotorController().isSoftLimitExceeded(direction); 
+	}
+	@Override
+	public boolean isSoftLimitReached(Direction direction) { 
+		return getMotorController().isSoftLimitReached(direction); 
+	}
+	@Override
+	public boolean isPhysicalLimitExceeded(Direction direction) { 
+		return getMotorController().isPhysicalLimitExceeded(direction); 
+	}
+	@Override
+	public boolean isPhysicalLimitReached(Direction direction) { 
+		return getMotorController().isPhysicalLimitReached(direction); 
+	}
 }

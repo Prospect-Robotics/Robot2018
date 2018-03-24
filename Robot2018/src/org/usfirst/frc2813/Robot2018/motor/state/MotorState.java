@@ -261,12 +261,14 @@ public class MotorState implements IMotorState {
 
 	@Override
 	public Rate getCurrentRateError() {
-		RateUOM uom = getHasTargetRate() ? targetRate.getUOM() : motor.getConfiguration().getNativeDisplayRateUOM();  
 		if(!getHasTargetRate()) { 
-			return uom.create(0);
+			return motor.getConfiguration().getNativeSensorRateUOM().create(0);
 		}
-		Rate convertedCurrentRate = motor.getCurrentRate().convertTo(uom);
-		Rate convertedTargetRate  = targetRate.convertTo(uom); 
+		//RateUOM uom = targetRate.getUOM();
+		RateUOM uom = motor.getConfiguration().getNativeSensorRateUOM();
+		Rate rate = motor.getCurrentRate();
+		Rate convertedCurrentRate = rate.convertTo(uom);
+		Rate convertedTargetRate  = targetRate.convertTo(uom);
 		return uom.create(convertedCurrentRate.getValue() - convertedTargetRate.getValue());
 	}
 

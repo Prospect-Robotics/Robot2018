@@ -163,4 +163,97 @@ public interface IMotor {
 	 * For testing auto, we'll ignore this device if it's disconnected 
 	 */
 	boolean isDisconnected();
+	/**
+	 * Get the physical limit of the hardware
+	 */
+	public Length getPhysicalLimit(Direction direction);
+	/**
+	 * Do we have a hard limit in the indicated direction 
+	 */
+	public boolean getHasHardLimit(Direction direction);
+
+	/**
+	 * Do we have a soft limit in the indicated direction 
+	 */
+	public boolean getHasSoftLimit(Direction direction);
+	/**
+	 * Do we have a hard or soft limit providing safety in the indicated direction 
+	 */
+	public boolean getHasHardOrSoftLimit(Direction direction);
+	
+	/**
+	 * Get the soft limit switch position for the given direction, or null if we don't have one.
+	 * @see getHasSoftLimit 
+	 */
+	public Length getSoftLimit(Direction direction);
+
+	/**
+	 * Get the minimum forward rate, in the pulses (and rounded)
+	 */
+	public Rate getMinimumForwardRate();
+	/**
+	 * Get the maximum forward rate, in the pulses (and rounded)
+	 */
+	public Rate getMaximumForwardRate();
+	/**
+	 * Get the maximum reverse rate, in the pulses (and rounded)
+	 */
+	public Rate getMaximumReverseRate();
+	/**
+	 * Get the maximum forward rate, in the pulses (and rounded)
+	 */
+	public Rate getMinimumReverseRate();
+	/**
+	 * Get the maximum rate, in the pulses (and rounded)
+	 */
+	public Rate getMaximumRate(Direction direction);
+	/**
+	 * Get the minimum rate, in the pulses (and rounded)
+	 */
+	public Rate getMinimumRate(Direction direction);
+	
+	/**
+	 * Get the hard limit switch position for the given direction, or null if we don't have one.
+	 * @see getHasHardLimit 
+	 */
+	public Length getHardLimit(Direction direction);
+
+	/**
+	 * Shortcut - do we have a hard limit in the indicated direction that we have exceeded?
+	 * NOTE: This does NOT tell you the limit switch, it tells you whether we think we exceeded the range!
+	 * @see getCurrentHardLimitStatus
+	 */
+	public boolean isHardLimitExceeded(Direction direction);
+
+	/**
+	 * Shortcut - do we have a hard limit in the indicated direction that we have reached?
+	 * NOTE: This does NOT tell you the limit switch, it tells you whether we think we exceeded the range!
+	 * @see getCurrentHardLimitStatus
+	 */
+	public boolean isHardLimitReached(Direction direction);
+
+	/**
+	 * Shortcut - do we think we should have passed a hard limit, but the switch isn't on?
+	 */
+	public boolean isHardLimitNeedingCalibration(Direction direction);
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have exceeded?
+	 */
+	public boolean isSoftLimitExceeded(Direction direction);
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have reached?
+	 */
+	public boolean isSoftLimitReached(Direction direction);
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have exceeded?
+	 */
+	public boolean isPhysicalLimitExceeded(Direction direction);
+
+	/**
+	 * Shortcut - do we have a soft limit in the indicated direction that we have reached?
+	 */
+	public boolean isPhysicalLimitReached(Direction direction);
 }
