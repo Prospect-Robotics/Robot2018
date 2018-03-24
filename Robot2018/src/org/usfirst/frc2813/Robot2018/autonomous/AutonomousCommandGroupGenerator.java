@@ -252,7 +252,7 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			if (useCurves) {
-				if (false) {
+				if (false) { // This is the old code that assume the bot faces forward
 				/**
 				 * The scale is straight ahead, but we want to approach from the side. Deflect towards the wall and
 				 * back so we end up straight, but closer to the wall so that we can approach the scale from the side.
@@ -296,14 +296,19 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
 			}
 			else {
-				// we are on the same side as the scale. Leave switch for team mates
-				autoCmdList.addDriveForwardSync(feet(24), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				double distanceToScale = backWallToSwitch + switchDepth + switchToScale - robotBumperLength;
+				double offsetToScale = sideWallToScale - sideWallToFirstRobotStartPosition;
+				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
+				autoCmdList.addDriveBackwardSync(inches(distanceToScale), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				// Start raising elevator while we are turning...
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
-				// Turn to face the scale
-				autoCmdList.addQuickTurnSync(right, 90);
+				// Turn to approach the scale
+				autoCmdList.addQuickTurnSync(left, 90);
 				// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
+				autoCmdList.addDriveBackwardSync(inches(offsetToScale), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				// Turn to approach the scale
+				autoCmdList.addQuickTurnSync(right, 90);
+				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
 			}
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
@@ -322,24 +327,11 @@ public class AutonomousCommandGroupGenerator {
 				 * The distance to the scale less our length is how far we need to move forward. This S curve does that in 2 arcs, so set
 				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
 				 */
-				radius = inches((140-46)/2);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-/*
-This is what Jack was working on Thursday, and it placed the cube on the right side of the switch, which I think is wrong...
-but I wanted to capture it in case we wanted to refer to it.  Once this routine is tested and finished I expect this comment
-and all the non-curve paths will go away.
-
-We do need to decide if fallback non-curves is something to maintain in case an encoder fails.
-  
-autoCmdList.addCurveForwardSync(LengthUOM.Feet.create(5), LengthUOM.Feet.create(5.00), true,  1.0);
-autoCmdList.addCurveForwardSync(LengthUOM.Feet.create(5), LengthUOM.Feet.create(5.00), false, 0.0);
-autoCmdList.addArmMoveToHighPositionAsync();
-autoCmdList.addArmWaitForTargetPositionSync();
-autoCmdList.addArmMoveToShootingPositionAsync();
-autoCmdList.addArmWaitForTargetPositionSync();
-autoCmdList.addShootCubeSequence();
- */
+				// FIXME!! need to make this more than 90 to get far enough to the side
+				double distanceToSwitch = backWallToSwitch - robotBumperLength;
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(distanceToSwitch/2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(distanceToSwitch/2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
+				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			}
 			else {
 				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
