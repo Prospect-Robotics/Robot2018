@@ -46,6 +46,6 @@ public class Length extends Value<LengthUOM,Length> {
 	 * Clamp a length to a limit
 	 */
 	public static Length clampToLimit(Direction direction, Length limit, Length input) {
-		return Length.isLimitExceeded(direction, limit, input) ? limit : input;
+		return isLimitExceeded(direction, limit, input) ? limit : input;
 	}
 }
