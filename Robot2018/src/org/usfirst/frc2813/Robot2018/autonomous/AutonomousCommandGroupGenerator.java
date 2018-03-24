@@ -198,6 +198,7 @@ public class AutonomousCommandGroupGenerator {
 		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
 		double switchWidth = 152.88;
 		double scaleWidth = 180.24;
+		double sideWallToScale = (fieldWidth - scaleWidth) / 2;
 
 		/**
 		 * Make a note that we are generating the sequence now, and capture the settings.
@@ -258,21 +259,29 @@ public class AutonomousCommandGroupGenerator {
 				// shallow S curve takes us 17.5 inches to the side and 89.9 inches forward
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-
 				double distanceTravelled = sCurveForwardShift(10*12, 22);
-				double distanceRemaining = backWallToSwitch + switchDepth + switchToScale + scalePlatformDepth / 2 - robotWheelbaseLength / 2 - distanceTravelled;
-				
-				// FIXME! Finish path! Rough plan is to plan a curve clockwise by 90 degrees, radius of our distance to scale. Subtract that
-				// radius from distanceRemaining (since we travel equally forward and to the side when curving 90 degrees) and split
-				// that distance into part A at full speed, then raise elevator, then part B at safe elevator up speed, then finally
-				// do the turn.				
+				double distanceShifted = sCurveSideShift(10*12, 22);
+
+				double currentDistanceToSideWall = sideWallToFirstRobotStartPosition - distanceShifted;
+				double offsetToScale = sideWallToScale - currentDistanceToSideWall;
+				double distanceRemaining = backWallToSwitch + switchDepth + switchToScale + scalePlatformDepth / 2 - robotWheelbaseLength / 2 - distanceTravelled - offsetToScale;
+
+				// the straight away. Start elevator in final 6 feet
+				autoCmdList.addDriveForwardSync(inches(distanceRemaining - 6 * 12), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
+				autoCmdList.addDriveForwardSync(inches(6 * 12), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+
+				// turn to switch. The radius is the side distance to the scale. We cover that to side and front
+				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(offsetToScale - 2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
 			}
-			// we are on the same side as the scale. Leave switch for team mates
-			autoCmdList.addDriveForwardSync(feet(24), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-			// Start raising elevator while we are turning...
-			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
-			// Turn to face the scale
-			autoCmdList.addQuickTurnSync(right, 90);
+			else {
+				// we are on the same side as the scale. Leave switch for team mates
+				autoCmdList.addDriveForwardSync(feet(24), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				// Start raising elevator while we are turning...
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
+				// Turn to face the scale
+				autoCmdList.addQuickTurnSync(right, 90);
+			}
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
 			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
