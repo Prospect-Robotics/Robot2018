@@ -305,7 +305,7 @@ public class AutonomousCommandGroupGenerator {
 				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
 				 */
 				// FIXME!! need to make this more than 90 to get far enough to the side
-				double distanceToSwitch = backWallToSwitch - robotBumperLength - 12;
+				double distanceToSwitch = (backWallToSwitch - robotBumperLength) - 12;
 				double sidewaysDistance = (switchWidth - robotBumperWidth - 6) / 2;
 				double straightToSquare = distanceToSwitch - sidewaysDistance;
 				autoCmdList.addDriveForwardSync(inches(straightToSquare / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
