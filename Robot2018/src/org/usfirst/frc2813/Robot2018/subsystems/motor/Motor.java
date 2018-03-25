@@ -379,7 +379,6 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		Logger.info(this + " entering " + proposedState);
 		switch(proposedState.getOperation()) {
 		case DISABLED:
-			(new Throwable()).printStackTrace();
 			getMotorController().disable();
 			break;
 		case HOLDING_CURRENT_POSITION:
