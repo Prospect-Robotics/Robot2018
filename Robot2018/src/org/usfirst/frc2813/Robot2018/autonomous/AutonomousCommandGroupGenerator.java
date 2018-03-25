@@ -253,8 +253,9 @@ public class AutonomousCommandGroupGenerator {
 		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
 		 * the auto script is a robot-safety critical feature.
 		 */
-		autoCmdList.elevator.addCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
+		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
 		autoCmdList.arm.addCalibrateSequenceSync();      /**  best effort attempt to calibrate the arm sensor, will wait for completion */
+		autoCmdList.elevator.addCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
 
 		PlacementTargetType.SWITCH.moveAsync();
 
