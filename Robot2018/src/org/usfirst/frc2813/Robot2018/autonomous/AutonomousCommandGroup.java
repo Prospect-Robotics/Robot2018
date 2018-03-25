@@ -18,7 +18,6 @@ import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
-import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -103,7 +102,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	when we don't have sufficient surface area for testing.  
 	This should really be coming from a sendable chooser.
 	*/
-	private static double DISTANCE_SCALING_MULTIPLIER = 1.0; // TODO: should only apply to wheels 
+	private static double DISTANCE_SCALING_MULTIPLIER = 1.0; // should only apply to wheels 
 	/**
 	 * Elevator height for placing cubes on the scale
 	 */
@@ -165,35 +164,22 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 
 	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for calculating scaled distances.
+	 * Misc Helpers.
 	 * ------------------------------------------------------------------------------------------------------ */
 
-	/*
-	 * Helper to create a distance in inches, scaled appropriately
-	 */
 	static Length inches(double inches) {
-		return LengthUOM.Inches.create(inches).multiply(DISTANCE_SCALING_MULTIPLIER);
+		return LengthUOM.Inches.create(inches);
 	}
 
-	/*
-	 * Helper to create a distance in feet, scaled appropriately
-	 * Package scoped on purpose
-	 */
 	static Length feet(double feet) {
-		return LengthUOM.Feet.create(feet).multiply(DISTANCE_SCALING_MULTIPLIER);
+		return LengthUOM.Feet.create(feet);
 	}
 	
 	static Length armDegrees(double degrees) {
 		return ArmDegrees.create(degrees);
 	}
 
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for keeping the code clean
-	 * ------------------------------------------------------------------------------------------------------ */
-
-	/*
-	 * Helper to get the placement height of a target
-	 */
+	/** Helper to get the placement height of a target */
 	public Length getPlacementHeight(PlacementTargetType target) {
 		switch(target) {
 		case SCALE:
@@ -206,46 +192,29 @@ public class AutonomousCommandGroup extends CommandGroup {
 		return null; // all enum cases handled
 	}
 
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for adding Drive Train commands
-	 * ------------------------------------------------------------------------------------------------------ */
-
 	/**
-	 * Add commands to reset the drive train encoders and gyros (typically called at the start of a match)
+	 *                  COMMAND GENERATORS
+	 * The remainder of this module is a set of methods to inject sequential commands into the
+	 * autonomous command sequence.
 	 */
+
+	/** Add commands to reset the drive train encoders and gyros (typically called at the start of a match) */
 	public void addDriveTrainSensorResetSequenceSync() {
 		addSequential(new DriveTrainResetEncodersInstant(Robot.driveTrain));
 		addSequential(new DriveTrainResetGyroInstant(Robot.driveTrain));
 	}
+
 	/**
 	 * Add a command for driving forward for a set distance, with a desired speed at the end of the movement.
 	 * @param direction The direction to drive
 	 * @param distance The distance to drive
 	 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
-	 * 
 	 */
-	private void addDriveCommandSync(Direction direction, Length distance, double endSpeed) {
+	public void addDriveSync(Direction direction, Length distance, double endSpeed) {
 		addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
 		currentSpeed = endSpeed;
 	}
-	/**
-	 * Add a command for driving forward for the indicated distance, with a desired speed at the end of the movement.
-	 * @see AutonomousCommandGroup#addDriveCommandSync(Direction, Length, double)
-	 * @param distance The distance to drive
-	 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
-	 */
-	public void addDriveForwardSync(Length distance, double endSpeed) {
-		addDriveCommandSync(Direction.FORWARD, distance, endSpeed);
-	}
-	/**
-	 * Add a command for driving reverse for the indicated distance, with a desired speed at the end of the movement.
-	 * @see AutonomousCommandGroup#addDriveCommandSync(Direction, Length, double)
-	 * @param distance The distance to drive
-	 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
-	 */
-	public void addDriveBackwardSync(Length distance, double endSpeed) {
-		addDriveCommandSync(Direction.BACKWARD, distance, endSpeed);
-	}
+
 	/**
 	 * Add a command for driving on a circular path for a set distance, with a desired speed at the end of the movement.
 	 * @param direction - forward or backward
@@ -254,36 +223,13 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * @param rotation - clockwise or counterclockwise
 	 * @param endSpeed - speed coming out this command
 	 */
-	private void addCurveCommandSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
-		Logger.printLabelled(LogType.INFO, "AUTO ADD CURVE XYZZY[", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
+	public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
+		Logger.printLabelled(LogType.DEBUG, "AUTO ADD CURVE", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
 		addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 				endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 		currentSpeed = endSpeed;
 	}
-	/**
-	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
-	 * end of the movement.
-	 * @see addCurveCommandSync
-	 * @param distance - along the curve.
-	 * @param radius - radius of circular path
-	 * @param rotation - clockwise or counterclockwise
-	 * @param endSpeed - speed coming out this command
-	 */
-	public void addCurveForwardSync(Length distance, Length radius, Direction rotation, double endSpeed) {
-		addCurveCommandSync(Direction.FORWARD, distance, radius, rotation, endSpeed);
-	}
-	/**
-	 * Add a command for driving forward along a curved path for the indicated distance, with a desired speed at the
-	 * end of the movement.
-	 * @see addCurveCommandSync
-	 * @param distance - along the curve.
-	 * @param radius - radius of circular path
-	 * @param rotation - clockwise or counterclockwise
-	 * @param endSpeed - speed coming out this command
-	 */
-	public void addCurveBackwardSync(Length distance, Length radius, Direction rotation, double endSpeed) {
-		addCurveCommandSync(Direction.BACKWARD, distance, radius, rotation, endSpeed);
-	}
+
 	/**
 	 * Add a command for driving on a circular path for a set number of degrees, with a desired speed at the end of the movement.
 	 * @param direction - forward or backward
@@ -293,8 +239,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * @param endSpeed - speed coming out this command
 	 */
 	public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
-		addCurveCommandSync(direction, radius.multiply(2*Math.PI*degrees/360), radius, rotation, endSpeed);
+		addCurveSync(direction, radius.multiply(2*Math.PI*degrees/360), radius, rotation, endSpeed);
 	}
+
 	/**
 	 * Create a command to spin in place, until we reach a specific *relative* angle.  Will turn in either direction
 	 * until that relative angle is hit, accounting for any overshoot by reversing direction for smaller and smaller
@@ -307,21 +254,13 @@ public class AutonomousCommandGroup extends CommandGroup {
 		addSequential(new DriveTrainQuickTurnSync(Robot.driveTrain, direction, relativeAngle, turnSpeed));
 	}
 
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for adding Elevator commands
-	 * ------------------------------------------------------------------------------------------------------ */
-
-	/**
-	 * Calibrate the elevator (move down), but don't wait for completion.
-	 * To check it you would have to wait for a limit switch. 
-	 */
+	/** Calibrate the elevator (move down), but don't wait for completion. */
 	public void addElevatorCalibrateAsync() {
 		if(!Robot.elevator.isDisconnected())
 			addSequential(new MotorCalibrateSensorAsync(Robot.elevator, Direction.DOWN));
 	}
-	/**
-	 * Wait for the Elevator to hit the hard reset limit
-	 */
+
+	/** Wait for the Elevator to hit the hard reset limit*/
 	public void addElevatorWaitForHardLimitSwitchSync() {
 		if(!Robot.elevator.isDisconnected())
 			addSequential(new MotorWaitForHardLimitSwitchSync(Robot.elevator, Direction.DOWN));
@@ -346,9 +285,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * Allow overriding maximum rate for PID move to position, 
 		 * go slower when we have a cube in the jaws!
 		 */
-		if(!Robot.elevator.isDisconnected())
+		if(!Robot.elevator.isDisconnected()) {
 			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.elevator, position));
+		}
 	}
+
 	/**
 	 * Start the elevator moving in the background
 	 * @param target Which scale or switch are we going for
@@ -356,24 +297,18 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void addElevatorMoveToPlacementHeightAsync(PlacementTargetType target) {
 		addElevatorMoveToPositionAsync(getPlacementHeight(target));
 	}
-	/**
-	 * Lower the Elevator to the bottom 
-	 */
+
+	/** Lower the Elevator to the bottom  */
 	public void addElevatorLowerAsync() {
 		addElevatorMoveToPositionAsync(LengthUOM.Inches.create(0));
 	}
-	/**
-	 * Wait for the Elevator to reach a target position. 
-	 */
+
+	/** Wait for the Elevator to reach a target position. */
 	public void addElevatorWaitForTargetPositionSync() {
 		// Wait for Elevator to reach it's destination to within +/- one inch.
 		if(!Robot.elevator.isDisconnected())
 			addSequential(new MotorWaitForTargetPositionSync(Robot.elevator, LengthUOM.Inches.create(1)));
 	}
-
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for adding Arm commands
-	 * ------------------------------------------------------------------------------------------------------ */
 
 	/**
 	 * Calibrate the arm (move down), but don't wait for completion.
@@ -383,16 +318,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 		if(!Robot.arm.isDisconnected())
 			addSequential(new MotorCalibrateSensorAsync(Robot.arm, Direction.IN));
 	}
-	/**
-	 * Wait for the Arm to hit the hard reset limit
-	 */
+
+	/** Wait for the Arm to hit the hard reset limit */
 	public void addArmWaitForHardLimitSwitchSync() {
 		if(!Robot.arm.isDisconnected())
 			addSequential(new MotorWaitForHardLimitSwitchSync(Robot.arm, Direction.IN));
 	}
 
 	/**
-	 * Calibrate the elevator (move down) and wait for the limit switch to be reached, so we know that 
+	 * Calibrate the arm (move down) and wait for the limit switch to be reached, so we know that 
 	 * our sensor has been set the value of the lower limit (zero).
 	 */
 	public void addArmCalibrateSequenceSync() {
@@ -410,33 +344,24 @@ public class AutonomousCommandGroup extends CommandGroup {
 			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, armDegrees));
 	}
 
-	/**
-	 * Move the arm In to the home position 
-	 */
+	/** Move the arm In to the home position */
 	public void addArmMoveInAsync() {
 		addArmMoveToPositionAsync(armDegrees(0));
 	}
 
-	/**
-	 * Wait for the Arm to reach a target position.
-	 * TODO: This should be moving to within a tolerance in ArmDegrees, not inches.
-	 */
+	/** Wait for the Arm to get very close to a target position. */
 	public void addArmWaitForTargetPositionSync() {
-		// Wait for Arm to reach it's destination to within 5 degrees
-		if(!Robot.arm.isDisconnected())
+		if(!Robot.arm.isDisconnected()) {
 			addSequential(new MotorWaitForTargetPositionSync(Robot.arm, armDegrees(5.0)));
+		}
 	}
 
-	/**
-	 * Move the arm to the "level" position, but do not wait.
-	 */
+	/** Move the arm to the "level" position, but do not wait. */
 	public void addArmMoveToLevelPositionAsync() {
 		addArmMoveToPositionAsync(ARM_POSITION_FOR_LEVEL);
 	}
 
-	/**
-	 * Move the arm to the "high" position, but do not wait.
-	 */
+	/** Move the arm to the "high" position, but do not wait. */
 	public void addArmMoveToHighPositionAsync() {
 		addArmMoveToPositionAsync(ARM_POSITION_HIGH);
 	}
@@ -449,84 +374,53 @@ public class AutonomousCommandGroup extends CommandGroup {
 		addArmMoveToPositionAsync(ARM_POSITION_INVERTED_SHOOT);
 	}
 
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for adding Jaws commands
-	 * ------------------------------------------------------------------------------------------------------ */
-
-	/**
-	 * Add a synchronous command to open the jaws
-	 */
+	/** Add a synchronous command to open the jaws */
 	private void addJawsOpenSync() {
 		addSequential(new SolenoidSetStateInstant(Robot.jaws, Direction.OPEN));		
 	}
 
-	/**
-	 * Add a synchronous command to close the jaws
-	 */
+	/** Add a synchronous command to close the jaws */
 	private void addJawsCloseSync() {
 		addSequential(new SolenoidSetStateInstant(Robot.jaws, Direction.CLOSE));		
 	}
 
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for adding intake commands
-	 * ------------------------------------------------------------------------------------------------------ */
-
-	/**
-	 * Add a command to start the intake spinning inwards
-	 */
+	/** Add a command to start the intake spinning inwards */
 	private void addIntakeInAsync() {
 		addSequential(new IntakeSpinAsync(Robot.intake, Direction.IN));		
 	}
 
-	/**
-	 * Add a command to start the intake spinning outwards
-	 */
+	/** Add a command to start the intake spinning outwards */
 	private void addIntakeOutAsync() {
 		addSequential(new IntakeSpinAsync(Robot.intake, Direction.OUT));		
 	}
 
-	/**
-	 * Add a command to stop the intake spinning
-	 */
+	/** Add a command to stop the intake spinning */
 	private void addIntakeStopSync() {
 		addSequential(new IntakeStopInstant(Robot.intake));		
 	}
 
-	/* ------------------------------------------------------------------------------------------------------
-	 * Helpers for adding complex command sequences
-	 * ------------------------------------------------------------------------------------------------------ */
-
-	/**
-	 * Add a delay in seconds
-	 * @param seconds to delay
-	 */
-	public void addDelayInSecondsSync(double seconds) {
+	/** Add a delay in seconds. */
+	private void addDelayInSecondsSync(double seconds) {
 		addSequential(new TimedCommand(seconds));
 	}
 
-	/**
-	 * Add a drop cube sequence.
-	 */
-	public void addDropCubeSequenceSync() {
+	/** Add a drop cube sequence. */
+	private void addDropCubeSequenceSync() {
 		addJawsOpenSync();
 		// NB: We expect to have a cube... but since the jaws were open I assume we're trying to shake it loose so go fast...
 		addArmMoveToLevelPositionAsync(); 
 		addArmWaitForTargetPositionSync();
 	}
 	
-	/**
-	 * Add a "shoot" sequence
-	 */
-	public void addShootCubeSequence() {
+	/** Add a "shoot" cube sequence. */
+	private void addShootCubeSequenceSync() {
 		addIntakeOutAsync();
 		addDelayInSecondsSync(0.2);
 		addIntakeStopSync();
 	}
 	
-	/**
-	 * Add a "grab" sequence
-	 */
-	public void addGrabCubeSequence() {
+	/** Add a "grab" cube sequence */
+	private void addGrabCubeSequenceSync() {
 		addIntakeInAsync();
 		addJawsCloseSync();
 		addDelayInSecondsSync(0.2);
@@ -540,8 +434,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 */
 	public void addDeliverCubeSequenceSync() {
 		addElevatorWaitForTargetPositionSync();
-		addShootCubeSequence();
+		addShootCubeSequenceSync();
 		addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
 	}
-	
 }

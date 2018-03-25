@@ -2,24 +2,34 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 
 
 /**
- * Generate a series of sequential commands to operate autonomously. Takes into
- * account game data. Used exclusively by AutonomousCommandGroup
+ * Generate a series of sequential commands to operate autonomously.
+ * 
+ * All command generation is done via methods in AutonomousCommandGroup.
+ * 
+ * Takes into account game data (switch and scale ownership) and robot starting position.
+ * 
+ * NOTE: If the robot is on the left or right, we assume we are on the left. The variables
+ * 'left' and 'right' as well as 'clockwise' and 'counterclockwise' will be reversed if
+ * we are on the right. When the robot is in the center starting position, we similarly
+ * assume the switch is ours to the left.
+ * 
+ * WARNING! A full reset is required to re-generate this code. Changing game data or
+ * robot position will NOT change autonomous, and commands consumed will NOT be regenerated.
  */
 public class AutonomousCommandGroupGenerator {
-	/**
-	 * This is the commandGroup we are populating with our autonomous routine
-	 */
+
+	/** This is the commandGroup we are populating with our autonomous routine */
 	private AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
 
-	/**
-	 * This is the bias for invertible scripts that can run on left or right sides.   
-	 */
+	/** This is the bias for invertible scripts that can run on left or right sides.  */
 	private static Direction SCRIPT_BIAS = Direction.LEFT;
 	/**
 	 * To re-use scripts, we write them as if we were on the left, going left, etc. and then
@@ -48,7 +58,6 @@ public class AutonomousCommandGroupGenerator {
 	 * @return The adjusted direction 
 	 */
 	private static Direction getBiasedDirection(Direction startingPosition, Direction nearSwitchPosition, Direction referenceDirection) {
-		
 		if(startingPosition.isNeutral()) {
 			return nearSwitchPosition.equals(SCRIPT_BIAS) ? referenceDirection : referenceDirection.getInverse();
 		} else if(startingPosition.equals(SCRIPT_BIAS)) {
@@ -72,60 +81,43 @@ public class AutonomousCommandGroupGenerator {
 			throw new IllegalArgumentException("In " + startingPosition + " position, biased " + original + " should have been " + expected + ".");
 		}
 	}
-	
-	/**
-	 * Built-in unit test to verify that our inversion logic matches our expectations 
-	 */
+
+	/** Built-in unit test to verify that our inversion logic matches our expectations. */
 	private static void verifyDirections() {		
-		// If we start at the left, there's no change...
+		/**  If we start at the left, there's no change... */
 		verify(Direction.LEFT,   Direction.LEFT,  Direction.LEFT,   Direction.LEFT);
 		verify(Direction.LEFT,   Direction.LEFT,  Direction.RIGHT,  Direction.RIGHT);
 		verify(Direction.LEFT,   Direction.RIGHT, Direction.LEFT,   Direction.LEFT);
 		verify(Direction.LEFT,   Direction.RIGHT, Direction.RIGHT,  Direction.RIGHT);
 		
-		// If we start on the right, we always want the opposite
-		verify(Direction.RIGHT,  Direction.LEFT,  Direction.LEFT,   Direction.RIGHT); // starting on right, invert logic
-		verify(Direction.RIGHT,  Direction.LEFT,  Direction.RIGHT,  Direction.LEFT);  // starting on right, invert logic
-		verify(Direction.RIGHT,  Direction.RIGHT, Direction.LEFT,   Direction.RIGHT); // starting on right, invert logic
-		verify(Direction.RIGHT,  Direction.RIGHT, Direction.RIGHT,  Direction.LEFT);  // starting on right, invert logic
+		/**  If we start on the right, we always want the opposite */
+		verify(Direction.RIGHT,  Direction.LEFT,  Direction.LEFT,   Direction.RIGHT); /**  starting on right, invert logic */
+		verify(Direction.RIGHT,  Direction.LEFT,  Direction.RIGHT,  Direction.LEFT);  /**  starting on right, invert logic */
+		verify(Direction.RIGHT,  Direction.RIGHT, Direction.LEFT,   Direction.RIGHT); /**  starting on right, invert logic */
+		verify(Direction.RIGHT,  Direction.RIGHT, Direction.RIGHT,  Direction.LEFT);  /**  starting on right, invert logic */
 
-		// If we start at the center, we track the near switch and will reverse direction if the target is on the right
+		/**  If we start at the center, we track the near switch and will reverse direction if the target is on the right */
 		verify(Direction.CENTER, Direction.LEFT,  Direction.LEFT,   Direction.LEFT);
 		verify(Direction.CENTER, Direction.LEFT,  Direction.RIGHT,  Direction.RIGHT);
-		verify(Direction.CENTER, Direction.RIGHT, Direction.LEFT,   Direction.RIGHT); // goal on right, invert logic
-		verify(Direction.CENTER, Direction.RIGHT, Direction.RIGHT,  Direction.LEFT);  // goal on right, invert logic
+		verify(Direction.CENTER, Direction.RIGHT, Direction.LEFT,   Direction.RIGHT); /**  goal on right, invert logic */
+		verify(Direction.CENTER, Direction.RIGHT, Direction.RIGHT,  Direction.LEFT);  /**  goal on right, invert logic */
 	}
-	/**
-	 * Give ourselves a name for debugging
-	 */
-	public String toString() {
-		return "AutonymousCodeGenerator";
+	/** Helper to create a length in inches. */
+	private static Length inches(double inches) {
+		return LengthUOM.Inches.create(inches);
 	}
-	/**
-	 * Helper to create a length in inches, scaled appropriately
-	 * @param inches A value in inches in double to wrap in a Length
-	 * @return A length
-	 */
-	Length inches(double inches) {
-		return AutonomousCommandGroup.inches(inches);
-	}
-	/**
-	 * Helper to create a length in feet, scaled appropriately
-	 * Package scoped on purpose
-	 * @param A value in feet to wrap in a Length
-	 * @return A length
-	 */
-	Length feet(double feet) {
-		return AutonomousCommandGroup.feet(feet);
+	/** Helper to create a length in feet. */
+	private static Length feet(double feet) {
+		return LengthUOM.Feet.create(feet);
 	}
 	/**
 	 * Helpers for using S curves to offset our position. If you travel the same amount around two circles
 	 * of opposite rotation, you end up pointed the same way, but offset diagonally
 	 */
-	double sCurveSideShift(double curveRadius, double degrees) {
+	private static double sCurveSideShift(double curveRadius, double degrees) {
 		return 2 * curveRadius * (1 - Math.cos(Math.toRadians(degrees)));
 	}
-	double sCurveForwardShift(double curveRadius, double degrees) {
+	private static double sCurveForwardShift(double curveRadius, double degrees) {
 		return 2 * curveRadius * (Math.sin(Math.toRadians(degrees)));
 	}
 	/**
@@ -136,13 +128,13 @@ public class AutonomousCommandGroupGenerator {
 	 */
 	@SuppressWarnings("unused")
 	public AutonomousCommandGroupGenerator() {
-		// Determine our game configuration
+		/**  Determine our game configuration */
 		Direction robotStartingPosition = Robot.positionSelector.getSelected();
 		Direction nearSwitchPosition = Robot.gameData.getNearSwitchPosition();
 		Direction farSwitchPosition = Robot.gameData.getFarSwitchPosition();
 		Direction scalePosition = Robot.gameData.getScalePosition();
 		
-		// Read user choices about our strategy
+		/**  Read user choices about our strategy */
 		boolean useCurves = Robot.autonomousSelectorCurves.getSelected() == Direction.ON;
 
 		/**
@@ -170,41 +162,37 @@ public class AutonomousCommandGroupGenerator {
 			counterclockwise = Direction.CLOCKWISE;			
 		}
 
-		/*
-		 * Sanity check our biasing logic 
-		 */
-		verifyDirections();
-		
-		/**
-		 * Define some handy measurements. Define as double in implied inches. Doing math with groups of Length is TOO PAINFUL!
-		 */
-		// cubes are placed along switches on the scale side and in pyramid on the other switch side
+		verifyDirections();  /** Sanity check our biasing logic  */
+
+		/** Define some handy measurements. Define as double in implied inches. Doing math with groups of Length is TOO PAINFUL! */
+
+		/**  cubes are placed along switches on the scale side and in pyramid on the other switch side */
 		double cubeSize = 14;
 
-		// robot dimensions with and without bumpers
+		/**  robot dimensions with and without bumpers */
 		double bumperThickness = 3.25;
 		double robotWheelbaseWidth = 31;
 		double robotWheelbaseLength = 20;
 		double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
 		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2;
-		double finalDistanceToTarget = 12; // how close to get before we shoot cube
+		double finalDistanceToTarget = 12; /**  how close to get before we shoot cube */
 
-		// field dimensions from back wall
+		/**  field dimensions from back wall */
 		double backWallToSwitch = 140;
-		double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; // pyramid of cubes on near side of scale
+		double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; /**  pyramid of cubes on near side of scale */
 		double backWallToFarSideOfSwitch = 196;
-		double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; // row of cubes on far side of scale
+		double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; /**  row of cubes on far side of scale */
 		double backWallToScalePlatform = 261.47;
 		double backWallToScaleTarget = 299.65;
 
-		// relative depth dimensions
+		/**  relative depth dimensions */
 		double switchDepth = backWallToFarSideOfSwitch - backWallToSwitch;
 		double switchToScalePlatform = backWallToScalePlatform - backWallToFarSideOfSwitch;
 		double scaleAlleyWidth = switchToScalePlatform - cubeSize;
 		double scalePlatformToTarget = backWallToScaleTarget - backWallToScalePlatform;
 		double scaleAlleyToTarget = 71.57;
 
-		// dimensions side to side
+		/**  dimensions side to side */
 		double backWallWidth = 264;
 		double fieldWidth = 293.69;
 		double switchWidth = 152.88;
@@ -212,7 +200,7 @@ public class AutonomousCommandGroupGenerator {
 		double scaleFullWidth = 150.55;
 		double scaleTargetWidth = 56;
 
-		// relative width dimensions
+		/**  relative width dimensions */
 		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
 		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
 		double sideWallToScaleTarget = (fieldWidth - scaleTargetWidth) / 2;
@@ -228,13 +216,19 @@ public class AutonomousCommandGroupGenerator {
 		 * 
 		 * This log message is a warning so you can catch that mistake instead of pulling your hair out debugging a phantom bug.
 		 */
-		Logger.info(this + ": Generating Auto Sequence.  Robot=" + robotStartingPosition + " NearSwitch=" + nearSwitchPosition + " Scale=" + scalePosition + " FarSwitch=" + farSwitchPosition + " AdjustedLeft=" + left + " AdjustedRight=" + right + ".");
+		Logger.printLabelled(LogType.INFO, this + ": Generating Auto Sequence",
+							"Robot", robotStartingPosition,
+							"NearSwitch", nearSwitchPosition,
+							"Scale", scalePosition,
+							"FarSwitch", farSwitchPosition,
+							"AdjustedLeft", left,
+							"AdjustedRight", right);
 
 		/* ------------------------------------------------------------------------------------------------------
 		 * Initialization
 		 * ------------------------------------------------------------------------------------------------------ */
 
-		// First, reset the gyro and the wheel encoders.
+		/**  First, reset the gyro and the wheel encoders. */
 		autoCmdList.addDriveTrainSensorResetSequenceSync();
 
 		/**
@@ -244,12 +238,12 @@ public class AutonomousCommandGroupGenerator {
 		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
 		 * the auto script is a robot-safety critical feature. 
 		 */
-		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
-		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
+		autoCmdList.addElevatorCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
+		autoCmdList.addArmCalibrateSequenceSync();      /**  best effort attempt to calibrate the arm sensor, will wait for completion */
 
 		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
 
-		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
+		/**  Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely. */
 		autoCmdList.setHaveCube(true);
 
 		/**
@@ -258,7 +252,7 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		if (!Robot.gameData.isGameDataValid()) {
 			Logger.error(this + ": No game data.");
-			autoCmdList.addDriveForwardSync(inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+			autoCmdList.addDriveSync(Direction.FORWARD, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			return;
 		}
 
@@ -291,21 +285,21 @@ public class AutonomousCommandGroupGenerator {
 				double sWidth = sCurveSideShift(sRadius, sDegrees);
 				double secondLeg = distanceToTarget - firstLeg - sLength;
 
-				autoCmdList.addDriveBackwardSync(inches(firstLeg), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(firstLeg), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				autoCmdList.addDriveBackwardSync(inches(secondLeg / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
-				autoCmdList.addDriveBackwardSync(inches(secondLeg / 2), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			}
 			else {
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
 				
-				autoCmdList.addDriveBackwardSync(inches(distanceToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(distanceToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
-				autoCmdList.addQuickTurnSync(left, 90); // right but we're backwards
-				autoCmdList.addDriveBackwardSync(inches(43), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-				autoCmdList.addQuickTurnSync(right, 90); // left but we're backwards
+				autoCmdList.addQuickTurnSync(left, 90); /**  right but we're backwards */
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(43), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				autoCmdList.addQuickTurnSync(right, 90); /**  left but we're backwards */
 			}
 		}
 		else if (robotStartingPosition.equals(Direction.CENTER)) {
@@ -322,8 +316,8 @@ public class AutonomousCommandGroupGenerator {
 				 * radius to half that. TODO: define field dimensions and our dimensions in variables.
 				 */
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
-				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2 - 6; // left bumper 6 inches right of left edge of switch
-				double radius = 63.0;  // found by trial and error
+				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2 - 6; /**  left bumper 6 inches right of left edge of switch */
+				double radius = 63.0;  /**  found by trial and error */
 				double degrees = 54.0;
 				
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
@@ -331,14 +325,14 @@ public class AutonomousCommandGroupGenerator {
 			}
 			else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
-				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2 - 6; // left bumper 6 inches right of left edge of switch
+				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2 - 6; /**  left bumper 6 inches right of left edge of switch */
 				double turnClearance = 8.0;
 
-				autoCmdList.addDriveForwardSync(inches(turnClearance), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
+				autoCmdList.addDriveSync(Direction.FORWARD, inches(turnClearance), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); /**  enough to turn */
 				autoCmdList.addQuickTurnSync(left, 90);
-				autoCmdList.addDriveForwardSync(inches(sideShiftToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addQuickTurnSync(right, 90);
-				autoCmdList.addDriveForwardSync(inches(distanceToTarget - turnClearance), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				autoCmdList.addDriveSync(Direction.FORWARD, inches(distanceToTarget - turnClearance), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			}
 		} else {
 			/**
@@ -356,39 +350,44 @@ public class AutonomousCommandGroupGenerator {
 				 *  4. proceed more slowly to the target
 				 *  5. deliver cube backwards
 				 */
-				double firstLeg = backWallToSwitch + switchDepth - robotBumperLength; // drive straight until aligned with end of switch
-				double firstCurveRadius = backWallToScaleAlley + scaleAlleyWidth / 2 - firstLeg; // turn from here into center of scaleAlley
+				double firstLeg = backWallToSwitch + switchDepth - robotBumperLength; /**  drive straight until aligned with end of switch */
+				double firstCurveRadius = backWallToScaleAlley + scaleAlleyWidth / 2 - firstLeg; /**  turn from here into center of scaleAlley */
 				
-				// This is a bit complex. Distance to center from end, plus where we start takes us to the middle. Then go to the end of the scale target less our length and 6 inches from the end
+				/**  This is a bit complex. Distance to center from end, plus where we start takes us to the middle. Then go to the end of the scale target less our length and 6 inches from the end */
 				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleTargetWidth / 2 - robotBumperLength - 6;
-				double secondCurveRadius = 24; // small so we don't clip the scale platform
+				double secondCurveRadius = 24; /**  small so we don't clip the scale platform */
 				double alleyStraightDistance = crossFieldDistance - firstCurveRadius - secondCurveRadius;
 
-				autoCmdList.addDriveBackwardSync(inches(firstLeg), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(firstLeg), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(firstCurveRadius), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
-				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 			}
 			else {
-				autoCmdList.addDriveBackwardSync(inches(backWallToScaleAlley + scaleAlleyWidth / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addQuickTurnSync(left, 90); // right but we're backwards
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(backWallToScaleAlley + scaleAlleyWidth / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addQuickTurnSync(left, 90); /**  right but we're backwards */
 				
-				// This is a bit complex. Distance to center from end, plus where we start takes us to the middle. Then go to the end of the scale target less our length and 6 inches from the end
+				/**  This is a bit complex. Distance to center from end, plus where we start takes us to the middle. Then go to the end of the scale target less our length and 6 inches from the end */
 				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleTargetWidth / 2 - robotBumperLength - 6;
 
-				autoCmdList.addDriveBackwardSync(inches(crossFieldDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
-				autoCmdList.addDriveBackwardSync(inches(crossFieldDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addQuickTurnSync(right, 90); // left but we're backwards
-				autoCmdList.addDriveBackwardSync(inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addQuickTurnSync(right, 90); /**  left but we're backwards */
+				autoCmdList.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 			}
 		}
-		// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
+		/**  NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing */
 		autoCmdList.addDeliverCubeSequenceSync();
 
-		// Remember we let go of our cube, we can really fly now...
+		/**  Remember we let go of our cube, we can really fly now... */
 		autoCmdList.setHaveCube(false);
+	}
+
+	/** Give ourselves a name for debugging */
+	public String toString() {
+		return "AutonymousCodeGenerator";
 	}
 }
