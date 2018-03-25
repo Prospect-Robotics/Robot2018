@@ -278,24 +278,6 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	/* ----------------------------------------------------------------------------------------------
 	 * Public API - Action Commands
 	 * ---------------------------------------------------------------------------------------------- */
-	
-	/*
-	 * [ACTION] Change speed while moving.  If we are not moving, has no effect
-	 * NB: This is a wrapper around moveInDirecectionAtSpeed, for convenience
-	 * ability to alter speed but not direction AND if we aren't moving be able
-	 * to call it safely without initiating any movement.
-	 */
-	public final void setTargetRate(Rate newSpeed) {
-		if(newSpeed.getValue() < 0) {
-			throw new IllegalArgumentException("moveInDirectionAtSpeed does not accept negative rates.  Change the direction instead.");
-		}
-		if(getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE) {
-			// Keep moving, call the official function
-			moveInDirectionAtRate(getTargetState().getTargetDirection(), newSpeed);
-		} else {
-			Logger.info(getConfiguration().getName() + " was asked to change speed to " + newSpeed + ", but we aren't moving so we won't do it.");
-		}
-	}
 
 	@Override
 	public boolean disable() {
