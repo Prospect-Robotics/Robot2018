@@ -306,7 +306,7 @@ public class AutonomousCommandGroupGenerator {
 				 */
 				// FIXME!! need to make this more than 90 to get far enough to the side
 				double distanceToSwitch = (backWallToSwitch - robotBumperLength) - 12;
-				double sidewaysDistance = (switchWidth - robotBumperWidth - 6) / 2;
+				double sidewaysDistance = (switchWidth - robotBumperWidth) / 2 - 6;
 				double straightToSquare = distanceToSwitch - sidewaysDistance;
 				autoCmdList.addDriveForwardSync(inches(straightToSquare / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(sidewaysDistance/2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
