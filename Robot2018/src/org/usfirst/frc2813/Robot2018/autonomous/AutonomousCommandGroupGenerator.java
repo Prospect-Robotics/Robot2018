@@ -378,7 +378,7 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), TRANSITION_SPEED_FULL);
 				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), TRANSITION_SPEED_FLUID);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, TRANSITION_SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, TRANSITION_SPEED_STOP);
 			}
 			else {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleAlley + scaleAlleyWidth / 2), TRANSITION_SPEED_FLUID);
@@ -391,7 +391,7 @@ public class AutonomousCommandGroupGenerator {
 				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), TRANSITION_SPEED_FLUID);
 				autoCmdList.drive.addQuickTurnSync(right, 90); /**  left but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), TRANSITION_SPEED_FLUID);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), TRANSITION_SPEED_STOP);
 			}
 		}
 		/**  NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing */
