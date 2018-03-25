@@ -27,6 +27,6 @@ public class SolenoidToggleStateInstant extends GearheadsInstantCommand {
 	}
 
     public String toString() {
-        return "SolenoidToggleState(" + solenoid + ")";
+        return getClass().getSimpleName() + "(" + solenoid + ")";
     }
 }
