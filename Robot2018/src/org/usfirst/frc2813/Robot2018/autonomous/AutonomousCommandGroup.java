@@ -349,7 +349,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		if(!Robot.elevator.isDisconnected())
 			addSequential(new MotorMoveToAbsolutePositionAsync(Robot.elevator, position));
 	}
-	/*
+	/**
 	 * Start the elevator moving in the background
 	 * @param target Which scale or switch are we going for
 	 */
@@ -534,26 +534,14 @@ public class AutonomousCommandGroup extends CommandGroup {
 	}
 
 	/**
-	 * Add a "deliver" sequence tailored towards target.  Elevator may still be returning to placement height at the end
+	 * Add a "deliver" sequence tailored towards target. Wait for elevator. Deliver cube. Lower elevator.
 	 * @param target where we want to place the cube
 	 * @param returnToPlacementHeightAsync do we want to go back to placement height afterwards?
 	 */
-	public void addDeliverCubeSequenceSync(PlacementTargetType target, boolean returnToPlacementHeightAsync) {
-		/*
-		 * NB: We will always 'move to placement height' here even though we have probably optimized
-		 * by doing this in advance.  This prevents us from slamming the arm into the field if somehow
-		 * we have forgotten that step, and makes this command a little more flexible.
-		 */
-		addElevatorMoveToPlacementHeightAsync(target);
-		/*
-		 * Always wait for the target position to be reached before continuing, to avoid slamming into
-		 * the field.
-		 */
+	public void addDeliverCubeSequenceSync() {
 		addElevatorWaitForTargetPositionSync();
 		addShootCubeSequence();
-		if(returnToPlacementHeightAsync) {
-			addElevatorMoveToPlacementHeightAsync(target);
-		}
+		addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
 	}
 	
 }
