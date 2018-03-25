@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
@@ -15,7 +16,7 @@ public final class MotorMoveInDirectionAtRate extends AbstractMotorCommand {
 	private final Direction direction;
 	private final Rate rate;
 
-	public MotorMoveInDirectionAtRate(Motor motor, Direction direction, Rate speed) {
+	public MotorMoveInDirectionAtRate(IMotor motor, Direction direction, Rate speed) {
 		super(motor, true);
 		this.direction = direction;
 		this.rate = speed;

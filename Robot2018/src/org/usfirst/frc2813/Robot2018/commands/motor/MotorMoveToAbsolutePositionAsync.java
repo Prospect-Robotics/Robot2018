@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
@@ -14,7 +15,7 @@ import org.usfirst.frc2813.units.values.Length;
 public final class MotorMoveToAbsolutePositionAsync extends AbstractMotorInstantCommand {
 	private final Length position;
 
-	public MotorMoveToAbsolutePositionAsync(Motor motor, Length position) {
+	public MotorMoveToAbsolutePositionAsync(IMotor motor, Length position) {
 		super(motor, true);
 		this.position = position;
 		setName(toString());

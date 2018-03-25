@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -20,7 +21,7 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 	 * @param continuousRotation Whether the motor has continuous rotation or not
 	 * @param targetRate the target rate for testing
 	 */
-	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate) {
+	public MotorVelocityPIDTest(IMotor motor, boolean continuousRotation, Rate targetRate) {
 		super(motor, true);
 		this.targetRate = targetRate;
 		this.continuousRotation = continuousRotation;
@@ -32,7 +33,7 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 	 * @param motor The motor to be tested
 	 * @param continuousRotation Whether the motor has continuous rotation or not
 	 */
-	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation) {
+	public MotorVelocityPIDTest(IMotor motor, boolean continuousRotation) {
 		this(motor, continuousRotation, motor.getConfiguration().getDefaultRate());
 	}
 
@@ -41,7 +42,7 @@ public final class MotorVelocityPIDTest extends AbstractMotorCommand {
 	 * for safety reasons.
 	 * @param motor The motor to be tested
 	 */
-	public MotorVelocityPIDTest(Motor motor) {
+	public MotorVelocityPIDTest(IMotor motor) {
 		this(motor, false, motor.getConfiguration().getDefaultRate());
 	}
 

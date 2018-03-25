@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
@@ -9,7 +10,7 @@ import org.usfirst.frc2813.logging.Logger;
  * Disable motor. Subsystem will quiesce.
  */
 public final class MotorDisableInstant extends AbstractMotorInstantCommand {
-	public MotorDisableInstant(Motor motor) {
+	public MotorDisableInstant(IMotor motor) {
 		super(motor, true);
 		setName(toString());
 	}

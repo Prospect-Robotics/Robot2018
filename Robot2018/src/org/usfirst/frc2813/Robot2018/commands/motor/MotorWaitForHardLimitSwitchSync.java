@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
@@ -11,7 +12,7 @@ import org.usfirst.frc2813.units.Direction;
 public final class MotorWaitForHardLimitSwitchSync extends AbstractMotorCommand {
 	private final Direction switchDirection;
 
-	public MotorWaitForHardLimitSwitchSync(Motor motor, Direction switchDirection) {
+	public MotorWaitForHardLimitSwitchSync(IMotor motor, Direction switchDirection) {
 		super(motor, false); // NB: IF this is running asynchronously, we don't interrupt the other command...
 		this.switchDirection = switchDirection;
 		setName(toString());

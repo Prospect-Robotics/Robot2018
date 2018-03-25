@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
@@ -11,12 +12,12 @@ import org.usfirst.frc2813.units.values.Length;
 public final class MotorWaitForTargetPositionSync extends AbstractMotorCommand {
 	private final Length allowableError;
 	
-	public MotorWaitForTargetPositionSync(Motor motor, Length allowableError) {
+	public MotorWaitForTargetPositionSync(IMotor motor, Length allowableError) {
 		super(motor, false); // NB: IF this is running asynchronously, we don't interrupt the other command...
 		this.allowableError = allowableError;
 		setName(toString());
 	}
-	public MotorWaitForTargetPositionSync(Motor motor) {
+	public MotorWaitForTargetPositionSync(IMotor motor) {
 		this(motor, motor.getConfiguration().getNativeDisplayLengthUOM().create(0.5));
 	}
 

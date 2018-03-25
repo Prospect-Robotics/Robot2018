@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
@@ -14,7 +15,7 @@ import org.usfirst.frc2813.units.Direction;
 public final class MotorCalibrateSensorAsync extends AbstractMotorInstantCommand {
 	private final Direction direction;
 
-	public MotorCalibrateSensorAsync(Motor motor, Direction direction) {
+	public MotorCalibrateSensorAsync(IMotor motor, Direction direction) {
 		super(motor, true);
 		this.direction = direction;
 		setName(toString());

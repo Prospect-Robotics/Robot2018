@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
@@ -13,7 +14,7 @@ import org.usfirst.frc2813.units.Direction;
 public final class MotorMoveInDirectionSync extends AbstractMotorCommand {
 	private final Direction direction;
 
-	public MotorMoveInDirectionSync(Motor motor, Direction direction) {
+	public MotorMoveInDirectionSync(IMotor motor, Direction direction) {
 		super(motor, true);
 		this.direction = direction;
 		if(this.direction.isNeutral()) {

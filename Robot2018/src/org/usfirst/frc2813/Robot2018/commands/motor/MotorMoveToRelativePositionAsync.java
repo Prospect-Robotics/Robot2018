@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
@@ -14,7 +15,7 @@ public final class MotorMoveToRelativePositionAsync extends AbstractMotorInstant
 	private final Direction direction;
 	private final Length relativeDistance;
 
-	public MotorMoveToRelativePositionAsync(Motor motor, Direction direction, Length relativeDistance) {
+	public MotorMoveToRelativePositionAsync(IMotor motor, Direction direction, Length relativeDistance) {
 		super(motor, true);
 		this.direction = direction;
 		this.relativeDistance = relativeDistance;

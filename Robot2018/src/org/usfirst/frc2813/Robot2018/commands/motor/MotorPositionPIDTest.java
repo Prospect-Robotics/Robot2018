@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -18,7 +19,7 @@ public final class MotorPositionPIDTest extends AbstractMotorCommand {
 	private Direction targetDirection = Direction.REVERSE;
 	private Length targetPosition = LengthUOM.Inches.create(0);
 	
-	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight) {
+	public MotorPositionPIDTest(IMotor motor, Length minHeight, Length maxHeight) {
 		super(motor, true);
 		this.minHeight = minHeight;
 		this.maxHeight = maxHeight;

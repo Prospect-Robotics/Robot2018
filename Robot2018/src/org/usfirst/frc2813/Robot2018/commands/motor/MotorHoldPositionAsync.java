@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.logging.LogType;
@@ -11,7 +12,7 @@ import org.usfirst.frc2813.logging.Logger;
  * maintain this. 
  */
 public final class MotorHoldPositionAsync extends AbstractMotorCommand {
-	public MotorHoldPositionAsync(Motor motor) {
+	public MotorHoldPositionAsync(IMotor motor) {
 		super(motor, true);
 		setName(toString());
 	}
