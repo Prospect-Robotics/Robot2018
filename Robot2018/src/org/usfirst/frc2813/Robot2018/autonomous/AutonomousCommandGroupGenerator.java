@@ -25,7 +25,17 @@ import org.usfirst.frc2813.units.values.Length;
  * robot position will NOT change autonomous, and commands consumed will NOT be regenerated.
  */
 public class AutonomousCommandGroupGenerator {
-
+	public enum PlacementTargetType {
+		SWITCH(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT),
+		SCALE(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT),
+		SCALE_INVERTED(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT);
+		
+		Length value;
+		
+		PlacementTargetType(Length height) {
+			value = height;
+		}
+	}
 	/** This is the commandGroup we are populating with our autonomous routine */
 	private AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
 

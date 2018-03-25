@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
-import org.usfirst.frc2813.Robot2018.PlacementTargetType;
+import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
@@ -106,15 +106,15 @@ public class AutonomousCommandGroup extends CommandGroup {
 	/**
 	 * Elevator height for placing cubes on the scale
 	 */
-	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT = inches(76);
+	public static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT = inches(76);
 	/**
 	 * Elevator height for shooting cubes on the scale when robot backwards
 	 */
-	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT = inches(76);
+	public static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT = inches(76);
 	/**
 	 * Elevator height for placing cubes on the switch
 	 */
-	static final Length ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT = inches(3);
+	public static final Length ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT = inches(3);
 	/**
 	 * Arm Position for Level extension
 	 */
@@ -177,19 +177,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	
 	static Length armDegrees(double degrees) {
 		return ArmDegrees.create(degrees);
-	}
-
-	/** Helper to get the placement height of a target */
-	public Length getPlacementHeight(PlacementTargetType target) {
-		switch(target) {
-		case SCALE:
-			return ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT;
-		case SWITCH:
-			return ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT;
-		case SCALE_INVERTED:
-			return ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT;
-		}
-		return null; // all enum cases handled
 	}
 
 	/**
@@ -294,8 +281,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 	 * Start the elevator moving in the background
 	 * @param target Which scale or switch are we going for
 	 */
-	public void addElevatorMoveToPlacementHeightAsync(PlacementTargetType target) {
-		addElevatorMoveToPositionAsync(getPlacementHeight(target));
+	public void addElevatorMoveToPlacementHeightAsync(AutonomousCommandGroupGenerator.PlacementTargetType target) {
+		addElevatorMoveToPositionAsync(target.value);
 	}
 
 	/** Lower the Elevator to the bottom  */
@@ -435,6 +422,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void addDeliverCubeSequenceSync() {
 		addElevatorWaitForTargetPositionSync();
 		addShootCubeSequenceSync();
-		addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
+		addElevatorMoveToPositionAsync(AutonomousCommandGroupGenerator.PlacementTargetType.SWITCH.value);
 	}
 }
