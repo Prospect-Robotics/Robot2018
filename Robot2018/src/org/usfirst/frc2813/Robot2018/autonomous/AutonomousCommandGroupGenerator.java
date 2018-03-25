@@ -179,6 +179,8 @@ public class AutonomousCommandGroupGenerator {
 		/**
 		 * Define some handy measurements. Define as double in implied inches. Doing math with groups of Length is TOO PAINFUL!
 		 */
+		// cubes are placed along switches on the scale side and in pyramid on the other switch side
+		double cubeSize = 13;
 		// robot dimensions with and without bumpers
 		double bumperThickness = 3.25;
 		double robotWheelbaseWidth = 31;
@@ -196,6 +198,7 @@ public class AutonomousCommandGroupGenerator {
 		double backWallWidth = 264;
 		double fieldWidth = 323.38;
 		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
+		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
 		double switchWidth = 152.88;
 		double scaleWidth = 180.24;
 		double sideWallToScale = (fieldWidth - scaleWidth) / 2;
@@ -229,6 +232,8 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
 		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
 		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
+		// Move the Arm down to the high position 
+		autoCmdList.addArmMoveToHighPositionAsync();
 
 		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
 		autoCmdList.setHaveCube(true);
@@ -246,6 +251,7 @@ public class AutonomousCommandGroupGenerator {
 			Logger.error(this + ": No game data.");
 			autoCmdList.addDriveForwardSync(feet(5), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			// NB: We still have a cube, so don't call setHaveCube here.
+			return;
 		} 
 		else if (robotStartingPosition.equals(scalePosition)) {
 			/**
@@ -262,7 +268,6 @@ public class AutonomousCommandGroupGenerator {
 				 *  5. deliver cube backwards
 				 */
 				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
-				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
 				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
@@ -275,7 +280,6 @@ public class AutonomousCommandGroupGenerator {
 			else {
 				double distanceToScale = backWallToSwitch + switchDepth + switchToScale - robotBumperLength;
 				double offsetToScale = sideWallToScale - sideWallToFirstRobotStartPosition;
-				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
 				autoCmdList.addDriveBackwardSync(inches(distanceToScale), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				// Start raising elevator while we are turning...
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
@@ -287,8 +291,6 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.addQuickTurnSync(right, 90);
 				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
 			}
-			// Remember we let go of our cube, we can really fly now...
-			autoCmdList.setHaveCube(false);
 		}
 		else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/*
@@ -322,47 +324,33 @@ public class AutonomousCommandGroupGenerator {
 			}
 			// NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing
 			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
-			// Remember we let go of our cube, we can really fly now...
-			autoCmdList.setHaveCube(false);
 		} else {
 			/*
-    		 * If the robot and the scale are on opposite sides,
-    		 * drive forward past the switch, spin towards the
-    		 * opposite side and drive down the alley
-    		 * between the scale and switch to the opposite side
-    		 * then turn towards the scale and then drop a cube 
-    		 * into the scale from that side.
-    		 * 
-    		 * NB: Make sure the other team won't be coming the other direction down the alley! 
-    		 * 
-			 * NB: We write this script as if the robot and scale are both on the left,
-			 * it will also be used inverted for when the robot and scale are both on the right.
+			 * Robot and  scale are on opposite side. Drive across the field between scale and switch.
+			 * from far side we cross over between switch and scale and place block on scale
 			 */
-			// from far side we cross over between switch and scale and place block on scale
 			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition + " position and the Scale is at the " + scalePosition + " position.");
-			// Tell the Elevator to go to the switch height, but don't wat for it.  It's low enough it's not a problem to start moving.
-			autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
-			// Move the Arm down to the high position 
-			autoCmdList.addArmMoveToHighPositionAsync();
 			if (useCurves) {
 				/**
 				 *  Start backwards at ends. This branch has scale on opposite side.
 				 *  1. drive forward until our far end aligns with far edge of switch
-				 *  2wide 90 degree turn to middle of alley
+				 *  2. wide 90 degree turn to middle of alley (accounting for cubes)
 				 *  3. 6 feet before we get there, raise the elevator
 				 *  4. proceed more slowly to the target
 				 *  5. deliver cube backwards
 				 */
 				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
+				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleWidth / 2 - robotBumperWidth - 6;
+				double firstCurveRadius = (switchToScale + cubeSize) / 2; // takes us to middle of path
+				double secondCurveRadius = 24; // small so we don't clip the scale platform
+				double alleyStraightDistance = crossFieldDistance - firstCurveRadius - secondCurveRadius;
+
 				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(switchToScale / 2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				
-				double alleyMiddleToScaleShootSpot = switchToScale / 2 - 12;
-				double alleyStraightDistance = scaleWidth / 2 - switchWidth / 2 - alleyMiddleToScaleShootSpot;
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(firstCurveRadius), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
 				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(alleyMiddleToScaleShootSpot), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 			}
 			else {
 				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
@@ -377,8 +365,8 @@ public class AutonomousCommandGroupGenerator {
 			}
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
 			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
-			// Remember we let go of our cube, we can really fly now...
-			autoCmdList.setHaveCube(false);
 		}
+		// Remember we let go of our cube, we can really fly now...
+		autoCmdList.setHaveCube(false);
 	}
 }
