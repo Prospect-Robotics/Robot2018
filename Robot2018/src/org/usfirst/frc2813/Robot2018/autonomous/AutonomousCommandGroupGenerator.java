@@ -278,7 +278,7 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
 				autoCmdList.addDriveBackwardSync(inches(distanceToScale), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				// Start raising elevator while we are turning...
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
 				// Turn to approach the scale
 				autoCmdList.addQuickTurnSync(left, 90);
 				// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
