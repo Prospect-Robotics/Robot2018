@@ -226,8 +226,9 @@ public class AutonomousCommandGroupGenerator {
 		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
 		 * the auto script is a robot-safety critical feature. 
 		 */
-//		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
-//		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
+		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
+		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
+		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
 
 		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
 		autoCmdList.setHaveCube(true);
@@ -330,36 +331,14 @@ public class AutonomousCommandGroupGenerator {
 				// FIXME!! need to make this more than 90 to get far enough to the side
 				double distanceToSwitch = backWallToSwitch - robotBumperLength - 12;
 				double sidewaysDistance = (switchWidth - robotBumperWidth - 6) / 2;
-				autoCmdList.addDriveForwardSync(inches(distanceToSwitch - sidewaysDistance), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				double straightToSquare = distanceToSwitch - sidewaysDistance;
+				autoCmdList.addDriveForwardSync(inches(straightToSquare / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(sidewaysDistance/2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
-				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(sidewaysDistance/2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
+				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(sidewaysDistance/2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FLUID); 
+				autoCmdList.addDriveForwardSync(inches(straightToSquare / 2), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SWITCH, true /* return to switch place position */);
 			}
 			else {
-				/**
-				 *  FIXME! still cut and paste. Not for this case
-				 *  Start backwards at ends. This branch has scale on oppos side.
-				 *  1. drive forward until our far end aligns with far edge of switch
-				 *  2. slow S curve to align with scale front
-				 *  3. 6 feet before we get there, raise the elevator
-				 *  4. proceed more slowly to the target
-				 *  5. deliver cube backwards
-				 */
-				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
-				autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
-				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				autoCmdList.addDriveForwardSync(inches(switchToScale - 6*12), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
-				autoCmdList.addDriveBackwardSync(inches(5*12), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-				// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-				autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
-
-				
-				
-				
-				
 				autoCmdList.addDriveForwardSync(inches(8), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // enough to turn
 				autoCmdList.addQuickTurnSync(left, 45);
 				autoCmdList.addDriveForwardSync(inches(121), AutonomousCommandGroup.TRANSITION_SPEED_FLUID); // diagonally from start to far side of near switch
@@ -390,30 +369,38 @@ public class AutonomousCommandGroupGenerator {
 			// Move the Arm down to the high position 
 			autoCmdList.addArmMoveToHighPositionAsync();
 			if (useCurves) {
-				// An S curve. counterclockwise 1/8 turn followed by clockwise 3/8 turn leaves us
-				// clear of the switch and pointing down the alley between switch and scale
-				radius = feet(5);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/4), radius, clockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);				
-				autoCmdList.addCurveForwardSync(radius.multiply(3*Math.PI/4), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				// now down the alley half way, then slow down and raise the elevator as we continue
-				autoCmdList.addDriveForwardSync(feet(14), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
-				// a bit more forward and then counterclockwise toward the scale
-				autoCmdList.addDriveForwardSync(feet(5), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				radius = feet(3);
-				autoCmdList.addCurveForwardSync(radius.multiply(Math.PI/2), radius, counterclockwise, AutonomousCommandGroup.TRANSITION_SPEED_STOP);
+				/**
+				 *  Start backwards at ends. This branch has scale on opposite side.
+				 *  1. drive forward until our far end aligns with far edge of switch
+				 *  2wide 90 degree turn to middle of alley
+				 *  3. 6 feet before we get there, raise the elevator
+				 *  4. proceed more slowly to the target
+				 *  5. deliver cube backwards
+				 */
+				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
+				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(switchToScale / 2), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
+				
+				double alleyMiddleToScaleShootSpot = switchToScale / 2 - 12;
+				double alleyStraightDistance = scaleWidth / 2 - switchWidth / 2 - alleyMiddleToScaleShootSpot;
+				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(alleyMiddleToScaleShootSpot), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 			}
 			else {
-				autoCmdList.addDriveForwardSync(feet(14), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
+				double distanceToFarSwitchEdge = backWallToSwitch + switchDepth - robotBumperLength;
+				autoCmdList.addDriveBackwardSync(inches(distanceToFarSwitchEdge), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addQuickTurnSync(right, 90);
-				autoCmdList.addDriveForwardSync(feet(15), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addQuickTurnSync(left, 90);
-				autoCmdList.addDriveForwardSync(feet(8), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
-				autoCmdList.addQuickTurnSync(left, 90);
+				
+				double alleyMiddleToScaleShootSpot = switchToScale / 2 - 12;
+				double alleyStraightDistance = scaleWidth / 2 - switchWidth / 2;
+				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
+				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				autoCmdList.addDriveBackwardSync(inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 			}
 			// NB: DeliverCubeCommandSequence will wait for Elevator to reach target height
-			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE, true /* return to switch place position */);
+			autoCmdList.addDeliverCubeSequenceSync(PlacementTargetType.SCALE_INVERTED, true /* return to switch place position */);
 			// Remember we let go of our cube, we can really fly now...
 			autoCmdList.setHaveCube(false);
 		}
