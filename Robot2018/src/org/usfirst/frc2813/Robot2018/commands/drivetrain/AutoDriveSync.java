@@ -72,7 +72,6 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	private static final double ACCELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
 	private static final double DECELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
 	private static final double MIN_SPEED = 0.3;  // speed to go if at a dead stop. The fastest we can go without spinning out
-	private static final double MAX_SPEED = 0.5;
 
 	private final Gyro gyro;
 	private final Direction direction;
@@ -100,7 +99,6 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		controller.setInputRange(-360, 360);
 		controller.setContinuous();
 		controller.setOutputRange(-1.0, 1.0);
-		startSpeed = endSpeed = MIN_SPEED;
 		maxSpeed=speed;
 		this.direction = direction;
 		this.distance = distance;
@@ -123,10 +121,10 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 */
 	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
 		this(driveTrain, speed, direction, distance);
-		startSpeed += (MAX_SPEED - MIN_SPEED) * startSpeedFactor;
+		startSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
 
-		endSpeed += (MAX_SPEED - MIN_SPEED) * endSpeedFactor;
+		endSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * endSpeedFactor;
 		decelRamp *= 1 - endSpeedFactor;
 	}
 

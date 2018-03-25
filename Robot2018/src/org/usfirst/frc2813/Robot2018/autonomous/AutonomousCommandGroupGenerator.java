@@ -253,8 +253,9 @@ public class AutonomousCommandGroupGenerator {
 		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
 		 * the auto script is a robot-safety critical feature.
 		 */
-		autoCmdList.elevator.addCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
+		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
 		autoCmdList.arm.addCalibrateSequenceSync();      /**  best effort attempt to calibrate the arm sensor, will wait for completion */
+		autoCmdList.elevator.addCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
 
 		PlacementTargetType.SWITCH.moveAsync();
 
@@ -336,7 +337,7 @@ public class AutonomousCommandGroupGenerator {
 				double degrees = 54.0;
 
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.COUNTERCLOCKWISE, TRANSITION_SPEED_FLUID);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.CLOCKWISE, TRANSITION_SPEED_FLUID);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.CLOCKWISE, TRANSITION_SPEED_STOP);
 			}
 			else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
@@ -378,7 +379,7 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), TRANSITION_SPEED_FULL);
 				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), TRANSITION_SPEED_FLUID);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, TRANSITION_SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, TRANSITION_SPEED_STOP);
 			}
 			else {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleAlley + scaleAlleyWidth / 2), TRANSITION_SPEED_FLUID);
@@ -391,7 +392,7 @@ public class AutonomousCommandGroupGenerator {
 				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), TRANSITION_SPEED_FLUID);
 				autoCmdList.drive.addQuickTurnSync(right, 90); /**  left but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), TRANSITION_SPEED_FLUID);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), TRANSITION_SPEED_STOP);
 			}
 		}
 		/**  NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing */
