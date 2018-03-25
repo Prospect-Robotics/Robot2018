@@ -63,7 +63,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 * 4.  IF the robot gets much worse than it is now, this can be increased but you could always fix the damage. 
 	 */
 	
-	private final PIDController controller = new PIDController(0.08, 0.00, 0.0, m_source, this::usePIDOutput);
+	private final PIDController controller = new PIDController(0.08, 0.01, 0.15, m_source, this::usePIDOutput);
 
 	/**
 	 * These defaults give us values that won't slip. Ramps to speed up and slow down and a min speed which we can
@@ -71,8 +71,8 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 */
 	private static final double ACCELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
 	private static final double DECELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
-	private static final double MIN_SPEED = 0.2;  // speed to go if at a dead stop. The fastest we can go without spinning out
-	private static final double MAX_SPEED = 1.0;
+	private static final double MIN_SPEED = 0.3;  // speed to go if at a dead stop. The fastest we can go without spinning out
+	private static final double MAX_SPEED = 0.8;
 
 	private final Gyro gyro;
 	private final Direction direction;
