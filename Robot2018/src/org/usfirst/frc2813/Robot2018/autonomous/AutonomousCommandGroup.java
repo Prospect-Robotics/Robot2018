@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
+import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
@@ -277,14 +278,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 		}
 	}
 
-	/**
-	 * Start the elevator moving in the background
-	 * @param target Which scale or switch are we going for
-	 */
-	public void addElevatorMoveToPlacementHeightAsync(AutonomousCommandGroupGenerator.PlacementTargetType target) {
-		addElevatorMoveToPositionAsync(target.value);
-	}
-
 	/** Lower the Elevator to the bottom  */
 	public void addElevatorLowerAsync() {
 		addElevatorMoveToPositionAsync(LengthUOM.Inches.create(0));
@@ -422,6 +415,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public void addDeliverCubeSequenceSync() {
 		addElevatorWaitForTargetPositionSync();
 		addShootCubeSequenceSync();
-		addElevatorMoveToPositionAsync(AutonomousCommandGroupGenerator.PlacementTargetType.SWITCH.value);
+		PlacementTargetType.SWITCH.moveAsync();
 	}
 }

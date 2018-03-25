@@ -25,17 +25,6 @@ import org.usfirst.frc2813.units.values.Length;
  * robot position will NOT change autonomous, and commands consumed will NOT be regenerated.
  */
 public class AutonomousCommandGroupGenerator {
-	public enum PlacementTargetType {
-		SWITCH(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT),
-		SCALE(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT),
-		SCALE_INVERTED(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT);
-		
-		Length value;
-		
-		PlacementTargetType(Length height) {
-			value = height;
-		}
-	}
 	/** This is the commandGroup we are populating with our autonomous routine */
 	private AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
 
@@ -251,7 +240,7 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.addElevatorCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
 		autoCmdList.addArmCalibrateSequenceSync();      /**  best effort attempt to calibrate the arm sensor, will wait for completion */
 
-		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
+		PlacementTargetType.SWITCH.moveAsync();
 
 		/**  Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely. */
 		autoCmdList.setHaveCube(true);
@@ -299,14 +288,14 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 			}
 			else {
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
 				
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(distanceToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.addQuickTurnSync(left, 90); /**  right but we're backwards */
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(43), AutonomousCommandGroup.TRANSITION_SPEED_STOP);
 				autoCmdList.addQuickTurnSync(right, 90); /**  left but we're backwards */
@@ -371,7 +360,7 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(firstLeg), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(firstCurveRadius), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
 			}
@@ -383,7 +372,7 @@ public class AutonomousCommandGroupGenerator {
 				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleTargetWidth / 2 - robotBumperLength - 6;
 
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE_INVERTED);
+				PlacementTargetType.SCALE_INVERTED.moveAsync();
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
 				autoCmdList.addQuickTurnSync(right, 90); /**  left but we're backwards */
 				autoCmdList.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
