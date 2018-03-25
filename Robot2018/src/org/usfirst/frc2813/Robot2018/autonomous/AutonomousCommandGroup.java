@@ -121,6 +121,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 			this.turnSpeed = turnSpeed;
 		}
 
+		/** Scale the acceleration/deceleration in the auto drive system. THIS IS GLOBAL AND INSTANT! */
+		public void setRampSpeed(double rampSpeed) {
+			AutoDriveSync.scaleRamps(rampSpeed);
+		}
+
 		/**
 		 * Add a command for driving on a circular path for a set number of degrees, with a desired speed at the end of the movement.
 		 * @param direction - forward or backward

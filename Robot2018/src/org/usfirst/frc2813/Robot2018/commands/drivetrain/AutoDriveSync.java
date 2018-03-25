@@ -79,6 +79,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	private final double distance;
 	private double startSpeed, endSpeed, maxSpeed;
 	private double startPosition;
+	private static double rampScaleFactor = 1.0; // scale ramps to be less agressive
 	private double accelRamp, decelRamp;
 	private double startAngle; // which may or may not be zero degrees.
 	private double deltaAngle; // for the turn version
@@ -103,8 +104,8 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		maxSpeed=speed;
 		this.direction = direction;
 		this.distance = distance;
-		accelRamp = ACCELERATION_RAMP;  // here we assume max ramp - ie: start and end at dead stop
-		decelRamp = DECELERATION_RAMP;
+		accelRamp = ACCELERATION_RAMP * rampScaleFactor;  // here we assume max ramp - ie: start and end at dead stop
+		decelRamp = DECELERATION_RAMP * rampScaleFactor;
 		onCurve = false;
 	}
 
@@ -150,6 +151,12 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		}
 		if (direction.isNegative()) {
 			deltaAngle *= -1.0;
+		}
+	}
+
+	public static void scaleRamps(double scaleFactor) {
+		if (scaleFactor > 0 && scaleFactor <= 1.0) {
+			rampScaleFactor = scaleFactor;
 		}
 	}
 
