@@ -253,32 +253,8 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			if (useCurves) {
-				if (false) { // This is the old code that assume the bot faces forward
 				/**
-				 * The scale is straight ahead, but we want to approach from the side. Deflect towards the wall and
-				 * back so we end up straight, but closer to the wall so that we can approach the scale from the side.
-				 * WARNING! We are less than 30 inches from the wall
-				 */
-				// shallow S curve takes us 17.5 inches to the side and 89.9 inches forward
-				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.COUNTERCLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 22.0, feet(10), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_FULL); 
-				double distanceTravelled = sCurveForwardShift(10*12, 22);
-				double distanceShifted = sCurveSideShift(10*12, 22);
-
-				double currentDistanceToSideWall = sideWallToFirstRobotStartPosition - distanceShifted;
-				double offsetToScale = sideWallToScale - currentDistanceToSideWall;
-				double distanceRemaining = backWallToSwitch + switchDepth + switchToScale + scalePlatformDepth / 2 - robotWheelbaseLength / 2 - distanceTravelled - offsetToScale;
-
-				// the straight away. Start elevator in final 6 feet
-				autoCmdList.addDriveForwardSync(inches(distanceRemaining - 6 * 12), AutonomousCommandGroup.TRANSITION_SPEED_FULL);
-				autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SCALE);
-				autoCmdList.addDriveForwardSync(inches(6 * 12), AutonomousCommandGroup.TRANSITION_SPEED_FLUID);
-
-				// turn to switch. The radius is the side distance to the scale. We cover that to side and front
-				autoCmdList.addCurveDegreesSync(Direction.FORWARD, 90.0, inches(offsetToScale - 2), Direction.CLOCKWISE, AutonomousCommandGroup.TRANSITION_SPEED_STOP); 
-				}
-				/**
-				 *  new approach. Start backwards at ends. This branch has scale on same side.
+				 *  We are backwards in the end position
 				 *  1. drive forward until our far end aligns with far edge of switch
 				 *  2. slow S curve to align with scale front
 				 *  3. 6 feet before we get there, raise the elevator
