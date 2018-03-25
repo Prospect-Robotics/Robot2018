@@ -336,7 +336,7 @@ public class AutonomousCommandGroupGenerator {
 				double degrees = 54.0;
 
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.COUNTERCLOCKWISE, TRANSITION_SPEED_FLUID);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.CLOCKWISE, TRANSITION_SPEED_FLUID);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), Direction.CLOCKWISE, TRANSITION_SPEED_STOP);
 			}
 			else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
