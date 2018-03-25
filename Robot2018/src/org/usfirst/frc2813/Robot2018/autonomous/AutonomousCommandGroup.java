@@ -234,23 +234,17 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/**
 		 * Arm Position for Level extension
 		 */
-		final Length ARM_POSITION_FOR_LEVEL = armDegrees(133);
+		final Length ARM_POSITION_FOR_LEVEL = ArmConfiguration.ArmDegrees.create(133);
 		/**
 		 * Arm Position for holding high
 		 */
-		final Length ARM_POSITION_HIGH = armDegrees(20);
+		final Length ARM_POSITION_HIGH = ArmConfiguration.ArmDegrees.create(20);
 		/**
 		 * Arm Position for shooting over head
 		 */
-		 final Length ARM_POSITION_INVERTED_SHOOT = armDegrees(15);
-		 final Length ARM_POSITION_SHOOT = armDegrees(70);
-		/**
-		 * Just a shortcut so we can refer to ArmDegrees easily
-		 */
-		 LengthUOM ArmDegrees = ArmConfiguration.ArmDegrees;
-		 Length armDegrees(double degrees) {
-			return ArmDegrees.create(degrees);
-		}
+		 final Length ARM_POSITION_INVERTED_SHOOT = ArmConfiguration.ArmDegrees.create(15);
+		 final Length ARM_POSITION_SHOOT = ArmConfiguration.ArmDegrees.create(70);
+
 		/**
 		 * Calibrate the arm (move down), but don't wait for completion.
 		 * To check it you would have to wait for a limit switch.
@@ -269,7 +263,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		}
 		/** Move the arm In to the home position */
 		public void addMoveInAsync() {
-			addMoveToPositionAsync(armDegrees(0));
+			addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(0));
 		}
 
 		/** Move the arm to the "high" position, but do not wait. */
@@ -309,7 +303,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Wait for the Arm to get very close to a target position. */
 		public void addWaitForTargetPositionSync() {
 			if(!Robot.arm.isDisconnected()) {
-				addSequential(new MotorWaitForTargetPositionSync(Robot.arm, armDegrees(5.0)));
+				addSequential(new MotorWaitForTargetPositionSync(Robot.arm, ArmConfiguration.ArmDegrees.create(5.0)));
 			}
 		}
 	}
