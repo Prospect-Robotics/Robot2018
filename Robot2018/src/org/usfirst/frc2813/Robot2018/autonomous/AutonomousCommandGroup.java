@@ -107,11 +107,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 	/**
 	 * Elevator height for placing cubes on the scale
 	 */
-	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT = inches(78);
+	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT = inches(76);
 	/**
 	 * Elevator height for shooting cubes on the scale when robot backwards
 	 */
-	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT = inches(78);
+	static final Length ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT = inches(76);
 	/**
 	 * Elevator height for placing cubes on the switch
 	 */
