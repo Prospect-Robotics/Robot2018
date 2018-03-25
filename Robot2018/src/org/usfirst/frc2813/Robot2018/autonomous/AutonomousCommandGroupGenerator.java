@@ -231,9 +231,8 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		autoCmdList.addElevatorCalibrateSequenceSync(); // best effort attempt to calibrate the elevator sensor
 		autoCmdList.addArmCalibrateSequenceSync();      // best effort attempt to calibrate the arm sensor, will wait for completion
+
 		autoCmdList.addElevatorMoveToPlacementHeightAsync(PlacementTargetType.SWITCH);
-		// Move the Arm down to the high position 
-		autoCmdList.addArmMoveToHighPositionAsync();
 
 		// Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely.
 		autoCmdList.setHaveCube(true);
@@ -253,11 +252,12 @@ public class AutonomousCommandGroupGenerator {
 			// NB: We still have a cube, so don't call setHaveCube here.
 			return;
 		} 
-		else if (robotStartingPosition.equals(scalePosition)) {
+		if (robotStartingPosition.equals(scalePosition)) {
 			/**
 			 * The robot and the scale are on the same side. Drive forward and approach the scale from the side.
 			 */
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
+			autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
 			if (useCurves) {
 				/**
 				 *  We are backwards in the end position
@@ -300,6 +300,7 @@ public class AutonomousCommandGroupGenerator {
 			 * robot.  If this isn't the case, the script will be run inverted.
 			 */
 			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the " + nearSwitchPosition + " position.");
+			autoCmdList.addArmMoveToShootingPositionAsync();
 			if (useCurves) {
 				/**
 				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
@@ -330,6 +331,7 @@ public class AutonomousCommandGroupGenerator {
 			 * from far side we cross over between switch and scale and place block on scale
 			 */
 			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition + " position and the Scale is at the " + scalePosition + " position.");
+			autoCmdList.addArmMoveToOverHeadShootingPositionAsync();
 			if (useCurves) {
 				/**
 				 *  Start backwards at ends. This branch has scale on opposite side.
