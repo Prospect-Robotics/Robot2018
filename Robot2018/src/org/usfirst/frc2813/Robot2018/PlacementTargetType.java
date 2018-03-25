@@ -1,12 +1,17 @@
 package org.usfirst.frc2813.Robot2018;
 
-import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
+import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 
 public enum PlacementTargetType {
-	SWITCH(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SWITCH_CUBE_PLACEMENT),
-	SCALE(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SCALE_CUBE_PLACEMENT),
-	SCALE_INVERTED(AutonomousCommandGroup.ELEVATOR_HEIGHT_FOR_SCALE_CUBE_BACKWARD_PLACEMENT);
+	/** Elevator height for placing cubes on the switch. */
+	SWITCH(LengthUOM.Inches.create(3)),
+
+	/** Elevator height for placing cubes on the scale. */
+	SCALE(LengthUOM.Inches.create(76)),
+	
+	/** Elevator height for shooting cubes on the scale when robot backwards */
+	SCALE_INVERTED(LengthUOM.Inches.create(76));
 	
 	public Length value;
 	
@@ -15,6 +20,6 @@ public enum PlacementTargetType {
 	}
 	
 	public void moveAsync() {
-		Robot.autonomousCommand.addElevatorMoveToPositionAsync(this.value);
+		Robot.autonomousCommand.elevator.addMoveToPositionAsync(this.value);
 	}
 }
