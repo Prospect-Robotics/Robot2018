@@ -59,7 +59,7 @@ public class Solenoid extends GearheadsSubsystem {
 			GearheadsCommand c = configuration.getDefaultCommandFactory().createCommand(this);
 			if(c != null) {
 				setDefaultCommand(c);
-				c.setIsDefaultCommand(true);
+				c.setTracingEnabled(false);
 			}
 		}
 	}

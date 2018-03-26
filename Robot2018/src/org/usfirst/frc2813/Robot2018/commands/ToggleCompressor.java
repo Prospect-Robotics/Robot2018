@@ -5,34 +5,33 @@ import edu.wpi.first.wpilibj.Compressor;
 /**
  * Compressor state toggle for debugging.
  */
-public class ToggleCompressor extends GearheadsInstantCommand {
-	private final Compressor compressor;
+public final class ToggleCompressor extends TargetedCommand<Compressor> {
 	/**
 	 * Turn the compressor on and off
 	 * @param compressor the compressor to be toggled
 	 */
     public ToggleCompressor(Compressor compressor) {
-        super();
-        this.compressor=compressor;
+        super(compressor);
         setRunWhenDisabled(true);
         setName(toString());
     }
 
     // Called once when the command executes
-    protected void initialize() {
-    	if(compressor.enabled()) {
+    protected void initializeImpl() {
+    	if(getTarget().enabled()) {
     		System.out.println(this + " disabling the compressor.");
-    		compressor.stop();
-    	}else {
+    		getTarget().stop();
+    	} else {
     		System.out.println(this + " enabling the compressor.");
-    		compressor.start();
-    		if(compressor.getPressureSwitchValue()) {
+    		getTarget().start();
+    		if(getTarget().getPressureSwitchValue()) {
     			System.out.println(this + " has enabled the compressor, but it will not start until tank pressure drops below 90PSI.");
     		}
     	}
     }
-    
-    public String toString() {
-    	return getClass().getSimpleName() + "(" + compressor + ")";
-    }
+
+	@Override
+	protected boolean isFinishedImpl() {
+		return true;
+	}
 }

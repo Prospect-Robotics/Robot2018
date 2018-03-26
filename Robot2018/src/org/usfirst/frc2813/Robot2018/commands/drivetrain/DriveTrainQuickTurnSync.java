@@ -1,5 +1,8 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.units.Direction;
 
@@ -7,7 +10,7 @@ import org.usfirst.frc2813.units.Direction;
  * Autonomous turn command. Use gyro and linear interpolation
  * to
  */
-public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
+public final class DriveTrainQuickTurnSync extends SubsystemCommand<DriveTrain> {
 	private final Direction direction;
 	private final double relativeAngleInDegrees;
 	private final double rate;
@@ -25,7 +28,7 @@ public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
 	 * Create a quick turn command for turning in a direction for a specific number of degrees.
 	 */
 	public DriveTrainQuickTurnSync(DriveTrain driveTrain, Direction direction, double relativeAngleInDegrees, double rate) {
-		super(driveTrain, true /* require the subsystem */);
+		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.direction = direction;
 		this.rate = rate;
 		this.relativeAngleInDegrees = relativeAngleInDegrees;
@@ -38,13 +41,16 @@ public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
 		if(rate > 1.0) {
 			throw new IllegalArgumentException("Do not specify rate greater than 100%.");
 		}
+		addArg("direction",direction);
+		addArg("relativeAngleInDegrees",relativeAngleInDegrees);
+		addArg("rate",rate);
 		setName(toString());
 	}
 
 	// Called just before this Command runs the first time
-	protected void initialize() {
-		super.initialize();
-		startingAngle = driveTrain.getGyro().getAngle();
+	@Override
+	protected void subsystemInitializeImpl() {
+		startingAngle = subsystem.getGyro().getAngle();
 		targetAngle   = startingAngle + (direction.getMultiplierAsDouble() * relativeAngleInDegrees);  
 	}
 
@@ -53,7 +59,7 @@ public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
 	 * NOTE: If we are turning in the wrong way, this will become a larger magnitude in either positive or negative values until we do a (360-target) - i.e. turn in the wrong direction eventually gets the same result.
 	 */
 	private double getErrorInDegrees() {
-		return targetAngle - driveTrain.getGyro().getAngle();
+		return targetAngle - subsystem.getGyro().getAngle();
 	}
 
 	/**
@@ -84,18 +90,19 @@ public final class DriveTrainQuickTurnSync extends AbstractDriveTrainCommand {
 	}
 
 	// Called repeatedly when this Command is scheduled to run
-	protected void execute() {
-		super.execute();
+	protected void subsystemExecuteImpl() {
 		int directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
-		driveTrain.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
+		subsystem.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
-	protected boolean isFinished() {
+	@Override
+	protected boolean subsystemIsFinishedImpl() {
 		return getErrorMagnitudeInDegrees() <= MIN_DEG;
 	}
     
-    public String toString() {
-    	return getClass().getSimpleName() + "(" + driveTrain + ", direction=" + direction + ", relativeAngleInDegrees=" + relativeAngleInDegrees + ", rate=" + rate + ")"; 
-    }
+	@Override
+	public boolean isSubsystemRequired() {
+		return true;
+	}
 }

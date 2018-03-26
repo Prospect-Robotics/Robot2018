@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.RobotMap;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PIDController;

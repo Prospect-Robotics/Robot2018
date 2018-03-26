@@ -1,5 +1,8 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
@@ -13,7 +16,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Class to use PID control of autonomous drive. Note that all units are inches
  */
-public class AutoDriveSync extends AbstractDriveTrainCommand {
+public class AutoDriveSync extends SubsystemCommand<DriveTrain> {
 	private final PIDSource m_source = new PIDSource() {
 
 		@Override
@@ -94,7 +97,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 * @param distance - how far to travel
 	 */
 	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance) {
-		super(driveTrain, true);
+		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
 		controller.setInputRange(-360, 360);
 		controller.setContinuous();
@@ -105,6 +108,10 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		accelRamp = ACCELERATION_RAMP * rampScaleFactor;  // here we assume max ramp - ie: start and end at dead stop
 		decelRamp = DECELERATION_RAMP * rampScaleFactor;
 		onCurve = false;
+		addArg("speed",speed);
+		addArg("direction",direction);
+		addArg("distance",distance);
+		setName(toString());
 	}
 
 	/**
@@ -126,6 +133,12 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 
 		endSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * endSpeedFactor;
 		decelRamp *= 1 - endSpeedFactor;
+		addArg("speed",speed);
+		addArg("direction",direction);
+		addArg("distance",distance);
+		addArg("startSpeedFactor",startSpeedFactor);
+		addArg("endSpeedFactor",endSpeedFactor);
+		setName(toString());
 	}
 
 	/**
@@ -139,8 +152,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	 * @param radius - the radius of the circle we are traveling
 	 * @param clockwise - the direction of the circle
 	 */
-	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor,
-			double endSpeedFactor, double radius, boolean clockwise) {
+	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
 		this(driveTrain, speed, direction, distance, startSpeedFactor, endSpeedFactor);
 		onCurve = true;
 		deltaAngle = (distance * 180.0) / (radius * Math.PI); // just an offset for now
@@ -150,6 +162,14 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		if (direction.isNegative()) {
 			deltaAngle *= -1.0;
 		}
+		addArg("speed",speed);
+		addArg("direction",direction);
+		addArg("distance",distance);
+		addArg("startSpeedFactor",startSpeedFactor);
+		addArg("endSpeedFactor",endSpeedFactor);
+		addArg("radius",radius);
+		addArg("clockwise",clockwise);
+		setName(toString());
 	}
 
 	public static void scaleRamps(double scaleFactor) {
@@ -159,7 +179,8 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	}
 
 	// Called just before this Command runs the first time
-	protected void initialize() {
+	@Override
+	protected void subsystemInitializeImpl() {
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive state",
 				"startSpeed", startSpeed,
 				"accelRamp", accelRamp,
@@ -173,7 +194,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
 		 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
 		 */
-		startPosition = driveTrain.getDistance();
+		startPosition = subsystem.getDistance();
 		startAngle = gyro.getAngle();
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive start", "position", startPosition, "angle", startAngle);
 		controller.enable();
@@ -198,7 +219,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 	}
 
 	private double distanceTravelled() {
-		double rawDelta = driveTrain.getDistance() - startPosition;
+		double rawDelta = subsystem.getDistance() - startPosition;
 		return rawDelta * direction.getMultiplierAsDouble();
 	}
 	
@@ -257,13 +278,9 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		return interpolate(0, 0, distance, deltaAngle, distanceTravelled);
 	}
 
-	// Called repeatedly when this Command is scheduled to run
-	protected void execute() {
-		//new PrintOutEncoderValues(60,driveTrain.encoderPort,driveTrain.encoderStarboard);
-	}
-
 	// Make this return true when this Command no longer needs to run execute()
-	protected boolean isFinished() {
+	@Override
+	protected boolean subsystemIsFinishedImpl() {
 		/* 
 		 * Keep track of whether we have finished, and ignore any PID outputs on a best effort basis.
 		 * It's highly probable that assigning to boolean complete will be atomic, though it's not 
@@ -271,9 +288,9 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		 */
 		return complete = (distanceTravelled() >= distance);
 	}
-
-	// Called once after isFinished returns true
-	protected void end() {
+	// Called once after isFinished returns true or interrupted.
+	@Override
+	protected void subsystemInterruptedImpl() {
 		controller.disable();
 		controller.reset();
 		/*
@@ -283,7 +300,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		 * and would have one if we were correcting for an error when driving straight.
 		 */
 		Logger.info("Stopping... leaving lastThrottle=" + lastThrottle);
-		driveTrain.arcadeDrive(lastThrottle, 0.0);
+		subsystem.arcadeDrive(lastThrottle, 0.0);
 	}
 
 	/**
@@ -309,7 +326,12 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 				"AngleError[now]", gyro.getAngle() - startAngle,
 				"Throttle", newThrottle,
 				"PID Output", pidOutput);
-		driveTrain.arcadeDrive(newThrottle, pidOutput);
+		subsystem.arcadeDrive(newThrottle, pidOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
+	}
+
+	@Override
+	public boolean isSubsystemRequired() {
+		return true;
 	}
 }

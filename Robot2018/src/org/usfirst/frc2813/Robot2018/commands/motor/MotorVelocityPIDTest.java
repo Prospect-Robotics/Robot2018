@@ -1,100 +1,84 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.motor.IMotor;
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Rate;
 
 /**
  * Move motor in given direction until interrupted.
  * Hold current position with PID when interrupted. 
+ * This command can be Synchronous or SynchronousWithTimeout
  */
-public final class MotorVelocityPIDTest extends AbstractMotorCommand {
+public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 	private Direction targetDirection = Direction.FORWARD;
 	private final Rate targetRate;
 	private final boolean continuousRotation;
 	
-	/**
-	 * Run a velocity test between limits (hard and/or soft) at the specified velocity  
-	 * @param motor The motor to be tested
-	 * @param continuousRotation Whether the motor has continuous rotation or not
-	 * @param targetRate the target rate for testing
-	 */
-	public MotorVelocityPIDTest(IMotor motor, boolean continuousRotation, Rate targetRate) {
-		super(motor, true);
+
+	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate, CommandDuration duration, Lockout lockout) {
+    	super(motor, duration, lockout);
 		this.targetRate = targetRate;
 		this.continuousRotation = continuousRotation;
+		addArg("targetRate", targetRate);
+		addArg("continuousRotation", continuousRotation);
 		setName(toString());
-	}
-
-	/**
-	 * Run a velocity test between limits (hard and/or soft) at the default velocity
-	 * @param motor The motor to be tested
-	 * @param continuousRotation Whether the motor has continuous rotation or not
-	 */
-	public MotorVelocityPIDTest(IMotor motor, boolean continuousRotation) {
-		this(motor, continuousRotation, motor.getConfiguration().getDefaultRate());
-	}
-
-	/**
-	 * Run a velocity test between limits (hard and/or soft) at the default velocity, assuming NO continuous rotation
-	 * for safety reasons.
-	 * @param motor The motor to be tested
-	 */
-	public MotorVelocityPIDTest(IMotor motor) {
-		this(motor, false, motor.getConfiguration().getDefaultRate());
-	}
-
-	@Override
-	protected void initialize() {
-		super.initialize();
 		if(continuousRotation) {
-			if(!motor.getHasHardOrSoftLimit(Direction.FORWARD)) {
+			if(!subsystem.getHasHardOrSoftLimit(Direction.FORWARD)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test with a hard or soft FORWARD limit in CONTINOUS mode.");
 			}
-			if(!motor.getHasHardOrSoftLimit(Direction.REVERSE)) {
+			if(!subsystem.getHasHardOrSoftLimit(Direction.REVERSE)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test with a hard or soft REVERSE limit in CONTINOUS mode.");
 			}
 		} else {
-			if(!motor.getHasHardOrSoftLimit(Direction.FORWARD)) {
+			if(!subsystem.getHasHardOrSoftLimit(Direction.FORWARD)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test without a hard or soft FORWARD limit in NON-CONTINOUS mode.");
 			}
-			if(!motor.getHasHardOrSoftLimit(Direction.REVERSE)) {
+			if(!subsystem.getHasHardOrSoftLimit(Direction.REVERSE)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test without a hard or soft REVERSE limit in NON-CONTINOUS mode.");
 			}
 		}
-		motor.moveInDirectionAtRate(targetDirection, targetRate);
+	}
+	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate, CommandDuration duration) {
+		this(motor, continuousRotation, targetRate, duration, Lockout.Disabled);
+	}
+	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate) {
+		this(motor, continuousRotation, targetRate, CommandDuration.DISABLED);
+	}
+	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation) {
+		this(motor, continuousRotation, motor.getConfiguration().getDefaultRate());
+	}
+	public MotorVelocityPIDTest(Motor motor) {
+		this(motor, motor.getConfiguration().hasAll(MotorConfiguration.LimitPosition) ? false : true);
 	}
 
 	@Override
-	protected void execute() {
-		if((motor.getHasHardLimit(targetDirection) && motor.getCurrentHardLimitSwitchStatus(targetDirection))
-		|| (motor.getHasSoftLimit(targetDirection) && motor.isSoftLimitReached(targetDirection))) {
+	protected void subsystemExecuteImpl() {
+		if((subsystem.getHasHardLimit(targetDirection) && subsystem.getCurrentHardLimitSwitchStatus(targetDirection))
+		|| (subsystem.getHasSoftLimit(targetDirection) && subsystem.isSoftLimitReached(targetDirection))) {
 			targetDirection = targetDirection.getInverse();
-			Logger.info("REVERSING.  GOING " + targetDirection + " @ " + motor.getCurrentPosition() + " Error " + motor.getCurrentRateError() + " Goal " + targetRate);
-			motor.moveInDirectionAtRate(targetDirection, targetRate);
+			trace("execute", "REVERSING.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentRateError() + " Goal " + targetRate);
+			subsystem.moveInDirectionAtRate(targetDirection, targetRate);
 		} else {
-			Logger.info("NOT THERE.  GOING " + targetDirection + " @ " + motor.getCurrentPosition() + " Error " + motor.getCurrentRateError() + " Goal " + targetRate);
+			trace("execute", "NOT THERE.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentRateError() + " Goal " + targetRate);
 		}
 	}
-
+	
 	@Override
-	protected boolean isFinished() {
-		return false;  // run until interrupted, even if subsystem stops
+	public boolean isSubsystemRequired() {
+		return true;
 	}
 
 	@Override
-	protected void interrupted() {
-		super.interrupted();
-        /*
-        * NOTE: Typically this is also the default command for motor subsystems, so it's kind of redundant but logical. 
-        */
-		motor.holdCurrentPosition();
+	protected void subsystemInitializeImpl() {
+		subsystem.moveInDirectionAtRate(targetDirection, targetRate);
 	}
 
 	@Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" + motor + ", continuousRotation=" + continuousRotation + ", targetRate=" + targetRate + ")";
-    }
+	protected boolean subsystemIsFinishedImpl() {
+		return false;
+	}
 }

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.usfirst.frc2813.Robot2018.commands.GearheadsCommand;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPositionAsync;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
@@ -179,7 +179,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			null, // remoteReverseHardLimitSwitchDeviceId
 			new ICommandFactory<Motor>() { // defaultCommand 
 				public GearheadsCommand createCommand(Motor m) { 
-					return new MotorHoldPositionAsync(m); 
+					return new MotorHoldPosition(m); 
 				}
 			},
 			createPidConfigurations() // pidConfigurations

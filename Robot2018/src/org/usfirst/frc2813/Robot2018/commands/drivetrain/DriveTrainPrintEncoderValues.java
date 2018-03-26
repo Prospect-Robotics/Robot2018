@@ -1,6 +1,9 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -8,14 +11,14 @@ import edu.wpi.first.wpilibj.Encoder;
 /**
  * Print out the drive train encoder values to the log.
  */
-public final class DriveTrainPrintEncoderValuesTimed extends AbstractDriveTrainTimedCommand {
+public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTrain> {
 	private long last;
 	private double timeout;
 	private final Encoder starboardEncoder;
 	private final Encoder portEncoder;
 
-	public DriveTrainPrintEncoderValuesTimed(DriveTrain driveTrain, double timeout) {
-		super(driveTrain, false /* do not require subsystem for background monitoring command */, timeout);
+	public DriveTrainPrintEncoderValues(DriveTrain driveTrain) {
+		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.last = 0;
 		this.timeout = timeout;
 		this.portEncoder = driveTrain.getEncoderPort();
@@ -25,11 +28,13 @@ public final class DriveTrainPrintEncoderValuesTimed extends AbstractDriveTrainT
 	}
 
 	// Called just before this Command runs the first time
-	protected void initialize() {
+	@Override
+	protected void subsystemInitializeImpl() {
 	}
 
 	// Called repeatedly when this Command is scheduled to run
-	protected void execute() {
+	@Override
+	protected void subsystemExecuteImpl() {
 		if((System.currentTimeMillis() - last) >= 100) {
 			System.out.println(
 					"starboardEncoder " + starboardEncoder.get() + " [" + starboardEncoder.getRaw() + "] " +starboardEncoder.getDistance()+" "+ starboardEncoder.getDistance()*DriveTrain.WHEEL_CIRCUMFERENCE_INCHES +" ["+starboardEncoder.getDistancePerPulse()+"] "+starboardEncoder.getDirection()+" ["+starboardEncoder.getStopped()+"]\n" +
@@ -41,11 +46,12 @@ public final class DriveTrainPrintEncoderValuesTimed extends AbstractDriveTrainT
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
-	protected boolean isFinished() {
+	protected boolean subsystemIsFinishedImpl() {
 		return false;
 	}
-    
-    public String toString() {
-    	return getClass().getSimpleName() + "(" + driveTrain + ", timeout=" + timeout + ")"; 
-    }
+	
+	@Override
+	public boolean isSubsystemRequired() {
+		return false;
+	}
 }

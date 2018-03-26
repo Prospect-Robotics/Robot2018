@@ -1,40 +1,46 @@
 package org.usfirst.frc2813.Robot2018.commands.subsystem;
 
-import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.logging.LogType;
-import org.usfirst.frc2813.logging.Logger;
-import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * Wait for a motor system to arrive at position, to within +/- allowableError
+ * Set the default command for a subsystem. Do not require exclusive access to the subsystem.
  */
-public final class SubsystemSetDefaultCommand extends GearheadsInstantCommand {
-	private final Subsystem subsystem;
+public class SubsystemSetDefaultCommand extends SubsystemCommand<GearheadsSubsystem> {
 	private final Command defaultCommand;
 
-	public SubsystemSetDefaultCommand(Subsystem subsystem, Command defaultCommand) {
-		this.subsystem = subsystem;
+	public SubsystemSetDefaultCommand(GearheadsSubsystem subsystem, Command defaultCommand) {
+		super(subsystem);
 		this.defaultCommand = defaultCommand;
-		requires(this.subsystem); // Interrupt any running commands?
 		setName(toString());
+		addArg("defaultCommand", defaultCommand);
 	}
 
 	@Override
-	protected void initialize() {
-		super.initialize();
+	protected void subsystemInitializeImpl() {
 		if(subsystem.getDefaultCommand() != defaultCommand) {
-			Logger.printFormat(LogType.INFO,"%s setting default command for %s to %s.", this, subsystem, defaultCommand);
+			traceFormatted("initialize","setting default command for %s to %s.", subsystem, defaultCommand);
 			subsystem.setDefaultCommand(defaultCommand);
 		} else {
-			Logger.printFormat(LogType.INFO,"%s doesn't need to set default command for %s, as it's already correct.", this, subsystem, defaultCommand);
+			traceFormatted("initialize","doesn't need to set default command for %s, as it's already correct.", subsystem, defaultCommand);
 		}
 	}
 
-    public String toString() {
-        return getClass().getSimpleName() + "(" + subsystem + ")";
-    }
+	/**
+	 * Returns false, we don't need exclusive access
+	 */
+	@Override
+	public boolean isSubsystemRequired() {
+		return false;
+	}
+
+	/**
+	 * return true, it's an instant command
+	 */
+	@Override
+	protected boolean subsystemIsFinishedImpl() {
+		return true;
+	}
 }
