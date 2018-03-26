@@ -18,33 +18,21 @@ public enum MotorOperation implements IMotorOperation {
 	// Calibrating sensor in a direction
 	CALIBRATING_SENSOR_IN_DIRECTION
 	;
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isDisabled()
-	 */
 	@Override
 	public boolean isDisabled() {
 		return this == DISABLED;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isHoldingCurrentPosition()
-	 */
 	@Override
 	public boolean isHoldingCurrentPosition() {
 		return this == HOLDING_CURRENT_POSITION;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isIdle()
-	 */
 	@Override
 	public boolean isIdle() {
 		return this.isDisabled() || this.isHoldingCurrentPosition();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isMoving()
-	 */
 	@Override
 	public boolean isMoving() {
 		return this.isMovingToAbsolutePosition() 
@@ -53,9 +41,6 @@ public enum MotorOperation implements IMotorOperation {
 				;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isMovingToPosition()
-	 */
 	@Override
 	public boolean isMovingToPosition() {
 		return this.isMovingToAbsolutePosition() 
@@ -63,25 +48,16 @@ public enum MotorOperation implements IMotorOperation {
 				;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isMovingToAbsolutePosition()
-	 */
 	@Override
 	public boolean isMovingToAbsolutePosition() {
 		return this == MOVING_TO_ABSOLUTE_POSITION;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isMovingToRelativePosition()
-	 */
 	@Override
 	public boolean isMovingToRelativePosition() {
 		return this == MOVING_TO_RELATIVE_POSITION;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation#isMovingInDirectionAtRate()
-	 */
 	@Override
 	public boolean isMovingInDirectionAtRate() {
 		return this == MOVING_IN_DIRECTION_AT_RATE;
@@ -89,7 +65,6 @@ public enum MotorOperation implements IMotorOperation {
 
 	@Override
 	public boolean isCalibratingSensorInDirection() {
-		// TODO Auto-generated method stub
 		return this == CALIBRATING_SENSOR_IN_DIRECTION;
 	}
 }
