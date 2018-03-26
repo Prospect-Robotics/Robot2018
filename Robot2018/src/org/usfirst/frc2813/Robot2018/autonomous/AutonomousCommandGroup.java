@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
-import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
@@ -57,16 +56,22 @@ public class AutonomousCommandGroup extends CommandGroup {
 		elevator = new Elevator();
 		time = new Time();
 	}
-	/* ------------------------------------------------------------------------------------------------------
-	 * Misc Helpers.
-	 * ------------------------------------------------------------------------------------------------------ */
 
-	static Length inches(double inches) {
-		return LengthUOM.Inches.create(inches);
-	}
+	/** global routine to reset and calibrate the robot systems. MUST BE CALLED FIRST! */
+	public void resetAndCalibrateSync() {
+		/**  First, reset the gyro and the wheel encoders. */
+		drive.addSensorResetSequenceSync();
 
-	static Length feet(double feet) {
-		return LengthUOM.Feet.create(feet);
+		/**
+		 * Next, return the elevator and the arm to the home position.  In competition, we will start in this
+		 * position and the auto-reset logic will calibrate them automatically - making this step instant and
+		 * unnecessary.  However, if we are testing, we want to make sure that we home the arm and the
+		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
+		 * the auto script is a robot-safety critical feature.
+		 */
+		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
+		arm.addCalibrateSequenceSync();
+		elevator.addCalibrateSequenceSync();
 	}
 
 	public class Drive {
@@ -185,7 +190,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	public class Elevator {
 		/** Calibrate the elevator (move down), but don't wait for completion. */
-		public void addCalibrateAsync() {
+		private void addCalibrateAsync() {
 			if(!Robot.elevator.isDisconnected()) {
 				addSequential(new MotorCalibrateSensorAsync(Robot.elevator, Direction.DOWN));
 			}
@@ -194,7 +199,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * Calibrate the elevator (move down) and wait for the limit switch to be reached, so we know that
 		 * our sensor has been set the value of the lower limit (zero).
 		 */
-		public void addCalibrateSequenceSync() {
+		private void addCalibrateSequenceSync() {
 			addCalibrateAsync();
 			addWaitForHardLimitSwitchSync();
 		}
@@ -232,52 +237,25 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public class Arm {
 
 		/**
-		 * Arm Position for Level extension
-		 */
-		final Length ARM_POSITION_FOR_LEVEL = ArmConfiguration.ArmDegrees.create(133);
-		/**
-		 * Arm Position for holding high
-		 */
-		final Length ARM_POSITION_HIGH = ArmConfiguration.ArmDegrees.create(20);
-		/**
-		 * Arm Position for shooting over head
-		 */
-		 final Length ARM_POSITION_INVERTED_SHOOT = ArmConfiguration.ArmDegrees.create(15);
-		 final Length ARM_POSITION_SHOOT = ArmConfiguration.ArmDegrees.create(70);
-
-		/**
 		 * Calibrate the arm (move down), but don't wait for completion.
 		 * To check it you would have to wait for a limit switch.
 		 */
-		public void addCalibrateAsync() {
-			if(!Robot.arm.isDisconnected())
+		private void addCalibrateAsync() {
+			if(!Robot.arm.isDisconnected()) {
 				addSequential(new MotorCalibrateSensorAsync(Robot.arm, Direction.IN));
+			}
 		}
 		/**
 		 * Calibrate the arm (move down) and wait for the limit switch to be reached, so we know that
 		 * our sensor has been set the value of the lower limit (zero).
 		 */
-		public void addCalibrateSequenceSync() {
+		private void addCalibrateSequenceSync() {
 			addCalibrateAsync();
 			addWaitForHardLimitSwitchSync();
 		}
 		/** Move the arm In to the home position */
 		public void addMoveInAsync() {
 			addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(0));
-		}
-
-		/** Move the arm to the "high" position, but do not wait. */
-		public void addMoveToHighPositionAsync() {
-			addMoveToPositionAsync(ARM_POSITION_HIGH);
-		}
-
-		/** Move the arm to the "level" position, but do not wait. */
-		public void addMoveToLevelPositionAsync() {
-			addMoveToPositionAsync(ARM_POSITION_FOR_LEVEL);
-		}
-
-		public void addMoveToOverHeadShootingPositionAsync() {
-			addMoveToPositionAsync(ARM_POSITION_INVERTED_SHOOT);
 		}
 
 		/**
@@ -288,10 +266,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 		public void addMoveToPositionAsync(Length armDegrees) {
 			if(!Robot.arm.isDisconnected())
 				addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, armDegrees));
-		}
-
-		public void addMoveToShootingPositionAsync() {
-			addMoveToPositionAsync(ARM_POSITION_SHOOT);
 		}
 
 		/** Wait for the Arm to hit the hard reset limit */
@@ -323,16 +297,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 		public void addDeliverSequenceSync() {
 			elevator.addWaitForTargetPositionSync();
 			addShootSequenceSync();
-			PlacementTargetType.SWITCH.moveAsync();
 		}
 
-		/** Add a drop cube sequence. */
-		private void addDropSequenceSync() {
-			addJawsOpenSync();
-			// NB: We expect to have a cube... but since the jaws were open I assume we're trying to shake it loose so go fast...
-			arm.addMoveToLevelPositionAsync();
-			arm.addWaitForTargetPositionSync();
-		}
+// We do not currently do any cube dropping
+//		/** Add a drop cube sequence. */
+//		private void addDropSequenceSync() {
+//			addJawsOpenSync();
+//			// NB: We expect to have a cube... but since the jaws were open I assume we're trying to shake it loose so go fast...
+//			arm.addMoveToLevelPositionAsync();
+//			arm.addWaitForTargetPositionSync();
+//		}
 
 		/** Add a "grab" cube sequence */
 		private void addGrabSequenceSync() {

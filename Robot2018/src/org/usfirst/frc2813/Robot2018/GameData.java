@@ -42,40 +42,23 @@ public class GameData {
 		return isGameDataValid;
 	}
 	
-	/*
+	/**
 	 * Get which side of the near switch belongs to our alliance.
 	 */
 	public Direction getNearSwitchPosition() { return nearSwitchPosition; }
-	/*
+	/**
 	 * Get which side of scale belongs to our alliance.
 	 */
 	public Direction getScalePosition() { return scalePosition; }
-	/*
+	/**
 	 * Get which side of the far switch belongs to our alliance.
 	 */
 	public Direction getFarSwitchPosition() { return farSwitchPosition; }
-	/*
-	 * Get which side of the specified target belongs to our alliance.
-	 */
-	public Direction getTargetPosition(PlacementTarget target) {
-		switch(target) {
-		case FAR_SWITCH:
-			return getFarSwitchPosition();
-		case NEAR_SWITCH:
-			return getNearSwitchPosition();
-		case SCALE:
-			return getScalePosition();
-		default:
-			throw new IllegalArgumentException("Got unsupported target: " + target);
-		}
-	}
 	
 	public String toString() {
 		if(isGameDataValid) {
-			return getClass().getSimpleName() + " [NearSwitch=" + getNearSwitchPosition() + ", Scale=" + getScalePosition() + ", " + getFarSwitchPosition() + "]"; 
-			
-		} else {
-			return getClass().getSimpleName() + " [Invalid]"; 
+			return getClass().getSimpleName() + " [NearSwitch=" + getNearSwitchPosition() + ", Scale=" + getScalePosition() + ", " + getFarSwitchPosition() + "]";
 		}
+		return getClass().getSimpleName() + " [Invalid]"; 
 	}
 }

@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
-import org.usfirst.frc2813.Robot2018.PlacementTargetType;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -40,6 +40,21 @@ public class AutonomousCommandGroupGenerator {
 	 * Speed zero for stopping after a move.
 	 */
 	private static final double TRANSITION_SPEED_STOP = 0.0;
+
+	/** Elevator heights for placing cubes on the switch. */
+	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(3);
+
+	/** Elevator height for placing cubes on the scale based on robot direction. */
+	private static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
+	private static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(76);
+	
+	/** Arm Position for Level extension. Use to grab cube. */
+	final Length ARM_POSITION_GRAB_CUBE = ArmConfiguration.ArmDegrees.create(133);
+
+	/** Arm Position for shooting over head */
+	static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
+	static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(70);
+
 
 	/** This is the commandGroup we are populating with our autonomous routine */
 	private AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
@@ -135,6 +150,40 @@ public class AutonomousCommandGroupGenerator {
 	private static double sCurveForwardShift(double curveRadius, double degrees) {
 		return 2 * curveRadius * (Math.sin(Math.toRadians(degrees)));
 	}
+
+	/** Prepare to shoot a cube at the switch. This is used as a starting position as well. */
+	protected void prepareForSwitchAsync(Direction direction) {
+		if (direction == direction.FORWARD) {
+			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_FORWARD_SHOOT);
+		}
+		else {
+			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_BACKWARD_SHOOT);
+		}
+		autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+	}
+	/**
+	 * Prepare to shoot a cube at the scale. This starts the elevator moving up all the way!
+	 * Be careful!!! We will not be very stable.
+	 * 
+	 * @param direction - which direction is the robot facing?
+	 */
+	protected void prepareForScaleAsync(Direction direction) {
+		if (direction == direction.FORWARD) {
+			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_FORWARD_SHOOT);
+			autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SCALE_FORWARD);
+		}
+		else {
+			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_BACKWARD_SHOOT);
+			autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SCALE_BACKWARD);
+		}
+	}
+	/** When we're done delivering a cube, we call this routine to switch to cube grabbing mode. */
+	protected void prepareForCubeGrabbingSync() {
+		autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_GRAB_CUBE);
+		autoCmdList.elevator.addWaitForTargetPositionSync();
+		autoCmdList.arm.addWaitForTargetPositionSync();
+	}
 	/**
 	 * Build a command sequence to be run during the Autonomous 15 second period.
 	 *
@@ -190,7 +239,7 @@ public class AutonomousCommandGroupGenerator {
 		double robotWheelbaseLength = 20;
 		double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
 		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2;
-		double finalDistanceToTarget = 12; /**  how close to get before we shoot cube */
+		double finalDistanceToTarget = 20; /**  how close to get before we shoot cube */
 
 		/**  field dimensions from back wall */
 		double backWallToSwitch = 140;
@@ -243,21 +292,7 @@ public class AutonomousCommandGroupGenerator {
 		 * Initialization
 		 * ------------------------------------------------------------------------------------------------------ */
 
-		/**  First, reset the gyro and the wheel encoders. */
-		autoCmdList.drive.addSensorResetSequenceSync();
-
-		/**
-		 * Next, return the elevator and the arm to the home position.  In competition, we will start in this
-		 * position and the auto-reset logic will calibrate them automatically - making this step instant and
-		 * unnecessary.  However, if we are testing, we want to make sure that we home the arm and the
-		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
-		 * the auto script is a robot-safety critical feature.
-		 */
-		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
-		autoCmdList.arm.addCalibrateSequenceSync();      /**  best effort attempt to calibrate the arm sensor, will wait for completion */
-		autoCmdList.elevator.addCalibrateSequenceSync(); /**  best effort attempt to calibrate the elevator sensor */
-
-		PlacementTargetType.SWITCH.moveAsync();
+		autoCmdList.resetAndCalibrateSync();
 
 		/**  Keep track of whether we expect to be holding a cube at each step, so we can choose our speed wisely. */
 		autoCmdList.cube.setHaveCube(true);
@@ -271,6 +306,9 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), TRANSITION_SPEED_STOP);
 			return;
 		}
+		
+		/** This initial state may not be exactly what we want, but it's safe. We can change it later. */
+		prepareForSwitchAsync(Direction.FORWARD);
 
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting position and the configurations
@@ -283,7 +321,6 @@ public class AutonomousCommandGroupGenerator {
 			 * The robot and the scale are on the same side. Drive forward and approach the scale from the side.
 			 */
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
-			autoCmdList.arm.addMoveToOverHeadShootingPositionAsync();
 			if (useCurves) {
 				/**
 				 *  We are backwards in the end position
@@ -305,14 +342,14 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.COUNTERCLOCKWISE, TRANSITION_SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.CLOCKWISE, TRANSITION_SPEED_FULL);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), TRANSITION_SPEED_FLUID);
-				PlacementTargetType.SCALE_INVERTED.moveAsync();
+				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), TRANSITION_SPEED_STOP);
 			}
 			else {
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToTarget), TRANSITION_SPEED_FLUID);
-				PlacementTargetType.SCALE_INVERTED.moveAsync();
+				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addQuickTurnSync(left, 90); /**  right but we're backwards */
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(43), TRANSITION_SPEED_STOP);
 				autoCmdList.drive.addQuickTurnSync(right, 90); /**  left but we're backwards */
@@ -324,7 +361,6 @@ public class AutonomousCommandGroupGenerator {
 			 * on the correct side.
 			 */
 			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the " + nearSwitchPosition + " position.");
-			autoCmdList.arm.addMoveToShootingPositionAsync();
 			if (useCurves) {
 				/**
 				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves us in the same orientation 2r up and 2r over
@@ -356,7 +392,6 @@ public class AutonomousCommandGroupGenerator {
 			 * from far side we cross over between switch and scale and place block on scale
 			 */
 			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition + " position and the Scale is at the " + scalePosition + " position.");
-			autoCmdList.arm.addMoveToOverHeadShootingPositionAsync();
 			if (useCurves) {
 				/**
 				 *  Start backwards at ends. This branch has scale on opposite side.
@@ -377,7 +412,7 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), TRANSITION_SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(firstCurveRadius), Direction.COUNTERCLOCKWISE, TRANSITION_SPEED_FULL);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), TRANSITION_SPEED_FULL);
-				PlacementTargetType.SCALE_INVERTED.moveAsync();
+				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), TRANSITION_SPEED_FLUID);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), Direction.CLOCKWISE, TRANSITION_SPEED_STOP);
 			}
@@ -389,7 +424,7 @@ public class AutonomousCommandGroupGenerator {
 				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleTargetWidth / 2 - robotBumperLength - 6;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), TRANSITION_SPEED_FULL);
-				PlacementTargetType.SCALE_INVERTED.moveAsync();
+				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), TRANSITION_SPEED_FLUID);
 				autoCmdList.drive.addQuickTurnSync(right, 90); /**  left but we're backwards */
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget), TRANSITION_SPEED_STOP);
@@ -397,6 +432,9 @@ public class AutonomousCommandGroupGenerator {
 		}
 		/**  NB: DeliverCubeCommandSequence will always wait for Elevator to reach target height, to avoid crashing */
 		autoCmdList.cube.addDeliverSequenceSync();
+
+		/** time to switch to cube grabbing mode */
+		prepareForCubeGrabbingSync();
 
 		/**  Remember we let go of our cube, we can really fly now... */
 		autoCmdList.cube.setHaveCube(false);
