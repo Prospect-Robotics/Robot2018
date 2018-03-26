@@ -25,6 +25,21 @@ import org.usfirst.frc2813.units.values.Length;
  * robot position will NOT change autonomous, and commands consumed will NOT be regenerated.
  */
 public class AutonomousCommandGroupGenerator {
+	/**
+	 * Some note about speed.
+	 * 
+	 * These speeds are scaled 0..1
+	 * The robot is capable of a range of throttle settings. This is managed elsewhere. Here
+	 * we use 0..1.
+	 * 
+	 * Transitional speed vs max speed:
+	 * The autonomous drive routine that call has a fixed min (slowest throttle setting which
+	 * affects the robot) and a programmable max. When we pass speed into these routines it.
+	 * is the speed to transition out with. That means that the robot speed will ramp for the
+	 * current full speed to the speed you set. Please note the difference between setting max
+	 * speed - which we do when we put the elevator up - and setting transition speed - which
+	 * we do entering a turn or when we stop.
+	 */
 	/** Full speed ahead! Only transition with this if tangents line up */
 	private static final double SPEED_FULL = 1.0;
 
