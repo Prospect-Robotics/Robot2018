@@ -96,13 +96,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 		private double turnSpeed = 0.25;
 
 		/**
-		We needed the ability to scale the distances involved for "mini testing"
-		when we don't have sufficient surface area for testing.
-		This should really be coming from a sendable chooser.
-		*/
-		private double DISTANCE_SCALING_MULTIPLIER = 1.0; // should only apply to wheels
-
-		/**
 		 * Set the sticky setting for the speed for taking curves.  This value will be used for all subsequent commands created for curved movement.
 		 * @param curveSpeed Percentage of output power {-1.0..1.0}
 		 */
