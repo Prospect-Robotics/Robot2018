@@ -2,8 +2,6 @@
 
 package org.usfirst.frc2813.Robot2018;
 
-import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DifferentialDriveWithBlocking;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -105,7 +103,7 @@ public class RobotMap {
 		driveTrainSpeedControllerStarFollow = new VictorSPX(8);
 		driveTrainSpeedControllerStarFollow.set(ControlMode.Follower, driveTrainSpeedControllerStarboard.getDeviceID());
 		driveTrainSpeedControllerStarFollow.setInverted(false);
-		driveTrainRobotDrive = new DifferentialDriveWithBlocking(driveTrainSpeedControllerPort, driveTrainSpeedControllerStarboard);
+		driveTrainRobotDrive = new DifferentialDrive(driveTrainSpeedControllerPort, driveTrainSpeedControllerStarboard);
 		LiveWindow.add(driveTrainRobotDrive);
 
 		driveTrainQuadratureEncoderStarboard = new Encoder(10, 11, true, EncodingType.k4X);// port 0 2*0+10=10, port 0 2*0+11=11

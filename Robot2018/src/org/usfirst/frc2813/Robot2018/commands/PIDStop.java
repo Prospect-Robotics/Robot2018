@@ -56,7 +56,7 @@ public class PIDStop extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	pid1.disable();
+    	if(pid1 != null) pid1.disable();
     	if(pid2 != null) pid2.disable();
     }
     
