@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.intake;
 
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
 import org.usfirst.frc2813.units.Direction;
 

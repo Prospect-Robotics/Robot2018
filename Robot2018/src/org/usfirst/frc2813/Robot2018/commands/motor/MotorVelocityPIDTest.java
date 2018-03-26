@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.Direction;

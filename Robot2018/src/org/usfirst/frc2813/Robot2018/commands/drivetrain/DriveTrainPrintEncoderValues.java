@@ -3,7 +3,7 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 
 import edu.wpi.first.wpilibj.Encoder;

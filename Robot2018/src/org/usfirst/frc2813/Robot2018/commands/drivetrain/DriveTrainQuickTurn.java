@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.units.Direction;
 
@@ -10,7 +10,7 @@ import org.usfirst.frc2813.units.Direction;
  * Autonomous turn command. Use gyro and linear interpolation
  * to
  */
-public final class DriveTrainQuickTurnSync extends SubsystemCommand<DriveTrain> {
+public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	private final Direction direction;
 	private final double relativeAngleInDegrees;
 	private final double rate;
@@ -27,7 +27,7 @@ public final class DriveTrainQuickTurnSync extends SubsystemCommand<DriveTrain> 
 	/*
 	 * Create a quick turn command for turning in a direction for a specific number of degrees.
 	 */
-	public DriveTrainQuickTurnSync(DriveTrain driveTrain, Direction direction, double relativeAngleInDegrees, double rate) {
+	public DriveTrainQuickTurn(DriveTrain driveTrain, Direction direction, double relativeAngleInDegrees, double rate) {
 		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.direction = direction;
 		this.rate = rate;

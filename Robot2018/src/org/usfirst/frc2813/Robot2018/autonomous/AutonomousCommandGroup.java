@@ -2,8 +2,8 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncoders;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyro;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
@@ -121,7 +121,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Scale the acceleration/deceleration in the auto drive system. THIS IS GLOBAL AND INSTANT! */
 		public void setRampSpeed(double rampSpeed) {
-			AutoDriveSync.scaleRamps(rampSpeed);
+			AutoDrive.scaleRamps(rampSpeed);
 		}
 
 		/**
@@ -146,7 +146,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
 			Logger.printLabelled(LogType.DEBUG, "AUTO ADD CURVE", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
-			addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
+			addSequential(new AutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 			currentSpeed = endSpeed;
 		}
@@ -158,7 +158,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
-			addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
+			addSequential(new AutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
 			currentSpeed = endSpeed;
 		}
 
@@ -177,7 +177,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param relativeAngle - how many degrees to turn
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
-			addSequential(new DriveTrainQuickTurnSync(Robot.driveTrain, direction, relativeAngle, turnSpeed));
+			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, direction, relativeAngle, turnSpeed));
 		}
 	}
 

@@ -4,9 +4,8 @@ import java.util.function.BiConsumer;
 
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveSync;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
@@ -16,6 +15,7 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorPositionPIDTest;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorVelocityPIDTest;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggle;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemDisableDefaultCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -151,7 +151,7 @@ public class OI {
 		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
-		SmartDashboard.putData("OIDrive", new DriveTrainOIDriveSync(Robot.driveTrain, joystick1, joystick2));
+		SmartDashboard.putData("OIDrive", new DriveTrainOIDrive(Robot.driveTrain, joystick1, joystick2));
 
 		driveStyleChooser = new SendableChooser<>();
 		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);

@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Class to use PID control of autonomous drive. Note that all units are inches
  */
-public class AutoDriveSync extends SubsystemCommand<DriveTrain> {
+public class AutoDrive extends SubsystemCommand<DriveTrain> {
 	private final PIDSource m_source = new PIDSource() {
 
 		@Override
@@ -96,7 +96,7 @@ public class AutoDriveSync extends SubsystemCommand<DriveTrain> {
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
 	 */
-	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance) {
+	public AutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
 		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
 		controller.setInputRange(-360, 360);
@@ -126,7 +126,7 @@ public class AutoDriveSync extends SubsystemCommand<DriveTrain> {
 	 * @param startSpeedFactor - how fast are we going? 0..1
 	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
 	 */
-	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
+	public AutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
 		this(driveTrain, speed, direction, distance);
 		startSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
@@ -152,7 +152,7 @@ public class AutoDriveSync extends SubsystemCommand<DriveTrain> {
 	 * @param radius - the radius of the circle we are traveling
 	 * @param clockwise - the direction of the circle
 	 */
-	public AutoDriveSync(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
+	public AutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
 		this(driveTrain, speed, direction, distance, startSpeedFactor, endSpeedFactor);
 		onCurve = true;
 		deltaAngle = (distance * 180.0) / (radius * Math.PI); // just an offset for now

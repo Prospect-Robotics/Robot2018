@@ -1,6 +1,5 @@
 package org.usfirst.frc2813.Robot2018.commands.subsystem;
 
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;

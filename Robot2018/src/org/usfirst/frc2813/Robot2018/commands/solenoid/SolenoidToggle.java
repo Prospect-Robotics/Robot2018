@@ -4,7 +4,7 @@ package org.usfirst.frc2813.Robot2018.commands.solenoid;
 
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
-import org.usfirst.frc2813.Robot2018.commands.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.units.Direction;
 
