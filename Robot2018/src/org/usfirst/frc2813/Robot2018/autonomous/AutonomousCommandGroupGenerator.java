@@ -397,21 +397,13 @@ public class AutonomousCommandGroupGenerator {
 				 * target 5. deliver cube backwards
 				 */
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
-				double firstLeg = backWallToFarSideOfSwitch;
-				double sRadius = 10 * 12;
-				double sDegrees = 35;
-				double sLength = sCurveForwardShift(sRadius, sDegrees);
-				double sWidth = sCurveSideShift(sRadius, sDegrees);
-				double secondLeg = distanceToTarget - firstLeg - sLength;
+				double radius = sideWallToScaleTarget - sideWallToFirstRobotEndPosition;
+				double verticalProjection = radius * Math.sqrt(2);
+				double firstLeg = distanceToTarget - verticalProjection;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius),
-						Direction.COUNTERCLOCKWISE, SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 35.0, inches(sRadius), Direction.CLOCKWISE,
-						SPEED_FULL);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(secondLeg / 2), SPEED_STOP);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius),
+						Direction.COUNTERCLOCKWISE, SPEED_STOP);
 			} else {
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
 
