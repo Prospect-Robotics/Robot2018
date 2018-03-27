@@ -1,5 +1,9 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 
@@ -11,57 +15,75 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class PIDStop extends Command {
+	private boolean haveEncoders = true;
+	private boolean initializedEncoders = false;
+	private final double Kp = 0.8, Ki = 0, Kd = 0;
 	
-	public static final double Kp = 0.8, Ki = 0, Kd = 0; // TODO placeholder values
-	
-	static PIDController pid1, pid2;
+	private PIDController pid1, pid2;
+	private List<PIDController> encoders = new ArrayList<PIDController>(); 
 
     public PIDStop() {
         requires(Robot.driveTrain);
     }
 
-    // Called just before this Command runs the first time
-    protected void initialize() {
-    	if(pid1 == null) {
+    protected boolean initializeEncoders() {
+    	if(!initializedEncoders) {
     		if(Robot.driveTrain.encoderPortFunctional && Robot.driveTrain.encoderStarboardFunctional) {
     			pid1 = new PIDController(Kp, Ki, Kd, Robot.driveTrain.getEncoderPort(), Robot.driveTrain.getSpeedControllerPort());
+    			encoders.add(pid1);
     			pid2 = new PIDController(Kp, Ki, Kd, Robot.driveTrain.getEncoderStarboard(), Robot.driveTrain.getSpeedControllerStarboard());
+    			encoders.add(pid2);
     		}
     		else if(Robot.driveTrain.encoderPortFunctional) {
     			pid1 = new PIDController(Kp, Ki, Kd, Robot.driveTrain.getEncoderPort(), PIDStop::driveBothWheels);
+    			encoders.add(pid1);
     		} else if(Robot.driveTrain.encoderStarboardFunctional) {
     			pid1 = new PIDController(Kp, Ki, Kd, Robot.driveTrain.getEncoderStarboard(), PIDStop::driveBothWheels);
+    			encoders.add(pid1);
     		} else {
     			DriverStation.reportWarning("Can't PIDStop, BOTH ENCODERS OFFLINE", true);
-    			return;
+    			haveEncoders = false;
+    		}
+    		for(PIDController pid : encoders) {
+    			pid.setAbsoluteTolerance(20); // 20 encoder ticks +/-, close enough for whatever encoder is used
     		}
     	}
-    	
-    	pid1.enable();
-    	if(pid2 != null) pid2.enable();
+    	initializedEncoders = true;
+    	return haveEncoders;
     }
-
-    // Called repeatedly when this Command is scheduled to run
-    protected void execute() {
-    	Thread.yield(); // give the PIDControllers a chance to run (Not sure if this is necessary, or preferable to the alternative)
+    
+    // Called just before this Command runs the first time
+    protected void initialize() {
+    	// Initialize encoders if necessary
+    	if(!initializeEncoders())
+    		return;
+		for(PIDController pid : encoders) {
+			pid.enable();
+		}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	if(pid1 == null)
-    		// can't do anything with only one controller
-    		return true;
-        return pid1.onTarget() && pid2 == null ? true : pid2.onTarget();
+    	// Just in case isFinished gets called out of order
+    	initializeEncoders();
+    	
+    	// Otherwise, check all encoders are at target - if there are none, we return true.
+    	boolean finished = true;
+		for(PIDController pid : encoders) {
+			finished = finished && pid.onTarget();
+		}
+		return finished;
     }
 
     // Called once after isFinished returns true
     protected void end() {
-    	if(pid1 != null) pid1.disable();
-    	if(pid2 != null) pid2.disable();
+    	// Disable all controllers
+		for(PIDController pid : encoders) {
+			pid.disable();
+		}
     }
-    
+   
     private static void driveBothWheels(double speed) {
     	Robot.driveTrain.arcadeDrive(speed, 0);
-    	
     }
 }
