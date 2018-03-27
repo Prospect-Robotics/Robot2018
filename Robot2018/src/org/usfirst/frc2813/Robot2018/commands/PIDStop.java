@@ -49,33 +49,41 @@ public class PIDStop extends Command {
     	initializedEncoders = true;
     }
     
-    // Called just before this Command runs the first time
-    protected void initialize() {
-    	// Initialize encoders if necessary
+    protected void disableEncoders() {
+    	initializeEncoders();
+		for(PIDController pid : encoders) {
+			pid.disable();
+		}
+    }
+    protected void enableEncoders() {
     	initializeEncoders();
 		for(PIDController pid : encoders) {
 			pid.enable();
 		}
     }
+    public boolean allEncodersOnTarget() {
+    	initializeEncoders();
+		for(PIDController pid : encoders) 
+			if(!pid.onTarget()) 
+				return false;
+		return true;
+    }
+    
+    // Called just before this Command runs the first time
+    protected void initialize() {
+    	// Enable all encoders
+    	enableEncoders();
+    }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	// Just in case isFinished gets called out of order
-    	initializeEncoders();
-    	// Otherwise, check all encoders are at target - if there are none, we return true.
-    	boolean finished = true;
-		for(PIDController pid : encoders) {
-			finished = finished && pid.onTarget();
-		}
-		return finished;
+		return allEncodersOnTarget();
     }
 
     // Called once after isFinished returns true
     protected void end() {
-    	// Disable all controllers
-		for(PIDController pid : encoders) {
-			pid.disable();
-		}
+    	// Disable all encoders
+    	disableEncoders();
     }
    
     private static void driveBothWheels(double speed) {
