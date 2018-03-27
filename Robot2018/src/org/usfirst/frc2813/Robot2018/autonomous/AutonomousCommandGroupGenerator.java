@@ -391,15 +391,17 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			if (useCurves) {
 				/**
-				 * We are backwards in the end position 1. drive forward until our far end
-				 * aligns with far edge of switch 2. slow S curve to align with scale front 3. 6
-				 * feet before we get there, raise the elevator 4. proceed more slowly to the
-				 * target 5. deliver cube backwards
+				 * We are backwards in the end position 1. Working backwards, we will approach the target
+				 * at a 45 degree angle to avoid the scale platform. The distance we need to travel from
+				 * left to right will be the sine of 45 degrees times the radius of some circle. From this
+				 * we find the radius. Now subtract the left->right offset from the forward distance.
+				 * Travel that distance straight. Then raise the elevator. Then follow our curve to the
+				 * target.
 				 */
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
-				double radius = sideWallToScaleTarget - sideWallToFirstRobotEndPosition;
-				double verticalProjection = radius * Math.sqrt(2);
-				double firstLeg = distanceToTarget - verticalProjection;
+				double y = sideWallToScaleTarget - sideWallToFirstRobotEndPosition;
+				double radius = y / Math.sin(Math.PI / 4);
+				double firstLeg = distanceToTarget - y;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
