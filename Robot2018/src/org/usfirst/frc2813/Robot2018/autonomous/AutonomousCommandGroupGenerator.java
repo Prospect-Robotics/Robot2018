@@ -391,7 +391,7 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			if (useCurves) {
 				/**
-				 * We are backwards in the end position 1. Working backwards, we will approach the target
+				 * We are backwards on the left side. Working backwards, we will approach the target
 				 * at a 45 degree angle to avoid the scale platform. The distance we need to travel from
 				 * left to right will be the sine of 45 degrees times the radius of some circle. From this
 				 * we find the radius. Now subtract the left->right offset from the forward distance.
