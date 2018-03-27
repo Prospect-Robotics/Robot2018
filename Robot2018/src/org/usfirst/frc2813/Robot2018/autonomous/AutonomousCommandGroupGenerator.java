@@ -402,6 +402,7 @@ public class AutonomousCommandGroupGenerator {
 				double firstLeg = distanceToTarget - verticalProjection;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), SPEED_FULL);
+				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius),
 						Direction.COUNTERCLOCKWISE, SPEED_STOP);
 			} else {
