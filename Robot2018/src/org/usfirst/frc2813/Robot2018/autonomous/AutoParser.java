@@ -81,7 +81,7 @@ public class AutoParser extends CommandGroup {
 							endSpeedFactor));
 				break;
 			case "stop":
-				add(new PIDStop());
+				add(new PIDStop(Robot.driveTrain));
 				break;
 			case "gripper":
 				String token = s.next().toUpperCase();

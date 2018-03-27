@@ -104,7 +104,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		private void trackSpeed(double speed) {
 			currentSpeed = speed;
 			if (speed == 0.0) {
-				addSequential(new PIDStop());
+				addSequential(new PIDStop(Robot.driveTrain));
 			}
 		}
 		/**
