@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class PIDStop extends Command {
-	private boolean haveEncoders = true;
 	private boolean initializedEncoders = false;
 	private final double Kp = 0.8, Ki = 0, Kd = 0;
 	
@@ -49,7 +48,7 @@ public class PIDStop extends Command {
     		}
     	}
     	initializedEncoders = true;
-    	return haveEncoders;
+    	return !encoders.isEmpty();
     }
     
     // Called just before this Command runs the first time
