@@ -391,12 +391,12 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			if (useCurves) {
 				/**
-				 * We are backwards on the left side. Working backwards, we will approach the target
-				 * at a 45 degree angle to avoid the scale platform. The distance we need to travel from
-				 * left to right will be the sine of 45 degrees times the radius of some circle. From this
-				 * we find the radius. Now subtract the left->right offset from the forward distance.
-				 * Travel that distance straight. Then raise the elevator. Then follow our curve to the
-				 * target.
+				 * We are backwards on the left side. Working backwards, we will approach the
+				 * target at a 45 degree angle to avoid the scale platform. The distance we need
+				 * to travel from left to right will be the sine of 45 degrees times the radius
+				 * of some circle. From this we find the radius. Now subtract the left->right
+				 * offset from the forward distance. Travel that distance straight. Then raise
+				 * the elevator. Then follow our curve to the target.
 				 */
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
 				double y = sideWallToScaleTarget - sideWallToFirstRobotEndPosition;
@@ -405,8 +405,8 @@ public class AutonomousCommandGroupGenerator {
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius),
-						counterclockwise, SPEED_STOP);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise,
+						SPEED_STOP);
 			} else {
 				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
 
@@ -437,8 +437,8 @@ public class AutonomousCommandGroupGenerator {
 				double radius = 63.0; /** found by trial and error */
 				double degrees = 54.0;
 
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius),
-						counterclockwise, SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
 			} else {
@@ -491,8 +491,8 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius),
-						clockwise, SPEED_STOP);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), clockwise,
+						SPEED_STOP);
 			} else {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleAlley + scaleAlleyWidth / 2),
 						SPEED_TURN);
