@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class PIDStop extends Command {
 	
-	public static final double Kp = 0, Ki = 0, Kd = 0; // TODO placeholder values
+	public static final double Kp = 0.8, Ki = 0, Kd = 0; // TODO placeholder values
 	
 	static PIDController pid1, pid2;
 
