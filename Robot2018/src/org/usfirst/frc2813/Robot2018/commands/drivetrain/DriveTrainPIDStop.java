@@ -33,7 +33,7 @@ public class DriveTrainPIDStop extends SubsystemCommand<DriveTrain> {
 		public void pidWrite(double output) {
 			pidStop.driveBothWheels(output);
 		}
-	};
+	}
 
     public DriveTrainPIDStop(DriveTrain driveTrain) {
     	super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);

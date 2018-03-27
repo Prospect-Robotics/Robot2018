@@ -43,4 +43,4 @@ public enum Lockout {
 	public boolean isEnabled() {
 		return !isDisabled();
 	}
-};
+}
