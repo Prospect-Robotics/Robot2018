@@ -41,7 +41,6 @@ public class PIDStop extends Command {
     			encoders.add(pid1);
     		} else {
     			DriverStation.reportWarning("Can't PIDStop, BOTH ENCODERS OFFLINE", true);
-    			haveEncoders = false;
     		}
     		for(PIDController pid : encoders) {
     			pid.setAbsoluteTolerance(20); // 20 encoder ticks +/-, close enough for whatever encoder is used
