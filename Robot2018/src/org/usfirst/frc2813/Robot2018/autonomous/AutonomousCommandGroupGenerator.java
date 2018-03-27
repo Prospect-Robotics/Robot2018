@@ -196,7 +196,7 @@ public class AutonomousCommandGroupGenerator {
 	 * Prepare to shoot a cube at the switch. This is used as a starting position as
 	 * well.
 	 */
-	protected void prepareForSwitchAsync(Direction direction) {
+	private void prepareForSwitchAsync(Direction direction) {
 		if (direction == direction.FORWARD) {
 			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_FORWARD_SHOOT);
 		} else {
@@ -457,61 +457,50 @@ public class AutonomousCommandGroupGenerator {
 		} else {
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
-			 * and switch. from far side we cross over between switch and scale and place
-			 * block on scale
+			 * and switch. Note that we must avoid driving over the scale platform. We do
+			 * this by circling back to face the scale target at 45 degrees. The same as
+			 * when we are on the same side.
 			 */
 			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition
 					+ " position and the Scale is at the " + scalePosition + " position.");
+
+			/** distance from start to center of scale alley */
+			double distanceToFirstTurn = backWallToScaleAlley + scaleAlleyWidth/2 - robotBumperLength;
+
+			/** distance from center of the robot from the center of the field */
+			double distanceToCenter = fieldWidth/2 - sideWallToFirstRobotStartPosition + robotBumperWidth/2;
+
+			/** distance down scale alley from the center of the field to the target */
+			double distanceFromCenter = scaleTargetWidth / 2 + robotBumperLength + finalDistanceToTarget;
+
+			double firstAngle = 90.0;
+			double secondAngle = 135.0;
+
 			if (useCurves) {
-				/**
-				 * Start backwards at ends. This branch has scale on opposite side. 1. drive
-				 * forward until our far end aligns with far edge of switch 2. wide 90 degree
-				 * turn to middle of alley (accounting for cubes) 3. 6 feet before we get there,
-				 * raise the elevator 4. proceed more slowly to the target 5. deliver cube
-				 * backwards
-				 */
-				double firstLeg = backWallToSwitch + switchDepth
-						- robotBumperLength; /** drive straight until aligned with end of switch */
-				double firstCurveRadius = backWallToScaleAlley + scaleAlleyWidth / 2
-						- firstLeg; /** turn from here into center of scaleAlley */
+				double firstRadius = scaleAlleyWidth;
+				double secondRadius = (scaleAlleyWidth / 2 - finalDistanceToTarget) / Math.cos(Math.PI/8);
+				double forwardDistanceTravelledBySecondCircle = Math.sin(Math.PI/8);
 
-				/**
-				 * This is a bit complex. Distance to center from end, plus where we start takes
-				 * us to the middle. Then go to the end of the scale target less our length and
-				 * 6 inches from the end
-				 */
-				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleTargetWidth / 2
-						- robotBumperLength - 6;
-				double secondCurveRadius = 24; /** small so we don't clip the scale platform */
-				double alleyStraightDistance = crossFieldDistance - firstCurveRadius - secondCurveRadius;
-
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, feet(firstCurveRadius),
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, firstAngle, inches(firstRadius),
 						counterclockwise, SPEED_FULL);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), SPEED_FULL);
+				
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter - firstRadius), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(alleyStraightDistance / 2), SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 90.0, inches(secondCurveRadius), clockwise,
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenter -
+						forwardDistanceTravelledBySecondCircle), SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, secondAngle, inches(secondRadius), clockwise,
 						SPEED_STOP);
 			} else {
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleAlley + scaleAlleyWidth / 2),
-						SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn), SPEED_TURN);
 				autoCmdList.drive.addQuickTurnSync(left, 90); /** right but we're backwards */
-
-				/**
-				 * This is a bit complex. Distance to center from end, plus where we start takes
-				 * us to the middle. Then go to the end of the scale target less our length and
-				 * 6 inches from the end
-				 */
-				double crossFieldDistance = fieldWidth / 2 - sideWallToFirstRobotStartPosition + scaleTargetWidth / 2
-						- robotBumperLength - 6;
-
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), SPEED_FULL);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(crossFieldDistance / 2), SPEED_TURN);
-				autoCmdList.drive.addQuickTurnSync(right, 90); /** left but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(scaleAlleyWidth / 2 + scaleAlleyToTarget),
-						SPEED_STOP);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenter), SPEED_TURN);
+				autoCmdList.drive.addQuickTurnSync(right, 135); /** left but we're backwards */
+
+				double finalDistance = (scaleAlleyWidth / 2 + scaleAlleyToTarget - finalDistanceToTarget) / Math.cos(Math.PI/8);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(finalDistance), SPEED_STOP);
 			}
 		}
 		/**
