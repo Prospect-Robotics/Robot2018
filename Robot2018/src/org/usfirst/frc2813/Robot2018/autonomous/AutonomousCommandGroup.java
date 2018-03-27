@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.commands.PIDStop;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncodersInstant;
@@ -96,6 +97,17 @@ public class AutonomousCommandGroup extends CommandGroup {
 		private double turnSpeed = 0.25;
 
 		/**
+		 * Track the current speed sent by use. If 0, we need to come to a complete stop before anything
+		 * else can happen.
+		 * @param speed
+		 */
+		private void trackSpeed(double speed) {
+			currentSpeed = speed;
+			if (speed == 0.0) {
+				addSequential(new PIDStop());
+			}
+		}
+		/**
 		 * Set the sticky setting for the speed for taking curves.  This value will be used for all subsequent commands created for curved movement.
 		 * @param curveSpeed Percentage of output power {-1.0..1.0}
 		 */
@@ -148,7 +160,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 			Logger.printLabelled(LogType.DEBUG, "AUTO ADD CURVE", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
 			addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
-			currentSpeed = endSpeed;
+			trackSpeed(endSpeed);
 		}
 
 		/**
@@ -159,7 +171,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
 			addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
-			currentSpeed = endSpeed;
+			trackSpeed(endSpeed);
 		}
 
 		/** Add commands to reset the drive train encoders and gyros (typically called at the start of a match) */
