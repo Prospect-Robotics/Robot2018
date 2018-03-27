@@ -25,7 +25,7 @@ public class PIDStop extends Command {
         requires(Robot.driveTrain);
     }
 
-    protected boolean initializeEncoders() {
+    protected void initializeEncoders() {
     	if(!initializedEncoders) {
     		if(Robot.driveTrain.encoderPortFunctional && Robot.driveTrain.encoderStarboardFunctional) {
     			pid1 = new PIDController(Kp, Ki, Kd, Robot.driveTrain.getEncoderPort(), Robot.driveTrain.getSpeedControllerPort());
@@ -47,14 +47,12 @@ public class PIDStop extends Command {
     		}
     	}
     	initializedEncoders = true;
-    	return !encoders.isEmpty();
     }
     
     // Called just before this Command runs the first time
     protected void initialize() {
     	// Initialize encoders if necessary
-    	if(!initializeEncoders())
-    		return;
+    	initializeEncoders();
 		for(PIDController pid : encoders) {
 			pid.enable();
 		}
@@ -64,7 +62,6 @@ public class PIDStop extends Command {
     protected boolean isFinished() {
     	// Just in case isFinished gets called out of order
     	initializeEncoders();
-    	
     	// Otherwise, check all encoders are at target - if there are none, we return true.
     	boolean finished = true;
 		for(PIDController pid : encoders) {
