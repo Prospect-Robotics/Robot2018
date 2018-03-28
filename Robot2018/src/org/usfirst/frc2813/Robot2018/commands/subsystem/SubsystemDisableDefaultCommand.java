@@ -1,38 +1,12 @@
 package org.usfirst.frc2813.Robot2018.commands.subsystem;
 
-import org.usfirst.frc2813.Robot2018.commands.GearheadsInstantCommand;
-import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.logging.LogType;
-import org.usfirst.frc2813.logging.Logger;
-import org.usfirst.frc2813.units.Direction;
-
-import edu.wpi.first.wpilibj.command.Subsystem;
+import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 
 /**
- * Wait for a motor system to arrive at position, to within +/- allowableError
+ * Disable the default command on a subsystem.  Do not require the exclusive access.
  */
-public final class SubsystemDisableDefaultCommand extends GearheadsInstantCommand {
-	private final Subsystem subsystem;
-
-	public SubsystemDisableDefaultCommand(Subsystem subsystem) {
-		this.subsystem = subsystem;
-		requires(this.subsystem);
-		// Interrupt any existing command
-		setName(toString());
+public final class SubsystemDisableDefaultCommand extends SubsystemSetDefaultCommand {
+	public SubsystemDisableDefaultCommand(GearheadsSubsystem subsystem) {
+		super(subsystem, null /* defaultCommand */);
 	}
-
-	@Override
-	protected void initialize() {
-		super.initialize();
-		if(subsystem.getDefaultCommand() != null) {
-			Logger.printFormat(LogType.INFO,"%s removing default command for %s.", this, subsystem);
-			subsystem.setDefaultCommand(null);
-		} else {
-			Logger.printFormat(LogType.INFO,"%s NOT removing default command for %s, it didn't have one.", this, subsystem);
-		}
-	}
-
-    public String toString() {
-        return getClass().getSimpleName() + "(" + subsystem + ")";
-    }
 }

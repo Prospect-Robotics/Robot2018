@@ -2,23 +2,31 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveSync;
-import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinSync;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensorAsync;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirectionSync;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePositionAsync;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorPositionPIDTest;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorVelocityPIDTest;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitchSync;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPositionSync;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggle;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemDisableDefaultCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.Robot2018.triggers.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -60,7 +68,7 @@ public class OI {
 
 	public Joystick joystick1, joystick2, buttonPanel;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
-
+	
 	@SuppressWarnings("unused")
 	public OI() {
 		/*
@@ -81,40 +89,48 @@ public class OI {
 		 *
 		 */
 		buttonPanel = new Joystick(0);
-		CommandGroup calibration = new CommandGroup();
-		calibration.addSequential(new MotorCalibrateSensorAsync(Robot.arm, Direction.REVERSE));
-		calibration.addSequential(new MotorWaitForHardLimitSwitchSync(Robot.arm, Direction.REVERSE));
-		calibration.addSequential(new MotorCalibrateSensorAsync(Robot.elevator, Direction.REVERSE));
-		calibration.addSequential(new MotorWaitForHardLimitSwitchSync(Robot.elevator, Direction.REVERSE));
 
-		new JoystickButton(buttonPanel, 1).whileHeld(new IntakeSpinSync(Robot.intake, Direction.IN));
-		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpinSync(Robot.intake, Direction.OUT));
-		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirectionSync(Robot.elevator, Direction.DOWN));
-		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirectionSync(Robot.elevator, Direction.UP));
+		CommandGroup calibration = new CommandGroup();
+		calibration.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
+		calibration.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
+
+		SubsystemCommand<Solenoid> ratchetEngageAndLock = new SolenoidSet(Robot.ratchet, Direction.ENGAGED, CommandDuration.DISABLED, Lockout.UntilUnlocked);
+		SubsystemCommand<Solenoid> climbingBarExtendAndLock = new SolenoidSet(Robot.climbingBar, Direction.OUT, CommandDuration.FOREVER, Lockout.UntilUnlocked);
+		SubsystemCommand<Motor> armDisableAndLock = new MotorDisable(Robot.arm, CommandDuration.FOREVER, Lockout.UntilUnlocked);
+		
+		CommandGroup climbSequenceEngage = new CommandGroup();
+		/* Engage and lock the ratchet. */
+		climbSequenceEngage.addSequential(ratchetEngageAndLock);
+		/* Extend and lock the climbing bar. */
+		climbSequenceEngage.addSequential(climbingBarExtendAndLock);
+		// disable sequence for a motor is:
+		climbSequenceEngage.addSequential(armDisableAndLock);
+
+		// TODO
+		CommandGroup climbSequenceDisengage = new CommandGroup();
+
+		new JoystickButton(buttonPanel, 1).whileHeld(new IntakeSpin(Robot.intake, Direction.IN));
+		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpin(Robot.intake, Direction.OUT));
+		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
+		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
 		if(true) { // NB: The other settings are for Mike's debugging of PID vales on Arm and Elevator and are disabled by default.		
-				new JoystickButton(buttonPanel, 6).whenPressed(new SolenoidToggleStateInstant(Robot.climbingBar));
-				new JoystickButton(buttonPanel, 7).whenPressed(new SolenoidToggleStateInstant(Robot.driveTrain.getGearShiftSolenoid()));
-				new JoystickButton(buttonPanel, 8).whenPressed(new SolenoidToggleStateInstant(Robot.ratchet));
-				new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggleStateInstant(Robot.jaws));
+				new JoystickButton(buttonPanel, 6).whenPressed(climbSequenceEngage);
+				new JoystickButton(buttonPanel, 7).whenPressed(new SolenoidToggle(Robot.driveTrain.getGearShiftSolenoid()));
+				new JoystickButton(buttonPanel, 8).whenPressed(climbSequenceDisengage);				
+				new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggle(Robot.jaws));
 		} else {
 			CommandGroup armDemo = new CommandGroup();
-			armDemo.addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(30)));
-			armDemo.addSequential(new MotorWaitForTargetPositionSync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(5)));
+			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(30), ArmConfiguration.ArmDegrees.create(5)));
 			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(45)));
-			armDemo.addSequential(new MotorWaitForTargetPositionSync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(5)));
+			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(45), ArmConfiguration.ArmDegrees.create(5)));
 			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(60)));
-			armDemo.addSequential(new MotorWaitForTargetPositionSync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(5)));
+			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(60), ArmConfiguration.ArmDegrees.create(5)));
 			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(75)));
-			armDemo.addSequential(new MotorWaitForTargetPositionSync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(5)));
+			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(75), ArmConfiguration.ArmDegrees.create(5)));
 			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(90)));
-			armDemo.addSequential(new MotorWaitForTargetPositionSync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(5)));
+			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(90), ArmConfiguration.ArmDegrees.create(5)));
 			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(105)));
-			armDemo.addSequential(new MotorWaitForTargetPositionSync(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(5)));
+			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(105), ArmConfiguration.ArmDegrees.create(5)));
 			armDemo.addSequential(new TimedCommand(3));
 			
 			new JoystickButton(buttonPanel, 6).whileHeld(new MotorPositionPIDTest(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(15), Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(110)));
@@ -122,11 +138,11 @@ public class OI {
 			//	new JoystickButton(buttonPanel, 8).whileHeld(new MotorVelocityPIDTest(Robot.arm));
 			new JoystickButton(buttonPanel, 8).whenPressed(armDemo);
 			new JoystickButton(buttonPanel, 9).whileHeld(new MotorVelocityPIDTest(Robot.elevator));
-			new JoystickButton(buttonPanel, 9).whileHeld(new MotorMoveToAbsolutePositionAsync(Robot.elevator, LengthUOM.Inches.create(6)));
+			new JoystickButton(buttonPanel, 9).whileHeld(new MotorMoveToAbsolutePosition(Robot.elevator, LengthUOM.Inches.create(6)));
 		}
 		new JoystickButton(buttonPanel, 10).whenPressed(calibration);
-		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.IN));
-		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirectionSync(Robot.arm, Direction.OUT));
+		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
+		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
 
 		joystick1 = new Joystick(1);
 		joystick2 = new Joystick(2);
@@ -135,7 +151,7 @@ public class OI {
 		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
-		SmartDashboard.putData("OIDrive", new DriveTrainOIDriveSync(Robot.driveTrain, joystick1, joystick2));
+		SmartDashboard.putData("OIDrive", new DriveTrainOIDrive(Robot.driveTrain, joystick1, joystick2));
 
 		driveStyleChooser = new SendableChooser<>();
 		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);

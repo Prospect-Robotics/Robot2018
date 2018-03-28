@@ -5,10 +5,10 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggle;
 import org.usfirst.frc2813.units.Direction;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -74,10 +74,10 @@ public class AutoParser extends CommandGroup {
 					default:
 						throw new IllegalArgumentException("expected 'clockwise' or 'counterclockwise', got " + st);
 					}
-					add(new AutoDriveSync(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
+					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
 							endSpeedFactor, curve, clockwise));
 				} else
-					add(new AutoDriveSync(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
+					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
 							endSpeedFactor));
 				break;
 			case "stop":
@@ -86,9 +86,9 @@ public class AutoParser extends CommandGroup {
 			case "gripper":
 				String token = s.next().toUpperCase();
 				if (token.equals("TOGGLE"))
-					add(new SolenoidToggleStateInstant(Robot.jaws));
+					add(new SolenoidToggle(Robot.jaws));
 				else {
-					add(new SolenoidSetStateInstant(Robot.jaws, Direction.valueOf(token)));
+					add(new SolenoidSet(Robot.jaws, Direction.valueOf(token)));
 				}
 				break;
 			case "intake":

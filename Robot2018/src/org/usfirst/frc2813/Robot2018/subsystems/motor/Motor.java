@@ -261,7 +261,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			GearheadsCommand c = getConfiguration().getDefaultCommandFactory().createCommand(this);
 			if(c != null) {
 				setDefaultCommand(c);
-				c.setIsDefaultCommand(true);
+				c.setTracingEnabled(false);
 			}
 		}
 	}
