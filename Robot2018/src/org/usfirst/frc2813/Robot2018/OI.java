@@ -256,14 +256,16 @@ public class OI {
 		 * (3)  FLOOR ELEVATOR (calibrates too)
 		 * (4)  ELEVATOR DOWN
 		 * (5)  ELEVATOR UP
-		 * (6)  ***** START CLIMBING SEQUENCE
-		 * (7)  SHIFT GEARS SOLENOID
-		 * (8)  ***** ABORT CLIMBING SEQUENCE
-		 * (9)  INTAKE/ARM SOLENOID
+		 * (6)  *** ARM POSITION PID TEST
+		 * (7)  *** ELEVATOR POSITION PID TEST
+		 * (8)  *** ARM DEMO SEQUENCE
+		 * (9)  *** ELEVATOR TO FIXED HEIGHT
 		 * (10) ARM/ELEVATOR CALIBRATION
 		 * (11) MOVE ARM UP
 		 * (12) MOVE ARM DOWN
 		 *
+		 * COMPETITION LAYOUT:
+		 * 
 		 */
 		buttonPanel = new Joystick(0);
 		joystick1 = new Joystick(1);
