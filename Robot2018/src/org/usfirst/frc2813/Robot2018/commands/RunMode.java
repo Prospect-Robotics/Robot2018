@@ -8,33 +8,33 @@ package org.usfirst.frc2813.Robot2018.commands;
  * Timer    - this is a TimedCommand and runs for a fixed duration, or until the subclass says it's done.
  * Forever  - no timer value, but we're going to run forever and ignore anything the subclass has to say about it.
  */
-public enum CommandDurationType {
+public enum RunMode {
 	/**
-	 * Off, no timer value will be used and this parameter will have no effect 
+	 * Off, do things normally.  Timer is unused. 
 	 */
-	Disabled,
+	RunNormally,
 	/**
 	 * There will be a timeout and we will return if the timeout elapses even if the command is not yet completed.<br/>
 	 * This is a command with an error timeout.
 	 */
-	Timeout, 
+	RunWithTimeout, 
 	/**
 	 * There will be a timeout and we will return if the timeout elapses even if the command is not yet completed.<br/>
 	 * This is a command that runs until a timer goes off.
 	 */
-	Timer, 
+	RunTimed, 
 	/**
 	 * This command is going to run forever and will ignore whether the command is complete.
 	 * This is like returning false from isFinished().
 	 */
-	Forever,
+	RunForever,
 	/**
 	 * This command is going to return immediately, ignoring the subclass's isFinished.
 	 */
-	Asynchronous;
-	public boolean isForever() { return this == Forever; }
-	public boolean isTimer() { return this == Timer; }
-	public boolean isTimeout() { return this == Timeout; }
-	public boolean isDisabled() { return this == Disabled; }
-	public boolean isAsynchronous() { return this == Asynchronous; }
+	RunAsynchronously;
+	public boolean isRunForever() { return this == RunForever; }
+	public boolean isRunTimed() { return this == RunTimed; }
+	public boolean isRunWithTimeout() { return this == RunWithTimeout; }
+	public boolean isRunNormally() { return this == RunNormally; }
+	public boolean isRunAsynchronously() { return this == RunAsynchronously; }
 }

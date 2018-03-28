@@ -12,7 +12,7 @@ public abstract class TargetedCommand<TARGET_TYPE> extends GearheadsCommand {
 	 * Create a command with a target object
 	 * @param target the target of the command
 	 */
-	public TargetedCommand(TARGET_TYPE target, CommandDuration duration) {
+	public TargetedCommand(TARGET_TYPE target, RunningInstructions duration) {
 		super(duration);
 		this.target = target;
 		if(this.target == null) {
@@ -25,7 +25,7 @@ public abstract class TargetedCommand<TARGET_TYPE> extends GearheadsCommand {
 	 * @param target the target of the command
 	 */
 	public TargetedCommand(TARGET_TYPE target) {
-		this(target, CommandDuration.DISABLED);
+		this(target, RunningInstructions.RUN_NORMALLY);
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -18,7 +18,7 @@ public final class MotorMoveInDirection extends MotorCommand {
 	/**
 	 * This command will hold for as long as it's running.
 	 */
-	public MotorMoveInDirection(Motor motor, Direction direction, Rate rate, CommandDuration duration, Lockout lockout) {
+	public MotorMoveInDirection(Motor motor, Direction direction, Rate rate, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
     	this.direction = direction;
     	this.rate = rate;
@@ -29,11 +29,11 @@ public final class MotorMoveInDirection extends MotorCommand {
 			throw new IllegalArgumentException("Use MotorHoldPosition or MotorDisable instead of passing a neutral direction to " + getClass().getSimpleName());
 		}
     }
-	public MotorMoveInDirection(Motor motor, Direction direction, Rate rate, CommandDuration duration) {
+	public MotorMoveInDirection(Motor motor, Direction direction, Rate rate, RunningInstructions duration) {
 		this(motor,direction,rate,duration,Lockout.Disabled);
 	}
 	public MotorMoveInDirection(Motor motor, Direction direction, Rate rate) {
-		this(motor, direction, rate, CommandDuration.DISABLED);
+		this(motor, direction, rate, RunningInstructions.RUN_NORMALLY);
 	}
 	public MotorMoveInDirection(Motor motor, Direction direction) {
 		this(motor, direction, motor.getConfiguration().getDefaultRate());

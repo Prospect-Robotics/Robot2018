@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.subsystem;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.TargetedCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
@@ -22,7 +22,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	 * @param lockout whether to prevent interruption and default command, while active
 	 * @param duration can be Disabled, Timeout, Duration, Forever
 	 */
-	public SubsystemCommand(SUBSYSTEM_TYPE target, CommandDuration duration, Lockout lockout) {
+	public SubsystemCommand(SUBSYSTEM_TYPE target, RunningInstructions duration, Lockout lockout) {
 		super(target, duration);
 		this.subsystem  = target;
 		this.lockout = lockout;
@@ -41,7 +41,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	 * @param lockout whether to prevent interruption and default command
 	 */
 	public SubsystemCommand(SUBSYSTEM_TYPE target) {
-		this(target, CommandDuration.DISABLED, Lockout.Disabled);
+		this(target, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 	}
 
 	//@Override

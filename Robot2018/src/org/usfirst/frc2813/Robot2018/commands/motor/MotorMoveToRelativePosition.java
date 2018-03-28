@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.Direction;
@@ -16,7 +16,7 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
 	private final Length relativeDistance;
 	private final Length allowableError;
 	
-    public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError, CommandDuration duration, Lockout lockout) {
+    public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
 		this.direction = direction;
 		this.relativeDistance = relativeDistance;
@@ -26,11 +26,11 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
 		addArg("relativeDistance", relativeDistance);
 		addArg("allowableError", allowableError);
     }
-	public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError, CommandDuration duration) {
+	public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError, RunningInstructions duration) {
 		this(motor, direction, relativeDistance, allowableError, duration, Lockout.Disabled);
 	}
 	public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError) {
-		this(motor, direction, relativeDistance, allowableError, CommandDuration.DISABLED);
+		this(motor, direction, relativeDistance, allowableError, RunningInstructions.RUN_NORMALLY);
 	}
 
 	/**

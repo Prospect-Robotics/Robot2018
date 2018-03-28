@@ -2,7 +2,7 @@
 
 package org.usfirst.frc2813.Robot2018.commands.solenoid;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
@@ -18,7 +18,7 @@ public final class SolenoidSet extends SubsystemCommand<Solenoid> {
 	 * Change the Solenoid state to a particular value.
 	 * If lockout is enabled, waits forever and prevents  
 	 */
-    public SolenoidSet(Solenoid solenoid, Direction position, CommandDuration duration, Lockout lockout) {
+    public SolenoidSet(Solenoid solenoid, Direction position, RunningInstructions duration, Lockout lockout) {
     	super(solenoid, duration, lockout);
         this.position = position;
         addArg("position", position);
@@ -28,7 +28,7 @@ public final class SolenoidSet extends SubsystemCommand<Solenoid> {
 	 * If lockout is enabled, waits forever and prevents  
 	 */
     public SolenoidSet(Solenoid solenoid, Direction position) {
-    	this(solenoid, position, CommandDuration.DISABLED, Lockout.Disabled);
+    	this(solenoid, position, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
     }
 	//@Override
 	protected void ghscInitialize() {

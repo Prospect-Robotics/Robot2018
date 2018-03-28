@@ -3,7 +3,7 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
@@ -68,7 +68,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 	}
 
 	public DriveTrainAutoStop(DriveTrain driveTrain) {
-		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
+		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.driveTrain = driveTrain;
 		requires(driveTrain);
 	}

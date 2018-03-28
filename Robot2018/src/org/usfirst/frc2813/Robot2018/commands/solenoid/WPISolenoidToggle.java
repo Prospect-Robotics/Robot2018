@@ -1,5 +1,5 @@
 package org.usfirst.frc2813.Robot2018.commands.solenoid;
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.TargetedCommand;
 
 /**
@@ -7,13 +7,13 @@ import org.usfirst.frc2813.Robot2018.commands.TargetedCommand;
  */
 public final class WPISolenoidToggle extends TargetedCommand<edu.wpi.first.wpilibj.Solenoid> {
 	
-    public WPISolenoidToggle(edu.wpi.first.wpilibj.Solenoid solenoid, CommandDuration duration) {
+    public WPISolenoidToggle(edu.wpi.first.wpilibj.Solenoid solenoid, RunningInstructions duration) {
     	super(solenoid, duration);
     	setName(toString());
     }
     
     public WPISolenoidToggle(edu.wpi.first.wpilibj.Solenoid solenoid) {
-    	this(solenoid, CommandDuration.DISABLED);
+    	this(solenoid, RunningInstructions.RUN_NORMALLY);
     }
 
 	//@Override

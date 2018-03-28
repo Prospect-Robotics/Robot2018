@@ -1,7 +1,7 @@
 // RobotBuilder Version: 2.0
 
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
@@ -18,7 +18,7 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 	private final Joystick joystick2;
 	
 	public DriveTrainOIDrive(DriveTrain driveTrain, Joystick joystick1, Joystick joystick2) {
-		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
+		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.joystick1 = joystick1;
 		this.joystick2 = joystick2;
 //		addArg("joystick1", joystick1);

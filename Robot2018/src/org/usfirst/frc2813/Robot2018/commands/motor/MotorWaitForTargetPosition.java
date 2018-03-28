@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -16,17 +16,17 @@ public final class MotorWaitForTargetPosition extends SubsystemCommand<Motor> {
 	/*
 	 * Make a synchronous command to wait for the target position, without a timeout
 	 */
-	public MotorWaitForTargetPosition(Motor motor, Length allowableError, CommandDuration duration, Lockout lockout) {
+	public MotorWaitForTargetPosition(Motor motor, Length allowableError, RunningInstructions duration, Lockout lockout) {
 		super(motor, duration, lockout);
 		this.allowableError = allowableError;
 		addArg("allowableError", allowableError);
 		setName(toString());
 	}
-	public MotorWaitForTargetPosition(Motor motor, Length allowableError, CommandDuration duration) {
+	public MotorWaitForTargetPosition(Motor motor, Length allowableError, RunningInstructions duration) {
 		this(motor,allowableError,duration,Lockout.Disabled);
 	}
 	public MotorWaitForTargetPosition(Motor motor, Length allowableError) {
-		this(motor, allowableError, CommandDuration.DISABLED);
+		this(motor, allowableError, RunningInstructions.RUN_NORMALLY);
 	}
 
 	/*

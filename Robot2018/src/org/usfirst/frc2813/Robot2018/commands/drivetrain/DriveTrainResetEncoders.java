@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
@@ -16,7 +16,7 @@ public class DriveTrainResetEncoders extends SubsystemCommand<DriveTrain> {
 	 * @param driveTrain The driveTrain subsystem to reset.
 	 */
     public DriveTrainResetEncoders(DriveTrain driveTrain) {
-        super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
+        super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
     }
 
     // Called once when the command executes

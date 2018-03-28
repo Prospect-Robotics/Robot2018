@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
@@ -28,7 +28,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	 * Create a quick turn command for turning in a direction for a specific number of degrees.
 	 */
 	public DriveTrainQuickTurn(DriveTrain driveTrain, Direction direction, double relativeAngleInDegrees, double rate) {
-		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
+		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.direction = direction;
 		this.rate = rate;
 		this.relativeAngleInDegrees = relativeAngleInDegrees;

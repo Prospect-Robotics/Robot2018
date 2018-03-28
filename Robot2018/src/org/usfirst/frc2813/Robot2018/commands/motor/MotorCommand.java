@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -12,10 +12,10 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
  */
 public abstract class MotorCommand extends SubsystemCommand<Motor> {
 	
-	public MotorCommand(Motor target, CommandDuration duration, Lockout lockout) {
+	public MotorCommand(Motor target, RunningInstructions duration, Lockout lockout) {
 		super(target, duration, lockout);
 	}
-	public MotorCommand(Motor target, CommandDuration duration) {
+	public MotorCommand(Motor target, RunningInstructions duration) {
 		this(target, duration, Lockout.Disabled);
 	}
 	@Override

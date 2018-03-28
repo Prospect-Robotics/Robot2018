@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -12,15 +12,15 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
  */
 public final class MotorHoldPosition extends MotorCommand {
 
-    public MotorHoldPosition(Motor motor, CommandDuration duration, Lockout lockout) {
+    public MotorHoldPosition(Motor motor, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
 		setName(toString());
     }
-    public MotorHoldPosition(Motor motor, CommandDuration duration) {
+    public MotorHoldPosition(Motor motor, RunningInstructions duration) {
     	this(motor, duration, Lockout.Disabled);
     }
 	public MotorHoldPosition(Motor motor) {
-		this(motor, CommandDuration.DISABLED);
+		this(motor, RunningInstructions.RUN_NORMALLY);
 	}
  
 	@Override

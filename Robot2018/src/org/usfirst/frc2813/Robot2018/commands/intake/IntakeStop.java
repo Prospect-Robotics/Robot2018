@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.intake;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
@@ -11,14 +11,14 @@ import org.usfirst.frc2813.units.Direction;
  */
 public class IntakeStop extends SubsystemCommand<Intake> {
 	
-	public IntakeStop(Intake intake, CommandDuration duration, Lockout lockout) {
+	public IntakeStop(Intake intake, RunningInstructions duration, Lockout lockout) {
 		super(intake, duration, lockout);
 	}
-	public IntakeStop(Intake intake, CommandDuration duration) {
+	public IntakeStop(Intake intake, RunningInstructions duration) {
 		this(intake, duration, Lockout.Disabled);
 	}
 	public IntakeStop(Intake intake) {
-		this(intake, CommandDuration.DISABLED);
+		this(intake, RunningInstructions.RUN_NORMALLY);
 	}
 
 	@Override

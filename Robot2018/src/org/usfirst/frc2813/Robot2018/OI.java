@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
@@ -94,9 +94,9 @@ public class OI {
 		calibration.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
 		calibration.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
 
-		SubsystemCommand<Solenoid> ratchetEngageAndLock = new SolenoidSet(Robot.ratchet, Direction.ENGAGED, CommandDuration.DISABLED, Lockout.UntilUnlocked);
-		SubsystemCommand<Solenoid> climbingBarExtendAndLock = new SolenoidSet(Robot.climbingBar, Direction.OUT, CommandDuration.FOREVER, Lockout.UntilUnlocked);
-		SubsystemCommand<Motor> armDisableAndLock = new MotorDisable(Robot.arm, CommandDuration.FOREVER, Lockout.UntilUnlocked);
+		SubsystemCommand<Solenoid> ratchetEngageAndLock = new SolenoidSet(Robot.ratchet, Direction.ENGAGED, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked);
+		SubsystemCommand<Solenoid> climbingBarExtendAndLock = new SolenoidSet(Robot.climbingBar, Direction.OUT, RunningInstructions.RUN_FOREVER, Lockout.UntilUnlocked);
+		SubsystemCommand<Motor> armDisableAndLock = new MotorDisable(Robot.arm, RunningInstructions.RUN_FOREVER, Lockout.UntilUnlocked);
 		
 		CommandGroup climbSequenceEngage = new CommandGroup();
 		/* Engage and lock the ratchet. */

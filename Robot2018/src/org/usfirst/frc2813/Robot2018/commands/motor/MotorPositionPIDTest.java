@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.units.Direction;
@@ -20,7 +20,7 @@ public final class MotorPositionPIDTest extends MotorCommand {
 	private Direction targetDirection = Direction.REVERSE;
 	private Length targetPosition = LengthUOM.Inches.create(0);
 
-	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight, Length allowableError, CommandDuration duration, Lockout lockout) {
+	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight, Length allowableError, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
 		this.minHeight = minHeight;
 		this.maxHeight = maxHeight;
@@ -30,11 +30,11 @@ public final class MotorPositionPIDTest extends MotorCommand {
 		addArg("allowableError", allowableError);
 		setName(toString());
 	}
-	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight, Length allowableError, CommandDuration duration) {
+	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight, Length allowableError, RunningInstructions duration) {
 		this(motor, minHeight, maxHeight, allowableError, duration, Lockout.Disabled);
 	}
 	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight, Length allowableError) {
-		this(motor, minHeight, maxHeight, allowableError, CommandDuration.DISABLED);
+		this(motor, minHeight, maxHeight, allowableError, RunningInstructions.RUN_NORMALLY);
 	}
 	public MotorPositionPIDTest(Motor motor, Length minHeight, Length maxHeight) {
 		this(motor, minHeight, maxHeight, motor.getConfiguration().getNativeDisplayLengthUOM().create(0.5));

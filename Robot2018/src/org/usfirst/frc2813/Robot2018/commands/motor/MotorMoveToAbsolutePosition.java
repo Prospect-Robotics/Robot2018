@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -16,7 +16,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 	private final Length position;
 	private final Length allowableError;
 	
-    public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, CommandDuration duration, Lockout lockout) {
+    public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
 		this.position = position;
 		this.allowableError = null;
@@ -27,11 +27,11 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 			Logger.warning(this + " does not need to specify an allowable error, if you aren't waiting for completion.");
 		}
     }
-	public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, CommandDuration duration) {
+	public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, RunningInstructions duration) {
 		this(motor, position, allowableError, duration, Lockout.Disabled);
 	}
 	public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError) {
-		this(motor, position, allowableError, CommandDuration.DISABLED);
+		this(motor, position, allowableError, RunningInstructions.RUN_NORMALLY);
 	}
 	public MotorMoveToAbsolutePosition(Motor motor, Length position) {
 		this(motor, position, null);

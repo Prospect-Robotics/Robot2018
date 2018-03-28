@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
@@ -19,7 +19,7 @@ public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 	private final boolean continuousRotation;
 	
 
-	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate, CommandDuration duration, Lockout lockout) {
+	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
 		this.targetRate = targetRate;
 		this.continuousRotation = continuousRotation;
@@ -42,11 +42,11 @@ public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 			}
 		}
 	}
-	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate, CommandDuration duration) {
+	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate, RunningInstructions duration) {
 		this(motor, continuousRotation, targetRate, duration, Lockout.Disabled);
 	}
 	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation, Rate targetRate) {
-		this(motor, continuousRotation, targetRate, CommandDuration.DISABLED);
+		this(motor, continuousRotation, targetRate, RunningInstructions.RUN_NORMALLY);
 	}
 	public MotorVelocityPIDTest(Motor motor, boolean continuousRotation) {
 		this(motor, continuousRotation, motor.getConfiguration().getDefaultRate());

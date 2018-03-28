@@ -1,7 +1,7 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
@@ -197,7 +197,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Calibrate the elevator (move down), but don't wait for completion. */
 		private void addCalibrateAsync() {
 			if(!Robot.elevator.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN, CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/**
@@ -224,7 +224,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 			 * go slower when we have a cube in the jaws!
 			 */
 			if(!Robot.elevator.isDisconnected()) {
-				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0), CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0), RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/** Wait for the Elevator to hit the hard reset limit*/
@@ -248,7 +248,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		private void addCalibrateAsync() {
 			if(!Robot.arm.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/**
@@ -272,7 +272,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addMoveToPositionAsync(Length armDegrees) {
 			if(!Robot.arm.isDisconnected())
-				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Wait for the Arm to hit the hard reset limit */
@@ -325,12 +325,12 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Add a command to start the intake spinning inwards */
 		private void addIntakeInAsync() {
-			addSequential(new IntakeSpin(Robot.intake, Direction.IN, CommandDuration.ASYNCHRONOUS));
+			addSequential(new IntakeSpin(Robot.intake, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Add a command to start the intake spinning outwards */
 		private void addIntakeOutAsync() {
-			addSequential(new IntakeSpin(Robot.intake, Direction.OUT, CommandDuration.ASYNCHRONOUS));
+			addSequential(new IntakeSpin(Robot.intake, Direction.OUT, RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Add a command to stop the intake spinning */

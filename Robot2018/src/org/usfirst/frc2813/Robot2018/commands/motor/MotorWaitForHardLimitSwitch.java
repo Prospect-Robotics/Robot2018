@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.motor;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
@@ -16,17 +16,17 @@ public final class MotorWaitForHardLimitSwitch extends SubsystemCommand<Motor> {
 	/*
 	 * Make a synchronous command to wait for the target position, without a timeout
 	 */
-	public MotorWaitForHardLimitSwitch(Motor motor, Direction direction, CommandDuration duration, Lockout lockout) {
+	public MotorWaitForHardLimitSwitch(Motor motor, Direction direction, RunningInstructions duration, Lockout lockout) {
 		super(motor, duration, lockout);
 		this.direction = direction;
 		addArg("direction", direction);
 		setName(toString());
 	}
-	public MotorWaitForHardLimitSwitch(Motor motor, Direction direction, CommandDuration duration) {
+	public MotorWaitForHardLimitSwitch(Motor motor, Direction direction, RunningInstructions duration) {
 		this(motor, direction, duration, Lockout.Disabled);
 	}
 	public MotorWaitForHardLimitSwitch(Motor motor, Direction direction) {
-		this(motor, direction, CommandDuration.DISABLED);
+		this(motor, direction, RunningInstructions.RUN_NORMALLY);
 	}
 
 	@Override

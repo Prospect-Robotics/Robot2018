@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * points for synchronous, asynchronous, timed, etc.
  */
 public abstract class GearheadsCommand extends Command {
-	private final CommandDuration duration;
+	private final RunningInstructions duration;
 	/**
 	 * If TRACING_LOG_LEVEL is within our current log level for the system, we will trace out when all the core Command functions are executing.
 	 * This is on by default for all command instances, but can be disabled object-by-object with setTracingEnabled. 
@@ -35,8 +35,8 @@ public abstract class GearheadsCommand extends Command {
 	/**
 	 * Create a new command with the specified type of duration and timer value
 	 */
-	protected GearheadsCommand(CommandDuration duration) {
-		this.duration = duration != null ? duration : new CommandDuration();
+	protected GearheadsCommand(RunningInstructions duration) {
+		this.duration = duration != null ? duration : new RunningInstructions();
 		// Do not log implicit duration
 		if(duration != null) {
 			addArg("duration",duration);
@@ -48,7 +48,7 @@ public abstract class GearheadsCommand extends Command {
 	/**
 	 * Get the duration function of the command, if there's a rule about time
 	 */
-	public final CommandDuration getDuration() {
+	public final RunningInstructions getDuration() {
 		return duration;
 	}
 	/**

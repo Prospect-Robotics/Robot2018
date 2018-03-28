@@ -1,6 +1,6 @@
 package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
@@ -97,7 +97,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param distance - how far to travel
 	 */
 	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
-		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
+		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
 		controller.setInputRange(-360, 360);
 		controller.setContinuous();

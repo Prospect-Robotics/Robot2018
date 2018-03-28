@@ -6,20 +6,20 @@ import org.usfirst.frc2813.units.values.Time;
  * This object encapsulates how long a command should run, and an optional timer value.
  *
  */
-public class CommandDuration {
-	private final CommandDurationType type;
+public class RunningInstructions {
+	private final RunMode type;
 	private final Time time;
 
-	public static CommandDuration DISABLED = new CommandDuration(CommandDurationType.Disabled, null);
-	public static CommandDuration FOREVER = new CommandDuration(CommandDurationType.Forever, null);
-	public static CommandDuration ASYNCHRONOUS = new CommandDuration(CommandDurationType.Asynchronous, null);
+	public static RunningInstructions RUN_NORMALLY = new RunningInstructions(RunMode.RunNormally, null);
+	public static RunningInstructions RUN_FOREVER = new RunningInstructions(RunMode.RunForever, null);
+	public static RunningInstructions RUN_ASYNCHRONOUSLY = new RunningInstructions(RunMode.RunAsynchronously, null);
 	
 	/**
 	 * Create a new command duration with a specific type an time (optional) 
 	 * @param type
 	 * @param duration
 	 */
-	public CommandDuration(CommandDurationType type, Time time) {
+	public RunningInstructions(RunMode type, Time time) {
 		this.type = type;
 		this.time = time;
 		if(type == null) {
@@ -27,16 +27,16 @@ public class CommandDuration {
 		}
 		// Make sure the timeout parameter is there when it should be and not there when it shouldn't
 		switch(type) {
-		case Disabled:
-		case Forever:
-		case Asynchronous:
+		case RunNormally:
+		case RunForever:
+		case RunAsynchronously:
 		default:
 			if(time != null) {
 				throw new IllegalArgumentException("Duration is " + type + ", so time parameter must be null.");
 			}
 			break;
-		case Timer:
-		case Timeout:
+		case RunTimed:
+		case RunWithTimeout:
 			if(time == null) {
 				throw new IllegalArgumentException("Duration is " + type + ", so time parameter must NOT be null.");
 			}
@@ -48,11 +48,11 @@ public class CommandDuration {
 	 * @param type
 	 * @param duration
 	 */
-	public CommandDuration() {
-		this(CommandDurationType.Disabled, null);
+	public RunningInstructions() {
+		this(RunMode.RunNormally, null);
 	}
 
-	public CommandDurationType getType() {
+	public RunMode getType() {
 		return type;
 	}
 	
@@ -60,11 +60,11 @@ public class CommandDuration {
 		return time;
 	}
 	
-	public boolean isForever() { return type.isForever(); }
-	public boolean isAsynchronous() { return type.isAsynchronous(); }
-	public boolean isTimer() { return type.isTimer(); }
-	public boolean isTimeout() { return type.isTimeout(); }
-	public boolean isDisabled() { return type.isDisabled(); }
+	public boolean isForever() { return type.isRunForever(); }
+	public boolean isAsynchronous() { return type.isRunAsynchronously(); }
+	public boolean isTimer() { return type.isRunTimed(); }
+	public boolean isTimeout() { return type.isRunWithTimeout(); }
+	public boolean isDisabled() { return type.isRunNormally(); }
 	
 	public String toString() {
 		return time != null ? (type + "(" + time + ")") : type.toString(); 
