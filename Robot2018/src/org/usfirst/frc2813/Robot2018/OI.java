@@ -11,6 +11,7 @@ import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
 import org.usfirst.frc2813.Robot2018.commands.interlock.Unlock;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorHoldPosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToRelativePosition;
@@ -172,26 +173,24 @@ public class OI {
 	 */
 	protected static CommandGroup createClimbSequence() {
 		CommandGroup climbSequence = new CommandGroup();
-		SubsystemCommand<Motor> elevatorClimb = new MotorMoveToAbsolutePosition(
-				Robot.elevator,
-				LengthUOM.Inches.create(0.0), // move to 0.0 inches (full climbed).  This is not a bug.  Fully retracted elevator is a fully climbed robot. 
-				LengthUOM.Inches.create(1.0), // tolerance +/- 1.0 inches
-				RunningInstructions.RUN_NORMALLY, 
-				Lockout.UntilUnlocked);
 		/* Extend and lock the climbing bar. */
 		climbSequence.addSequential(new SolenoidSet(Robot.climbingBar, Direction.OUT, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked)); 
 		/* Should disable 'hold position' fighting us, and the ratchet! */
-		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.elevator));   
+		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.elevator));
+		/* Force default command to stop */
+		climbSequence.addSequential(new MotorDisable(Robot.elevator));
 	    /* Now immediately engage and lock the ratchet! */
 		climbSequence.addSequential(new SolenoidSet(Robot.ratchet, Direction.ENGAGED, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked));
 		/* Should disable 'hold position' fighting us */
 		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.arm));        
-        /* Arm should go limp */
+        /* Force default command to stop */
 		climbSequence.addSequential(new MotorDisable(Robot.arm, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked));
-		
-		/*NB: Currently we are going to go with manual elevator climb control..."down is up", "up" is interlocked. */
-		// climbSequence.addSequential(elevatorClimb);            /* Should fully retract the elevator */
 
+		/*
+		 * At this point you have drive control and elevator down control, which allows robot to climb up.
+		 * The interlock on "elevator up" will prevent movement while ratchet is engaged.
+		 * I haven't tried to disable drive during climb... we never discussed that.
+		 */
 		return climbSequence;
 	}
 
@@ -208,9 +207,7 @@ public class OI {
 				Robot.elevator,
 				Direction.ROBOT_CLIMB_UP, // down means climb... up will break the robot.  This is *NOT* a bug.
 				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(1024), /* NB: This is 1/4 turn, of encoder with 4096 pulses per revolution */
-				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(25), // tolerance +/- 25 pulses
-				RunningInstructions.RUN_NORMALLY, 
-				Lockout.UntilUnlocked);
+				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(25)); // tolerance +/- 25 pulses
 
 		/* First we can unlock the climbing bar, if nobody is on it - it's not going to kill us to retract it. */
 		climbAbort.addSequential(new Unlock(Robot.climbingBar));
@@ -218,6 +215,7 @@ public class OI {
 		/* Unlock and re-enable holding for the arm */
 		climbAbort.addSequential(new Unlock(Robot.arm));
 		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.arm));
+		climbAbort.addSequential(new MotorHoldPosition(Robot.arm));
 
 		/* Unlock and reset the ratchet.  It won't be free until we do a 1/4 turn higher */
 		climbAbort.addSequential(new Unlock(Robot.ratchet));
@@ -225,8 +223,12 @@ public class OI {
 		climbAbort.addSequential(elevatorClimbQuarterTurn); // This will disengage the ratchet if it's stuck 
 
 		/* Lastly, unlock the Elevator */ 
-		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.elevator)); 
+		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.elevator));
+		climbAbort.addSequential(new MotorHoldPosition(Robot.elevator));
 
+		/*
+		 * At this point everything is back to normal except the climb bar is still hanging out the back
+		 */
 		return climbAbort;
 	}
 	
