@@ -26,7 +26,7 @@ public abstract class GearheadsCommand extends Command {
 	 * This log level controls the logging of which of the main 
 	 * high level functions being called on command, i.e. "in end', "in isfinished" etc... 
 	 */
-	private static final LogType TRACING_LOG_LEVEL = LogType.INFO;
+	private static final LogType TRACING_LOG_LEVEL = LogType.DEBUG;
 	/**
 	 * We will populate this array with the key/value pairs of arguments for formatting into a nice pretty name.
 	 * @see addArg
