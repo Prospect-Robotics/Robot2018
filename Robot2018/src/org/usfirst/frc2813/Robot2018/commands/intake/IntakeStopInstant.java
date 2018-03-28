@@ -15,12 +15,12 @@ public class IntakeStopInstant extends AbstractIntakeInstantCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		if(intake.getCurrentDirection().equals(Direction.STOP)) {
+		if(intake.getCurrentDirection().equals(Direction.IDLE)) {
 			if(!isDefaultCommand()) {
 				Logger.warning("Telling " + intake + " to stop, but it already is.");
 			}
 		} else {
-			intake.spin(Direction.STOP);
+			intake.spin(Direction.IDLE);
 		}
 	}
 }
