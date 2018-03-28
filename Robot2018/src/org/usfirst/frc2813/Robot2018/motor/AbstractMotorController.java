@@ -721,11 +721,11 @@ public abstract class AbstractMotorController implements IMotorController {
 	}
 	@Override
 	public boolean isPhysicalLimitExceeded(Direction direction) {
-		return Length.isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition());
+		return Length.isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
 	}
 	@Override
 	public boolean isPhysicalLimitReached(Direction direction) {
-		return Length.isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition());
+		return Length.isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
 	}
 	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
