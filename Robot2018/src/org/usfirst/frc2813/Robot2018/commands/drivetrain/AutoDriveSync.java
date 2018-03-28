@@ -298,13 +298,13 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		double distanceTravelled = distanceTravelled();
 		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
 
-		System.out.printf("auto drive sync time %ul\n", System.currentTimeMillis());
 		/*
 		 * 3/22/2018 MT - 
 		 * Added reporting of the error in the angle, so you can see how well PID is controlling angular 
 		 * drift from the angle at the start of the command.  Within +/- 1 degree seems to be adequate.
 		 */
 		Logger.printLabelled(LogType.INFO, "PID linear stepping",
+				"Timestamp", System.currentTimeMillis(),
 				"TargetDistance", distance * direction.getMultiplier(),
 				"distance travelled", distanceTravelled,
 				"AngleError[now]", gyro.getAngle() - startAngle,
