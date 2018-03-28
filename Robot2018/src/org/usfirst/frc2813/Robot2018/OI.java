@@ -25,6 +25,7 @@ import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemRestoreDefaultC
 import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.Robot2018.triggers.JoystickPastMidpoint;
 import org.usfirst.frc2813.Robot2018.triggers.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -231,7 +232,12 @@ public class OI {
 		 */
 		return climbAbort;
 	}
-	
+	public Command createHighGear() {
+		return new SolenoidSet(Robot.gearShifter, Direction.OFF);
+	}
+	public Command createLowGear() {
+		return new SolenoidSet(Robot.gearShifter, Direction.ON);
+	}
 	public Command createIntakeIn() {
 		return new IntakeSpin(Robot.intake, Direction.IN);
 	}
@@ -374,6 +380,10 @@ public class OI {
 			new JoystickButton(buttonPanel, 12).whileHeld(createPickUpPositionSequence());
 			break;
 		}
+		
+		// Add the stick shifter
+		new JoystickPastMidpoint(joystick2, Direction.FORWARD).whenActive(createHighGear());
+		new JoystickPastMidpoint(joystick2, Direction.REVERSE).whenActive(createLowGear());
 
 		// Add compressor to live window
 		LiveWindow.add(RobotMap.compressor);
