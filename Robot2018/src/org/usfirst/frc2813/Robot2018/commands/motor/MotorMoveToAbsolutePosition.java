@@ -19,7 +19,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
     public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, RunningInstructions duration, Lockout lockout) {
     	super(motor, duration, lockout);
 		this.position = position;
-		this.allowableError = null;
+		this.allowableError = allowableError;
 		setName(toString());
 		addArg("position", position);
 		addArg("allowableError", allowableError);

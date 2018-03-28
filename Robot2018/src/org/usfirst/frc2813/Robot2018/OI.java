@@ -145,16 +145,16 @@ public class OI {
 		return group;
 	}
 	public Command createArmToPickUpPosition() {
-		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_GRAB_CUBE);
+		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_GRAB_CUBE, ArmConfiguration.ArmDegrees.create(5));
 	}
 	public Command createElevatorToPickUpHeight() {
-		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_GRAB_CUBE);
+		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_GRAB_CUBE, LengthUOM.Inches.create(0.5));
 	}
 	public Command createElevatorToShootPosition() {
-		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_SWITCH);
+		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_SWITCH, LengthUOM.Inches.create(0.5));
 	}
 	public Command createArmToShootPosition() {
-		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_FORWARD_SHOOT);
+		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_FORWARD_SHOOT, ArmConfiguration.ArmDegrees.create(5));
 	}
 	public Command createElevatorCalibrate() {
 		return new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE);
