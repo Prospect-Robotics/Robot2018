@@ -51,25 +51,30 @@ public enum Direction{
 	/** Alias for NEGATIVE */
 	CLOSE(Canonical.NEGATIVE),
 
-	/* Alias for POSITIVE */
+	/** Alias for POSITIVE */
 	ON(Canonical.POSITIVE),
 	/** Alias for NEGATIVE */
 	OFF(Canonical.NEGATIVE),
 
-	/* Alias for POSITIVE */
+	/** Alias for POSITIVE */
 	HIGH_GEAR(Canonical.POSITIVE),
 	/** Alias for NEGATIVE */
 	LOW_GEAR(Canonical.NEGATIVE),
 
-	/* Alias for POSITIVE - opposite is IDLE - it's an on/off */
+	/** Alias for POSITIVE - opposite is IDLE - it's an on/off */
 	ENGAGED(Canonical.POSITIVE),
 	/** Alias for NEUTRAL */
 	DISENGAGED(Canonical.NEUTRAL),
 
-	/* Alias for POSITIVE - opposite is IDLE - it's an on/off */
+	/** Alias for POSITIVE - opposite is IDLE - it's an on/off */
 	ENABLED(Canonical.POSITIVE),
 	/** Alias for NEUTRAL */
 	DISABLED(Canonical.NEUTRAL),
+
+	/** When we are climbing, lowering the elevator raises the robot */
+	ROBOT_CLIMB_UP(Canonical.NEGATIVE),
+	/** When we are climbing, raising the elevator lowers the robot - and destroys it if the ratchet is engaged!!! */
+	ROBOT_CLIMB_DOWN(Canonical.POSITIVE),
 
 	/** Alias for NEUTRAL */
 	IDLE(Canonical.NEUTRAL),
@@ -194,6 +199,10 @@ public enum Direction{
 			return DISABLED;
 		case DISABLED:
 			return ENABLED;
+		case ROBOT_CLIMB_UP:
+			return ROBOT_CLIMB_DOWN;
+		case ROBOT_CLIMB_DOWN:
+			return ROBOT_CLIMB_UP;
 		default:
 			if(canonicalDirection == Canonical.POSITIVE) {
 				return NEGATIVE;
