@@ -10,29 +10,29 @@ import org.usfirst.frc2813.units.values.Length;
  * Wait for a motor system to arrive at position, to within +/- allowableError
  * Do not require the subsystem, in case someone is driving this in parallel.
  */
-public final class MotorWaitForMoveToPosition extends SubsystemCommand<Motor> {
+public final class MotorWaitForTargetPosition extends SubsystemCommand<Motor> {
 	private final Length allowableError;
 	
 	/*
 	 * Make a synchronous command to wait for the target position, without a timeout
 	 */
-	public MotorWaitForMoveToPosition(Motor motor, Length allowableError, CommandDuration duration, Lockout lockout) {
+	public MotorWaitForTargetPosition(Motor motor, Length allowableError, CommandDuration duration, Lockout lockout) {
 		super(motor, duration, lockout);
 		this.allowableError = allowableError;
 		addArg("allowableError", allowableError);
 		setName(toString());
 	}
-	public MotorWaitForMoveToPosition(Motor motor, Length allowableError, CommandDuration duration) {
+	public MotorWaitForTargetPosition(Motor motor, Length allowableError, CommandDuration duration) {
 		this(motor,allowableError,duration,Lockout.Disabled);
 	}
-	public MotorWaitForMoveToPosition(Motor motor, Length allowableError) {
+	public MotorWaitForTargetPosition(Motor motor, Length allowableError) {
 		this(motor, allowableError, CommandDuration.DISABLED);
 	}
 
 	/*
 	 * Make a synchronous command to wait for the target position, without a timeout
 	 */
-	public MotorWaitForMoveToPosition(Motor motor) {
+	public MotorWaitForTargetPosition(Motor motor) {
 		this(motor, motor.getConfiguration().getNativeDisplayLengthUOM().create(0.5));
 	}
 
