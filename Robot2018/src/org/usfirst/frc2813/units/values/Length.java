@@ -49,7 +49,7 @@ public class Length extends Value<LengthUOM,Length> {
 	 */
 	public static boolean isLimitReached(Direction direction, Length limit, Length position, Length marginOfError) {
 		if(direction.isPositive()) {
-			return position.getCanonicalValue() >= (limit.getCanonicalValue() + marginOfError.getCanonicalValue()); 
+			return position.getCanonicalValue() >= (limit.getCanonicalValue() + marginOfError.getCanonicalValue());
 		} else {
 			return position.getCanonicalValue() <= (limit.getCanonicalValue() - marginOfError.getCanonicalValue());
 		}
