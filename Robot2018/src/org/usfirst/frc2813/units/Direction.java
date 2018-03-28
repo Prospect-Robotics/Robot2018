@@ -182,10 +182,6 @@ public enum Direction{
 			return OFF;
 		case OFF:
 			return ON;
-		case STOP:
-			return GO;
-		case GO:
-			return STOP;
 		case HIGH_GEAR:
 			return LOW_GEAR;
 		case LOW_GEAR:
