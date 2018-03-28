@@ -126,6 +126,18 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 
 		endSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * endSpeedFactor;
 		decelRamp *= 1 - endSpeedFactor;
+		
+		Logger.printLabelled(LogType.INFO, "Auto Drive Sync ctor",
+				"Timestamp", System.currentTimeMillis(),
+				"speed", speed,
+				"distance", distance,
+				"startSpeedFactor", startSpeedFactor,
+				"endSpeedFactor", endSpeedFactor,
+				"startSpeed", startSpeed,
+				"accelRamp", accelRamp,
+				"endSpeed", endSpeed,
+				"decelRamp", decelRamp);
+
 	}
 
 	/**
