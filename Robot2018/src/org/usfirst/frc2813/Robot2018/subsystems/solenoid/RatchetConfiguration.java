@@ -8,14 +8,13 @@ import org.usfirst.frc2813.units.Direction;
  * Ratchet configuration
  */
 public class RatchetConfiguration extends SolenoidConfiguration {
-
 	/*
 	 * Configuration of the Jaws subsystem
 	 */
 	public RatchetConfiguration() {
 		super(
 				"Ratchet", 
-				SolenoidLogic.SolenoidLogicNormal, 
+				SolenoidLogic.SolenoidLogicNormal, // NB: If Jack reverses solenoid polarity, this is where you fix the code.
 				SolenoidType.SingleSolenoid, 
 				Direction.DISENGAGED,
 				null);
