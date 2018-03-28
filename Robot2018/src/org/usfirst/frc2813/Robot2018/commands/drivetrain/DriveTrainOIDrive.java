@@ -21,8 +21,8 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.joystick1 = joystick1;
 		this.joystick2 = joystick2;
-		addArg("joystick1", joystick1);
-		addArg("joystick2", joystick2);
+//		addArg("joystick1", joystick1);
+//		addArg("joystick2", joystick2);
 		setName(toString());
 	}
 

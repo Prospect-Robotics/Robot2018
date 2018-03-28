@@ -18,7 +18,7 @@ public abstract class TargetedCommand<TARGET_TYPE> extends GearheadsCommand {
 		if(this.target == null) {
 			throw new IllegalArgumentException("Constructor was passed a null value.");
 		}
-		addArg(target.getClass().getSimpleName(), target);
+		addArg("target", target);
 	}
 	/**
 	 * Create a command with a target object

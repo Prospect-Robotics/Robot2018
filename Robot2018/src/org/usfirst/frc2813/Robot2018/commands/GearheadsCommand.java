@@ -17,25 +17,21 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  */
 public abstract class GearheadsCommand extends Command {
 	private final CommandDuration duration;
-
-	static {
-		Logger.addMe();
-	}
 	/**
 	 * If TRACING_LOG_LEVEL is within our current log level for the system, we will trace out when all the core Command functions are executing.
 	 * This is on by default for all command instances, but can be disabled object-by-object with setTracingEnabled. 
 	 */
-	private boolean enableTracing = false;
+	private boolean enableTracing = true;
 	/**
 	 * This log level controls the logging of which of the main 
 	 * high level functions being called on command, i.e. "in end', "in isfinished" etc... 
 	 */
-	private static final LogType TRACING_LOG_LEVEL = LogType.DEBUG;
+	private static final LogType TRACING_LOG_LEVEL = LogType.INFO;
 	/**
 	 * We will populate this array with the key/value pairs of arguments for formatting into a nice pretty name.
 	 * @see addArg
 	 */
-	private static final ArrayList<Object> args = new ArrayList<Object>(); 
+	private final ArrayList<Object> args = new ArrayList<Object>(); 
 	/**
 	 * Create a new command with the specified type of duration and timer value
 	 */
