@@ -57,11 +57,6 @@ public enum Direction{
 	OFF(Canonical.NEGATIVE),
 
 	/* Alias for POSITIVE */
-	STOP(Canonical.POSITIVE),
-	/** Alias for NEGATIVE */
-	GO(Canonical.NEGATIVE),
-
-	/* Alias for POSITIVE */
 	HIGH_GEAR(Canonical.POSITIVE),
 	/** Alias for NEGATIVE */
 	LOW_GEAR(Canonical.NEGATIVE),
@@ -187,10 +182,6 @@ public enum Direction{
 			return OFF;
 		case OFF:
 			return ON;
-		case STOP:
-			return GO;
-		case GO:
-			return STOP;
 		case HIGH_GEAR:
 			return LOW_GEAR;
 		case LOW_GEAR:

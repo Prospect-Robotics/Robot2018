@@ -16,7 +16,7 @@ public class Intake extends GearheadsSubsystem {
 
 	public Intake(WPI_VictorSPX victor) {
 		spx = victor;
-		direction = Direction.STOP;
+		direction = Direction.IDLE;
 		speed = 1.0;
 	}
 
@@ -50,9 +50,9 @@ public class Intake extends GearheadsSubsystem {
 		if(isEmulated()) {
 			return direction;
 		} else if(getCurrentSpeed() == 0) {
-			return Direction.STOP;
+			return Direction.IDLE;
 		} else if(spx.get() == 0) {
-			return Direction.STOP;
+			return Direction.IDLE;
 		}
 		else if(spx.get() < 0) {
 			return Direction.IN;

@@ -139,6 +139,16 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		addArg("startSpeedFactor",startSpeedFactor);
 		addArg("endSpeedFactor",endSpeedFactor);
 		setName(toString());
+		Logger.printLabelled(LogType.INFO, "Auto Drive Sync ctor",
+				"Timestamp", System.currentTimeMillis(),
+				"speed", speed,
+				"distance", distance,
+				"startSpeedFactor", startSpeedFactor,
+				"endSpeedFactor", endSpeedFactor,
+				"startSpeed", startSpeed,
+				"accelRamp", accelRamp,
+				"endSpeed", endSpeed,
+				"decelRamp", decelRamp);
 	}
 
 	/**

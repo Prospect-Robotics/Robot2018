@@ -23,10 +23,10 @@ public class IntakeStop extends SubsystemCommand<Intake> {
 
 	@Override
 	protected void ghscInitialize() {
-		if(subsystem.getCurrentDirection().equals(Direction.STOP)) {
+		if(subsystem.getCurrentDirection().equals(Direction.IDLE)) {
 			trace("initialize", "Telling " + subsystem + " to stop, but it already is.");
 		} else {
-			subsystem.spin(Direction.STOP);
+			subsystem.spin(Direction.IDLE);
 		}
 	}
 

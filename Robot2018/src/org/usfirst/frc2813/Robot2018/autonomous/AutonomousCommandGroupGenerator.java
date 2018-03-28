@@ -317,6 +317,7 @@ public class AutonomousCommandGroupGenerator {
 		double scaleAlleyWidth = switchToScalePlatform - cubeSize;
 		double scalePlatformToTarget = backWallToScaleTarget - backWallToScalePlatform;
 		double scaleAlleyToTarget = 71.57;
+		double scaleDepth = 56;
 
 		/** dimensions side to side */
 		double backWallWidth = 264;
@@ -393,7 +394,7 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			/** This is the total side offset between us and the scale target */
 			double offsetRemaining = sideWallToScaleTarget - sideWallToFirstRobotCenter;
-			double totalDistanceAhead = backWallToScaleTarget + scalePlatformWidth;
+			double totalDistanceAhead = backWallToScaleTarget + scaleDepth/2;
 			if (useCurves) {
 				/**
 				 * We are backwards on the left side. Working backwards, we will approach the
