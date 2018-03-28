@@ -1,10 +1,8 @@
 package org.usfirst.frc2813.Robot2018.interlock;
 
 /**
- * Interlocks can be added to GearheadsSubsystem instances.
- * If any interlock returns false from isInterlockSafe(), the subsystem should refuse all commands.
+ * An IIinterlock object is used as a callback to see when it's safe to perform an operation.
  * @author mike.taylor
- *
  */
 public interface IInterlock {
 	/**
