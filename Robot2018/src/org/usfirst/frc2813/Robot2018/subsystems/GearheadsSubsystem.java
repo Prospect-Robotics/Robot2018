@@ -92,5 +92,16 @@ public abstract class GearheadsSubsystem extends Subsystem {
 		}
 		return super.getDefaultCommand();
 	}
+
+	/**
+	 * Reset the default command (to be used after we disabled it for a while)
+	 */
+	public final void resetDefaultCommand() {
+		if(isSafeToOperate()) {
+			initDefaultCommand();
+		} else {
+			Logger.warning(this + " could not resetDefaultCommand because we are interlocked.");
+		}
+	}
 	
 }
