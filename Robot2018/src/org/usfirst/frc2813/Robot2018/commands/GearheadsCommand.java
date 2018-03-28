@@ -71,7 +71,7 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	/**
 	 * Check the status of all interlocks to see if it's safe
 	 */
-	public boolean isSafeToOperate() {
+	public final boolean isSafeToOperate() {
 		for(IInterlock interlock : interlocks) {
 			if(!interlock.isSafeToOperate())
 				return false;

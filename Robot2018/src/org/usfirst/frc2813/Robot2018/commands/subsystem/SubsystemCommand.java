@@ -20,8 +20,7 @@ import edu.wpi.first.wpilibj.command.Command;
 public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem> extends TargetedCommand<SUBSYSTEM_TYPE> implements IInterlock,IInterlockable {
 	protected final SUBSYSTEM_TYPE subsystem;	
 	protected final Lockout lockout;
-	protected Command lastDefaultCommand;
-	private boolean locked = false;
+	private boolean subsystemLocked = false;
 	/**
 	 * Create a command that targets a subsystem.
 	 * @param target the subsystem we are operating on
@@ -54,7 +53,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	protected final void ghcInitialize() {
 		// Handle lockout
 		if(lockout.isEnabled()) {
-			lock();
+			this.setInterruptible(false);
 		}
 		// Call the subclass if it's safe to do so
 		if(isSafeToOperate())
@@ -82,10 +81,18 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 			if(isSafeToOperate())
 				ghscinterruptedWhileWaiting();
 		}
-		// Unlock the subsystem
-		if(lockout.isWhileRunning()) {
-			unlock();
+		/*
+		 * If we weren't merely trying to lock out other commands while running this one,
+		 * we will then lock the subsystem against subsequent commands.
+		 */
+		if(!lockout.isWhileRunning()) {
+			traceFormatted("lock","locking subsystem %s", subsystem);
+			subsystem.addInterlock(LOCKED.ALWAYS);
 		}
+		/* At this point, "unlocking" the command is always safe, we're done and don't carea bout 
+		 * interruptible anymore.
+		 */
+		this.setInterruptible(true);
 	}
 
 	@Override
@@ -97,36 +104,6 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	@Override
 	protected final boolean ghcIsFinished() {
 		return ghscIsFinished();
-	}
-
-	@Override
-	public final boolean isSafeToOperate() {
-		return super.isSafeToOperate() && !this.locked;
-	}
-
-	protected void lock() {
-		traceFormatted("lock","locking out %s", subsystem);
-		this.locked = true;
-		subsystem.addInterlock(LOCKED.ALWAYS);
-		trace("lock","setting to not interruptable.");
-		this.setInterruptible(false);
-		trace("lock","adding LOCKED to interlock list.");
-	}
-
-	protected void unlock() {
-		if(locked) {
-			traceFormatted("unlock","unlocking %s", subsystem);
-			// Now cleanup if necessary
-			if(subsystem.getDefaultCommand() == null && lastDefaultCommand != null) {
-				traceFormatted("unlock", "setting as default command for %s back to %s.", subsystem, lastDefaultCommand);
-				subsystem.setDefaultCommand(lastDefaultCommand);
-			}
-			subsystem.removeInterlock(LOCKED.ALWAYS);
-			trace("unlock","removing LOCKED from interlock list.");
-			this.locked = false;
-			trace("unlock","setting to interruptable.");
-			this.setInterruptible(true);
-		}
 	}
 
 	/**
