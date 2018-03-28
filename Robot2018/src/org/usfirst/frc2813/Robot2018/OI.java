@@ -183,7 +183,7 @@ public class OI {
 	    /* Now immediately engage and lock the ratchet! */
 		climbSequence.addSequential(new SolenoidSet(Robot.ratchet, Direction.ENGAGED, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked));
 		/* Should disable 'hold position' fighting us */
-		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.arm));        
+		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.arm));
         /* Force default command to stop */
 		climbSequence.addSequential(new MotorDisable(Robot.arm, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked));
 

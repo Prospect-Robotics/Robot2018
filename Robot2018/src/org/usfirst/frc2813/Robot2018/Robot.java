@@ -12,6 +12,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ElevatorConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.ClimbingBarConfiguration;
+import org.usfirst.frc2813.Robot2018.subsystems.solenoid.GearShiftConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.JawsConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.RatchetConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
@@ -112,6 +113,7 @@ public class Robot extends TimedRobot {
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
 		ratchet = new Solenoid(new RatchetConfiguration(), RobotMap.ratchetSolenoid);
 		climbingBar = new Solenoid(new ClimbingBarConfiguration(), RobotMap.climbingBarSolenoid);
+		gearShifter = new Solenoid(new GearShiftConfiguration(), RobotMap.gearShiftSolenoid);
 
 		// Get the game setup data from the driver station
 		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
