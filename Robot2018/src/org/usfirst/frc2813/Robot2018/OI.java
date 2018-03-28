@@ -2,8 +2,8 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
@@ -117,18 +117,18 @@ public class OI {
 				Robot.elevator,
 				LengthUOM.Inches.create(0.0), // move to 0.0 inches (full climbed).  This is not a bug.  Fully retracted elevator is a fully climbed robot. 
 				LengthUOM.Inches.create(1.0), // tolerance +/- 1.0 inches
-				CommandDuration.FOREVER, 
+				RunningInstructions.RUN_NORMALLY, 
 				Lockout.UntilUnlocked);
 		/* Extend and lock the climbing bar. */
-		climbSequence.addSequential(new SolenoidSet(Robot.climbingBar, Direction.OUT, CommandDuration.DISABLED, Lockout.UntilUnlocked)); 
+		climbSequence.addSequential(new SolenoidSet(Robot.climbingBar, Direction.OUT, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked)); 
 		/* Should disable 'hold position' fighting us, and the ratchet! */
 		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.elevator));   
 	    /* Now immediately engage and lock the ratchet! */
-		climbSequence.addSequential(new SolenoidSet(Robot.ratchet, Direction.ENGAGED, CommandDuration.DISABLED, Lockout.UntilUnlocked));
+		climbSequence.addSequential(new SolenoidSet(Robot.ratchet, Direction.ENGAGED, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked));
 		/* Should disable 'hold position' fighting us */
 		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.arm));        
         /* Arm should go limp */
-		climbSequence.addSequential(new MotorDisable(Robot.arm, CommandDuration.DISABLED, Lockout.UntilUnlocked));
+		climbSequence.addSequential(new MotorDisable(Robot.arm, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked));
 		
 		/*NB: Currently we are going to go with manual elevator climb control..."down is up", "up" is interlocked. */
 		// climbSequence.addSequential(elevatorClimb);            /* Should fully retract the elevator */
@@ -149,7 +149,7 @@ public class OI {
 				Direction.ROBOT_CLIMB_UP, // down means climb... up will break the robot.  This is *NOT* a bug.
 				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(1024), /* NB: This is 1/4 turn, of encoder with 4096 pulses per revolution */
 				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(25), // tolerance +/- 25 pulses
-				CommandDuration.FOREVER, 
+				RunningInstructions.RUN_NORMALLY, 
 				Lockout.UntilUnlocked);
 
 		/* First we can unlock the climbing bar, if nobody is on it - it's not going to kill us to retract it. */
