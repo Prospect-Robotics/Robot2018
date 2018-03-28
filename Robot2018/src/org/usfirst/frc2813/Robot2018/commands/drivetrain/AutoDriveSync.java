@@ -298,6 +298,7 @@ public class AutoDriveSync extends AbstractDriveTrainCommand {
 		double distanceTravelled = distanceTravelled();
 		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
 
+		System.out.printf("auto drive sync time %ul\n", System.currentTimeMillis());
 		/*
 		 * 3/22/2018 MT - 
 		 * Added reporting of the error in the angle, so you can see how well PID is controlling angular 
