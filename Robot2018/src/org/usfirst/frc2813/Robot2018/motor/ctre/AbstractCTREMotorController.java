@@ -1,9 +1,8 @@
-package org.usfirst.frc2813.Robot2018.motor.victor;
+package org.usfirst.frc2813.Robot2018.motor.ctre;
 
 import java.util.Iterator;
 
 import org.usfirst.frc2813.Robot2018.motor.AbstractMotorController;
-import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PID;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
@@ -15,20 +14,22 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.IMotorControllerEnhanced;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 
 /**
- * A wrapper class to handle an Victor SPX motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
+ * A wrapper class to handle an Talon SRX motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
  * if you need a translation layer.  
  */
-public class VictorSPX extends AbstractMotorController implements IMotor {
-	private final com.ctre.phoenix.motorcontrol.can.VictorSPX mc;
-
+public abstract class AbstractCTREMotorController extends AbstractMotorController {
+	private final com.ctre.phoenix.motorcontrol.IMotorController mc;
+	
 	/* ----------------------------------------------------------------------------------------------
 	 * State
 	 * ---------------------------------------------------------------------------------------------- */
@@ -56,10 +57,9 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	 * Constructors
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	public VictorSPX(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.can.VictorSPX mc) {
+	public AbstractCTREMotorController(IMotorConfiguration configuration, com.ctre.phoenix.motorcontrol.IMotorController mc) {
 		super(configuration);
 		this.mc = mc;
-		initialize();
 	}
 	
 	/* ----------------------------------------------------------------------------------------------
@@ -78,18 +78,9 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	}
 	
 	@Override
-	public boolean getCurrentHardLimitSwitchStatus(Direction direction) {
-		if (direction.isNegative()) {
-			return mc.getSensorCollection().isRevLimitSwitchClosed();
-		} else {
-			return mc.getSensorCollection().isFwdLimitSwitchClosed();
-		}
-	}
-	
-	@Override
 	public final Length getCurrentPosition() {
 		int raw = mc.getSelectedSensorPosition(currentPID.getPIDIndex());
-		Length length = configuration.createSensorLength(raw); 
+		Length length = configuration.createSensorLength(raw);
 //		Logger.info("readPosition " + raw + " --> " + length);
 		return length;
 	}
@@ -160,7 +151,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	 * Internal Helper Functions - Motor Specific
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	private int getTimeout() {
+	protected int getTimeout() {
 		switch(currentState.getOperation()) {
 		case HOLDING_CURRENT_POSITION:
 		case MOVING_IN_DIRECTION_AT_RATE:
@@ -175,7 +166,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 	/*
 	 * Toggle whether the hard limit resets the position sensor automatically.  Default is off.
 	 */
-	private void setHardLimitSwitchClearsPositionAutomatically(Direction direction, boolean clearPositionAutomatically) {
+	protected void setHardLimitSwitchClearsPositionAutomatically(Direction direction, boolean clearPositionAutomatically) {
 			ParamEnum parameter = direction.isNegative() ? ParamEnum.eClearPositionOnLimitR : ParamEnum.eClearPositionOnLimitF;
 			mc.configSetParameter(
 					parameter, 
@@ -185,7 +176,27 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 					getTimeout());
 	}
 	
-	private boolean resetEncoderSensorPosition(PID pid, Length sensorPosition) {
+	/**
+	 * Try to set the position and check the return code
+	 */
+	protected boolean tryToSetSensorPosition(int pulses) {
+		mc.selectProfileSlot(lastSlot.getProfileSlotIndex(), currentPID.getPIDIndex());
+		ErrorCode errorCode = mc.setSelectedSensorPosition(pulses, currentPID.getPIDIndex(), getTimeout());
+		if(errorCode != ErrorCode.OK) {
+			Logger.error(this + " failed to reset sensor position with error " + errorCode + ".");
+		}
+		return errorCode == ErrorCode.OK;
+	}
+	
+	protected boolean isSensorCloseEnough(int pulses) {
+		// Do a read back
+		int readBack = mc.getSelectedSensorPosition(PID.Primary.getPIDIndex());
+		// Check close enough
+		return Math.abs(readBack - pulses) <= SENSOR_RESET_TOLERANCE_PULSES;
+	}
+
+	protected boolean resetEncoderSensorPosition(PID pid, Length sensorPosition) {
+		boolean resetOK = true;
 		if(pid.equals(PID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
 			Logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
 			return true;
@@ -193,21 +204,53 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		// Select relative & reset
 		int rawValue = getConfiguration().toSensorUnits(sensorPosition).getValueAsInt();
 		Logger.debug(this + " setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ").");
-		mc.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, pid.getPIDIndex(), getTimeout());
-		mc.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
-		int readBack = mc.getSelectedSensorPosition(pid.getPIDIndex());
-		if(Math.abs(readBack - rawValue) > SENSOR_RESET_TOLERANCE_PULSES) {
-			Logger.error(this + " failed setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ") - got " + readBack + " instead.");
-			mc.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
-			return false;
+		configureFeedbackSensor(pid);
+		if(true) {
+			// NB: Clear no-op profile slot just to be sure		
+			configurePID(PIDProfileSlot.NoOpPosition, 0, 0, 0, 0);
+			// Set that as the slot
+			mc.selectProfileSlot(PIDProfileSlot.NoOpPosition.getProfileSlotIndex(), currentPID.getPIDIndex());
+			// Configure disabled, then position, then disabled, then velocity, then disabled... no matter what mode we were in - we should change modes at least once...
+			mc.set(ControlMode.Disabled, 0.0);
+			// Change modes, hoping to shake loose old PID state
+			if(lastControlMode != ControlMode.Position) {
+				mc.set(ControlMode.Position, 0.0);
+			} else if(lastControlMode != ControlMode.Velocity) {
+				mc.set(ControlMode.Velocity, 0.0);
+			} else if(lastControlMode != ControlMode.PercentOutput) {
+				mc.set(ControlMode.PercentOutput, 0.0);
+			}
+			//Go back to disabled
+			mc.set(ControlMode.Disabled, 0.0);
 		}
-		return true;
+		// Restore correct slot & set sensor position
+		mc.selectProfileSlot(lastSlot.getProfileSlotIndex(), currentPID.getPIDIndex());
+		
+		// Make up to ten attempts to set the sensor value.  If the thing is still settling, this will hopefully handle it  
+		int maxTries = 10;
+		for(int attempts = 0; attempts < maxTries; attempts++) {
+			// Try to set the sensor Position
+			tryToSetSensorPosition(rawValue);
+			if(isSensorCloseEnough(rawValue)) {
+				break;
+			}
+			// Sleep a very short time.  10 tries, 1ms = 10ms which is still <= a typical command timeout
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	
+		// Return true if we're close enough...
+		return isSensorCloseEnough(rawValue);
 	}
 	/*
 	 * Configure PID values
 	 */
 	@SuppressWarnings("unused")
-	private void configurePID(PIDProfileSlot profileSlot, double p, double i, double d) {
+	protected void configurePID(PIDProfileSlot profileSlot, double p, double i, double d) {
 		configurePID(profileSlot, p, i, d, 0);
 	}
 	
@@ -232,6 +275,9 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 				+ "]");
 	}
 	
+	protected abstract void configureHardLimitSwitches();
+	protected abstract void configureFeedbackSensor(PID pid);
+	
 	@Override
 	public void configure() {
 		// Start disabled
@@ -251,8 +297,7 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		configurePID(PIDProfileSlot.ProfileSlot2, 0, 0, 0, 0);
 		configurePID(PIDProfileSlot.ProfileSlot3, 0, 0, 0, 0);
 
-		// Start with primary PID set to relative
-		mc.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, currentPID.getPIDIndex(), getTimeout());
+		configureFeedbackSensor(currentPID);
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be neutral
 		 * within this range. See Table in Section 17.2.1 for native units per rotation.
@@ -263,25 +308,10 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		mc.configAllowableClosedloopError(PIDProfileSlot.ProfileSlot3.getProfileSlotIndex(), 0, getTimeout());
 		// Disable clearing position on quad index, we don't support/use it and this restores SRX default.
 		mc.configSetParameter(ParamEnum.eClearPositionOnQuadIdx, 0 /* disabled */, 0 /* unused */, 0 /* unused */, getTimeout());
-
-		// Set forward hard limits
-		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteForwardHardLimitSwitch)) {
-			mc.configForwardLimitSwitchSource(configuration.getRemoteForwardHardLimitSwitchSource(), configuration.getForwardHardLimitSwitchNormal(), configuration.getRemoteForwardHardLimitSwitchDeviceId(), getTimeout());
-//			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, configuration.getForwardHardLimitSwitchResetsEncoder());
-setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);			
-		} else {
-			mc.configForwardLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.FORWARD, false);
-		}
-		// Set reverse hard limits
-		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.RemoteReverseHardLimitSwitch)) {
-			mc.configReverseLimitSwitchSource(configuration.getRemoteReverseHardLimitSwitchSource(), configuration.getReverseHardLimitSwitchNormal(), configuration.getRemoteReverseHardLimitSwitchDeviceId(), getTimeout());
-//			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, configuration.getReverseHardLimitSwitchResetsEncoder());
-setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);			
-		} else {
-			mc.configReverseLimitSwitchSource(RemoteLimitSwitchSource.Deactivated, LimitSwitchNormal.Disabled, 0, getTimeout());
-			setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
-		}
+		
+		// Configure hard limit switches
+		configureHardLimitSwitches();
+		
 		// Set forward soft limit
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch)) {
 			mc.configForwardSoftLimitEnable(true, getTimeout());
