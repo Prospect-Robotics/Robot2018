@@ -23,7 +23,8 @@ public class PIDStop extends Command {
 	private DriveTrain driveTrain;
 
 	private boolean initialized = false;
-	private List<PIDController> encoders = new ArrayList<PIDController>(); 
+	private boolean isPIDEnabled = false;
+	private List<PIDController> pidControllers = new ArrayList<PIDController>(); 
 	private List<PIDOutput>     speedControllers = new ArrayList<PIDOutput>(); 
 	
 	// Write to a list of PID controllers
@@ -34,66 +35,74 @@ public class PIDStop extends Command {
         requires(driveTrain);
     }
 
-    protected void initializeEncoders() {
+    protected void initializePIDControllers() {
     	if(!initialized) {
         	// Build a list of all the speed controllers, we can use when we need to drive them all 
         	speedControllers.add(driveTrain.getSpeedControllerPort());
         	speedControllers.add(driveTrain.getSpeedControllerStarboard());
         	// Initialize one PID for every working encoder.
     		if(driveTrain.encoderPortFunctional && driveTrain.encoderStarboardFunctional) {
-    			encoders.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(),      driveTrain.getSpeedControllerPort()));
-    			encoders.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), driveTrain.getSpeedControllerStarboard()));
+    			pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(),      driveTrain.getSpeedControllerPort()));
+    			pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), driveTrain.getSpeedControllerStarboard()));
     		}
     		else if(driveTrain.encoderPortFunctional) {
-    			encoders.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(),      driveAll));
+    			pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(),      driveAll));
     		} else if(driveTrain.encoderStarboardFunctional) {
-    			encoders.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), driveAll));
+    			pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), driveAll));
     		} else {
     			DriverStation.reportWarning("Can't PIDStop, BOTH ENCODERS OFFLINE", true);
     		}
     		// Configure the speed PID controller common values
-    		for(PIDController pid : encoders) {
+    		for(PIDController pid : pidControllers) {
     			pid.setAbsoluteTolerance(20); // 20 encoder ticks +/-, close enough for whatever encoder is used
     			pid.setOutputRange(-1.0,  1.0);
+    			pid.disable();
     		}
         	initialized = true;
     	}
     }
-    
-    protected void disableEncoders() {
-    	initializeEncoders();
-		for(PIDController pid : encoders) {
+
+    protected void disablePID() {
+    	initializePIDControllers();
+		for(PIDController pid : pidControllers) {
 			pid.disable();
 		}
+		isPIDEnabled = false;
     }
-    protected void enableEncoders() {
-    	initializeEncoders();
-		for(PIDController pid : encoders) {
+    
+    protected void enablePID() {
+    	initializePIDControllers();
+		for(PIDController pid : pidControllers) {
 			pid.enable();
 		}
+		isPIDEnabled = true;
     }
+    
     public boolean allEncodersOnTarget() {
-    	initializeEncoders();
-		for(PIDController pid : encoders) 
+    	initializePIDControllers();
+		for(PIDController pid : pidControllers) 
 			if(!pid.onTarget()) 
 				return false;
 		return true;
     }
     
-    // Called just before this Command runs the first time
     protected void initialize() {
     	// Enable all encoders
-    	enableEncoders();
+    	initializePIDControllers();
+    	enablePID();
     }
 
-    // Make this return true when this Command no longer needs to run execute()
+    protected boolean isPIDEnabled() {
+    	return isPIDEnabled;
+    }
+
     protected boolean isFinished() {
-		return allEncodersOnTarget();
+		return allEncodersOnTarget() || !isPIDEnabled;
     }
 
     // Called once after isFinished returns true
     protected void end() {
     	// Disable all encoders
-    	disableEncoders();
+    	disablePID();
     }
 }
