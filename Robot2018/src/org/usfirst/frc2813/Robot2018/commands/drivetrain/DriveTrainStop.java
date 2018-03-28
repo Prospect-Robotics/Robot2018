@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class DriveTrainPIDStop extends SubsystemCommand<DriveTrain> {
+public class DriveTrainStop extends SubsystemCommand<DriveTrain> {
 	
 	public static final double Kp = 0, Ki = 0, Kd = 0; // TODO placeholder values
 	
@@ -24,9 +24,9 @@ public class DriveTrainPIDStop extends SubsystemCommand<DriveTrain> {
 	private boolean PIDenabled = false;
 
 	class DriveBothWheels implements PIDOutput {
-		private final DriveTrainPIDStop pidStop;
+		private final DriveTrainStop pidStop;
 		
-		DriveBothWheels(DriveTrainPIDStop pidStop) {
+		DriveBothWheels(DriveTrainStop pidStop) {
 			this.pidStop = pidStop;
 		}
 		@Override
@@ -35,7 +35,7 @@ public class DriveTrainPIDStop extends SubsystemCommand<DriveTrain> {
 		}
 	}
 
-    public DriveTrainPIDStop(DriveTrain driveTrain) {
+    public DriveTrainStop(DriveTrain driveTrain) {
     	super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
     	this.driveBothWheelsCallback = new DriveBothWheels(this);
     }

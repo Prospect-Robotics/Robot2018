@@ -5,7 +5,7 @@ package org.usfirst.frc2813.Robot2018.subsystems.drivetrain;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainPIDStop;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainStop;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDriveWithPIDStop;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.GearShiftConfiguration;

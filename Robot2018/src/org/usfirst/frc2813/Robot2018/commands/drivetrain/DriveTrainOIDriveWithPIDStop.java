@@ -7,7 +7,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 
-public class DriveTrainOIDriveWithPIDStop extends DriveTrainPIDStop {
+public class DriveTrainOIDriveWithPIDStop extends DriveTrainStop {
 	
 	private final Joystick joystick1; 
 	private final Joystick joystick2;
