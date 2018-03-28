@@ -53,7 +53,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final double SPEED_TURN = 0.2;
 
 	/** Elevator heights for placing cubes on the switch. */
-	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(3);
+	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
 
 	/** Elevator height for placing cubes on the scale based on robot direction. */
 	private static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
@@ -203,6 +203,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_BACKWARD_SHOOT);
 		}
 		autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+		autoCmdList.drive.setDriveSpeed(.5);//XXX Only for the cafeteria floor
 	}
 
 	/**
@@ -259,7 +260,7 @@ public class AutonomousCommandGroupGenerator {
 		 *
 		 * NOTE: This only allows us to interact with the switch when we start in the
 		 * middle and only with the scale otherwise. If we want to do both, we will have
-		 * to split off two directional biases. Us relative to swtich and us relative to
+		 * to split off two directional biases. Us relative to switch and us relative to
 		 * scale.
 		 * 
 		 * @see getBiasedDirection
@@ -303,7 +304,7 @@ public class AutonomousCommandGroupGenerator {
 		double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
 
 		/** field dimensions from back wall */
-		double backWallToSwitch = 140;
+		double backWallToSwitch = 110;
 		double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; /** pyramid of cubes on near side of scale */
 		double backWallToFarSideOfSwitch = 196;
 		double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; /** row of cubes on far side of scale */
