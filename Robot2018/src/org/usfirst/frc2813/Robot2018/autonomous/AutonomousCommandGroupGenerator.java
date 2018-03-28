@@ -408,8 +408,7 @@ public class AutonomousCommandGroupGenerator {
 				
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise,
-						SPEED_STOP);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
 			} else {
 				double diagonalTravel = offsetRemaining * Math.sqrt(2) - (robotBumperLength/2 + finalDistanceToTarget);
 				double straightTravel = totalDistanceAhead - offsetRemaining;
