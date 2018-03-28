@@ -393,6 +393,7 @@ public class AutonomousCommandGroupGenerator {
 			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
 			/** This is the total side offset between us and the scale target */
 			double offsetRemaining = sideWallToScaleTarget - sideWallToFirstRobotCenter;
+			double totalDistanceAhead = backWallToScaleTarget + scalePlatformWidth;
 			if (useCurves) {
 				/**
 				 * We are backwards on the left side. Working backwards, we will approach the
@@ -404,15 +405,15 @@ public class AutonomousCommandGroupGenerator {
 				 */
 				double radius = offsetRemaining - (robotBumperLength/2 + finalDistanceToTarget) / Math.sqrt(2);
 				
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleTarget - offsetRemaining), SPEED_FULL);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise,
 						SPEED_STOP);
 			} else {
 				double diagonalTravel = offsetRemaining * Math.sqrt(2) - (robotBumperLength/2 + finalDistanceToTarget);
-				double straightTravel = backWallToScaleTarget - offsetRemaining;
+				double straightTravel = totalDistanceAhead - offsetRemaining;
 
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleTarget - offsetRemaining), SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining), SPEED_TURN);
 				autoCmdList.drive.addQuickTurnSync(left, 90); /** right but we're backwards */
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(43), SPEED_TURN);
 				prepareForScaleAsync(Direction.BACKWARD);
