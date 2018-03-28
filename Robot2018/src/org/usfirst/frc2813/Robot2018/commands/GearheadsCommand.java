@@ -175,7 +175,7 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 		if(!isSafeToOperate()) {
 			Logger.error(this + ": INTERLOCK PREVENTED ISFINISHED OPERATION. RETURN TRUE.");
 			isFinished = true;
-		if(!isFinished && runningInstructions.isForever()) {
+		} else if(!isFinished && runningInstructions.isForever()) {
 			trace("isFinished", "command is in running forever mode.");
 			isFinished = false;
 		} else if(getRunningInstructions().isAsynchronous()) {

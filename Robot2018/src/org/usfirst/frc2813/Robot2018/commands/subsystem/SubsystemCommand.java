@@ -3,8 +3,8 @@ package org.usfirst.frc2813.Robot2018.commands.subsystem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.TargetedCommand;
 import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
 import org.usfirst.frc2813.Robot2018.interlock.IInterlockable;
@@ -77,7 +77,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 		if(isSafeToOperate())
 			ghscInterrupted();
 		// A hook for shutting down that's conditional
-		if(!getDuration().isAsynchronous()) {
+		if(!getRunningInstructions().isAsynchronous()) {
 			traceFormatted("interrupted", "interrupted while waiting, calling interruptedWhileWaiting.");
 			if(isSafeToOperate())
 				ghscinterruptedWhileWaiting();

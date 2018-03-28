@@ -2,21 +2,26 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
-import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainOIDrive;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
+import org.usfirst.frc2813.Robot2018.commands.interlock.Unlock;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorDisable;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToRelativePosition;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorPositionPIDTest;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorVelocityPIDTest;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggle;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemDisableDefaultCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemRestoreDefaultCommand;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemSetDefaultCommand;
+import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
@@ -69,6 +74,102 @@ public class OI {
 	public Joystick joystick1, joystick2, buttonPanel;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 	
+	protected static void createMotorTestingButtons(Joystick buttonPanel)
+	{
+		CommandGroup armDemo = new CommandGroup();
+		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(30), ArmConfiguration.ArmDegrees.create(5)));
+		armDemo.addSequential(new TimedCommand(3));
+		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(45), ArmConfiguration.ArmDegrees.create(5)));
+		armDemo.addSequential(new TimedCommand(3));
+		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(60), ArmConfiguration.ArmDegrees.create(5)));
+		armDemo.addSequential(new TimedCommand(3));
+		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(75), ArmConfiguration.ArmDegrees.create(5)));
+		armDemo.addSequential(new TimedCommand(3));
+		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(90), ArmConfiguration.ArmDegrees.create(5)));
+		armDemo.addSequential(new TimedCommand(3));
+		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(105), ArmConfiguration.ArmDegrees.create(5)));
+		armDemo.addSequential(new TimedCommand(3));
+		
+		new JoystickButton(buttonPanel, 6).whileHeld(new MotorPositionPIDTest(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(15), Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(110)));
+		new JoystickButton(buttonPanel, 7).whileHeld(new MotorPositionPIDTest(Robot.elevator, LengthUOM.Inches.create(5), LengthUOM.Inches.create(30)));
+		//	new JoystickButton(buttonPanel, 8).whileHeld(new MotorVelocityPIDTest(Robot.arm));
+		new JoystickButton(buttonPanel, 8).whenPressed(armDemo);
+		new JoystickButton(buttonPanel, 9).whileHeld(new MotorVelocityPIDTest(Robot.elevator));
+		new JoystickButton(buttonPanel, 9).whileHeld(new MotorMoveToAbsolutePosition(Robot.elevator, LengthUOM.Inches.create(6)));
+	}
+	
+	protected CommandGroup createCalibrationSequence() {
+		CommandGroup calibration = new CommandGroup();
+		calibration.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
+		calibration.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
+		return calibration;
+	}
+	
+	/**
+	 * When we are climbing, we are retracting the elevator - 
+	 * elevator "down" climbs, and elevator "up" will break the robot because of the ratchet...
+	 * 
+	 * NOTE: Use Direction.ROBOT_CLIMB_UP and Direction.ROBOT_CLIMB_DOWN if this confuses you.
+	 */
+	protected static CommandGroup createClimbSequence() {
+		CommandGroup climbSequence = new CommandGroup();
+		SubsystemCommand<Motor> elevatorClimb = new MotorMoveToAbsolutePosition(
+				Robot.elevator,
+				LengthUOM.Inches.create(0.0), // move to 0.0 inches (full climbed).  This is not a bug.  Fully retracted elevator is a fully climbed robot. 
+				LengthUOM.Inches.create(1.0), // tolerance +/- 1.0 inches
+				CommandDuration.FOREVER, 
+				Lockout.UntilUnlocked);
+		/* Extend and lock the climbing bar. */
+		climbSequence.addSequential(new SolenoidSet(Robot.climbingBar, Direction.OUT, CommandDuration.DISABLED, Lockout.UntilUnlocked)); 
+		/* Should disable 'hold position' fighting us, and the ratchet! */
+		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.elevator));   
+	    /* Now immediately engage and lock the ratchet! */
+		climbSequence.addSequential(new SolenoidSet(Robot.ratchet, Direction.ENGAGED, CommandDuration.DISABLED, Lockout.UntilUnlocked));
+		/* Should disable 'hold position' fighting us */
+		climbSequence.addSequential(new SubsystemDisableDefaultCommand(Robot.arm));        
+        /* Arm should go limp */
+		climbSequence.addSequential(new MotorDisable(Robot.arm, CommandDuration.DISABLED, Lockout.UntilUnlocked));
+		
+		/*NB: Currently we are going to go with manual elevator climb control..."down is up", "up" is interlocked. */
+		// climbSequence.addSequential(elevatorClimb);            /* Should fully retract the elevator */
+
+		return climbSequence;
+	}
+
+	/**
+	 * When we are climbing, we are retracting the elevator - 
+	 * elevator "down" climbs, and elevator "up" will break the robot because of the ratchet...
+	 * 
+	 * NOTE: Use Direction.ROBOT_CLIMB_UP and Direction.ROBOT_CLIMB_DOWN if this confuses you.
+	 */
+	protected static CommandGroup createClimbAbortSequence() {
+		CommandGroup climbAbort = new CommandGroup();
+		SubsystemCommand<Motor> elevatorClimbQuarterTurn = new MotorMoveToRelativePosition(
+				Robot.elevator,
+				Direction.ROBOT_CLIMB_UP, // down means climb... up will break the robot.  This is *NOT* a bug.
+				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(1024), /* NB: This is 1/4 turn, of encoder with 4096 pulses per revolution */
+				Robot.elevator.getConfiguration().getNativeSensorLengthUOM().create(25), // tolerance +/- 25 pulses
+				CommandDuration.FOREVER, 
+				Lockout.UntilUnlocked);
+
+		/* First we can unlock the climbing bar, if nobody is on it - it's not going to kill us to retract it. */
+		climbAbort.addSequential(new Unlock(Robot.climbingBar));
+
+		/* Unlock and re-enable holding for the arm */
+		climbAbort.addSequential(new Unlock(Robot.arm));
+		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.arm));
+
+		/* Unlock and reset the ratchet.  It won't be free until we do a 1/4 turn higher */
+		climbAbort.addSequential(new Unlock(Robot.ratchet));
+		climbAbort.addSequential(new SolenoidSet(Robot.ratchet, Direction.DISENGAGED));
+		climbAbort.addSequential(elevatorClimbQuarterTurn); // This will disengage the ratchet if it's stuck 
+
+		/* Lastly, unlock the Elevator */ 
+		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.elevator)); 
+
+		return climbAbort;
+	}
+
 	@SuppressWarnings("unused")
 	public OI() {
 		/*
@@ -79,68 +180,38 @@ public class OI {
 		 * (3)  FLOOR ELEVATOR
 		 * (4)  ELEVATOR DOWN
 		 * (5)  ELEVATOR UP
-		 * (6)  CLIMBING BAR SOLENOID
+		 * (6)  ***** START CLIMBING SEQUENCE
 		 * (7)  SHIFT GEARS SOLENOID
-		 * (8)  ELEVATOR RATCHET SOLENOID
+		 * (8)  ***** ABORT CLIMBING SEQUENCE
 		 * (9)  INTAKE/ARM SOLENOID
-		 * (10) ELEVATOR SHUFFLE
+		 * (10) ARM/ELEVATOR CALIBRATION
 		 * (11) MOVE ARM UP
 		 * (12) MOVE ARM DOWN
 		 *
 		 */
 		buttonPanel = new Joystick(0);
 
-		CommandGroup calibration = new CommandGroup();
-		calibration.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
-		calibration.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
-
-		SubsystemCommand<Solenoid> ratchetEngageAndLock = new SolenoidSet(Robot.ratchet, Direction.ENGAGED, RunningInstructions.RUN_NORMALLY, Lockout.UntilUnlocked);
-		SubsystemCommand<Solenoid> climbingBarExtendAndLock = new SolenoidSet(Robot.climbingBar, Direction.OUT, RunningInstructions.RUN_FOREVER, Lockout.UntilUnlocked);
-		SubsystemCommand<Motor> armDisableAndLock = new MotorDisable(Robot.arm, RunningInstructions.RUN_FOREVER, Lockout.UntilUnlocked);
-		
-		CommandGroup climbSequenceEngage = new CommandGroup();
-		/* Engage and lock the ratchet. */
-		climbSequenceEngage.addSequential(ratchetEngageAndLock);
-		/* Extend and lock the climbing bar. */
-		climbSequenceEngage.addSequential(climbingBarExtendAndLock);
-		// disable sequence for a motor is:
-		climbSequenceEngage.addSequential(armDisableAndLock);
-
-		// TODO
-		CommandGroup climbSequenceDisengage = new CommandGroup();
-
 		new JoystickButton(buttonPanel, 1).whileHeld(new IntakeSpin(Robot.intake, Direction.IN));
 		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpin(Robot.intake, Direction.OUT));
+		
+		SubsystemCommand<Motor> elevatorUp = new MotorMoveInDirection(Robot.elevator, Direction.UP);
+		// Add an interlock on elevatorUp so that it will not engage with the ratchet 
+		elevatorUp.addInterlock(new IInterlock() {
+			public boolean isSafeToOperate() {
+				return Robot.ratchet.getTargetPosition().equals(Direction.DISENGAGED);
+			}
+		});
 		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
-		new JoystickButton(buttonPanel, 5).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.UP));
+		new JoystickButton(buttonPanel, 5).whileHeld(elevatorUp);
 		if(true) { // NB: The other settings are for Mike's debugging of PID vales on Arm and Elevator and are disabled by default.		
-				new JoystickButton(buttonPanel, 6).whenPressed(climbSequenceEngage);
+				new JoystickButton(buttonPanel, 6).whenPressed(createClimbSequence());
 				new JoystickButton(buttonPanel, 7).whenPressed(new SolenoidToggle(Robot.driveTrain.getGearShiftSolenoid()));
-				new JoystickButton(buttonPanel, 8).whenPressed(climbSequenceDisengage);				
+				new JoystickButton(buttonPanel, 8).whenPressed(createClimbAbortSequence());				
 				new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggle(Robot.jaws));
 		} else {
-			CommandGroup armDemo = new CommandGroup();
-			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(30), ArmConfiguration.ArmDegrees.create(5)));
-			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(45), ArmConfiguration.ArmDegrees.create(5)));
-			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(60), ArmConfiguration.ArmDegrees.create(5)));
-			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(75), ArmConfiguration.ArmDegrees.create(5)));
-			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(90), ArmConfiguration.ArmDegrees.create(5)));
-			armDemo.addSequential(new TimedCommand(3));
-			armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(105), ArmConfiguration.ArmDegrees.create(5)));
-			armDemo.addSequential(new TimedCommand(3));
-			
-			new JoystickButton(buttonPanel, 6).whileHeld(new MotorPositionPIDTest(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(15), Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(110)));
-			new JoystickButton(buttonPanel, 7).whileHeld(new MotorPositionPIDTest(Robot.elevator, LengthUOM.Inches.create(5), LengthUOM.Inches.create(30)));
-			//	new JoystickButton(buttonPanel, 8).whileHeld(new MotorVelocityPIDTest(Robot.arm));
-			new JoystickButton(buttonPanel, 8).whenPressed(armDemo);
-			new JoystickButton(buttonPanel, 9).whileHeld(new MotorVelocityPIDTest(Robot.elevator));
-			new JoystickButton(buttonPanel, 9).whileHeld(new MotorMoveToAbsolutePosition(Robot.elevator, LengthUOM.Inches.create(6)));
+			createMotorTestingButtons(buttonPanel);
 		}
-		new JoystickButton(buttonPanel, 10).whenPressed(calibration);
+		new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence());
 		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
 		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
 
