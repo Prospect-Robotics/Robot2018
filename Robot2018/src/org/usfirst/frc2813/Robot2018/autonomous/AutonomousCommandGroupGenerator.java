@@ -400,12 +400,12 @@ public class AutonomousCommandGroupGenerator {
 				 * offset from the forward distance. Travel that distance straight. Then raise
 				 * the elevator. Then follow our curve to the target.
 				 */
-				double distanceToTarget = backWallToScaleTarget - robotBumperLength - finalDistanceToTarget;
-				double y = sideWallToScaleTarget - sideWallToFirstRobotEndPosition;
-				double radius = y / Math.sin(Math.PI / 4);
-				double firstLeg = distanceToTarget - y;
-
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(firstLeg), SPEED_FULL);
+				
+				/** This is the total side offset between us and the scale target */
+				double offset = sideWallToScaleTarget - sideWallToFirstRobotCenter;
+				double radius = offset - (robotBumperLength/2 + finalDistanceToTarget) / Math.sqrt(2);
+				
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(backWallToScaleTarget - offset), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise,
 						SPEED_STOP);
