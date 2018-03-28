@@ -1,5 +1,13 @@
 package org.usfirst.frc2813.Robot2018.interlock;
 
+import org.usfirst.frc2813.Robot2018.Robot;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveInDirection;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
+import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.units.Direction;
+
+import edu.wpi.first.wpilibj.command.Command;
+
 /**
  * Any object that can have safety interlocks will have this interface.
  * 
@@ -33,6 +41,19 @@ package org.usfirst.frc2813.Robot2018.interlock;
  * 	return true;
  * }
  * 
+ * Example:
+ * 	
+ *	 public Command createElevatorUp() {
+ *		SubsystemCommand<Motor> elevatorUp = new MotorMoveInDirection(Robot.elevator, Direction.UP);
+ *		// Add an interlock on elevatorUp so that it will not engage with the ratchet 
+ *		elevatorUp.addInterlock(new IInterlock() {
+ *			public boolean isSafeToOperate() {
+ *				return Robot.ratchet.getTargetPosition().equals(Direction.DISENGAGED);
+ *			}
+ *		});
+ *		return elevatorUp;
+ *	 }
+ *
  * @author mike.taylor
  */
 public interface IInterlockable extends IInterlock {

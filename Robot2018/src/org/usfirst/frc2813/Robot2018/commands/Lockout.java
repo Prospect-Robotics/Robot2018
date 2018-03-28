@@ -18,8 +18,8 @@ package org.usfirst.frc2813.Robot2018.commands;
  * 
  * EXAMPLES: 
  * 
- * 1.  Disable a motor and prevent the default command (or any other) from moving it until it's explicitly locked.  
- * Use Lockout.RunForever
+ * 1.  Disable a motor and prevent the default command (or any other) from moving it until it's explicitly unlocked.  
+ * Use Lockout.UntilUnlocked
  * 
  * 2.  Run a command that needs to complete and shouldn't be interrupted.
  * Use Lockout.WhileRunning
