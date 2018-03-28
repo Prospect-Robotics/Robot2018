@@ -491,7 +491,7 @@ public class AutonomousCommandGroupGenerator {
 				
 				double secondRadius = (scaleAlleyWidth/2 - projectedDistToTarget) * Math.sqrt(2);
 				
-				double distanceFromCenterToSecondTurn = distanceFromCenter + scaleTargetWidth/2 - projectedDistToTarget;
+				double distanceFromCenterToSecondTurn = distanceFromCenter - projectedDistToTarget;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, firstAngle, inches(firstRadius), counterclockwise, SPEED_FULL);
