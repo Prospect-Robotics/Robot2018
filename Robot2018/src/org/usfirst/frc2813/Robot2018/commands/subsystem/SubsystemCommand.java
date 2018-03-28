@@ -68,7 +68,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 		// A hook for shutting down
 		ghscInterrupted();
 		// A hook for shutting down that's conditional
-		if(!getDuration().isAsynchronous()) {
+		if(!getRunningInstructions().isAsynchronous()) {
 			traceFormatted("interrupted", "interrupted while waiting, calling interruptedWhileWaiting.");
 			ghscinterruptedWhileWaiting();
 		}

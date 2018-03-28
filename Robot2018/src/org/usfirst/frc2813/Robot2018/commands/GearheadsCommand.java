@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * points for synchronous, asynchronous, timed, etc.
  */
 public abstract class GearheadsCommand extends Command {
-	private final RunningInstructions duration;
+	private final RunningInstructions runningInstructions;
 	/**
 	 * If TRACING_LOG_LEVEL is within our current log level for the system, we will trace out when all the core Command functions are executing.
 	 * This is on by default for all command instances, but can be disabled object-by-object with setTracingEnabled. 
@@ -36,20 +36,20 @@ public abstract class GearheadsCommand extends Command {
 	 * Create a new command with the specified type of duration and timer value
 	 */
 	protected GearheadsCommand(RunningInstructions duration) {
-		this.duration = duration != null ? duration : new RunningInstructions();
+		this.runningInstructions = duration != null ? duration : new RunningInstructions();
 		// Do not log implicit duration
 		if(duration != null) {
 			addArg("duration",duration);
 		}
-		if(this.duration.getTime() != null) {
-			setTimeout(this.duration.getTime());
+		if(this.runningInstructions.getTime() != null) {
+			setTimeout(this.runningInstructions.getTime());
 		}
 	}
 	/**
 	 * Get the duration function of the command, if there's a rule about time
 	 */
-	public final RunningInstructions getDuration() {
-		return duration;
+	public final RunningInstructions getRunningInstructions() {
+		return runningInstructions;
 	}
 	/**
 	 * Enable or disable tracking on a per-object basis.  
@@ -131,17 +131,17 @@ public abstract class GearheadsCommand extends Command {
 		boolean isFinished = false;
 		// Trace first
 		entered("isFinished");
-		if(!isFinished && duration.isForever()) {
+		if(!isFinished && runningInstructions.isForever()) {
 			trace("isFinished", "command is in running forever mode.");
 			isFinished = false;
-		} else if(getDuration().isAsynchronous()) {
+		} else if(getRunningInstructions().isAsynchronous()) {
 			traceFormatted("isFinished", "returning true.  Duration set to Asynchronous.");
 			return true;
-		} else if(!isFinished && duration.isTimeout() && isTimedOut()) {
+		} else if(!isFinished && runningInstructions.isTimeout() && isTimedOut()) {
 			trace("isFinished", "command failed with timeout error.");
 			isFinished = true;
-		} else if(!isFinished && duration.isTimer() && isTimedOut()) {
-			trace("isFinished", "timed command completed, ran for " + duration.getTime() + ".");
+		} else if(!isFinished && runningInstructions.isTimer() && isTimedOut()) {
+			trace("isFinished", "timed command completed, ran for " + runningInstructions.getTime() + ".");
 			isFinished = true;
 		} else if(!isFinished && isTimedOut()) {
 			Logger.error(this + " WARNING: Someone is messing with timer.  If the timer is set, the duration should be either Timer or Timeout.");
@@ -149,7 +149,7 @@ public abstract class GearheadsCommand extends Command {
 		} else if(!isFinished && ghcIsFinished()) {
 			trace("isFinished", "subclass says it's finished.");
 			isFinished = true;
-		} else if(!isFinished && duration.isTimer()) {
+		} else if(!isFinished && runningInstructions.isTimer()) {
 			trace("isFinished", "timed command not finished yet.");
 			isFinished = false;
 		} else {
