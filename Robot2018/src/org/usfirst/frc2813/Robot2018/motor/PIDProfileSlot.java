@@ -11,6 +11,7 @@ public enum PIDProfileSlot {
 	ProfileSlot1(1), 
 	ProfileSlot2(2), 
 	ProfileSlot3(3),
+	NoOpPosition(ProfileSlot3), 
 	HoldingPosition(ProfileSlot2), 
 	MovingToPosition(ProfileSlot1),
 	MovingAtVelocity(ProfileSlot0);
