@@ -217,7 +217,7 @@ public class AutonomousCommandGroupGenerator {
 	 *            - which direction is the robot facing?
 	 */
 	protected void prepareForScaleAsync(Direction direction) {
-		if (direction == direction.FORWARD) {
+		if (direction == Direction.FORWARD) {
 			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_FORWARD_SHOOT);
 			autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SCALE_FORWARD);
 		} else {
