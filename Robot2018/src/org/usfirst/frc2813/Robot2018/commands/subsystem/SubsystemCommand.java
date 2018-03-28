@@ -84,7 +84,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	}
 
 	@Override
-	protected final boolean ghcFinished() {
+	protected final boolean ghcIsFinished() {
 		return ghscIsFinished();
 	}
 

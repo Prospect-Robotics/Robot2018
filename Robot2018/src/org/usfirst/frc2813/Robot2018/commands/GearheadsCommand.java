@@ -146,7 +146,7 @@ public abstract class GearheadsCommand extends Command {
 		} else if(!isFinished && isTimedOut()) {
 			Logger.error(this + " WARNING: Someone is messing with timer.  If the timer is set, the duration should be either Timer or Timeout.");
 			isFinished = true;
-		} else if(!isFinished && ghcFinished()) {
+		} else if(!isFinished && ghcIsFinished()) {
 			trace("isFinished", "subclass says it's finished.");
 			isFinished = true;
 		} else if(!isFinished && duration.isTimer()) {
@@ -218,7 +218,7 @@ public abstract class GearheadsCommand extends Command {
 	 * Concrete subclass must implement this method.
 	 * @see isFinished
 	 */
-	protected abstract boolean ghcFinished();
+	protected abstract boolean ghcIsFinished();
 	/**
 	 * If there is a timeout associated with the command, return it here.
 	 * @see TimedCommand

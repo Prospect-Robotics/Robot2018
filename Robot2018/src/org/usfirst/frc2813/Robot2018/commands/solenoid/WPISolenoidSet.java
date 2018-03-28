@@ -33,7 +33,7 @@ public final class WPISolenoidSet extends TargetedCommand<edu.wpi.first.wpilibj.
 	}
 	
 	// @Override
-	public boolean ghcFinished() {
+	public boolean ghcIsFinished() {
 		return true;
 	}
 }

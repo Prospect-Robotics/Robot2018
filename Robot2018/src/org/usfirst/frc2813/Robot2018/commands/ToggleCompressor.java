@@ -31,7 +31,7 @@ public final class ToggleCompressor extends TargetedCommand<Compressor> {
     }
 
 	@Override
-	protected boolean ghcFinished() {
+	protected boolean ghcIsFinished() {
 		return true;
 	}
 }

@@ -24,7 +24,7 @@ public final class WPISolenoidToggle extends TargetedCommand<edu.wpi.first.wpili
 	}
 	
 	// @Override
-	public boolean ghcFinished() {
+	public boolean ghcIsFinished() {
 		return true;
 	}
 }
