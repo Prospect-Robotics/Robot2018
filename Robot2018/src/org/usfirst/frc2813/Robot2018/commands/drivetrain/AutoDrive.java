@@ -321,6 +321,7 @@ public class AutoDrive extends SubsystemCommand<DriveTrain> {
 		 * drift from the angle at the start of the command.  Within +/- 1 degree seems to be adequate.
 		 */
 		Logger.printLabelled(LogType.INFO, "PID linear stepping",
+				"Timestamp", System.currentTimeMillis(),
 				"TargetDistance", distance * direction.getMultiplier(),
 				"distance travelled", distanceTravelled,
 				"AngleError[now]", gyro.getAngle() - startAngle,
