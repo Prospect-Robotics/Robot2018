@@ -112,7 +112,7 @@ public class PWM extends AbstractMotorController implements IMotor {
 
 	@Override
 	public Rate getCurrentRate() {
-		return configuration.getNativeSensorRateUOM().create(speedController.get());
+		return configuration.createSensorRate(speedController.get());
 	}
 
 	@Override

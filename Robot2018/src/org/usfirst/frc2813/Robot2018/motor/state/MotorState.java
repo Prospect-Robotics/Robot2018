@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018.motor.state;
 
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
@@ -62,6 +63,12 @@ public class MotorState implements IMotorState {
 	 */
 	@Override
 	public Direction getTargetDirection() {
+		if(targetDirection != null) {
+			return targetDirection;
+		}
+		if(getHasTargetAbsolutePosition() && getHasStartingAbsolutePosition()) {
+			return (getTargetAbsolutePosition().getCanonicalValue() < getStartingAbsolutePosition().getCanonicalValue()) ? Direction.REVERSE : Direction.FORWARD;
+		}
 		return targetDirection;
 	}
 
@@ -98,14 +105,14 @@ public class MotorState implements IMotorState {
 	 */
 	@Override
 	public String getDescription() {
-		return "MotorState[Op=" + operation 
-				+ (targetDirection != null ? " TgtDir=" + targetDirection : "")
+		String params = ((targetDirection != null ? " TgtDir=" + targetDirection : "")
 				+ (targetRate != null ? " TgtRate=" + targetRate : "")
 				+ (targetAbsolutePosition != null ? " TgtAbsPos=" + targetAbsolutePosition : "")
 				+ (targetRelativeDistance != null ? " TgtRelDist=" + targetRelativeDistance : "")
 				+ (targetRate != null ? " TgtRateErr=" + getCurrentRateError() : "")
 				+ (operation.isMovingToPosition() ? " TgtPosErr=" + getCurrentPositionError() : "")
-				+ "]";
+				).trim();
+		return operation + (params.length() > 0 ? "[" + params + "]" : "");				 
 	}
 	
 	/* (non-Javadoc)
@@ -225,7 +232,7 @@ public class MotorState implements IMotorState {
 
 	@Override
 	public boolean getHasTargetDirection() {
-		return targetDirection != null;
+		return getTargetDirection() != null;
 	}
 
 	@Override
@@ -235,7 +242,7 @@ public class MotorState implements IMotorState {
 
 	@Override
 	public boolean getHasTargetAbsolutePosition() {
-		return targetAbsolutePosition != null;
+		return getTargetAbsolutePosition() != null;
 	}
 
 	@Override
@@ -262,7 +269,7 @@ public class MotorState implements IMotorState {
 	@Override
 	public Rate getCurrentRateError() {
 		if(!getHasTargetRate()) { 
-			return motor.getConfiguration().getNativeSensorRateUOM().create(0);
+			return motor.getConfiguration().createSensorRate(0);
 		}
 		//RateUOM uom = targetRate.getUOM();
 		RateUOM uom = motor.getConfiguration().getNativeSensorRateUOM();
@@ -293,5 +300,79 @@ public class MotorState implements IMotorState {
 	@Override
 	public boolean getHasStartingAbsolutePosition() {
 		return true; // NB: Could do this only for relative moves, but why not
+	}
+	
+
+	@Override
+	public boolean checkStatus(IStatusCheckCallback cb) {
+		boolean done = false;
+
+		// Capture the encoder value
+		int currentEncoderValue = motor.getConfiguration().toSensorUnits(motor.getCurrentPosition()).getValueAsInt();
+		long currentTimeMillis = System.currentTimeMillis();
+		
+		// Calibration complete?
+		if(!done) {
+			if(isCalibratingSensorInDirection() && motor.getCurrentHardLimitSwitchStatus(getTargetDirection())) {
+				cb.completed("We think we are calibrating and hit the correct hard limit switch for " + getTargetDirection());
+				done = true;
+			} else if(isDisabled()) {
+				cb.disabled("We are disabled.  This may be due to a failure, or not.");
+				done = true;
+			}
+		}
+		
+		// Check hard limits reached while moving
+		if(!done) {
+			if(getTargetDirection() != null) {
+				if(motor.getCurrentHardLimitSwitchStatus(getTargetDirection())) {
+					cb.interrupted("We were moving and hit a hard limit switch.");
+					done = true;
+				}
+				if(motor.getCurrentSoftLimitSwitchStatus(getTargetDirection())) {
+					cb.interrupted("We were moving and hit a soft limit switch.");
+					done = true;
+				}
+			}
+		}
+		
+		// If holding position
+		if(isHoldingCurrentPosition()) {
+			cb.completed("We're just holding the current position.");
+			done = true;
+		}
+
+		// See if we're at the target position
+		if(!done) {
+			Length margin = motor.getConfiguration().createDisplayLength(0.001);
+			if(isMovingToPosition() && motor.getCurrentPositionErrorWithin(margin)) {
+				cb.completed("We think we are within " + margin + " of target.  Actual error is " + motor.getCurrentPositionError() + " position is " + motor.getCurrentPosition());
+				done = true;
+			}
+		}
+
+		// Check the limits and stalled - PID died?
+		if(!done) {
+			// PID running
+			if(isMovingToPosition()) {
+				boolean hitHardLimit = motor.getCurrentHardLimitSwitchStatus(Direction.FORWARD) || motor.getCurrentHardLimitSwitchStatus(Direction.REVERSE);
+				boolean hitSoftLimit = motor.getCurrentSoftLimitSwitchStatus(Direction.FORWARD) || motor.getCurrentSoftLimitSwitchStatus(Direction.REVERSE);
+				// If we're not being run for the first time, see if we've stopped moving...
+				// We're running PID but we stopped moving and a limit is active... tell tale sign
+				if(cb.getLastEncoderValue() != 0 && (hitHardLimit || hitSoftLimit) && (currentEncoderValue == cb.getLastEncoderValue())) { // TODO: Add a time component to 'not changed in xx seconds' and add a 'margin for pulses' this only works for simulator
+					if(hitHardLimit) {
+						cb.interrupted("PID hit hard limit switch and stopped.");
+						done = true;
+					}
+					if(hitSoftLimit) {
+						cb.interrupted("PID hit soft limit switch and stopped.");
+						done = true;
+					}
+				}
+			}
+		}
+		cb.setLastCheckedTimeMillis(currentTimeMillis);
+		cb.setLastEncoderValue(currentEncoderValue);
+		return done;
 	}
 }

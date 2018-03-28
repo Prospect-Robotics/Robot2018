@@ -92,7 +92,7 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 		double distancePerNativeSensorUnitPerSecond = configuration.getNativeSensorRateUOM().getValue().getLength(TimeUOM.Seconds.create(1)).getValue();
 		encoder.setDistancePerPulse(distancePerNativeSensorUnitPerSecond);
 		// Reset the encoder and clear the relative offset
-		relativeOffset = configuration.getNativeSensorLengthUOM().create(0); 
+		relativeOffset = configuration.createSensorLength(0);
 		encoder.reset();
 	}
 
@@ -100,7 +100,7 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 	protected boolean resetEncoderSensorPositionImpl(Length sensorPosition) {
 		// NB: encoder won't store an offset for us, but we can still store it.
 		encoder.reset();
-		relativeOffset = toSensorUnits(sensorPosition);
+		relativeOffset = getConfiguration().toSensorUnits(sensorPosition);
 		return true;
 	}
 

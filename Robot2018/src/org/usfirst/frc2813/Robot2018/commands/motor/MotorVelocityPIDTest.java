@@ -27,17 +27,17 @@ public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 		addArg("continuousRotation", continuousRotation);
 		setName(toString());
 		if(continuousRotation) {
-			if(!subsystem.getHasHardOrSoftLimit(Direction.FORWARD)) {
+			if(!subsystem.getConfiguration().getHasHardOrSoftLimit(Direction.FORWARD)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test with a hard or soft FORWARD limit in CONTINOUS mode.");
 			}
-			if(!subsystem.getHasHardOrSoftLimit(Direction.REVERSE)) {
+			if(!subsystem.getConfiguration().getHasHardOrSoftLimit(Direction.REVERSE)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test with a hard or soft REVERSE limit in CONTINOUS mode.");
 			}
 		} else {
-			if(!subsystem.getHasHardOrSoftLimit(Direction.FORWARD)) {
+			if(!subsystem.getConfiguration().getHasHardOrSoftLimit(Direction.FORWARD)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test without a hard or soft FORWARD limit in NON-CONTINOUS mode.");
 			}
-			if(!subsystem.getHasHardOrSoftLimit(Direction.REVERSE)) {
+			if(!subsystem.getConfiguration().getHasHardOrSoftLimit(Direction.REVERSE)) {
 				throw new UnsupportedOperationException("Cowardly refusing to run the velocity pid test without a hard or soft REVERSE limit in NON-CONTINOUS mode.");
 			}
 		}
@@ -57,8 +57,8 @@ public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 
 	@Override
 	protected void ghscExecute() {
-		if((subsystem.getHasHardLimit(targetDirection) && subsystem.getCurrentHardLimitSwitchStatus(targetDirection))
-		|| (subsystem.getHasSoftLimit(targetDirection) && subsystem.isSoftLimitReached(targetDirection))) {
+		if((subsystem.getConfiguration().getHasHardLimit(targetDirection) && subsystem.getCurrentHardLimitSwitchStatus(targetDirection))
+		|| (subsystem.getConfiguration().getHasSoftLimit(targetDirection) && subsystem.isSoftLimitReached(targetDirection))) {
 			targetDirection = targetDirection.getInverse();
 			trace("execute", "REVERSING.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentRateError() + " Goal " + targetRate);
 			subsystem.moveInDirectionAtRate(targetDirection, targetRate);

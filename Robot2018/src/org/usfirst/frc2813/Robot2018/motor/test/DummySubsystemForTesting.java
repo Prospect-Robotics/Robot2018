@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.subsystems;
+package org.usfirst.frc2813.Robot2018.motor.test;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.command.Command;
  * your subsystem to this base class for testing.  Sadly, no preprocessor
  * so it's a manual process. 
  */
-public class StandaloneGearheadsSubsystem {
+public class DummySubsystemForTesting {
 	protected boolean encoderFunctional = true;
 	protected boolean emulated = true;
 
 	private String name;
-	public StandaloneGearheadsSubsystem() {
+	public DummySubsystemForTesting() {
 		this.name = getClass().getSimpleName();
 	}
 	
@@ -66,8 +66,8 @@ public class StandaloneGearheadsSubsystem {
 	public static class PeriodicTimerThread extends Thread {
 		private static final int PERIODIC_INTERVAL = 250;
 		private long lastRun = System.currentTimeMillis();
-		private final StandaloneGearheadsSubsystem target;
-		PeriodicTimerThread(StandaloneGearheadsSubsystem target) {
+		private final DummySubsystemForTesting target;
+		PeriodicTimerThread(DummySubsystemForTesting target) {
 			this.target = target;
 		}
 		

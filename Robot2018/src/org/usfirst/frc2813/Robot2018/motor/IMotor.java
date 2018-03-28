@@ -24,7 +24,7 @@ import org.usfirst.frc2813.units.values.Rate;
 *
 */
 public interface IMotor {
-	
+
 	// Information
 	
 	/** 
@@ -195,84 +195,6 @@ public interface IMotor {
 	 * as we are reaching our target condition. 
 	 */
 	void periodic();
-	/**
-	 * For testing auto, we'll ignore this device if it's disconnected
-	 * @return true if the motor is being skipped because of a failure or it's not ready yet. 
-	 */
-	boolean isDisconnected();
-	/**
-	 * Get the physical limit of the hardware
-	 * @param direction the direction to check
-	 * @return the physical limit, as specified in the configuration.
-	 */
-	public Length getPhysicalLimit(Direction direction);
-	/**
-	 * Do we have a hard limit in the indicated direction
-	 * @param direction the direction to check
-	 * @return true/false 
-	 */
-	public boolean getHasHardLimit(Direction direction);
-	/**
-	 * Do we have a soft limit in the indicated direction 
-	 * @param direction the direction to check
-	 * @return true/false 
-	 */
-	public boolean getHasSoftLimit(Direction direction);
-	/**
-	 * Do we have a hard or soft limit providing safety in the indicated direction 
-	 * @param direction the direction to check
-	 * @return true/false 
-	 */
-	public boolean getHasHardOrSoftLimit(Direction direction);
-	
-	/**
-	 * Get the soft limit switch position for the given direction, or null if we don't have one.
-	 * @param direction the direction to check
-	 * @see getHasSoftLimit
-	 * @return The soft limit if one exists, or null if we don't have one 
-	 */
-	public Length getSoftLimit(Direction direction);
-
-	/**
-	 * Get the minimum forward rate
-	 * @return the requested rate, if applicable.
-	 */
-	public Rate getMinimumForwardRate();
-	/**
-	 * Get the maximum forward rate
-	 * @return the requested rate, if applicable.
-	 */
-	public Rate getMaximumForwardRate();
-	/**
-	 * Get the maximum reverse rate
-	 * @return the requested rate, if applicable.
-	 */
-	public Rate getMaximumReverseRate();
-	/**
-	 * Get the minimum reverse rate
-	 * @return the requested rate, if applicable.
-	 */
-	public Rate getMinimumReverseRate();
-	/**
-	 * Get the maximum rate
-	 * @param direction the direction to check
-	 * @return the requested rate, if applicable.
-	 */
-	public Rate getMaximumRate(Direction direction);
-	/**
-	 * Get the minimum rate
-	 * @param direction the direction to check
-	 * @return the requested rate, if applicable.
-	 */
-	public Rate getMinimumRate(Direction direction);
-	
-	/**
-	 * Get the hard limit value
-	 * @param direction the direction to check
-	 * @return The hard limit in a direction, if a hard limit switch exists. 
-	 * @see IMotor#getHasHardLimit
-	 */
-	public Length getHardLimit(Direction direction);
 
 	/**
 	 * Shortcut - do we have a hard limit in the indicated direction that we have exceeded?

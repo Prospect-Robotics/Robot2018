@@ -89,7 +89,7 @@ public final class TalonSRX extends AbstractMotorController {
 	@Override
 	public final Length getCurrentPosition() {
 		int raw = mc.getSelectedSensorPosition(currentPID.getPIDIndex());
-		Length length = configuration.getNativeSensorLengthUOM().create(raw); 
+		Length length = configuration.createSensorLength(raw);
 //		Logger.info("readPosition " + raw + " --> " + length);
 		return length;
 	}
@@ -125,20 +125,20 @@ public final class TalonSRX extends AbstractMotorController {
 			break;
 		case MOVING_TO_ABSOLUTE_POSITION:
 			newControlMode = ControlMode.Position;
-			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
+			newControlModeValue = getConfiguration().toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
 			break;
 		case MOVING_TO_RELATIVE_POSITION:
 			newControlMode = ControlMode.Position;
-			newControlModeValue = toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
+			newControlModeValue = getConfiguration().toSensorUnits(proposedState.getTargetAbsolutePosition()).getValue();
 			break;
 		case MOVING_IN_DIRECTION_AT_RATE:
 			newControlMode = ControlMode.Velocity;
-			newControlModeValue = toSensorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+			newControlModeValue = getConfiguration().toSensorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			break;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			newControlMode = ControlMode.Velocity;
 			if(!getCurrentHardLimitSwitchStatus(proposedState.getTargetDirection())) {
-				newControlModeValue = toSensorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
+				newControlModeValue = getConfiguration().toSensorUnits(configuration.getDefaultRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			}
 		default:
 			break;
@@ -211,7 +211,7 @@ public final class TalonSRX extends AbstractMotorController {
 			return true;
 		}
 		// Select relative & reset
-		int rawValue = toSensorUnits(sensorPosition).getValueAsInt();
+		int rawValue = getConfiguration().toSensorUnits(sensorPosition).getValueAsInt();
 		Logger.debug(this + " setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ").");
 		mc.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, pid.getPIDIndex(), getTimeout());
 		if(true) {
@@ -343,7 +343,7 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		// Set forward soft limit
 		if(configuration.hasAll(IMotorConfiguration.Forward|IMotorConfiguration.LimitPosition|IMotorConfiguration.ForwardSoftLimitSwitch)) {
 			mc.configForwardSoftLimitEnable(true, getTimeout());
-			mc.configForwardSoftLimitThreshold(getForwardSoftLimit().getValueAsInt(), getTimeout());
+			mc.configForwardSoftLimitThreshold(getConfiguration().toSensorUnits(getConfiguration().getForwardSoftLimit()).getValueAsInt(), getTimeout());
 		} else {
 			mc.configForwardSoftLimitThreshold(0, getTimeout()); // Clear it so it's not confusing us in RoboRio Web UI
 			mc.configForwardSoftLimitEnable(false, getTimeout());
@@ -351,7 +351,7 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		// Set reverse soft limit
 		if(configuration.hasAll(IMotorConfiguration.Reverse|IMotorConfiguration.LimitPosition|IMotorConfiguration.ReverseSoftLimitSwitch)) {
 			mc.configReverseSoftLimitEnable(true, getTimeout());
-			mc.configReverseSoftLimitThreshold(getReverseSoftLimit().getValueAsInt(), getTimeout());
+			mc.configReverseSoftLimitThreshold(getConfiguration().toSensorUnits(getConfiguration().getReverseSoftLimit()).getValueAsInt(), getTimeout());
 		} else {
 			mc.configReverseSoftLimitThreshold(0, getTimeout()); // Clear it so it's not confusing us in RoboRio Web UI
 			mc.configReverseSoftLimitEnable(false, getTimeout());
@@ -379,13 +379,9 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		}
 	}
 
-	public String toString() {
-		return configuration.getName() + "." + this.getClass().getSimpleName();  
-	}
-
 	@Override
 	public Rate getCurrentRate() {
-		return configuration.getNativeSensorRateUOM().create(mc.getSelectedSensorVelocity(currentPID.getPIDIndex()));
+		return configuration.createSensorRate(mc.getSelectedSensorVelocity(currentPID.getPIDIndex()));
 	}
 
 	@Override

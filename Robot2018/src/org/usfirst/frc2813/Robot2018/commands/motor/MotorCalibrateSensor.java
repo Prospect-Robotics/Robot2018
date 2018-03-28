@@ -18,7 +18,7 @@ public final class MotorCalibrateSensor extends MotorCommand {
     	super(motor, duration, lockout);
 		this.direction = direction;
 		addArg("direction", direction);
-		if(!motor.getHasHardLimit(direction)) {
+		if(!motor.getConfiguration().getHasHardLimit(direction)) {
 			throw new IllegalArgumentException("The motor " + motor + " does not have a hard limit sensor in the " + direction + " direction. Cowardly refusing to break the robot.");
 		}
 		setName(toString());

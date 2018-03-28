@@ -331,11 +331,6 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	}
 
 	@Override
-	public boolean isDisconnected() {
-		return getMotorController().isDisconnected();
-	}
-
-	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
 		return getMotorController().getCurrentSoftLimitSwitchStatus(switchDirection);
 	}
@@ -343,94 +338,6 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	protected IMotorState toDisplay(IMotorState motorState) {
 		return motorState.convertTo(getConfiguration().getNativeDisplayLengthUOM(), getConfiguration().getNativeDisplayRateUOM(), getPhaseMultiplier() != 1.0);
 	}
-	@Override
-	public Length getPhysicalLimit(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		Length length = getMotorController().getPhysicalLimit(newDirection);
-		Length newLength = toDisplayUnitsNoPhaseCorrection(length);
-		log("getPhysicalLimit", "converted " + direction + " to " + newDirection + " and " + length + " to " + newLength);
-		return newLength;
-	}
-	@Override
-	public boolean getHasHardLimit(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		log("getHasHardLimit", "converted " + direction + " to " + newDirection);
-		return getMotorController().getHasHardLimit(newDirection);
-	}
-	@Override
-	public boolean getHasSoftLimit(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		log("getHasSoftLimit", "converted " + direction + " to " + newDirection);
-		return getMotorController().getHasSoftLimit(newDirection);
-	}
-	@Override
-	public boolean getHasHardOrSoftLimit(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		log("getHasHardOrSoftLimit", "converted " + direction + " to " + newDirection);
-		return getMotorController().getHasHardOrSoftLimit(newDirection);
-	}
-	
-	@Override
-	public Length getSoftLimit(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		Length length = getMotorController().getSoftLimit(newDirection);
-		Length newLength = toDisplayUnitsNoPhaseCorrection(length);
-		log("getSoftLimit", "converted " + direction + " to " + newDirection + " and " + length + " to " + newLength);
-		return newLength;
-	}
-	@Override
-	public Rate getMinimumForwardRate() {
-		Rate rate = getMotorController().getMinimumForwardRate();
-		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMinimumForwardRate", "converted " + rate + " to " + newRate);
-		return newRate;
-	}
-	@Override
-	public Rate getMaximumForwardRate() {
-		Rate rate = getMotorController().getMaximumForwardRate();
-		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMaximumForwardRate", "converted " + rate + " to " + newRate);
-		return newRate;
-	}
-	@Override
-	public Rate getMaximumReverseRate() {
-		Rate rate = getMotorController().getMaximumReverseRate();
-		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMaximumReverseRate", "converted " + rate + " to " + newRate);
-		return newRate;
-	}
-	@Override
-	public Rate getMinimumReverseRate() {
-		Rate rate = getMotorController().getMinimumReverseRate();
-		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMinimumReverseRate", "converted " + rate + " to " + newRate);
-		return newRate;
-	}
-	@Override
-	public Rate getMaximumRate(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		Rate rate = getMotorController().getMaximumRate(newDirection);
-		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMaximumRate", "converted " + direction + " to " + newDirection + " and " + rate + " to " + newRate);
-		return newRate;
-	}
-	@Override
-	public Rate getMinimumRate(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		Rate rate = getMotorController().getMinimumRate(newDirection);
-		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMinimumRate", "converted " + direction + " to " + newDirection + " and " + rate + " to " + newRate);
-		return newRate;
-	}
-	@Override
-	public Length getHardLimit(Direction direction) {
-		Direction newDirection = adjustPhase(direction);
-		Length length = getMotorController().getHardLimit(newDirection);
-		Length newLength = toDisplayUnitsNoPhaseCorrection(length);
-		log("getHardLimit", "converted " + direction + " to " + newDirection + " and " + length + " to " + newLength);
-		return newLength;
-	}
-	
 	@Override
 	public boolean isHardLimitExceeded(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);

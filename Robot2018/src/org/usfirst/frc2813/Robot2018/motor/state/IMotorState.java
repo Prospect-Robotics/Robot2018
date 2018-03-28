@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.motor.state;
 
+import org.usfirst.frc2813.Robot2018.motor.IMotor;
 import org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.units.Direction;
@@ -127,4 +128,24 @@ public interface IMotorState extends IMotorOperation {
 	 * @return The new object with units converted as specified.
 	 */
 	IMotorState convertTo(LengthUOM lengthUOM, RateUOM rateUOM, boolean invertDirection);
+
+	/**
+	 * Callback API for doing a status check for monitoring...
+	 */
+	public interface IStatusCheckCallback {
+		public IMotor getMotor();
+		public int getLastEncoderValue();
+		public void setLastEncoderValue(int lastEncoderValue);
+		public long getLastCheckedTimeMillis();
+		public void setLastCheckedTimeMillis(long lastCheckedTimeMillis);
+		public void completed(String message);
+		public void failed(String message);
+		public void disabled(String message);
+		public void interrupted(String message);
+	};
+	/**
+	 * Is the current operation likely to be complete
+	 * @return true if we think it's over.
+	 */
+	public boolean checkStatus(IStatusCheckCallback cb);
 }

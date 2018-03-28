@@ -12,6 +12,7 @@ import org.usfirst.frc2813.Robot2018.motor.simulated.Simulated;
 import org.usfirst.frc2813.Robot2018.motor.state.IMotorState;
 import org.usfirst.frc2813.Robot2018.motor.state.MotorStateFactory;
 import org.usfirst.frc2813.Robot2018.motor.talon.TalonSRX;
+import org.usfirst.frc2813.Robot2018.motor.test.MotorMonitorThread;
 import org.usfirst.frc2813.Robot2018.motor.victor.VictorSPX;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.LogType;
@@ -50,7 +51,7 @@ import edu.wpi.first.wpilibj.PWMSpeedController;
  *    of the current target state, previous target state, etc. as those are redundant and 
  *    unnecessarily complicate things.
  *
- *  To run standalone tests, change base class to StandaloneGearheadsSubsystem
+ *  To run standalone tests, change base class to DummySubsystemForTesting from GearheadsSubsystem
  *  
  *  IMPORTANT: This motor class doesn't know about units used by the actual motor!! You should NEVER
  *  be talking about pulses in here.  See the units adapter class which handles the translation layer!!!
@@ -215,7 +216,6 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			 }
 		}
 	}
-	
 	/**
 	 * Get the controller's target state
 	 * @see IMotorController#getTargetState()
@@ -231,11 +231,6 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	 */
 	protected IMotorState getControllerPreviousTargetState() {
 		return getMotorController().getPreviousTargetState();
-	}
-
-	@Override
-	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
-		return getMotorController().getCurrentHardLimitSwitchStatus(switchDirection);
 	}
 
 	@Override
@@ -409,7 +404,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			Logger.warning("Motor configuration says it's disconnected. Refusing action.");
 			return false;	
 		}
-		
+
 		// Check that the state transition is legal before we do anything.
 		if(!isStateTransitionAllowed(proposedState)) {
 			Logger.warning(this + " state transition aborted.");
@@ -422,11 +417,6 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 			return false;
 		}
 
-		// See if there was any translation and report on the alterations (units typically)
-		if(!getControllerTargetState().equals(proposedState)) {
-			Logger.info(this + " - Scaling Occurred [Target: " + proposedState + " Controller: " + getControllerTargetState()); 
-		}
-
 		Logger.debug(this + " state transition complete.  old: " + getTargetState() + " status: " + proposedState + ".");
 		Logger.debug(this + "] " + getDiagnostics());
 		this.previousState = this.currentState;
@@ -435,7 +425,6 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		return true;
 	}
 
-	
 	private static final long DISPLAY_INTERVAL = 2500;
 	private long lastPositionReport = System.currentTimeMillis() - DISPLAY_INTERVAL;
 	private void dumpSubsystemStatusAtIntervals() {
@@ -449,81 +438,25 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	public Rate getCurrentRate() {
 		return getMotorController().getCurrentRate();
 	}
-
 	@Override
 	public Length getCurrentPositionError() {
 		return getMotorController().getCurrentPositionError();
 	}
-
 	@Override
 	public Rate getCurrentRateError() {
 		return getMotorController().getCurrentRateError();
 	}
-
 	@Override
 	public boolean getCurrentRateErrorWithin(Rate marginOfError) {
 		return getMotorController().getCurrentRateErrorWithin(marginOfError);
 	}
-
 	@Override
 	public boolean getCurrentPositionErrorWithin(Length marginOfError) {
 		return getMotorController().getCurrentPositionErrorWithin(marginOfError);
 	}
 	@Override
-	public boolean isDisconnected() {
-		return getConfiguration().hasAll(IMotorConfiguration.Disconnected);
-	}
-	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction switchDirection) {
 		return getMotorController().getCurrentSoftLimitSwitchStatus(switchDirection);
-	}
-	@Override
-	public Length getPhysicalLimit(Direction direction) {
-		return getMotorController().getPhysicalLimit(direction);
-	}
-	@Override
-	public boolean getHasHardLimit(Direction direction) {
-		return getMotorController().getHasHardLimit(direction);
-	}
-	@Override
-	public boolean getHasHardOrSoftLimit(Direction direction) {
-		return getMotorController().getHasHardOrSoftLimit(direction);
-	}
-	@Override
-	public boolean getHasSoftLimit(Direction direction) {
-		return getMotorController().getHasSoftLimit(direction);
-	}
-	@Override
-	public Length getSoftLimit(Direction direction) {
-		return getMotorController().getSoftLimit(direction);
-	}
-	@Override
-	public Rate getMinimumForwardRate() {
-		return getMotorController().getMinimumForwardRate();
-	}
-	@Override
-	public Rate getMaximumForwardRate() {
-		return getMotorController().getMaximumForwardRate();
-	}
-	@Override
-	public Rate getMaximumReverseRate() {
-		return getMotorController().getMaximumReverseRate();
-	}
-	@Override
-	public Rate getMinimumReverseRate() {
-		return getMotorController().getMinimumReverseRate();
-	}
-	@Override
-	public Rate getMaximumRate(Direction direction) {
-		return getMotorController().getMaximumRate(direction);
-	}
-	@Override
-	public Rate getMinimumRate(Direction direction) {
-		return getMotorController().getMinimumRate(direction);
-	}
-	@Override
-	public Length getHardLimit(Direction direction) {
-		return getMotorController().getHardLimit(direction);
 	}
 	@Override
 	public boolean isHardLimitExceeded(Direction direction) { 
@@ -552,5 +485,27 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	@Override
 	public boolean isPhysicalLimitReached(Direction direction) { 
 		return getMotorController().isPhysicalLimitReached(direction); 
+	}
+	@Override
+	public boolean getCurrentHardLimitSwitchStatus(Direction switchDirection) {
+		return getMotorController().getCurrentHardLimitSwitchStatus(switchDirection);
+	}
+
+	private MotorMonitorThread monitor = null;
+	
+	public synchronized void startMonitoring() {
+		if(monitor != null) {
+			throw new IllegalStateException("Periodic timer is already running.");
+		}
+		this.monitor = new MotorMonitorThread(this);
+		monitor.start();
+	}
+	
+	public synchronized void stopMonitoring() {
+		if(monitor == null) {
+			throw new IllegalStateException("Periodic timer is already terminated.");
+		}
+		monitor.interrupt();
+		monitor = null;
 	}
 }

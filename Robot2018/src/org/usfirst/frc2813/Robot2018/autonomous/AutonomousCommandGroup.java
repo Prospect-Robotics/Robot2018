@@ -196,7 +196,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public class Elevator {
 		/** Calibrate the elevator (move down), but don't wait for completion. */
 		private void addCalibrateAsync() {
-			if(!Robot.elevator.isDisconnected()) {
+			if(!Robot.elevator.getConfiguration().isDisconnected()) {
 				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
@@ -205,7 +205,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * our sensor has been set the value of the lower limit (zero).
 		 */
 		private void addCalibrateSync() {
-			if(!Robot.elevator.isDisconnected()) {
+			if(!Robot.elevator.getConfiguration().isDisconnected()) {
 				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
 			}
 		}
@@ -223,19 +223,19 @@ public class AutonomousCommandGroup extends CommandGroup {
 			 * Allow overriding maximum rate for PID move to position,
 			 * go slower when we have a cube in the jaws!
 			 */
-			if(!Robot.elevator.isDisconnected()) {
+			if(!Robot.elevator.getConfiguration().isDisconnected()) {
 				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0), RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/** Wait for the Elevator to hit the hard reset limit*/
 		public void addWaitForHardLimitSwitchSync() {
-			if(!Robot.elevator.isDisconnected())
+			if(!Robot.elevator.getConfiguration().isDisconnected())
 				addSequential(new MotorWaitForHardLimitSwitch(Robot.elevator, Direction.DOWN));
 		}
 		/** Wait for the Elevator to reach a target position. */
 		public void addWaitForTargetPositionSync() {
 			// Wait for Elevator to reach it's destination to within +/- one inch.
-			if(!Robot.elevator.isDisconnected())
+			if(!Robot.elevator.getConfiguration().isDisconnected())
 				addSequential(new MotorWaitForTargetPosition(Robot.elevator, LengthUOM.Inches.create(1)));
 		}
 	}
@@ -247,7 +247,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * To check it you would have to wait for a limit switch.
 		 */
 		private void addCalibrateAsync() {
-			if(!Robot.arm.isDisconnected()) {
+			if(!Robot.arm.getConfiguration().isDisconnected()) {
 				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
@@ -256,7 +256,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * our sensor has been set the value of the lower limit (zero).
 		 */
 		private void addCalibrateSync() {
-			if(!Robot.arm.isDisconnected()) {
+			if(!Robot.arm.getConfiguration().isDisconnected()) {
 				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN));
 			}
 		}
@@ -271,19 +271,19 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @see ArmConfiguration#ArmDegrees
 		 */
 		public void addMoveToPositionAsync(Length armDegrees) {
-			if(!Robot.arm.isDisconnected())
+			if(!Robot.arm.getConfiguration().isDisconnected())
 				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Wait for the Arm to hit the hard reset limit */
 		public void addWaitForHardLimitSwitchSync() {
-			if(!Robot.arm.isDisconnected())
+			if(!Robot.arm.getConfiguration().isDisconnected())
 				addSequential(new MotorWaitForHardLimitSwitch(Robot.arm, Direction.IN));
 		}
 
 		/** Wait for the Arm to get very close to a target position. */
 		public void addWaitForTargetPositionSync() {
-			if(!Robot.arm.isDisconnected()) {
+			if(!Robot.arm.getConfiguration().isDisconnected()) {
 				addSequential(new MotorWaitForTargetPosition(Robot.arm, ArmConfiguration.ArmDegrees.create(5.0)));
 			}
 		}
