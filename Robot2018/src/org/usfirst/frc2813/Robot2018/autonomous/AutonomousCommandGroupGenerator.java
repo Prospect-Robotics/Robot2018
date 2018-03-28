@@ -304,7 +304,7 @@ public class AutonomousCommandGroupGenerator {
 		double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
 
 		/** field dimensions from back wall */
-		double backWallToSwitch = 110;
+		double backWallToSwitch = 140;
 		double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; /** pyramid of cubes on near side of scale */
 		double backWallToFarSideOfSwitch = 196;
 		double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; /** row of cubes on far side of scale */
