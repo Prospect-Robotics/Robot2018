@@ -24,7 +24,7 @@ public final class MotorHoldPosition extends MotorCommand {
 	}
  
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(!subsystem.getTargetState().getOperation().equals(MotorOperation.HOLDING_CURRENT_POSITION)) {
 			traceFormatted("initialize","setting %s to hold position", subsystem);
 			subsystem.holdCurrentPosition();
@@ -37,7 +37,7 @@ public final class MotorHoldPosition extends MotorCommand {
 	 * Requires the subsystem
 	 */
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
@@ -45,7 +45,7 @@ public final class MotorHoldPosition extends MotorCommand {
 	 * Return false forever, run until interrupted, timer expires, etc..
 	 */
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 }

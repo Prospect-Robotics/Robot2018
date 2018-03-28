@@ -56,7 +56,7 @@ public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 	}
 
 	@Override
-	protected void subsystemExecuteImpl() {
+	protected void ghscExecute() {
 		if((subsystem.getHasHardLimit(targetDirection) && subsystem.getCurrentHardLimitSwitchStatus(targetDirection))
 		|| (subsystem.getHasSoftLimit(targetDirection) && subsystem.isSoftLimitReached(targetDirection))) {
 			targetDirection = targetDirection.getInverse();
@@ -68,17 +68,17 @@ public final class MotorVelocityPIDTest extends SubsystemCommand<Motor> {
 	}
 	
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		subsystem.moveInDirectionAtRate(targetDirection, targetRate);
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 }

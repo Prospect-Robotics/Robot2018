@@ -37,13 +37,13 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
 	 * Start the move
 	 */
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		traceFormatted("initialize", "telling %s to move %s by %s.", subsystem, direction, relativeDistance);
 		subsystem.moveToRelativePosition(direction, relativeDistance);
 	}
 
 	@Override
-	public boolean subsystemIsFinishedImpl() {
+	public boolean ghscIsFinished() {
      	// Handle completion for sync mode
     	if(subsystem.getCurrentPositionErrorWithin(allowableError)) {
     		traceFormatted("isFinished", "success waiting for %s to move %s by %s.", subsystem, direction, relativeDistance);
@@ -54,7 +54,7 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
     }
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 

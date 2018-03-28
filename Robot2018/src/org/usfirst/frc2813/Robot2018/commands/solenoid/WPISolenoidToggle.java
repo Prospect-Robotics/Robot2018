@@ -17,14 +17,14 @@ public final class WPISolenoidToggle extends TargetedCommand<edu.wpi.first.wpili
     }
 
 	//@Override
-	protected void initializeImpl() {
+	protected void ghcInitialize() {
         boolean old = target.get();
         traceFormatted("intialize", "toggling %s from %b to %b", target, old, !old);
         target.set(!old);
 	}
 	
 	// @Override
-	public boolean isFinishedImpl() {
+	public boolean ghcFinished() {
 		return true;
 	}
 }

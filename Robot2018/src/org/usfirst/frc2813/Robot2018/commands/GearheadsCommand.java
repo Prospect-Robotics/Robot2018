@@ -109,7 +109,7 @@ public abstract class GearheadsCommand extends Command {
 	@Override
 	protected final void end() {
 		entered("end");
-		endImpl();
+		ghcEnd();
 		super.end(); 
 		returning("end");
 	}
@@ -120,7 +120,7 @@ public abstract class GearheadsCommand extends Command {
 	@Override
 	protected final void interrupted() {
 		entered("interrupted");
-		interruptedImpl();
+		ghcInterrupted();
 		super.interrupted();
 		returning("interrupted");
 	}
@@ -150,7 +150,7 @@ public abstract class GearheadsCommand extends Command {
 		} else if(!isFinished && isTimedOut()) {
 			Logger.error(this + " WARNING: Someone is messing with timer.  If the timer is set, the duration should be either Timer or Timeout.");
 			isFinished = true;
-		} else if(!isFinished && isFinishedImpl()) {
+		} else if(!isFinished && ghcFinished()) {
 			trace("isFinished", "subclass says it's finished.");
 			isFinished = true;
 		} else if(!isFinished && duration.isTimer()) {
@@ -170,7 +170,7 @@ public abstract class GearheadsCommand extends Command {
 	// @Override
 	protected final void execute() {
 		entered("execute");
-		executeImpl();
+		ghcExecute();
 		returning("execute");
 	}
 	/**
@@ -180,7 +180,7 @@ public abstract class GearheadsCommand extends Command {
 	protected final void initialize() {
 		setName(toString());
 		entered("initialize");
-		initializeImpl();
+		ghcInitialize();
 		returning("initialize");
 	}
 	/**
@@ -202,32 +202,27 @@ public abstract class GearheadsCommand extends Command {
 	 * Concrete subclass may implement this method
 	 * @see initialize
 	 */
-	protected void initializeImpl() { }
+	protected void ghcInitialize() { }
 	/**
 	 * Concrete subclass may implement this method
 	 * @see execute
 	 */
-	protected void executeImpl() { }
+	protected void ghcExecute() { }
 	/**
 	 * Concrete subclass may implement this method
 	 * @see cancel
 	 */
-	protected void cancelImpl() { }
-	/**
-	 * Concrete subclass may implement this method
-	 * @see cancel
-	 */
-	protected void endImpl() { }
+	protected void ghcEnd() { }
 	/**
 	 * Concrete subclass may implement this method
 	 * @see interrupted
 	 */
-	protected void interruptedImpl() { }
+	protected void ghcInterrupted() { }
 	/**
 	 * Concrete subclass must implement this method.
 	 * @see isFinished
 	 */
-	protected abstract boolean isFinishedImpl();
+	protected abstract boolean ghcFinished();
 	/**
 	 * If there is a timeout associated with the command, return it here.
 	 * @see TimedCommand

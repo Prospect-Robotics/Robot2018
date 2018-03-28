@@ -31,7 +31,7 @@ public final class SolenoidSet extends SubsystemCommand<Solenoid> {
     	this(solenoid, position, CommandDuration.DISABLED, Lockout.Disabled);
     }
 	//@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(subsystem.getCurrentPosition() == position) {
 			traceFormatted("initialize","NOT changing %2$s from %3$s to %4$s, it's already %4$s",subsystem,subsystem.getCurrentPosition(),position);
 		} else {
@@ -41,7 +41,7 @@ public final class SolenoidSet extends SubsystemCommand<Solenoid> {
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
@@ -49,7 +49,7 @@ public final class SolenoidSet extends SubsystemCommand<Solenoid> {
 	 * Instant command
 	 */
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

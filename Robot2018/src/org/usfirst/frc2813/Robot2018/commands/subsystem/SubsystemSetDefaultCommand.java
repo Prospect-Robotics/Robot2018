@@ -18,7 +18,7 @@ public class SubsystemSetDefaultCommand extends SubsystemCommand<GearheadsSubsys
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(subsystem.getDefaultCommand() != defaultCommand) {
 			traceFormatted("initialize","setting default command for %s to %s.", subsystem, defaultCommand);
 			subsystem.setDefaultCommand(defaultCommand);
@@ -31,7 +31,7 @@ public class SubsystemSetDefaultCommand extends SubsystemCommand<GearheadsSubsys
 	 * Returns false, we don't need exclusive access
 	 */
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return false;
 	}
 
@@ -39,7 +39,7 @@ public class SubsystemSetDefaultCommand extends SubsystemCommand<GearheadsSubsys
 	 * return true, it's an instant command
 	 */
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

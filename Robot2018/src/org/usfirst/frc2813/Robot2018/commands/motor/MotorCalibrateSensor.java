@@ -33,7 +33,7 @@ public final class MotorCalibrateSensor extends MotorCommand {
     }
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(subsystem.getTargetState().getOperation() == MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION && subsystem.getTargetState().getTargetDirection() == direction) {
 			traceFormatted("initialize", "NOT telling %s to calibrate the sensor in  to %s, it's already doing that.",subsystem,direction);
 		} else {
@@ -46,12 +46,12 @@ public final class MotorCalibrateSensor extends MotorCommand {
 	 * We definitely require the subsystem
 	 */
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		if(subsystem.getCurrentHardLimitSwitchStatus(direction)) {
 			traceFormatted("isFinished", "hard limit reached.  calibration completed.");
 			return true;

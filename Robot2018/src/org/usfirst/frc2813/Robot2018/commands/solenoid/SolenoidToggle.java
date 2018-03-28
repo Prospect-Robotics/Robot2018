@@ -24,7 +24,7 @@ public class SolenoidToggle extends SubsystemCommand<Solenoid> {
     }
 
 	//@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		Direction oldPosition = subsystem.getCurrentPosition();
 		Direction newPosition = oldPosition.getInverse();
 		traceFormatted("intialize", "toggling %s from %s to %s", subsystem, oldPosition, newPosition);
@@ -35,7 +35,7 @@ public class SolenoidToggle extends SubsystemCommand<Solenoid> {
 	 * @return true
 	 */
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
@@ -43,7 +43,7 @@ public class SolenoidToggle extends SubsystemCommand<Solenoid> {
 	 * @return true
 	 */
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

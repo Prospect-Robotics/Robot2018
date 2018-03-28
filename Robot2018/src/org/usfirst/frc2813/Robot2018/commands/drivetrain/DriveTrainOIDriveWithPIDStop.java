@@ -28,7 +28,7 @@ public class DriveTrainOIDriveWithPIDStop extends DriveTrainStop {
 	 * Called repeatedly when this Command is scheduled to run
 	 */
 	@Override
-	protected void subsystemExecuteImpl() {
+	protected void ghscExecute() {
 		boolean pidStop = false;
 		if(DriverStation.getInstance().isAutonomous()) {
 			pidStop = true;

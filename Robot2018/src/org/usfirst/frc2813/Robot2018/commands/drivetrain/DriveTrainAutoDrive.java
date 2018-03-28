@@ -180,7 +180,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 	// Called just before this Command runs the first time
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive state",
 				"startSpeed", startSpeed,
 				"accelRamp", accelRamp,
@@ -280,7 +280,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		/* 
 		 * Keep track of whether we have finished, and ignore any PID outputs on a best effort basis.
 		 * It's highly probable that assigning to boolean complete will be atomic, though it's not 
@@ -290,7 +290,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	}
 	// Called once after isFinished returns true or interrupted.
 	@Override
-	protected void subsystemInterruptedImpl() {
+	protected void ghscInterrupted() {
 		controller.disable();
 		controller.reset();
 		/*
@@ -332,7 +332,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 }

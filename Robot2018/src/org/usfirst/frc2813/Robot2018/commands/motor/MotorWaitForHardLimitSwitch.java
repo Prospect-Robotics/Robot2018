@@ -30,7 +30,7 @@ public final class MotorWaitForHardLimitSwitch extends SubsystemCommand<Motor> {
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		// NB: If the motor is moving to a position (relative or absolute)
 		if(!isFinished()) {
 			traceFormatted("initialize","waiting for %s to reach %s hard limit switch.",subsystem,direction);
@@ -40,7 +40,7 @@ public final class MotorWaitForHardLimitSwitch extends SubsystemCommand<Motor> {
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		boolean finished = subsystem.getCurrentHardLimitSwitchStatus(direction);
 		if(!finished) {
 			traceFormatted("isFinished", "waiting for %s to reach %s hard limit switch.",subsystem,direction);
@@ -54,7 +54,7 @@ public final class MotorWaitForHardLimitSwitch extends SubsystemCommand<Motor> {
 	 * Return false, we don't interrupt any other command using the motor - it's possibly moving the motor where we want it.
 	 */
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return false;
 	}
 }

@@ -37,7 +37,7 @@ public final class MotorWaitForTargetPosition extends SubsystemCommand<Motor> {
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		// NB: If the motor is moving to a position (relative or absolute)
 		if(!isFinished()) {
 			traceFormatted("initialize","waiting for %s to reach %s.",subsystem,subsystem.getTargetState().getTargetAbsolutePosition());
@@ -47,7 +47,7 @@ public final class MotorWaitForTargetPosition extends SubsystemCommand<Motor> {
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		// NB: If there's no target position (absolute or relative), this will always return true.
 		boolean finished = subsystem.getCurrentPositionErrorWithin(allowableError);
 		// NB: If the motor is moving to a position (relative or absolute)
@@ -61,7 +61,7 @@ public final class MotorWaitForTargetPosition extends SubsystemCommand<Motor> {
 	 * Return false, we don't interrupt any other command using the motor - it's possibly moving the motor where we want it.
 	 */
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return false;
 	}
 }

@@ -17,7 +17,7 @@ public final class ToggleCompressor extends TargetedCommand<Compressor> {
     }
 
     // Called once when the command executes
-    protected void initializeImpl() {
+    protected void ghcInitialize() {
     	if(getTarget().enabled()) {
     		System.out.println(this + " disabling the compressor.");
     		getTarget().stop();
@@ -31,7 +31,7 @@ public final class ToggleCompressor extends TargetedCommand<Compressor> {
     }
 
 	@Override
-	protected boolean isFinishedImpl() {
+	protected boolean ghcFinished() {
 		return true;
 	}
 }

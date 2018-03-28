@@ -38,7 +38,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {		
+	protected void ghscInitialize() {		
 		if(subsystem.getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && subsystem.getTargetState().getTargetAbsolutePosition() == position) {
 			traceFormatted("initialize","NOT telling %s to move to %s, it's already doing that.", subsystem, position);
 		} else {
@@ -48,7 +48,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
     	// Handle completion for sync mode
     	if(subsystem.getCurrentPositionErrorWithin(allowableError)) {
     		traceFormatted("isFinished", "success waiting for %s to move to %s.",subsystem,position);
@@ -59,7 +59,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
     }
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 }

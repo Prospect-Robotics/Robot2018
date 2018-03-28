@@ -27,10 +27,10 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 		this.subsystem  = target;
 		this.lockout = lockout;
 		addArg("lockout", lockout);
-		if(isSubsystemRequired()) {
+		if(ghscIsSubsystemRequired()) {
 			requires(target);
 		}
-		if(lockout.isWhileRunning() && !isSubsystemRequired()) {
+		if(lockout.isWhileRunning() && !ghscIsSubsystemRequired()) {
 			throw new IllegalArgumentException("You cannot lockout a subsystem unless you also 'require' the subsystem.  Fix isSubsystemRequired().");
 		}
 	}
@@ -45,32 +45,32 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	}
 
 	//@Override
-	protected final void initializeImpl() {
+	protected final void ghcInitialize() {
 		// Handle lockout
 		if(lockout.isEnabled()) {
 			lock();
 		}
 		// Call the subclass
-		subsystemInitializeImpl();
+		ghscInitialize();
 	}
 
 	/**
 	 * When we end, we will handle unlocking here 
 	 */
 	@Override
-	protected final void endImpl() {
+	protected final void ghcEnd() {
 		// Call the subclass to get their deal
-		subsystemEndImpl();
+		ghscEnd();
 	}
 
 	@Override
-	protected void interruptedImpl() {
+	protected final void ghcInterrupted() {
 		// A hook for shutting down
-		subsystemInterruptedImpl();
+		ghscInterrupted();
 		// A hook for shutting down that's conditional
 		if(!getDuration().isAsynchronous()) {
 			traceFormatted("interrupted", "interrupted while waiting, calling interruptedWhileWaiting.");
-			interruptedWhileWaitingImpl();
+			ghscinterruptedWhileWaiting();
 		}
 		// Unlock the subsystem
 		if(lockout.isWhileRunning()) {
@@ -79,13 +79,13 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	}
 
 	@Override
-	protected void executeImpl() {
-		subsystemExecuteImpl();
+	protected final void ghcExecute() {
+		ghscExecute();
 	}
 
 	@Override
-	protected final boolean isFinishedImpl() {
-		return subsystemIsFinishedImpl();
+	protected final boolean ghcFinished() {
+		return ghscIsFinished();
 	}
 
 	protected void lock() {
@@ -116,17 +116,17 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	 * Is the subsystem "required"
 	 * @see requires 
 	 */
-	public abstract boolean isSubsystemRequired();
+	public abstract boolean ghscIsSubsystemRequired();
 	// For subclasses
-	protected abstract void subsystemInitializeImpl();
+	protected abstract void ghscInitialize();
 	// For subclasses
-	protected abstract boolean subsystemIsFinishedImpl();
+	protected abstract boolean ghscIsFinished();
 	// For subclasses
-	protected void subsystemEndImpl() {}
+	protected void ghscEnd() {}
 	// For subclasses
-	protected void subsystemExecuteImpl() {}
+	protected void ghscExecute() {}
 	// For subclasses - called on end or interrupted
-	protected void subsystemInterruptedImpl() {}
+	protected void ghscInterrupted() {}
 	// For subclasses - called on end or interrupted, but only if we were in waiting mode and we set shutdownOnInterruption so we will safe on interruption.
-	protected void interruptedWhileWaitingImpl() {}
+	protected void ghscinterruptedWhileWaiting() {}
 }

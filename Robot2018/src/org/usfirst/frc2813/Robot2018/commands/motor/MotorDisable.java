@@ -23,7 +23,7 @@ public final class MotorDisable extends MotorCommand {
     }
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(subsystem.getTargetState().getOperation() == MotorOperation.DISABLED) {
 			if(!isTracingEnabled()) {
 				traceFormatted("initialize", "NOT SETTING %s to disable (neutral state), it's already disabled.", subsystem);
@@ -35,12 +35,12 @@ public final class MotorDisable extends MotorCommand {
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

@@ -22,7 +22,7 @@ public class IntakeStop extends SubsystemCommand<Intake> {
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(subsystem.getCurrentDirection().equals(Direction.STOP)) {
 			trace("initialize", "Telling " + subsystem + " to stop, but it already is.");
 		} else {
@@ -31,12 +31,12 @@ public class IntakeStop extends SubsystemCommand<Intake> {
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

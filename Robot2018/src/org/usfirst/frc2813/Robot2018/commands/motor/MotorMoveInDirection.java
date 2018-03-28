@@ -40,7 +40,7 @@ public final class MotorMoveInDirection extends MotorCommand {
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {		
+	protected void ghscInitialize() {		
 		if(subsystem.getTargetState().getOperation() == MotorOperation.MOVING_IN_DIRECTION_AT_RATE 
 				&& subsystem.getTargetState().getTargetDirection().equals(direction)
 				&& subsystem.getTargetState().getTargetRate().equals(rate)
@@ -54,12 +54,12 @@ public final class MotorMoveInDirection extends MotorCommand {
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 }

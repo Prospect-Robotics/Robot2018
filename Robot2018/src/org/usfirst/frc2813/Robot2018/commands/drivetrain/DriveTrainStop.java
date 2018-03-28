@@ -42,7 +42,7 @@ public class DriveTrainStop extends SubsystemCommand<DriveTrain> {
 
     // Called just before this Command runs the first time
     @Override
-    protected void subsystemInitializeImpl() {
+    protected void ghscInitialize() {
     	if(pid1 == null) {
     		if(Robot.driveTrain.encoderPortFunctional && subsystem.encoderStarboardFunctional) {
     			pid1 = new PIDController(Kp, Ki, Kd, subsystem.getEncoderPort(), subsystem.getSpeedControllerPort());
@@ -63,7 +63,7 @@ public class DriveTrainStop extends SubsystemCommand<DriveTrain> {
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
-    protected boolean subsystemIsFinishedImpl() {
+    protected boolean ghscIsFinished() {
 //    	if(pid1 == null)
 //    		// can't do anything with only one controller
 //    		return true;
@@ -91,7 +91,7 @@ public class DriveTrainStop extends SubsystemCommand<DriveTrain> {
     
     // Called once after we are interrupted or end normally
     @Override
-    protected void interruptedWhileWaitingImpl() {
+    protected void ghscinterruptedWhileWaiting() {
     	disablePID();
     }
 
@@ -100,7 +100,7 @@ public class DriveTrainStop extends SubsystemCommand<DriveTrain> {
     }
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 }

@@ -21,19 +21,19 @@ public class DriveTrainResetEncoders extends SubsystemCommand<DriveTrain> {
 
     // Called once when the command executes
     @Override
-    protected void subsystemInitializeImpl() {
+    protected void ghscInitialize() {
     	trace("initialize", "resetting drive train encoders.");
     	subsystem.getEncoderStarboard().reset();
     	subsystem.getEncoderPort().reset();
     }
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true; // stop while we are resetting, so we don't screw up
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

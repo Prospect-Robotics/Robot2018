@@ -30,7 +30,7 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 	 * Called repeatedly when this Command is scheduled to run
 	 */
 	@Override
-	protected void subsystemExecuteImpl() {
+	protected void ghscExecute() {
 		if(!DriverStation.getInstance().isAutonomous()) {
 			subsystem.arcadeDrive(joystick1, joystick2);
 		}
@@ -40,16 +40,16 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 	 * Never finished, wait for interruption?
 	 */
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 	}
 }

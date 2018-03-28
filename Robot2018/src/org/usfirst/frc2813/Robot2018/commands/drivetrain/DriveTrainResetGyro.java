@@ -23,19 +23,19 @@ public final class DriveTrainResetGyro extends SubsystemCommand<DriveTrain> {
      * Reset the gyro
      */
     @Override
-    protected void subsystemInitializeImpl() {
+    protected void ghscInitialize() {
     	super.initialize();
     	trace("initialize", "resetting drive train gyro.");
     	subsystem.getGyro().reset();
     }
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true; // stop while we are resetting, so we don't screw up
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return true;
 	}
 }

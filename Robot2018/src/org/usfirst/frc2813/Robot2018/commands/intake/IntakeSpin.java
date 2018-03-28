@@ -27,12 +27,12 @@ public class IntakeSpin extends SubsystemCommand<Intake> {
     }
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		if(subsystem.getTargetDirection().equals(direction)) {
 			traceFormatted("initialize", "NOT telling %s to spin %s, but it already is.", subsystem, direction);
 		} else {
@@ -42,12 +42,12 @@ public class IntakeSpin extends SubsystemCommand<Intake> {
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 
 	@Override
-	protected void interruptedWhileWaitingImpl() {
+	protected void ghscinterruptedWhileWaiting() {
 		traceFormatted("interrupted", "telling %s to stop.", subsystem);
 		subsystem.stop();
 	}

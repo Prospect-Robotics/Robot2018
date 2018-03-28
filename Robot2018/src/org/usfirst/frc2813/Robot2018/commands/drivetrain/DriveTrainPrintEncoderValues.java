@@ -29,12 +29,12 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 
 	// Called just before this Command runs the first time
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
-	protected void subsystemExecuteImpl() {
+	protected void ghscExecute() {
 		if((System.currentTimeMillis() - last) >= 100) {
 			System.out.println(
 					"starboardEncoder " + starboardEncoder.get() + " [" + starboardEncoder.getRaw() + "] " +starboardEncoder.getDistance()+" "+ starboardEncoder.getDistance()*DriveTrain.WHEEL_CIRCUMFERENCE_INCHES +" ["+starboardEncoder.getDistancePerPulse()+"] "+starboardEncoder.getDirection()+" ["+starboardEncoder.getStopped()+"]\n" +
@@ -46,12 +46,12 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 	
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return false;
 	}
 }

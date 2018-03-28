@@ -49,7 +49,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 
 	// Called just before this Command runs the first time
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		startingAngle = subsystem.getGyro().getAngle();
 		targetAngle   = startingAngle + (direction.getMultiplierAsDouble() * relativeAngleInDegrees);  
 	}
@@ -90,19 +90,19 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	}
 
 	// Called repeatedly when this Command is scheduled to run
-	protected void subsystemExecuteImpl() {
+	protected void ghscExecute() {
 		int directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
 		subsystem.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return getErrorMagnitudeInDegrees() <= MIN_DEG;
 	}
     
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 }

@@ -41,12 +41,12 @@ public final class MotorPositionPIDTest extends MotorCommand {
 	}
 	
 	@Override
-	protected void subsystemInitializeImpl() {
+	protected void ghscInitialize() {
 		subsystem.moveToAbsolutePosition(minHeight);
 	}
 
 	@Override
-	protected void subsystemExecuteImpl() {
+	protected void ghscExecute() {
 		if(subsystem.getCurrentPositionErrorWithin(allowableError)) {
 			targetDirection = targetDirection.getInverse();
 			trace("execute", "REVERSING.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentPositionError() + " Goal " + targetPosition);
@@ -58,12 +58,12 @@ public final class MotorPositionPIDTest extends MotorCommand {
 	}
 
 	@Override
-	public boolean isSubsystemRequired() {
+	public boolean ghscIsSubsystemRequired() {
 		return true;
 	}
 
 	@Override
-	protected boolean subsystemIsFinishedImpl() {
+	protected boolean ghscIsFinished() {
 		return false;
 	}
 }

@@ -19,7 +19,7 @@ public abstract class MotorCommand extends SubsystemCommand<Motor> {
 		this(target, duration, Lockout.Disabled);
 	}
 	@Override
-	protected void interruptedWhileWaitingImpl() {
+	protected void ghscinterruptedWhileWaiting() {
 		traceFormatted("interrupted", "telling %s to hold position.", subsystem);
 		subsystem.holdCurrentPosition();
 	}
