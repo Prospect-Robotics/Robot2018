@@ -2,7 +2,7 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncoders;
@@ -133,7 +133,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Scale the acceleration/deceleration in the auto drive system. THIS IS GLOBAL AND INSTANT! */
 		public void setRampSpeed(double rampSpeed) {
-			AutoDrive.scaleRamps(rampSpeed);
+			DriveTrainAutoDrive.scaleRamps(rampSpeed);
 		}
 
 		/**
@@ -158,7 +158,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
 			Logger.printLabelled(LogType.DEBUG, "AUTO ADD CURVE", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
-			addSequential(new AutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 			trackSpeed(endSpeed);
 		}
@@ -170,7 +170,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
-			addSequential(new AutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
 			trackSpeed(endSpeed);
 		}
 

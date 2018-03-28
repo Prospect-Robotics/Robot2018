@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Class to use PID control of autonomous drive. Note that all units are inches
  */
-public class AutoDrive extends SubsystemCommand<DriveTrain> {
+public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private final PIDSource m_source = new PIDSource() {
 
 		@Override
@@ -96,7 +96,7 @@ public class AutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
 	 */
-	public AutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
 		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
 		controller.setInputRange(-360, 360);
@@ -126,7 +126,7 @@ public class AutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param startSpeedFactor - how fast are we going? 0..1
 	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
 	 */
-	public AutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
 		this(driveTrain, speed, direction, distance);
 		startSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
@@ -152,7 +152,7 @@ public class AutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param radius - the radius of the circle we are traveling
 	 * @param clockwise - the direction of the circle
 	 */
-	public AutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
 		this(driveTrain, speed, direction, distance, startSpeedFactor, endSpeedFactor);
 		onCurve = true;
 		deltaAngle = (distance * 180.0) / (radius * Math.PI); // just an offset for now

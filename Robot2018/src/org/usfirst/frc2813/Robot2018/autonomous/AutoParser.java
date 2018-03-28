@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDrive;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggle;
@@ -74,10 +74,10 @@ public class AutoParser extends CommandGroup {
 					default:
 						throw new IllegalArgumentException("expected 'clockwise' or 'counterclockwise', got " + st);
 					}
-					add(new AutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
+					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
 							endSpeedFactor, curve, clockwise));
 				} else
-					add(new AutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
+					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
 							endSpeedFactor));
 				break;
 			case "stop":
