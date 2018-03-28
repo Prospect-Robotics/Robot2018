@@ -1,18 +1,19 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
+import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDrive;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncoders;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyro;
-import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpin;
-import org.usfirst.frc2813.Robot2018.commands.intake.IntakeStop;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensor;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePosition;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitch;
-import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForMoveToPosition;
-import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
+import org.usfirst.frc2813.Robot2018.commands.PIDStop;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncodersInstant;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyroInstant;
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinAsync;
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeStopInstant;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensorAsync;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorMoveToAbsolutePositionAsync;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitchSync;
+import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPositionSync;
+import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
@@ -70,8 +71,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * the auto script is a robot-safety critical feature.
 		 */
 		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
-		arm.addCalibrateSync();
-		elevator.addCalibrateSync();
+		arm.addCalibrateSequenceSync();
+		elevator.addCalibrateSequenceSync();
 	}
 
 	public class Drive {
@@ -95,6 +96,17 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		private double turnSpeed = 0.25;
 
+		/**
+		 * Track the current speed sent by use. If 0, we need to come to a complete stop before anything
+		 * else can happen.
+		 * @param speed
+		 */
+		private void trackSpeed(double speed) {
+			currentSpeed = speed;
+			if (speed == 0.0) {
+				addSequential(new PIDStop(Robot.driveTrain));
+			}
+		}
 		/**
 		 * Set the sticky setting for the speed for taking curves.  This value will be used for all subsequent commands created for curved movement.
 		 * @param curveSpeed Percentage of output power {-1.0..1.0}
@@ -121,7 +133,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Scale the acceleration/deceleration in the auto drive system. THIS IS GLOBAL AND INSTANT! */
 		public void setRampSpeed(double rampSpeed) {
-			AutoDrive.scaleRamps(rampSpeed);
+			AutoDriveSync.scaleRamps(rampSpeed);
 		}
 
 		/**
@@ -146,9 +158,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
 			Logger.printLabelled(LogType.DEBUG, "AUTO ADD CURVE", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
-			addSequential(new AutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
+			addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
-			currentSpeed = endSpeed;
+			trackSpeed(endSpeed);
 		}
 
 		/**
@@ -158,14 +170,14 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
-			addSequential(new AutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
-			currentSpeed = endSpeed;
+			addSequential(new AutoDriveSync(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
+			trackSpeed(endSpeed);
 		}
 
 		/** Add commands to reset the drive train encoders and gyros (typically called at the start of a match) */
 		public void addSensorResetSequenceSync() {
-			addSequential(new DriveTrainResetEncoders(Robot.driveTrain));
-			addSequential(new DriveTrainResetGyro(Robot.driveTrain));
+			addSequential(new DriveTrainResetEncodersInstant(Robot.driveTrain));
+			addSequential(new DriveTrainResetGyroInstant(Robot.driveTrain));
 		}
 
 		/**
@@ -177,7 +189,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param relativeAngle - how many degrees to turn
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
-			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, direction, relativeAngle, turnSpeed));
+			addSequential(new DriveTrainQuickTurnSync(Robot.driveTrain, direction, relativeAngle, turnSpeed));
 		}
 	}
 
@@ -185,17 +197,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Calibrate the elevator (move down), but don't wait for completion. */
 		private void addCalibrateAsync() {
 			if(!Robot.elevator.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN, CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorCalibrateSensorAsync(Robot.elevator, Direction.DOWN));
 			}
 		}
 		/**
 		 * Calibrate the elevator (move down) and wait for the limit switch to be reached, so we know that
 		 * our sensor has been set the value of the lower limit (zero).
 		 */
-		private void addCalibrateSync() {
-			if(!Robot.elevator.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
-			}
+		private void addCalibrateSequenceSync() {
+			addCalibrateAsync();
+			addWaitForHardLimitSwitchSync();
 		}
 		/** Lower the Elevator to the bottom  */
 		public void addLowerAsync() {
@@ -211,19 +222,20 @@ public class AutonomousCommandGroup extends CommandGroup {
 			 * Allow overriding maximum rate for PID move to position,
 			 * go slower when we have a cube in the jaws!
 			 */
-			if(!Robot.elevator.isDisconnected()) 
-				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1), CommandDuration.ASYNCHRONOUS));
+			if(!Robot.elevator.isDisconnected()) {
+				addSequential(new MotorMoveToAbsolutePositionAsync(Robot.elevator, position));
+			}
 		}
 		/** Wait for the Elevator to hit the hard reset limit*/
 		public void addWaitForHardLimitSwitchSync() {
 			if(!Robot.elevator.isDisconnected())
-				addSequential(new MotorWaitForHardLimitSwitch(Robot.elevator, Direction.DOWN));
+				addSequential(new MotorWaitForHardLimitSwitchSync(Robot.elevator, Direction.DOWN));
 		}
 		/** Wait for the Elevator to reach a target position. */
 		public void addWaitForTargetPositionSync() {
 			// Wait for Elevator to reach it's destination to within +/- one inch.
 			if(!Robot.elevator.isDisconnected())
-				addSequential(new MotorWaitForMoveToPosition(Robot.elevator, LengthUOM.Inches.create(1)));
+				addSequential(new MotorWaitForTargetPositionSync(Robot.elevator, LengthUOM.Inches.create(1)));
 		}
 	}
 
@@ -235,17 +247,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		private void addCalibrateAsync() {
 			if(!Robot.arm.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorCalibrateSensorAsync(Robot.arm, Direction.IN));
 			}
 		}
 		/**
 		 * Calibrate the arm (move down) and wait for the limit switch to be reached, so we know that
 		 * our sensor has been set the value of the lower limit (zero).
 		 */
-		private void addCalibrateSync() {
-			if(!Robot.arm.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN));
-			}
+		private void addCalibrateSequenceSync() {
+			addCalibrateAsync();
+			addWaitForHardLimitSwitchSync();
 		}
 		/** Move the arm In to the home position */
 		public void addMoveInAsync() {
@@ -259,19 +270,19 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addMoveToPositionAsync(Length armDegrees) {
 			if(!Robot.arm.isDisconnected())
-				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), CommandDuration.ASYNCHRONOUS));
+				addSequential(new MotorMoveToAbsolutePositionAsync(Robot.arm, armDegrees));
 		}
 
 		/** Wait for the Arm to hit the hard reset limit */
 		public void addWaitForHardLimitSwitchSync() {
 			if(!Robot.arm.isDisconnected())
-				addSequential(new MotorWaitForHardLimitSwitch(Robot.arm, Direction.IN));
+				addSequential(new MotorWaitForHardLimitSwitchSync(Robot.arm, Direction.IN));
 		}
 
 		/** Wait for the Arm to get very close to a target position. */
 		public void addWaitForTargetPositionSync() {
 			if(!Robot.arm.isDisconnected()) {
-				addSequential(new MotorWaitForMoveToPosition(Robot.arm, ArmConfiguration.ArmDegrees.create(5.0)));
+				addSequential(new MotorWaitForTargetPositionSync(Robot.arm, ArmConfiguration.ArmDegrees.create(5.0)));
 			}
 		}
 	}
@@ -312,27 +323,27 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Add a command to start the intake spinning inwards */
 		private void addIntakeInAsync() {
-			addSequential(new IntakeSpin(Robot.intake, Direction.IN, CommandDuration.ASYNCHRONOUS));
+			addSequential(new IntakeSpinAsync(Robot.intake, Direction.IN));
 		}
 
 		/** Add a command to start the intake spinning outwards */
 		private void addIntakeOutAsync() {
-			addSequential(new IntakeSpin(Robot.intake, Direction.OUT, CommandDuration.ASYNCHRONOUS));
+			addSequential(new IntakeSpinAsync(Robot.intake, Direction.OUT));
 		}
 
 		/** Add a command to stop the intake spinning */
 		private void addIntakeStopSync() {
-			addSequential(new IntakeStop(Robot.intake));
+			addSequential(new IntakeStopInstant(Robot.intake));
 		}
 
 		/** Add a synchronous command to close the jaws */
 		private void addJawsCloseSync() {
-			addSequential(new SolenoidSet(Robot.jaws, Direction.CLOSE));
+			addSequential(new SolenoidSetStateInstant(Robot.jaws, Direction.CLOSE));
 		}
 
 		/** Add a synchronous command to open the jaws */
 		private void addJawsOpenSync() {
-			addSequential(new SolenoidSet(Robot.jaws, Direction.OPEN));
+			addSequential(new SolenoidSetStateInstant(Robot.jaws, Direction.OPEN));
 		}
 
 		/** Add a "shoot" cube sequence. */

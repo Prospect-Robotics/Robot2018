@@ -14,6 +14,7 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -184,7 +185,27 @@ public final class TalonSRX extends AbstractMotorController {
 					getTimeout());
 	}
 	
+	/**
+	 * Try to set the position and check the return code
+	 */
+	private boolean tryToSetSensorPosition(int pulses) {
+		mc.selectProfileSlot(lastSlot.getProfileSlotIndex(), currentPID.getPIDIndex());
+		ErrorCode errorCode = mc.setSelectedSensorPosition(pulses, currentPID.getPIDIndex(), getTimeout());
+		if(errorCode != ErrorCode.OK) {
+			Logger.error(this + " failed to reset sensor position with error " + errorCode + ".");
+		}
+		return errorCode == ErrorCode.OK;
+	}
+	
+	private boolean isSensorCloseEnough(int pulses) {
+		// Do a read back
+		int readBack = mc.getSelectedSensorPosition(PID.Primary.getPIDIndex());
+		// Check close enough
+		return Math.abs(readBack - pulses) <= SENSOR_RESET_TOLERANCE_PULSES;
+	}
+
 	private boolean resetEncoderSensorPosition(PID pid, Length sensorPosition) {
+		boolean resetOK = true;
 		if(pid.equals(PID.Auxilliary) && !AUXILLIARY_PID_SUPPORTED) {
 			Logger.warning("WARNING: correctEncoderSensorPositions will not be run on auxilliary PID loop.  Firmware support for aux PID is not released yet.");
 			return true;
@@ -193,14 +214,46 @@ public final class TalonSRX extends AbstractMotorController {
 		int rawValue = toSensorUnits(sensorPosition).getValueAsInt();
 		Logger.debug(this + " setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ").");
 		mc.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, pid.getPIDIndex(), getTimeout());
-		mc.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
-		int readBack = mc.getSelectedSensorPosition(pid.getPIDIndex());
-		if(Math.abs(readBack - rawValue) > SENSOR_RESET_TOLERANCE_PULSES) {
-			Logger.error(this + " failed setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ") - got " + readBack + " instead.");
-			mc.setSelectedSensorPosition(rawValue, pid.getPIDIndex(), getTimeout());
-			return false;
+		if(true) {
+			// NB: Clear no-op profile slot just to be sure		
+			configurePID(PIDProfileSlot.NoOpPosition, 0, 0, 0, 0);
+			// Set that as the slot
+			mc.selectProfileSlot(PIDProfileSlot.NoOpPosition.getProfileSlotIndex(), currentPID.getPIDIndex());
+			// Configure disabled, then position, then disabled, then velocity, then disabled... no matter what mode we were in - we should change modes at least once...
+			mc.set(ControlMode.Disabled, 0.0);
+			// Change modes, hoping to shake loose old PID state
+			if(lastControlMode != ControlMode.Position) {
+				mc.set(ControlMode.Position, 0.0);
+			} else if(lastControlMode != ControlMode.Velocity) {
+				mc.set(ControlMode.Velocity, 0.0);
+			} else if(lastControlMode != ControlMode.PercentOutput) {
+				mc.set(ControlMode.PercentOutput, 0.0);
+			}
+			//Go back to disabled
+			mc.set(ControlMode.Disabled, 0.0);
 		}
-		return true;
+		// Restore correct slot & set sensor position
+		mc.selectProfileSlot(lastSlot.getProfileSlotIndex(), currentPID.getPIDIndex());
+		
+		// Make up to ten attempts to set the sensor value.  If the thing is still settling, this will hopefully handle it  
+		int maxTries = 10;
+		for(int attempts = 0; attempts < maxTries; attempts++) {
+			// Try to set the sensor Position
+			tryToSetSensorPosition(rawValue);
+			if(isSensorCloseEnough(rawValue)) {
+				break;
+			}
+			// Sleep a very short time.  10 tries, 1ms = 10ms which is still <= a typical command timeout
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	
+		// Return true if we're close enough...
+		return isSensorCloseEnough(rawValue);
 	}
 	/*
 	 * Configure PID values
