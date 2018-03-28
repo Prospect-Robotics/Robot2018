@@ -6,7 +6,7 @@ package org.usfirst.frc2813.Robot2018.commands;
  */
 public enum Lockout {
 	/**
-	 * Prevent stealing of the resource while we're running
+	 * Prevent stealing of the resource while we're running.
 	 */
 	WhileRunning,
 	/**
@@ -14,7 +14,7 @@ public enum Lockout {
 	 */
 	UntilUnlocked,
 	/**
-	 * Do not prevent stealing of the resource
+	 * Do not prevent stealing of the resource, and then leave the subsystem interlocked.
 	 */
 	Disabled
 	;
