@@ -1,7 +1,10 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
+import org.usfirst.frc2813.Robot2018.interlock.IInterlockable;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.uom.TimeUOM;
@@ -15,7 +18,7 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  * This command provides support for the different basic starting 
  * points for synchronous, asynchronous, timed, etc.
  */
-public abstract class GearheadsCommand extends Command {
+public abstract class GearheadsCommand extends Command implements IInterlockable {
 	private final RunningInstructions runningInstructions;
 	/**
 	 * If TRACING_LOG_LEVEL is within our current log level for the system, we will trace out when all the core Command functions are executing.
@@ -31,7 +34,11 @@ public abstract class GearheadsCommand extends Command {
 	 * We will populate this array with the key/value pairs of arguments for formatting into a nice pretty name.
 	 * @see addArg
 	 */
-	private final ArrayList<Object> args = new ArrayList<Object>(); 
+	private final ArrayList<Object> args = new ArrayList<Object>();
+	/**
+	 * This is the list of interlocks to check before performing the command
+	 */
+	private final List<IInterlock> interlocks = new ArrayList<IInterlock>();
 	/**
 	 * Create a new command with the specified type of duration and timer value
 	 */
@@ -44,6 +51,32 @@ public abstract class GearheadsCommand extends Command {
 		if(this.runningInstructions.getTime() != null) {
 			setTimeout(this.runningInstructions.getTime());
 		}
+	}
+	/**
+	 * Add an interlock to the subsystem.  Will not add duplicates.  
+	 * Do not expect reference counting.
+	 */
+	public final void addInterlock(IInterlock interlock) {
+		if(!interlocks.contains(interlock)) {
+			interlocks.add(interlock);
+		}
+	}
+	/**
+	 * Remove the interlock from the subsystem.
+	 * Do not expect reference counting.
+	 */
+	public final void removeInterlock(IInterlock interlock) {
+		interlocks.remove(interlock);
+	}
+	/**
+	 * Check the status of all interlocks to see if it's safe
+	 */
+	public boolean isSafeToOperate() {
+		for(IInterlock interlock : interlocks) {
+			if(!interlock.isSafeToOperate())
+				return false;
+		}
+		return true;
 	}
 	/**
 	 * Get the duration function of the command, if there's a rule about time
@@ -105,8 +138,12 @@ public abstract class GearheadsCommand extends Command {
 	@Override
 	protected final void end() {
 		entered("end");
-		ghcEnd();
-		super.end(); 
+		if(!isSafeToOperate()) {
+			Logger.error(this + ": INTERLOCK PREVENTED INTERRUPTED OPERATION.");
+		} else {
+			ghcEnd();
+		}
+		super.end(); // NB: This is safe. 
 		returning("end");
 	}
 	/**
@@ -116,8 +153,12 @@ public abstract class GearheadsCommand extends Command {
 	@Override
 	protected final void interrupted() {
 		entered("interrupted");
-		ghcInterrupted();
-		super.interrupted();
+		if(!isSafeToOperate()) {
+			Logger.error(this + ": INTERLOCK PREVENTED INTERRUPTED OPERATION.");
+		} else {
+			ghcInterrupted();
+		}
+		super.interrupted(); // NB: This is safe.
 		returning("interrupted");
 	}
 
@@ -131,6 +172,9 @@ public abstract class GearheadsCommand extends Command {
 		boolean isFinished = false;
 		// Trace first
 		entered("isFinished");
+		if(!isSafeToOperate()) {
+			Logger.error(this + ": INTERLOCK PREVENTED ISFINISHED OPERATION. RETURN TRUE.");
+			isFinished = true;
 		if(!isFinished && runningInstructions.isForever()) {
 			trace("isFinished", "command is in running forever mode.");
 			isFinished = false;
@@ -166,7 +210,11 @@ public abstract class GearheadsCommand extends Command {
 	// @Override
 	protected final void execute() {
 		entered("execute");
-		ghcExecute();
+		if(!isSafeToOperate()) {
+			Logger.error(this + ": INTERLOCK PREVENTED EXECUTE OPERATION.");
+		} else {
+			ghcExecute();
+		}
 		returning("execute");
 	}
 	/**
@@ -176,7 +224,11 @@ public abstract class GearheadsCommand extends Command {
 	protected final void initialize() {
 		setName(toString());
 		entered("initialize");
-		ghcInitialize();
+		if(!isSafeToOperate()) {
+			Logger.error(this + ": INTERLOCK PREVENTED INITIALIZE OPERATION.");
+		} else {
+			ghcInitialize();
+		}
 		returning("initialize");
 	}
 	/**

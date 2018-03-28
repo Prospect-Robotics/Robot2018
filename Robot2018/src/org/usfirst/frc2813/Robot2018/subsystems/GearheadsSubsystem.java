@@ -1,5 +1,10 @@
 package org.usfirst.frc2813.Robot2018.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
+import org.usfirst.frc2813.Robot2018.interlock.IInterlockable;
 import org.usfirst.frc2813.logging.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -9,13 +14,14 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  * This class contains code common to all Subsystems
  */
-public abstract class GearheadsSubsystem extends Subsystem {
+public abstract class GearheadsSubsystem extends Subsystem implements IInterlockable {
 	static {
 		Logger.addMe();
 	}
 	private boolean _isEmulated = false;
 	private boolean lockout = false;
 	public boolean encoderFunctional = true;
+	private final List<IInterlock> interlocks = new ArrayList<IInterlock>();
 
 	/**
 	 * Is the subsystem emulated?
@@ -38,56 +44,46 @@ public abstract class GearheadsSubsystem extends Subsystem {
 	public void disableEmulator() {
 		_isEmulated = false;
 	}
-	
 	/**
 	 * Short cut for determining if the robot is enabled.  I need this
 	 * @return true if the robot is enabled. 
 	 */
-	public boolean isRobotEnabled() {
+	public final boolean isRobotEnabled() {
 		return DriverStation.getInstance().isEnabled();
 	}
-	private Command lockedBy = null;	
 	/**
-	 * Lockout all operations on the subsystem
+	 * Add an interlock to the subsystem.  Will not add duplicates.  
+	 * Do not expect reference counting.
 	 */
-	public void lock(Command lockedBy) {
-		if(this.lockedBy != null && this.lockedBy != lockedBy) {
-			throw new RuntimeException("The " + this + " subsystem has already been locked by " + this.lockedBy + " and cannot be locked by " + lockedBy);
-		}
-		if(getCurrentCommand() != lockedBy) {
-			throw new RuntimeException("The " + this + " subsystem can only be locked by the current command.");
-		}
-		this.lockedBy = lockedBy;
-	}
-	/**
-	 * Lockout all operations on the subsystem
-	 */
-	public void unlock(Command lockedBy) {
-		if(getCurrentCommand() != lockedBy) {
-			throw new RuntimeException("The " + this + " subsystem can only be unlocked by the current command.");
-		}
-		if(this.lockedBy == lockedBy) {
-			this.lockedBy = null;
-		} else if(this.lockedBy != null) {
-			throw new RuntimeException("The " + this + " subsystem has already been locked by " + this.lockedBy + " and cannot be unlocked by " + lockedBy);
-		} else {
-			throw new RuntimeException("The " + this + " subsystem is not locked.");
+	public final void addInterlock(IInterlock interlock) {
+		if(!interlocks.contains(interlock)) {
+			interlocks.add(interlock);
 		}
 	}
 	/**
-	 * Is this subsystem supposed to stop, because we need to lockout other commands
-	 * @return
+	 * Remove an interlock from the subsystem
+	 * Do not expect reference counting.
 	 */
-	public boolean isLocked() {
-		return this.lockout;
+	public final void removeInterlock(IInterlock interlock) {
+		interlocks.remove(interlock);
 	}
-	
+	/**
+	 * Check the status of all interlocks to see if it's safe
+	 */
+	public final boolean isSafeToOperate() {
+		for(IInterlock interlock : interlocks) {
+			if(!interlock.isSafeToOperate())
+				return false;
+		}
+		return true;
+	}
 	/**
 	 * Do not allow re-queuing default command if we're locked.
 	 */
 	@Override
-	public Command getDefaultCommand() {
-		if(isLocked()) {
+	public final Command getDefaultCommand() {
+		if(!isSafeToOperate()) {
+			Logger.warning(this + " could not getDefaultCommand because we are interlocked.");
 			return null;
 		}
 		return super.getDefaultCommand();

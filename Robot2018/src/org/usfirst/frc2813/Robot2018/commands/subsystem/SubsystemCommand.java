@@ -1,8 +1,14 @@
 package org.usfirst.frc2813.Robot2018.commands.subsystem;
 
-import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.TargetedCommand;
+import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
+import org.usfirst.frc2813.Robot2018.interlock.IInterlockable;
+import org.usfirst.frc2813.Robot2018.interlock.LOCKED;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -11,7 +17,7 @@ import edu.wpi.first.wpilibj.command.Command;
  * This command targets a subsystem and knows how to require the resource (optionally) and handle locking/exclusivity of the resource. 
  * 'require' the target subsystem in the constructor
  */
-public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem> extends TargetedCommand<SUBSYSTEM_TYPE> {
+public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem> extends TargetedCommand<SUBSYSTEM_TYPE> implements IInterlock,IInterlockable {
 	protected final SUBSYSTEM_TYPE subsystem;	
 	protected final Lockout lockout;
 	protected Command lastDefaultCommand;
@@ -50,8 +56,9 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 		if(lockout.isEnabled()) {
 			lock();
 		}
-		// Call the subclass
-		ghscInitialize();
+		// Call the subclass if it's safe to do so
+		if(isSafeToOperate())
+			ghscInitialize();
 	}
 
 	/**
@@ -59,18 +66,21 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 	 */
 	@Override
 	protected final void ghcEnd() {
-		// Call the subclass to get their deal
-		ghscEnd();
+		// Call the subclass if it's safe to do so
+		if(isSafeToOperate())
+			ghscEnd();
 	}
 
 	@Override
 	protected final void ghcInterrupted() {
-		// A hook for shutting down
-		ghscInterrupted();
+		// Call the subclass if it's safe to do so
+		if(isSafeToOperate())
+			ghscInterrupted();
 		// A hook for shutting down that's conditional
-		if(!getRunningInstructions().isAsynchronous()) {
+		if(!getDuration().isAsynchronous()) {
 			traceFormatted("interrupted", "interrupted while waiting, calling interruptedWhileWaiting.");
-			ghscinterruptedWhileWaiting();
+			if(isSafeToOperate())
+				ghscinterruptedWhileWaiting();
 		}
 		// Unlock the subsystem
 		if(lockout.isWhileRunning()) {
@@ -80,7 +90,8 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 
 	@Override
 	protected final void ghcExecute() {
-		ghscExecute();
+		if(isSafeToOperate())
+			ghscExecute();
 	}
 
 	@Override
@@ -88,17 +99,20 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 		return ghscIsFinished();
 	}
 
+	@Override
+	public final boolean isSafeToOperate() {
+		return super.isSafeToOperate() && !this.locked;
+	}
+
 	protected void lock() {
 		traceFormatted("lock","locking out %s", subsystem);
-		subsystem.lock(this);
 		this.locked = true;
-		this.lastDefaultCommand = subsystem.getDefaultCommand();
-		traceFormatted("lock", "setting as default command for %s.", subsystem);
-		subsystem.setDefaultCommand(null);
+		subsystem.addInterlock(LOCKED.ALWAYS);
 		trace("lock","setting to not interruptable.");
 		this.setInterruptible(false);
+		trace("lock","adding LOCKED to interlock list.");
 	}
-	
+
 	protected void unlock() {
 		if(locked) {
 			traceFormatted("unlock","unlocking %s", subsystem);
@@ -107,11 +121,14 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 				traceFormatted("unlock", "setting as default command for %s back to %s.", subsystem, lastDefaultCommand);
 				subsystem.setDefaultCommand(lastDefaultCommand);
 			}
-			subsystem.unlock(this);
+			subsystem.removeInterlock(LOCKED.ALWAYS);
+			trace("unlock","removing LOCKED from interlock list.");
 			this.locked = false;
+			trace("unlock","setting to interruptable.");
+			this.setInterruptible(true);
 		}
 	}
-	
+
 	/**
 	 * Is the subsystem "required"
 	 * @see requires 
