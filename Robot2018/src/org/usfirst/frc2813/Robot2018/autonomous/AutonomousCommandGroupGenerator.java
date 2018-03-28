@@ -331,7 +331,7 @@ public class AutonomousCommandGroupGenerator {
 		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
 		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
 		double sideWallToFirstRobotCenter = sideWallToFirstRobotStartPosition + robotBumperWidth / 2;
-		double sideWallToScaleTarget = (fieldWidth - scaleTargetWidth) / 2;
+		double sideWallToScaleTarget = (fieldWidth - scaleFullWidth) / 2;
 		double sideWallToScalePlatform = (fieldWidth - scalePlatformWidth) / 2;
 		double sideWallToSwitch = (fieldWidth - switchWidth) / 2;
 
