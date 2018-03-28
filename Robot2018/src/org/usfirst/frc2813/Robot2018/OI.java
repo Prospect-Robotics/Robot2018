@@ -20,11 +20,9 @@ import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggle;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemDisableDefaultCommand;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemRestoreDefaultCommand;
-import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemSetDefaultCommand;
 import org.usfirst.frc2813.Robot2018.interlock.IInterlock;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
-import org.usfirst.frc2813.Robot2018.subsystems.solenoid.Solenoid;
 import org.usfirst.frc2813.Robot2018.triggers.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -44,6 +42,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
+	
+	/*
+	 * There are currently three sets of button definitions.  
+	 * Standard - What we've been using all along, 
+	 * MotorTesting - what I used for motor testing, 
+	 * Competition - and what Jesse wants for competition.
+	 */
+	private enum ButtonLayout { Standard, MotorTesting, Competition };
+	private static ButtonLayout buttonLayout = ButtonLayout.Standard;
+	
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a joystick.
 	// You create one by telling it which joystick it's on and which button
@@ -71,11 +79,12 @@ public class OI {
 	// until it is finished as determined by it's isFinished method.
 	// button.whenReleased(new ExampleCommand());
 
-	public Joystick joystick1, joystick2, buttonPanel;
+	public final Joystick joystick1;
+	public final Joystick joystick2;
+	public final Joystick buttonPanel;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 	
-	protected static void createMotorTestingButtons(Joystick buttonPanel)
-	{
+	public CommandGroup createArmDemoSequence() {
 		CommandGroup armDemo = new CommandGroup();
 		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(30), ArmConfiguration.ArmDegrees.create(5)));
 		armDemo.addSequential(new TimedCommand(3));
@@ -89,15 +98,25 @@ public class OI {
 		armDemo.addSequential(new TimedCommand(3));
 		armDemo.addSequential(new MotorMoveToAbsolutePosition(Robot.arm, ArmConfiguration.ArmDegrees.create(105), ArmConfiguration.ArmDegrees.create(5)));
 		armDemo.addSequential(new TimedCommand(3));
-		
-		new JoystickButton(buttonPanel, 6).whileHeld(new MotorPositionPIDTest(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(15), Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(110)));
-		new JoystickButton(buttonPanel, 7).whileHeld(new MotorPositionPIDTest(Robot.elevator, LengthUOM.Inches.create(5), LengthUOM.Inches.create(30)));
-		//	new JoystickButton(buttonPanel, 8).whileHeld(new MotorVelocityPIDTest(Robot.arm));
-		new JoystickButton(buttonPanel, 8).whenPressed(armDemo);
-		new JoystickButton(buttonPanel, 9).whileHeld(new MotorVelocityPIDTest(Robot.elevator));
-		new JoystickButton(buttonPanel, 9).whileHeld(new MotorMoveToAbsolutePosition(Robot.elevator, LengthUOM.Inches.create(6)));
+		return armDemo;
 	}
-	
+
+	public Command createArmPositionPIDTest() {
+		return new MotorPositionPIDTest(Robot.arm, Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(15), Robot.arm.getConfiguration().getNativeDisplayLengthUOM().create(110));
+	}
+
+	public Command createElevatorVelocityPIDTest() {
+		return new MotorVelocityPIDTest(Robot.elevator);
+	}
+	public Command createElevatorPositionPIDTest() {
+		return new MotorPositionPIDTest(Robot.elevator, LengthUOM.Inches.create(5), LengthUOM.Inches.create(30));
+	}
+	public Command createElevatorToFixedHeight() {
+		return new MotorMoveToAbsolutePosition(Robot.elevator, LengthUOM.Inches.create(6));
+	}	
+	public Command createElevatorCalibrate() {
+		return new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE);
+	}
 	protected CommandGroup createCalibrationSequence() {
 		CommandGroup calibration = new CommandGroup();
 		calibration.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
@@ -136,6 +155,7 @@ public class OI {
 		return climbSequence;
 	}
 
+	
 	/**
 	 * When we are climbing, we are retracting the elevator - 
 	 * elevator "down" climbs, and elevator "up" will break the robot because of the ratchet...
@@ -169,15 +189,71 @@ public class OI {
 
 		return climbAbort;
 	}
-
+	
+	public Command createIntakeIn() {
+		return new IntakeSpin(Robot.intake, Direction.IN);
+	}
+	
+	public Command createIntakeOut() {
+		return new IntakeSpin(Robot.intake, Direction.OUT);
+	}
+	
+	public Command createElevatorUp() {
+		SubsystemCommand<Motor> elevatorUp = new MotorMoveInDirection(Robot.elevator, Direction.UP);
+		// Add an interlock on elevatorUp so that it will not engage with the ratchet 
+		elevatorUp.addInterlock(new IInterlock() {
+			public boolean isSafeToOperate() {
+				return Robot.ratchet.getTargetPosition().equals(Direction.DISENGAGED);
+			}
+		});
+		return elevatorUp;
+	}
+	
+	public Command createElevatorDown() {
+		return new MotorMoveInDirection(Robot.elevator, Direction.DOWN);
+	}
+	
+	public Command createGearShiftToggle() {
+		return new SolenoidToggle(Robot.driveTrain.getGearShiftSolenoid());
+	}
+	
+	public Command createRobotJawsToggle() {
+		return new SolenoidToggle(Robot.jaws);
+	}
+	
+	public Command createArmIn() {
+		return new MotorMoveInDirection(Robot.arm, Direction.IN);
+	}
+	
+	public Command createArmOut() {
+		return new MotorMoveInDirection(Robot.arm, Direction.OUT);
+	}
+	
 	@SuppressWarnings("unused")
 	public OI() {
 		/*
 		 * BUTTON PANEL BUTTONS:
+		 * 
+		 * STANDARD LAYOUT:
 		 *
 		 * (1)  SPIN INTAKE IN
 		 * (2)  SPIN INTAKE OUT
-		 * (3)  FLOOR ELEVATOR
+		 * (3)  FLOOR ELEVATOR (calibrates too)
+		 * (4)  ELEVATOR DOWN
+		 * (5)  ELEVATOR UP
+		 * (6)  ***** START CLIMBING SEQUENCE
+		 * (7)  SHIFT GEARS SOLENOID
+		 * (8)  ***** ABORT CLIMBING SEQUENCE
+		 * (9)  INTAKE/ARM SOLENOID
+		 * (10) ARM/ELEVATOR CALIBRATION
+		 * (11) MOVE ARM UP
+		 * (12) MOVE ARM DOWN
+		 * 
+		 * MOTOR TESTING LAYOUT:
+		 * 
+		 * (1)  SPIN INTAKE IN
+		 * (2)  SPIN INTAKE OUT
+		 * (3)  FLOOR ELEVATOR (calibrates too)
 		 * (4)  ELEVATOR DOWN
 		 * (5)  ELEVATOR UP
 		 * (6)  ***** START CLIMBING SEQUENCE
@@ -190,40 +266,54 @@ public class OI {
 		 *
 		 */
 		buttonPanel = new Joystick(0);
-
-		new JoystickButton(buttonPanel, 1).whileHeld(new IntakeSpin(Robot.intake, Direction.IN));
-		new JoystickButton(buttonPanel, 2).whileHeld(new IntakeSpin(Robot.intake, Direction.OUT));
-		
-		SubsystemCommand<Motor> elevatorUp = new MotorMoveInDirection(Robot.elevator, Direction.UP);
-		// Add an interlock on elevatorUp so that it will not engage with the ratchet 
-		elevatorUp.addInterlock(new IInterlock() {
-			public boolean isSafeToOperate() {
-				return Robot.ratchet.getTargetPosition().equals(Direction.DISENGAGED);
-			}
-		});
-		new JoystickButton(buttonPanel, 4).whileHeld(new MotorMoveInDirection(Robot.elevator, Direction.DOWN));
-		new JoystickButton(buttonPanel, 5).whileHeld(elevatorUp);
-		if(true) { // NB: The other settings are for Mike's debugging of PID vales on Arm and Elevator and are disabled by default.		
-				new JoystickButton(buttonPanel, 6).whenPressed(createClimbSequence());
-				new JoystickButton(buttonPanel, 7).whenPressed(new SolenoidToggle(Robot.driveTrain.getGearShiftSolenoid()));
-				new JoystickButton(buttonPanel, 8).whenPressed(createClimbAbortSequence());				
-				new JoystickButton(buttonPanel, 9).whenPressed(new SolenoidToggle(Robot.jaws));
-		} else {
-			createMotorTestingButtons(buttonPanel);
-		}
-		new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence());
-		new JoystickButton(buttonPanel, 11).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.IN));
-		new JoystickButton(buttonPanel, 12).whileHeld(new MotorMoveInDirection(Robot.arm, Direction.OUT));
-
 		joystick1 = new Joystick(1);
 		joystick2 = new Joystick(2);
 
+		/*
+		 * Load the desired button layout
+		 */
+		switch(buttonLayout) {
+		case Standard:
+			new JoystickButton(buttonPanel, 1).whileHeld(createIntakeIn());
+			new JoystickButton(buttonPanel, 2).whileHeld(createIntakeOut());
+			new JoystickButton(buttonPanel, 3).whileHeld(createElevatorCalibrate());
+			new JoystickButton(buttonPanel, 4).whileHeld(createElevatorDown());
+			new JoystickButton(buttonPanel, 5).whileHeld(createElevatorUp());
+			new JoystickButton(buttonPanel, 6).whenPressed(createClimbSequence());
+			new JoystickButton(buttonPanel, 7).whenPressed(createGearShiftToggle());
+			new JoystickButton(buttonPanel, 8).whenPressed(createClimbAbortSequence());				
+			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
+			new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence());
+			new JoystickButton(buttonPanel, 11).whileHeld(createArmIn());
+			new JoystickButton(buttonPanel, 12).whileHeld(createArmOut());
+			break;
+		case MotorTesting:
+			new JoystickButton(buttonPanel, 1).whileHeld(createIntakeIn());
+			new JoystickButton(buttonPanel, 2).whileHeld(createIntakeOut());
+			new JoystickButton(buttonPanel, 3).whileHeld(createElevatorCalibrate());
+			new JoystickButton(buttonPanel, 4).whileHeld(createElevatorDown());
+			new JoystickButton(buttonPanel, 5).whileHeld(createElevatorUp());
+			new JoystickButton(buttonPanel, 6).whileHeld(createArmPositionPIDTest());
+			new JoystickButton(buttonPanel, 7).whileHeld(createElevatorPositionPIDTest());
+			new JoystickButton(buttonPanel, 8).whenPressed(createArmDemoSequence()); // new MotorVelocityPIDTest(Robot.arm));
+			new JoystickButton(buttonPanel, 9).whileHeld(createElevatorToFixedHeight()); // new createElevatorVelocityPIDTest());
+			new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence());
+			new JoystickButton(buttonPanel, 11).whileHeld(createArmIn());
+			new JoystickButton(buttonPanel, 12).whileHeld(createArmOut());
+			break;
+		default:
+		case Competition:
+			break;
+		}
+
+		// Add compressor to live window
 		LiveWindow.add(RobotMap.compressor);
+		
+		// Add roborio user button compressor toggle
 		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
 		SmartDashboard.putData("OIDrive", new DriveTrainOIDrive(Robot.driveTrain, joystick1, joystick2));
-
 		driveStyleChooser = new SendableChooser<>();
 		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);
 		driveStyleChooser.addObject("Tank drive", Robot.driveTrain::tankDrive);
