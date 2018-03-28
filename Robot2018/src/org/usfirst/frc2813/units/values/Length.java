@@ -26,6 +26,12 @@ public class Length extends Value<LengthUOM,Length> {
 	 * Shortcut to see if position exceeds limit
 	 */
 	public static boolean isLimitExceeded(Direction direction, Length limit, Length position) {
+		return isLimitExceeded(direction, limit, position, position.getUOM().create(0));
+	}
+	/**
+	 * Shortcut to see if position exceeds limit
+	 */
+	public static boolean isLimitExceeded(Direction direction, Length limit, Length position, Length marginOfError) {
 		if(direction.isPositive()) {
 			return position.getCanonicalValue() > limit.getCanonicalValue(); 
 		} else {
@@ -36,10 +42,16 @@ public class Length extends Value<LengthUOM,Length> {
 	 * Shortcut to see if position meets or exceeds limit
 	 */
 	public static boolean isLimitReached(Direction direction, Length limit, Length position) {
+		return isLimitExceeded(direction, limit, position, position.getUOM().create(0));
+	}
+	/**
+	 * Shortcut to see if position meets or exceeds limit
+	 */
+	public static boolean isLimitReached(Direction direction, Length limit, Length position, Length marginOfError) {
 		if(direction.isPositive()) {
-			return position.getCanonicalValue() >= limit.getCanonicalValue(); 
+			return position.getCanonicalValue() >= (limit.getCanonicalValue() + marginOfError.getCanonicalValue()); 
 		} else {
-			return position.getCanonicalValue() <= limit.getCanonicalValue();
+			return position.getCanonicalValue() <= (limit.getCanonicalValue() - marginOfError.getCanonicalValue());
 		}
 	}
 	/**

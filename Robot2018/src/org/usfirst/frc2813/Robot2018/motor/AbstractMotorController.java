@@ -576,7 +576,7 @@ public abstract class AbstractMotorController implements IMotorController {
 	 */
 	private void checkForHardLimitError(Direction targetDirection) {
 		if(isHardLimitNeedingCalibration(targetDirection)) {
-			Logger.warning(this + " WARNING WARNING WARNING - " + targetDirection + " HARD LIMIT has drifted.  We're past the limit, but the switch is not active.  Limit: " + bothUnits(getHardLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
+			Logger.warning(this + " " + targetDirection + " HARD LIMIT has drifted.  We're past the limit, but the switch is not active.  Limit: " + bothUnits(getHardLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
 		}
 		/* NB: We check for sensor is active, but sensor position != 0 elsewhere.  It can actually have a range.  We keep setting to zero until the motor
 		       moves away from the limit switch.  There may be a range of sensor positions that still trigger the switch.  So we can't just check to see if it's 
@@ -588,7 +588,7 @@ public abstract class AbstractMotorController implements IMotorController {
 	 */
 	private void checkForSoftLimitError(Direction targetDirection) {
 		if(isSoftLimitExceeded(targetDirection)) {
-			Logger.warning(this + " WARNING WARNING WARNING - " + targetDirection + " soft limit has been exceeded.  Limit: " + bothUnits(getSoftLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
+			Logger.warning(this + " " + targetDirection + " soft limit has been exceeded.  Limit: " + bothUnits(getSoftLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
 		}
 	}
 	/*
@@ -596,7 +596,7 @@ public abstract class AbstractMotorController implements IMotorController {
 	 */
 	private void checkForPhysicalLimitError(Direction targetDirection) {
 		if(isPhysicalLimitExceeded(targetDirection)) {
-			Logger.warning(this + " WARNING WARNING WARNING - " + targetDirection + " configured limit has been exceeded.  Update the limits.  Limit: " + bothUnits(getPhysicalLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
+			Logger.warning(this + " " + targetDirection + " configured limit has been exceeded.  Update the limits.  Limit: " + bothUnits(getPhysicalLimit(targetDirection)) + " Position: " + bothUnits(getCurrentPosition()));
 		}
 	}
 	/*
@@ -697,26 +697,27 @@ public abstract class AbstractMotorController implements IMotorController {
 		return null;
 	}
 
+	private static final double MAX_PULSE_ERROR = 50;
 	@Override
 	public boolean isHardLimitExceeded(Direction direction) {
-		return getHasHardLimit(direction) && Length.isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition());
+		return getHasHardLimit(direction) && Length.isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
 	}
 	@Override
 	public boolean isHardLimitReached(Direction direction) {
-		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition());
+		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
 	}
 	@Override
 	public boolean isHardLimitNeedingCalibration(Direction direction) {
-		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition()) 
+		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR)) 
 				&& !getCurrentHardLimitSwitchStatus(direction);
 	}
 	@Override
 	public boolean isSoftLimitExceeded(Direction direction) {
-		return getHasSoftLimit(direction) && Length.isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
+		return getHasSoftLimit(direction) && Length.isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
 	}
 	@Override
 	public boolean isSoftLimitReached(Direction direction) {
-		return getHasSoftLimit(direction) && Length.isLimitReached(direction, getSoftLimit(direction), getCurrentPosition());
+		return getHasSoftLimit(direction) && Length.isLimitReached(direction, getSoftLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
 	}
 	@Override
 	public boolean isPhysicalLimitExceeded(Direction direction) {
