@@ -1,4 +1,4 @@
-package org.usfirst.frc2813.Robot2018.commands;
+package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  * controller to stop on N pids. At least one encoder is required to work.
  */
-public class PIDStop extends Command {
+public class DriveTrainStop extends Command {
 
 	private final double Kp = 0.8, Ki = 0, Kd = 0;
 
@@ -33,7 +33,7 @@ public class PIDStop extends Command {
 		}
 	};
 
-	public PIDStop(DriveTrain driveTrain) {
+	public DriveTrainStop(DriveTrain driveTrain) {
 		this.driveTrain = driveTrain;
 		requires(driveTrain);
 	}
