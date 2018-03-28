@@ -56,6 +56,7 @@ public abstract class GearheadsSubsystem extends Subsystem implements IInterlock
 	 * Do not expect reference counting.
 	 */
 	public final void addInterlock(IInterlock interlock) {
+		(new Throwable()).printStackTrace();
 		if(!interlocks.contains(interlock)) {
 			interlocks.add(interlock);
 		}

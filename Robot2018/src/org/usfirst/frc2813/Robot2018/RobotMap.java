@@ -170,7 +170,7 @@ public class RobotMap {
 
 		jawsSolenoid = new Solenoid(0,1);
 		ratchetSolenoid = new Solenoid(0,2);
-		gearShiftSolenoid = new Solenoid(0,3);
+		gearShiftSolenoid = new Solenoid(0,0);
 		climbingBarSolenoid = new Solenoid(0,4);
 	}
 }

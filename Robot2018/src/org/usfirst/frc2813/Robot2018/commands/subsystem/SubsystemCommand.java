@@ -85,7 +85,7 @@ public abstract class SubsystemCommand<SUBSYSTEM_TYPE extends GearheadsSubsystem
 		 * If we weren't merely trying to lock out other commands while running this one,
 		 * we will then lock the subsystem against subsequent commands.
 		 */
-		if(!lockout.isWhileRunning()) {
+		if(lockout.isUntilUnlocked()) {
 			traceFormatted("lock","locking subsystem %s", subsystem);
 			subsystem.addInterlock(LOCKED.ALWAYS);
 		}
