@@ -3,7 +3,11 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.usfirst.frc2813.Robot2018.commands.CommandDuration;
+import org.usfirst.frc2813.Robot2018.commands.Lockout;
+import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
+import org.usfirst.frc2813.units.Direction;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PIDController;
@@ -13,7 +17,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  * controller to stop on N pids. At least one encoder is required to work.
  */
-public class DriveTrainAutoStop extends Command {
+public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 
 	private final double Kp = 0.8, Ki = 0, Kd = 0;
 
@@ -64,6 +68,7 @@ public class DriveTrainAutoStop extends Command {
 	}
 
 	public DriveTrainAutoStop(DriveTrain driveTrain) {
+		super(driveTrain, CommandDuration.DISABLED, Lockout.Disabled);
 		this.driveTrain = driveTrain;
 		requires(driveTrain);
 	}
@@ -129,7 +134,7 @@ public class DriveTrainAutoStop extends Command {
 		return true;
 	}
 
-	protected void initialize() {
+	protected void ghscInitialize() {
 		// Enable all encoders
 		initializePIDControllers();
 		enablePID();
@@ -139,12 +144,12 @@ public class DriveTrainAutoStop extends Command {
 		return isPIDEnabled;
 	}
 
-	protected boolean isFinished() {
+	protected boolean ghscIsFinished() {
 		return !isAutonomous() || allEncodersOnTarget() || !isPIDEnabled;
 	}
 
 	// Called once after isFinished returns true
-	protected void end() {
+	protected void ghscEnd() {
 		// Disable all encoders
 		disablePID();
 	}
@@ -155,4 +160,10 @@ public class DriveTrainAutoStop extends Command {
 	protected static boolean isAutonomous() {
 		return DriverStation.getInstance().isAutonomous();
 	}
+
+	@Override
+	public boolean ghscIsSubsystemRequired() {
+		return true;
+	}
+
 }

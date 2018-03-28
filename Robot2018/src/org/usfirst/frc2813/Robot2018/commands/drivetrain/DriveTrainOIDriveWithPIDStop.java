@@ -7,7 +7,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 
-public class DriveTrainOIDriveWithPIDStop extends DriveTrainStop {
+public class DriveTrainOIDriveWithPIDStop extends DriveTrainAutoStop {
 	
 	private final Joystick joystick1; 
 	private final Joystick joystick2;
@@ -20,10 +20,18 @@ public class DriveTrainOIDriveWithPIDStop extends DriveTrainStop {
 		addArg("joystick2", joystick2);
 		setName(toString());
 	}
+	
+	/**
+	 * We are always going to keep going as the default command and we're interactive
+	 */
+	protected boolean ghscIsFinished() {
+		return false;
+	}
 
 	protected boolean isJoystickIdle() {
 		return joystick1.getY() == 0 || joystick1.getX() == 0;
 	}
+
 	/**
 	 * Called repeatedly when this Command is scheduled to run
 	 */
