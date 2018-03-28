@@ -55,6 +55,9 @@ public class AutonomousCommandGroupGenerator {
 	/** Elevator heights for placing cubes on the switch. */
 	public static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
 
+	/** Elevator heights for picking up a cube on from the ground. */
+	public static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(6);
+
 	/** Elevator height for placing cubes on the scale based on robot direction. */
 	public static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
 	public static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(76);

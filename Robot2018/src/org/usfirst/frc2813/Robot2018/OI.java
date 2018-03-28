@@ -2,6 +2,7 @@ package org.usfirst.frc2813.Robot2018;
 
 import java.util.function.BiConsumer;
 
+import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.ToggleCompressor;
@@ -26,6 +27,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
 import org.usfirst.frc2813.Robot2018.triggers.RoboRIOUserButton;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.values.Length;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -51,6 +53,15 @@ public class OI {
 	 */
 	private enum ButtonLayout { Standard, MotorTesting, Competition };
 	private static ButtonLayout buttonLayout = ButtonLayout.Standard;
+	
+	/**
+	 * IF the position buttons 11 and 12 were supposed to move the ELEVATOR, change here..
+	 */
+	private static boolean POSITION_BUTTONS_INCLUDE_ELEVATOR = true;
+	/**
+	 * IF the position buttons 11 and 12 were supposed to move the ARM, change here..
+	 */
+	private static boolean POSITION_BUTTONS_INCLUDE_ARM = false;
 	
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a joystick.
@@ -111,9 +122,38 @@ public class OI {
 	public Command createElevatorPositionPIDTest() {
 		return new MotorPositionPIDTest(Robot.elevator, LengthUOM.Inches.create(5), LengthUOM.Inches.create(30));
 	}
-	public Command createElevatorToFixedHeight() {
-		return new MotorMoveToAbsolutePosition(Robot.elevator, LengthUOM.Inches.create(6));
-	}	
+	public Command createShootingPositionSequence() {
+		CommandGroup group = new CommandGroup();
+		if(POSITION_BUTTONS_INCLUDE_ELEVATOR) {
+			group.addSequential(createElevatorToShootPosition());
+		}
+		if(POSITION_BUTTONS_INCLUDE_ARM) {
+			group.addSequential(createArmToShootPosition());
+		}
+		return group;
+	}
+	public Command createPickUpPositionSequence() {
+		CommandGroup group = new CommandGroup();
+		if(POSITION_BUTTONS_INCLUDE_ELEVATOR) {
+			group.addSequential(createElevatorToPickUpHeight());
+		}
+		if(POSITION_BUTTONS_INCLUDE_ARM) {
+			group.addSequential(createArmToPickUpPosition());
+		}
+		return group;
+	}
+	public Command createArmToPickUpPosition() {
+		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_GRAB_CUBE);
+	}
+	public Command createElevatorToPickUpHeight() {
+		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_GRAB_CUBE);
+	}
+	public Command createElevatorToShootPosition() {
+		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_SWITCH);
+	}
+	public Command createArmToShootPosition() {
+		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_FORWARD_SHOOT);
+	}
 	public Command createElevatorCalibrate() {
 		return new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE);
 	}
@@ -259,13 +299,26 @@ public class OI {
 		 * (6)  *** ARM POSITION PID TEST
 		 * (7)  *** ELEVATOR POSITION PID TEST
 		 * (8)  *** ARM DEMO SEQUENCE
-		 * (9)  *** ELEVATOR TO FIXED HEIGHT
+		 * (9)  ELEVATOR TO PICKUP HEIGHT
 		 * (10) ARM/ELEVATOR CALIBRATION
 		 * (11) MOVE ARM UP
 		 * (12) MOVE ARM DOWN
 		 *
 		 * COMPETITION LAYOUT:
 		 * 
+		 * (1)  START CLIMBING
+		 * (2)  ABORT CLIMBING
+		 * (3)  ARM UP
+		 * (4)  ARM DOWN
+		 * (5)  INTAKE IN
+		 * (6)  INTAKE OUT
+		 * (7)  ELEVATOR UP
+		 * (8)  ELEVATOR DOWN
+		 * (9)  JAWS
+		 * (10) ELEVATOR TO FLOOR
+		 * (11) ELEVATOR TO SHOOTING HEIGHT
+		 * (12) ELEVATOR TO PICKUP HEIGHT
+		 *
 		 */
 		buttonPanel = new Joystick(0);
 		joystick1 = new Joystick(1);
@@ -298,13 +351,25 @@ public class OI {
 			new JoystickButton(buttonPanel, 6).whileHeld(createArmPositionPIDTest());
 			new JoystickButton(buttonPanel, 7).whileHeld(createElevatorPositionPIDTest());
 			new JoystickButton(buttonPanel, 8).whenPressed(createArmDemoSequence()); // new MotorVelocityPIDTest(Robot.arm));
-			new JoystickButton(buttonPanel, 9).whileHeld(createElevatorToFixedHeight()); // new createElevatorVelocityPIDTest());
+			new JoystickButton(buttonPanel, 9).whileHeld(createElevatorToPickUpHeight()); // new createElevatorVelocityPIDTest());
 			new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence());
 			new JoystickButton(buttonPanel, 11).whileHeld(createArmIn());
 			new JoystickButton(buttonPanel, 12).whileHeld(createArmOut());
 			break;
 		default:
 		case Competition:
+			new JoystickButton(buttonPanel, 1).whenPressed(createClimbSequence());
+			new JoystickButton(buttonPanel, 2).whenPressed(createClimbAbortSequence());
+			new JoystickButton(buttonPanel, 3).whileHeld(createArmIn());
+			new JoystickButton(buttonPanel, 4).whileHeld(createArmOut());
+			new JoystickButton(buttonPanel, 5).whileHeld(createIntakeIn());
+			new JoystickButton(buttonPanel, 6).whileHeld(createIntakeOut());
+			new JoystickButton(buttonPanel, 7).whileHeld(createElevatorUp());
+			new JoystickButton(buttonPanel, 8).whileHeld(createElevatorDown());
+			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
+			new JoystickButton(buttonPanel, 10).whileHeld(createElevatorCalibrate()); // "elevator to floor"
+			new JoystickButton(buttonPanel, 11).whileHeld(createShootingPositionSequence());
+			new JoystickButton(buttonPanel, 12).whileHeld(createPickUpPositionSequence());
 			break;
 		}
 
