@@ -54,7 +54,7 @@ public class OI {
 	 * Competition - and what Jesse wants for competition.
 	 */
 	private enum ButtonLayout { Standard, MotorTesting, Competition };
-	private static ButtonLayout buttonLayout = ButtonLayout.Standard;
+	private static ButtonLayout buttonLayout = ButtonLayout.Competition;
 	
 	/**
 	 * IF the position buttons 11 and 12 were supposed to move the ELEVATOR, change here..
