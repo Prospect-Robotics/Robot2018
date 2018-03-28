@@ -331,7 +331,7 @@ public class AutonomousCommandGroupGenerator {
 		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
 		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
 		double sideWallToFirstRobotCenter = sideWallToFirstRobotStartPosition + robotBumperWidth / 2;
-		double sideWallToScaleTarget = (fieldWidth - scaleTargetWidth) / 2;
+		double sideWallToScaleTarget = (fieldWidth - scaleFullWidth) / 2;
 		double sideWallToScalePlatform = (fieldWidth - scalePlatformWidth) / 2;
 		double sideWallToSwitch = (fieldWidth - switchWidth) / 2;
 
@@ -491,7 +491,7 @@ public class AutonomousCommandGroupGenerator {
 				
 				double secondRadius = (scaleAlleyWidth/2 - projectedDistToTarget) * Math.sqrt(2);
 				
-				double distanceFromCenterToSecondTurn = distanceFromCenter + scaleTargetWidth/2 - projectedDistToTarget;
+				double distanceFromCenterToSecondTurn = distanceFromCenter - projectedDistToTarget;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, firstAngle, inches(firstRadius), counterclockwise, SPEED_FULL);
