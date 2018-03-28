@@ -41,30 +41,30 @@ public class AutonomousCommandGroupGenerator {
 	 * transition speed - which we do entering a turn or when we stop.
 	 */
 	/** Full speed ahead! Only transition with this if tangents line up */
-	private static final double SPEED_FULL = 1.0;
+	public static final double SPEED_FULL = 1.0;
 
 	/** This is used our speed when we put the elevator up */
-	private static final double SPEED_ELEVATOR_UP = 0.35;
+	public static final double SPEED_ELEVATOR_UP = 0.35;
 
 	/** Speed zero for stopping after a move. */
-	private static final double SPEED_STOP = 0.0;
+	public static final double SPEED_STOP = 0.0;
 
 	/** Speed zero for stopping after a move. */
-	private static final double SPEED_TURN = 0.2;
+	public static final double SPEED_TURN = 0.2;
 
 	/** Elevator heights for placing cubes on the switch. */
-	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
+	public static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
 
 	/** Elevator height for placing cubes on the scale based on robot direction. */
-	private static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
-	private static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(76);
+	public static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
+	public static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(76);
 
 	/** Arm Position for Level extension. Use to grab cube. */
-	final Length ARM_POSITION_GRAB_CUBE = ArmConfiguration.ArmDegrees.create(133);
+	public static final Length ARM_POSITION_GRAB_CUBE = ArmConfiguration.ArmDegrees.create(133);
 
 	/** Arm Position for shooting over head */
-	static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
-	static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(70);
+	public static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
+	public static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(70);
 
 	/** This is the commandGroup we are populating with our autonomous routine */
 	private AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
