@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainStop;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSetStateInstant;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidToggleStateInstant;
 import org.usfirst.frc2813.units.Direction;
@@ -81,7 +81,7 @@ public class AutoParser extends CommandGroup {
 							endSpeedFactor));
 				break;
 			case "stop":
-				add(new DriveTrainStop(Robot.driveTrain));
+				add(new DriveTrainAutoStop(Robot.driveTrain));
 				break;
 			case "gripper":
 				String token = s.next().toUpperCase();

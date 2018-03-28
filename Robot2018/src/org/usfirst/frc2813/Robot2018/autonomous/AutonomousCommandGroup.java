@@ -6,7 +6,7 @@ import org.usfirst.frc2813.Robot2018.commands.drivetrain.AutoDriveSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurnSync;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetEncodersInstant;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainResetGyroInstant;
-import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainStop;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSpinAsync;
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeStopInstant;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorCalibrateSensorAsync;
@@ -104,7 +104,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		private void trackSpeed(double speed) {
 			currentSpeed = speed;
 			if (speed == 0.0) {
-				addSequential(new DriveTrainStop(Robot.driveTrain));
+				addSequential(new DriveTrainAutoStop(Robot.driveTrain));
 			}
 		}
 		/**

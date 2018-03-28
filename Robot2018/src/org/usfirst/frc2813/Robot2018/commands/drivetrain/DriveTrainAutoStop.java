@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  * controller to stop on N pids. At least one encoder is required to work.
  */
-public class DriveTrainStop extends Command {
+public class DriveTrainAutoStop extends Command {
 
 	private final double Kp = 0.8, Ki = 0, Kd = 0;
 
@@ -24,20 +24,56 @@ public class DriveTrainStop extends Command {
 	private List<PIDController> pidControllers = new ArrayList<>();
 	private List<PIDOutput> speedControllers = new ArrayList<>();
 
-	// Write to a list of PID controllers
-	private PIDOutput driveAll = new PIDOutput() {
+	/**
+	 * This class is a multiplexer that takes PIDOutput and sends to all speed controllers
+	 */
+	private static class AllPIDControllers implements PIDOutput {
+		private final DriveTrainAutoStop parent;
+		
+		public AllPIDControllers(DriveTrainAutoStop parent) {
+			this.parent = parent;
+		}
+		
 		public void pidWrite(double output) {
-			for (PIDOutput pid : speedControllers) {
+			for (PIDOutput pid : parent.speedControllers) {
 				pid.pidWrite(output);
 			}
 		}
-	};
+	}
+	
+	/**
+	 * This class wraps a PIDOutput and only calls the output if we are in auto.
+	 * If not, it will disable the command's PID controllers
+	 */
+	private static class AutoOnlyPIDOutput implements PIDOutput {
+		private final DriveTrainAutoStop parent;
+		private final PIDOutput pidOut;
+		
+		public AutoOnlyPIDOutput(DriveTrainAutoStop parent, PIDOutput pidOut) {
+			this.parent = parent;
+			this.pidOut = pidOut;
+		}
+		
+		public void pidWrite(double output) {
+			if(parent.isAutonomous()) {
+				parent.disablePID();
+			} else {
+				pidOut.pidWrite(output);
+			}
+		}
+	}
 
-	public DriveTrainStop(DriveTrain driveTrain) {
+	public DriveTrainAutoStop(DriveTrain driveTrain) {
 		this.driveTrain = driveTrain;
 		requires(driveTrain);
 	}
 
+	/**
+	 * All speedControllers go into a list, and an instance of AllPIDControllers redirects PIDOutput to each of them.
+	 * Each speed controller output (including the AllPIDControllers instance) is wrapped in a wrapper class
+	 * AutoOnlyPIDOutput.  AutoOnlyPIDOutput's job is to NOT output anything when we are no longer in auto,
+	 * but instead shut down the left over PID controllers in the command.
+	 */
 	protected void initializePIDControllers() {
 		if (!initialized) {
 			// Build a list of all the speed controllers, we can use when we need to drive
@@ -47,13 +83,15 @@ public class DriveTrainStop extends Command {
 			// Initialize one PID for every working encoder.
 			if (driveTrain.encoderPortFunctional && driveTrain.encoderStarboardFunctional) {
 				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(),
-						driveTrain.getSpeedControllerPort()));
+						new AutoOnlyPIDOutput(this, driveTrain.getSpeedControllerPort())));
 				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(),
-						driveTrain.getSpeedControllerStarboard()));
+						new AutoOnlyPIDOutput(this, driveTrain.getSpeedControllerStarboard())));
 			} else if (driveTrain.encoderPortFunctional) {
-				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(), driveAll));
+				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(), 
+						new AutoOnlyPIDOutput(this, new AllPIDControllers(this))));
 			} else if (driveTrain.encoderStarboardFunctional) {
-				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), driveAll));
+				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), 
+						new AutoOnlyPIDOutput(this, new AllPIDControllers(this))));
 			} else {
 				DriverStation.reportWarning("Can't PIDStop, BOTH ENCODERS OFFLINE", true);
 			}
@@ -102,12 +140,19 @@ public class DriveTrainStop extends Command {
 	}
 
 	protected boolean isFinished() {
-		return allEncodersOnTarget() || !isPIDEnabled;
+		return !isAutonomous() || allEncodersOnTarget() || !isPIDEnabled;
 	}
 
 	// Called once after isFinished returns true
 	protected void end() {
 		// Disable all encoders
 		disablePID();
+	}
+	
+	/**
+	 * Helper to determine if auto is still going or if we should shutdown.
+	 */
+	protected static boolean isAutonomous() {
+		return DriverStation.getInstance().isAutonomous();
 	}
 }
