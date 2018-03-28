@@ -441,7 +441,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	private void dumpSubsystemStatusAtIntervals() {
 		if(System.currentTimeMillis() - lastPositionReport >= DISPLAY_INTERVAL) {
 			lastPositionReport = System.currentTimeMillis();
-			Logger.info("[[PERIODIC]] " + getDiagnostics());
+			Logger.debug("[[PERIODIC]] " + getDiagnostics());
 		}
 	}
 
