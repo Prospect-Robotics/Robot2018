@@ -36,7 +36,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
 
 	// Software Settings
-	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(4); // TBD
+	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(12); // TBD
 
 	// Hardware Inputs
 	private static final Length SHAFT_DIAMETER                = LengthUOM.Inches.create(1.25);

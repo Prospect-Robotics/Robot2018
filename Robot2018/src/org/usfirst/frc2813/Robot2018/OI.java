@@ -53,17 +53,17 @@ public class OI {
 	 * MotorTesting - what I used for motor testing, 
 	 * Competition - and what Jesse wants for competition.
 	 */
-	private enum ButtonLayout { Standard, MotorTesting, Competition };
+	private enum ButtonLayout { Standard, MotorTesting, Competition }
 	private static ButtonLayout buttonLayout = ButtonLayout.Competition;
 	
 	/**
 	 * IF the position buttons 11 and 12 were supposed to move the ELEVATOR, change here..
 	 */
-	private static boolean POSITION_BUTTONS_INCLUDE_ELEVATOR = true;
+	private static boolean POSITION_BUTTONS_INCLUDE_ELEVATOR = false;
 	/**
 	 * IF the position buttons 11 and 12 were supposed to move the ARM, change here..
 	 */
-	private static boolean POSITION_BUTTONS_INCLUDE_ARM = false;
+	private static boolean POSITION_BUTTONS_INCLUDE_ARM = true;
 	
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a joystick.
@@ -216,7 +216,7 @@ public class OI {
 		/* Unlock and re-enable holding for the arm */
 		climbAbort.addSequential(new Unlock(Robot.arm));
 		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.arm));
-		climbAbort.addSequential(new MotorHoldPosition(Robot.arm));
+		climbAbort.addParallel(new MotorHoldPosition(Robot.arm));
 
 		/* Unlock and reset the ratchet.  It won't be free until we do a 1/4 turn higher */
 		climbAbort.addSequential(new Unlock(Robot.ratchet));
@@ -225,7 +225,7 @@ public class OI {
 
 		/* Lastly, unlock the Elevator */ 
 		climbAbort.addSequential(new SubsystemRestoreDefaultCommand(Robot.elevator));
-		climbAbort.addSequential(new MotorHoldPosition(Robot.elevator));
+		climbAbort.addParallel(new MotorHoldPosition(Robot.elevator));
 
 		/*
 		 * At this point everything is back to normal except the climb bar is still hanging out the back
@@ -375,9 +375,9 @@ public class OI {
 			new JoystickButton(buttonPanel, 7).whileHeld(createElevatorUp());
 			new JoystickButton(buttonPanel, 8).whileHeld(createElevatorDown());
 			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
-			new JoystickButton(buttonPanel, 10).whileHeld(createElevatorCalibrate()); // "elevator to floor"
-			new JoystickButton(buttonPanel, 11).whileHeld(createShootingPositionSequence());
-			new JoystickButton(buttonPanel, 12).whileHeld(createPickUpPositionSequence());
+			new JoystickButton(buttonPanel, 10).whenPressed(createElevatorCalibrate()); // "elevator to floor"
+			new JoystickButton(buttonPanel, 11).whenPressed(createShootingPositionSequence());
+			new JoystickButton(buttonPanel, 12).whenPressed(createPickUpPositionSequence());
 			break;
 		}
 		
