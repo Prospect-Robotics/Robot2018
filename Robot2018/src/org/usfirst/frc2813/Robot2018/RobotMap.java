@@ -171,6 +171,6 @@ public class RobotMap {
 		gearShiftSolenoid = new Solenoid(0,0);
 		jawsSolenoid = new Solenoid(0,1);
 		ratchetSolenoid = new Solenoid(0,2);
-		climbingBarSolenoid = new Solenoid(0,4);
+		climbingBarSolenoid = new Solenoid(0,3);
 	}
 }

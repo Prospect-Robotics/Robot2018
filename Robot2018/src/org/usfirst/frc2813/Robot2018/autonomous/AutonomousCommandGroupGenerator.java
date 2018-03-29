@@ -368,10 +368,13 @@ public class AutonomousCommandGroupGenerator {
 		 * forward and stop. There is a two deep pile of cubes near the switch, stop a
 		 * foot short of them.
 		 */
-		if (!Robot.gameData.isGameDataValid()) {
-			Logger.error(this + ": No game data.");
-			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
-			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
+//		if (!Robot.gameData.isGameDataValid()) {
+//			Logger.error(this + ": No game data.");
+		if (true) {
+//			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
+			Direction direction = Direction.FORWARD;
+//			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
+			autoCmdList.drive.addDriveSync(direction, inches(101.5), SPEED_STOP);
 			return;
 		}
 
