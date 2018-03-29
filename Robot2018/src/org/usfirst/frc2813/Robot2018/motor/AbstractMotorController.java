@@ -616,7 +616,7 @@ public abstract class AbstractMotorController implements IMotorController {
 		autoResetSensorPositionIfNecessary();
 		updatePIDProfileSlotForCurrentState();
 		checkOperationComplete();
-		checkForLimitErrors();
+		// checkForLimitErrors();
 	}
 
 	@Override
