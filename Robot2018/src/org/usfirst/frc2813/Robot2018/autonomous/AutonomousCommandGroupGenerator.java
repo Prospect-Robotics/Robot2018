@@ -414,8 +414,6 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
 				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
-				Logger.info(this+": after call to addCurveDriveSync");
-//				Logger.printFormat(LogType.INFO,"%s: after call to AddCurveDegreesSync.",this);
 			} else {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_TURN);
 				prepareForScaleAsync(Direction.BACKWARD);
@@ -517,7 +515,6 @@ public class AutonomousCommandGroupGenerator {
 		 * NB: DeliverCubeCommandSequence will always wait for Elevator to reach target
 		 * height, to avoid crashing
 		 */
-		Logger.debug(this + ": adding cube deliver sequence");
 		autoCmdList.cube.addDeliverSequenceSync();
 
 		/** time to switch to cube grabbing mode */
