@@ -320,7 +320,8 @@ public class AutonomousCommandGroupGenerator {
 		double scaleAlleyWidth = switchToScalePlatform - cubeSize;
 		double scalePlatformToTarget = backWallToScaleTarget - backWallToScalePlatform;
 		double scaleAlleyToTarget = 71.57;
-		double scaleDepth = 56;
+		double scaleDepth = 48.7;
+		double scaleWidth = 56;
 
 		/** dimensions side to side */
 		double backWallWidth = 264;
