@@ -74,7 +74,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 */
 	private static final double ACCELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
 	private static final double DECELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
-	private static final double MIN_SPEED = 0.3;  // speed to go if at a dead stop. The fastest we can go without spinning out
+	private static final double MIN_THROTTLE = 0.3;
+	private static final double MAX_THROTTLE = 1.0;
 
 	private final Gyro gyro;
 	private final Direction direction;
@@ -129,10 +130,10 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 */
 	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
 		this(driveTrain, speed, direction, distance);
-		startSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * startSpeedFactor;
+		startSpeed = maxSpeed * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
 
-		endSpeed = MIN_SPEED + (maxSpeed - MIN_SPEED) * endSpeedFactor;
+		endSpeed = maxSpeed * endSpeedFactor;
 		decelRamp *= 1 - endSpeedFactor;
 		addArg("speed",speed);
 		addArg("direction",direction);
@@ -226,7 +227,12 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double rawDelta = subsystem.getDistance() - startPosition;
 		return rawDelta * direction.getMultiplierAsDouble();
 	}
-	
+
+	/** Convert speed (0..1) to throttle +-[MIN_THROTTLE,MAX_THROTTLE] */
+	private double calcThrottle(double speed) {
+		return MIN_THROTTLE + (MAX_THROTTLE - MIN_THROTTLE) * speed;
+	}
+
 	/**
 	 * Get the desired throttle based on where we are in our journey.
 	 * Start by handling edge cases.
@@ -236,7 +242,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param distanceTravelled How far has the robot moved.  driveTrain.getDistance() suggests this is in feet.
 	 * @return desired speed between MIN_SPEED and maxSpeed
 	 */
-	private double calcThrottle(double distanceTravelled) {
+	private double calcSpeed(double distanceTravelled) {
 		double distanceRemaining = distance - distanceTravelled;
 		double startLimit, endLimit;
 
@@ -317,7 +323,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 			return;
 		}
 		double distanceTravelled = distanceTravelled();
-		double newThrottle = calcThrottle(distanceTravelled) * direction.getMultiplier();
+		double newSpeed = calcSpeed(distanceTravelled);
+		double newThrottle = calcThrottle(newSpeed) * direction.getMultiplier();
 
 		/*
 		 * 3/22/2018 MT - 
@@ -329,6 +336,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 				"TargetDistance", distance * direction.getMultiplier(),
 				"distance travelled", distanceTravelled,
 				"AngleError[now]", gyro.getAngle() - startAngle,
+				"Speed", newSpeed,
 				"Throttle", newThrottle,
 				"PID Output", pidOutput);
 		subsystem.arcadeDrive(newThrottle, pidOutput);
