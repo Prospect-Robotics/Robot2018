@@ -231,13 +231,19 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 		}
 		returning("initialize");
 	}
+	private String cachedLabel = null;
+	private int argsWhenLabelCached = 0;
 	/**
 	 * Build a formatted representation of the command, by calling getArgs().
 	 * Currently we don't have a way to automate the capture of command arguments
 	 * but we'll make one anyway.
 	 */
 	public String toString() {
-		return Formatter.formatConstructor(getClass(), args);
+		if(cachedLabel == null || args.size() != argsWhenLabelCached) {
+			cachedLabel = Formatter.formatConstructor(getClass(), args);
+			argsWhenLabelCached = args.size();
+		}
+		return cachedLabel;
 	}
 	/**
 	 * Add an arg to the list 
