@@ -368,6 +368,10 @@ public class AutonomousCommandGroupGenerator {
 		 * forward and stop. There is a two deep pile of cubes near the switch, stop a
 		 * foot short of them.
 		 */
+		/**
+		 * XXX This code has been modified for practice matches to only cross auto line. Lines commented out should be uncommented
+		 * for normal use for no game data
+		 */
 //		if (!Robot.gameData.isGameDataValid()) {
 //			Logger.error(this + ": No game data.");
 		if (true) {
