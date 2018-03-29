@@ -39,7 +39,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		public double pidGet() {
 			double angleTravelled = gyro.getAngle() - startAngle;
 			if (onCurve) {
-				// We subtract the angle we're expecting to be facing from the current angle, so that what is left is just the error, signed value  
+				// We subtract the angle we're expecting to be facing from the current angle, so that what is left is just the error, signed value
 				angleTravelled -= calcAngle(distanceTravelled());
 			}
 			return angleTravelled;
@@ -47,26 +47,26 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	};
 	// divide Ki and multiply Kd by 0.05 to emulate the behavior of a normal PIDController which uses a fixed 0.05 second period.
 	/*
-	 * NB: 3/22/2018 MT - Changed PID to P only (0.08).  
-	 * NOTES: 
-	 * 
+	 * NB: 3/22/2018 MT - Changed PID to P only (0.08).
+	 * NOTES:
+	 *
 	 * 1.  The PID is controlling a % of maximum output power for rotation, so we have to generate a proportional value that is
-	 * much smaller than 1.0 but proportional to direction and magnitude of the error in our current gyroscope angle relative to 
+	 * much smaller than 1.0 but proportional to direction and magnitude of the error in our current gyroscope angle relative to
 	 * the gyroscope angle when we started.
-	 * 
+	 *
 	 * 2.  The goal is to get something that is "just enough" to compensate for the worst case performance anomaly -
 	 * in other words - we are dragging on the left right now so the output has to be just strong enough to counter that and no
-	 * stronger.  
-	 * 
+	 * stronger.
+	 *
 	 * 3.  Without knowing how throttle % and angle % are combined, the current loading and battery level, and the maximum
-	 * speed under those conditions - we really can't begin to calculate this value.  Fortunately, we just have to derived it 
-	 * empirically and it was pretty easy.  I just increased by .01 until it was tracking to within approximately 
-	 * +/- 1 degree through the arc.  
-	 * 
-	 * 4.  IF the robot gets much worse than it is now, this can be increased but you could always fix the damage. 
+	 * speed under those conditions - we really can't begin to calculate this value.  Fortunately, we just have to derived it
+	 * empirically and it was pretty easy.  I just increased by .01 until it was tracking to within approximately
+	 * +/- 1 degree through the arc.
+	 *
+	 * 4.  IF the robot gets much worse than it is now, this can be increased but you could always fix the damage.
 	 */
 	
-	private final PIDController controller = new PIDController(0.07, 0.01, 0.15, m_source, this::usePIDOutput);
+	private final PIDController pidAngleController = new PIDController(0.07, 0.01, 0.15, m_source, this::pidAngleOutputFunc);
 
 	/**
 	 * These defaults give us values that won't slip. Ramps to speed up and slow down and a min speed which we can
@@ -103,9 +103,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
-		controller.setInputRange(-360, 360);
-		controller.setContinuous();
-		controller.setOutputRange(-1.0, 1.0);
+		pidAngleController.setInputRange(-360, 360);
+		pidAngleController.setContinuous();
+		pidAngleController.setOutputRange(-1.0, 1.0);
 		maxSpeed=speed;
 		this.direction = direction;
 		this.distance = distance;
@@ -204,7 +204,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 				"accelRamp", accelRamp,
 				"endSpeed", endSpeed,
 				"decelRamp", decelRamp);
-		controller.enable();
+		pidAngleController.enable();
 	}
 
 	/**
@@ -301,22 +301,23 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean ghscIsFinished() {
-		/* 
+		/*
 		 * Keep track of whether we have finished, and ignore any PID outputs on a best effort basis.
-		 * It's highly probable that assigning to boolean complete will be atomic, though it's not 
-		 * guaranteed.  I didn't think it was worth adding a mutex here and in the PID callback. 
+		 * It's highly probable that assigning to boolean complete will be atomic, though it's not
+		 * guaranteed.  I didn't think it was worth adding a mutex here and in the PID callback.
 		 */
-		return complete = (distanceTravelled() >= distance);
+		complete = (distanceTravelled() >= distance);
+		return complete;
 	}
 	// Called once after isFinished returns true or interrupted.
 	@Override
 	protected void ghscInterrupted() {
-		controller.disable();
-		controller.reset();
+		pidAngleController.disable();
+		pidAngleController.reset();
 		/*
 		 * When we end, we are going to push the same throttle value that we calculated for the "end speed"
-		 * and ramped down to, but we're going to disable the turn.  The last PID output we sent to the 
-		 * controller before we reached our goal for curves will almost certainly have a non-zero rotation rate
+		 * and ramped down to, but we're going to disable the turn.  The last PID output we sent to the
+		 * pidAngleController before we reached our goal for curves will almost certainly have a non-zero rotation rate
 		 * and would have one if we were correcting for an error when driving straight.
 		 */
 		Logger.info("Stopping... leaving lastThrottle=" + lastThrottle);
@@ -324,10 +325,10 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	}
 
 	/**
-	 * This is the pid callback. It provides out angle adjustment.
-	 * @param pidOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source) 
+	 * This is the Angle controlling PID callback. It provides angle adjustment.
+	 * @param pidAngleOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source)
 	 */
-	private void usePIDOutput(double pidOutput) {
+	private void pidAngleOutputFunc(double pidAngleOutput) {
 		// If the command is complete, ignore any extra PID output callbacks while we are shutting PID down.
 		if (complete) return;
 
@@ -342,8 +343,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 //				"AngleError[now]", gyro.getAngle() - startAngle - calcAngle(distanceTravelled()),
 				"Desired speed", desiredSpeed,
 				"Throttle", newThrottle,
-				"PID Output", pidOutput);
-		subsystem.arcadeDrive(newThrottle, pidOutput);
+				"PID Angle Output", pidAngleOutput);
+		subsystem.arcadeDrive(newThrottle, pidAngleOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
 
