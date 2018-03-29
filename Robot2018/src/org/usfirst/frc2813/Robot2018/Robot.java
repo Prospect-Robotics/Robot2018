@@ -115,9 +115,6 @@ public class Robot extends TimedRobot {
 		climbingBar = new Solenoid(new ClimbingBarConfiguration(), RobotMap.climbingBarSolenoid);
 		gearShifter = new Solenoid(new GearShiftConfiguration(), RobotMap.gearShiftSolenoid);
 
-		// Get the game setup data from the driver station
-		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
-
 		// Ask the Gearheads what position the robot is in
 		SmartDashboard.putData("Which position is the robot in?", positionSelector);
 
@@ -194,6 +191,10 @@ public class Robot extends TimedRobot {
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
 		new POST(autonomousCommand).start();
+
+		// Get the game setup data from the driver station
+		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
+		
 	}
 
 	/**
