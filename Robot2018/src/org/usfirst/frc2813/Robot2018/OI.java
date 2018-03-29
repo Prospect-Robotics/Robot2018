@@ -55,16 +55,12 @@ public class OI {
 	 */
 	private enum ButtonLayout { Standard, MotorTesting, Competition }
 	private static ButtonLayout buttonLayout = ButtonLayout.Competition;
-	
-	/**
-	 * IF the position buttons 11 and 12 were supposed to move the ELEVATOR, change here..
-	 */
-	private static boolean POSITION_BUTTONS_INCLUDE_ELEVATOR = false;
-	/**
-	 * IF the position buttons 11 and 12 were supposed to move the ARM, change here..
-	 */
-	private static boolean POSITION_BUTTONS_INCLUDE_ARM = true;
-	
+
+	private static final Length ELEVATOR_HEIGHT_TOLERANCE  = LengthUOM.Inches.create(0.25);
+	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(4.0);
+	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(55);
+	private static final Length ARM_POSITION_TOLERANCE     = ArmConfiguration.ArmDegrees.create(5);
+
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a joystick.
 	// You create one by telling it which joystick it's on and which button
@@ -126,35 +122,24 @@ public class OI {
 	}
 	public Command createShootingPositionSequence() {
 		CommandGroup group = new CommandGroup();
-		if(POSITION_BUTTONS_INCLUDE_ELEVATOR) {
-			group.addSequential(createElevatorToShootPosition());
-		}
-		if(POSITION_BUTTONS_INCLUDE_ARM) {
-			group.addSequential(createArmToShootPosition());
-		}
+		group.addSequential(createArmToShootPosition());
 		return group;
 	}
 	public Command createPickUpPositionSequence() {
 		CommandGroup group = new CommandGroup();
-		if(POSITION_BUTTONS_INCLUDE_ELEVATOR) {
-			group.addSequential(createElevatorToPickUpHeight());
-		}
-		if(POSITION_BUTTONS_INCLUDE_ARM) {
-			group.addSequential(createArmToPickUpPosition());
-		}
+		group.addSequential(createElevatorToPickUpHeight());
+		group.addSequential(createArmToPickUpPosition());
 		return group;
 	}
 	public Command createArmToPickUpPosition() {
 		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_GRAB_CUBE, ArmConfiguration.ArmDegrees.create(5));
 	}
+
 	public Command createElevatorToPickUpHeight() {
-		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_GRAB_CUBE, LengthUOM.Inches.create(0.5));
-	}
-	public Command createElevatorToShootPosition() {
-		return new MotorMoveToAbsolutePosition(Robot.elevator, AutonomousCommandGroupGenerator.ELEVATOR_HEIGHT_SWITCH, LengthUOM.Inches.create(0.5));
+		return new MotorMoveToAbsolutePosition(Robot.elevator, ELEVATOR_HEIGHT_GRAB_CUBE, ELEVATOR_HEIGHT_TOLERANCE);
 	}
 	public Command createArmToShootPosition() {
-		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_FORWARD_SHOOT, ArmConfiguration.ArmDegrees.create(5));
+		return new MotorMoveToAbsolutePosition(Robot.arm, ARM_POSITION_FORWARD_SHOOT, ARM_POSITION_TOLERANCE);
 	}
 	public Command createElevatorCalibrate() {
 		return new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE);
@@ -165,7 +150,6 @@ public class OI {
 		calibration.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
 		return calibration;
 	}
-	
 	/**
 	 * When we are climbing, we are retracting the elevator - 
 	 * elevator "down" climbs, and elevator "up" will break the robot because of the ratchet...
