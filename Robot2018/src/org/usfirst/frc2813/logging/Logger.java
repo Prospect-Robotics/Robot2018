@@ -50,8 +50,9 @@ public class Logger {
 	 */
 	public static void print(LogType severity, Object... objects) {
 		String finalPrint = "";
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		finalPrint+=String.format("%02d:%02d:%03d] ",calendar.MINUTE,calendar.SECOND,calendar.MILLISECOND );
+		//calendar.setTimeInMillis(System.currentTimeMillis());
+		//finalPrint+=String.format("%02d:%02d:%03d] ",calendar.MINUTE,calendar.SECOND,calendar.MILLISECOND );
+		finalPrint+=System.currentTimeMillis()+" ";
 		if (loggingLevel.showTrace) {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			System.out.println(Arrays.toString(trace));// TODO remove getStackTrace() from trace
