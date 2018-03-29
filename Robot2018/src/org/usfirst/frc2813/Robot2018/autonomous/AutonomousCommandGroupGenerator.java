@@ -381,7 +381,8 @@ public class AutonomousCommandGroupGenerator {
 		 * change it later.
 		 */
 		prepareForSwitchAsync(Direction.FORWARD);
-
+		
+		
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting
 		 * position and the configurations of switch and scale. We make these decisions
@@ -395,7 +396,7 @@ public class AutonomousCommandGroupGenerator {
 			 * The robot and the scale are on the same side. Drive forward and approach the
 			 * scale from the side.
 			 */
-			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
+			Logger.printFormat(LogType.INFO,"%s: Robot and Scale are both at the %s position.",this,robotStartingPosition);
 			/** This is the total side offset between us and the scale target */
 			double offsetRemaining = sideWallToScaleTarget - sideWallToFirstRobotCenter;
 			double totalDistanceAhead = backWallToScaleTarget + scaleDepth/2;
@@ -410,9 +411,19 @@ public class AutonomousCommandGroupGenerator {
 				 */
 				double radius = offsetRemaining - (robotBumperLength/2 + finalDistanceToTarget) / Math.sqrt(2);
 				
+//				Logger.printFormat(LogType.INFO,"%s: samde side use curves, calling AddDriveSync with dir: %s, dist %d, speed %s.",this, Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining).getValue(), SPEED_FULL);
+				Logger.info(this+": before call to addDriveSync");
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD);
+//				Logger.printFormat(LogType.INFO,"%s: Calling prepareForScaleAsync.",this);
+				Logger.info(this+": after call to addDriveSync");
+//				prepareForScaleAsync(Direction.BACKWARD);
+				Logger.info(this+": after call to prepare for scale");
+//				Logger.printFormat(LogType.INFO,"%s: samde side use curves, calling AddCurveDegreesSync with dir: %s, angle: %f, radius %d, direction %s, speed %s.",this, Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
+				Logger.info(this+": before call to addCurveDriveSync");
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
+				Logger.info(this+": after call to addCurveDriveSync");
+//				Logger.printFormat(LogType.INFO,"%s: after call to AddCurveDegreesSync.",this);
+				
 			} else {
 				double diagonalTravel = offsetRemaining * Math.sqrt(2) - (robotBumperLength/2 + finalDistanceToTarget);
 				double straightTravel = totalDistanceAhead - offsetRemaining;
@@ -518,7 +529,7 @@ public class AutonomousCommandGroupGenerator {
 		 * NB: DeliverCubeCommandSequence will always wait for Elevator to reach target
 		 * height, to avoid crashing
 		 */
-		Logger.debug(this + ": adding cube deliver sequence");
+		Logger.printFormat(LogType.INFO,"%s: adding cube deliver sequence.",this);	// TODO:  just debugging code - remove
 		autoCmdList.cube.addDeliverSequenceSync();
 
 		/** time to switch to cube grabbing mode */
