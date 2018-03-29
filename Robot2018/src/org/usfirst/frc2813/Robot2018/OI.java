@@ -375,7 +375,7 @@ public class OI {
 			new JoystickButton(buttonPanel, 7).whileHeld(createElevatorUp());
 			new JoystickButton(buttonPanel, 8).whileHeld(createElevatorDown());
 			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
-			new JoystickButton(buttonPanel, 10).whenPressed(createElevatorCalibrate()); // "elevator to floor"
+			new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence()); // NB: Jack asked to have arm go in first.
 			new JoystickButton(buttonPanel, 11).whenPressed(createShootingPositionSequence());
 			new JoystickButton(buttonPanel, 12).whenPressed(createPickUpPositionSequence());
 			break;
