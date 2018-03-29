@@ -35,4 +35,8 @@ public abstract class TargetedCommand<TARGET_TYPE> extends GearheadsCommand {
 	public final TARGET_TYPE getTarget() {
 		return this.target;
 	}
+	
+	public final String toString() {
+		return target + "." + super.toString();
+	}
 }

@@ -29,7 +29,7 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 * This log level controls the logging of which of the main 
 	 * high level functions being called on command, i.e. "in end', "in isfinished" etc... 
 	 */
-	private static final LogType TRACING_LOG_LEVEL = LogType.DEBUG;
+	private static final LogType TRACING_LOG_LEVEL = LogType.INFO;
 	/**
 	 * We will populate this array with the key/value pairs of arguments for formatting into a nice pretty name.
 	 * @see addArg
@@ -236,7 +236,7 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 * Currently we don't have a way to automate the capture of command arguments
 	 * but we'll make one anyway.
 	 */
-	public final String toString() {
+	public String toString() {
 		return Formatter.formatConstructor(getClass(), args);
 	}
 	/**
