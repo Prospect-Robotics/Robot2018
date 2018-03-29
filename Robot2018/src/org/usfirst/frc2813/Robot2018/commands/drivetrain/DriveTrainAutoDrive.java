@@ -81,7 +81,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private final double distance;
 	private double startSpeed, endSpeed, maxSpeed;
 	private double startPosition;
-	private static double rampScaleFactor = 1.0; // scale ramps to be less agressive
+	private double startTime;
+	private static double rampScaleFactor = 1.0; // scale ramps to be less aggressive
 	private double accelRamp, decelRamp;
 	private double startAngle; // which may or may not be zero degrees.
 	private double deltaAngle; // for the turn version
@@ -139,16 +140,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		addArg("startSpeedFactor",startSpeedFactor);
 		addArg("endSpeedFactor",endSpeedFactor);
 		setName(toString());
-		Logger.printLabelled(LogType.INFO, "Auto Drive Sync ctor",
-				"Timestamp", System.currentTimeMillis(),
-				"speed", speed,
-				"distance", distance,
-				"startSpeedFactor", startSpeedFactor,
-				"endSpeedFactor", endSpeedFactor,
-				"startSpeed", startSpeed,
-				"accelRamp", accelRamp,
-				"endSpeed", endSpeed,
-				"decelRamp", decelRamp);
 	}
 
 	/**
@@ -191,11 +182,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	// Called just before this Command runs the first time
 	@Override
 	protected void ghscInitialize() {
-		Logger.printLabelled(LogType.INFO, "PID AutoDrive state",
-				"startSpeed", startSpeed,
-				"accelRamp", accelRamp,
-				"endSpeed", endSpeed,
-				"decelRamp", decelRamp);
 		// Encoder 2 spins the opposite direction of Encoder 1.  Encoder 1 has a positive sense, Encoder 2 will therefore have a negative sense.
 		// In order to add the two values correctly, you should add Encoder 1 to the negative of Encoder 2, or "Encoder 1 - Encoder 2"
 		// This will, counter intuitively, add the two values, NOT take the difference between the two values
@@ -206,7 +192,15 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 */
 		startPosition = subsystem.getDistance();
 		startAngle = gyro.getAngle();
-		Logger.printLabelled(LogType.INFO, "PID AutoDrive start", "position", startPosition, "angle", startAngle);
+		startTime = System.currentTimeMillis();
+		Logger.printLabelled(LogType.INFO, "PID AutoDrive initialize",
+				"startTime", startTime,
+				"startPosition", startPosition,
+				"startSpeed", startSpeed,
+				"startAngle", startAngle,
+				"accelRamp", accelRamp,
+				"endSpeed", endSpeed,
+				"decelRamp", decelRamp);
 		controller.enable();
 	}
 
