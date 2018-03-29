@@ -370,8 +370,8 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		if (!Robot.gameData.isGameDataValid()) {
 			Logger.error(this + ": No game data.");
-			autoCmdList.drive.addDriveSync(Direction.FORWARD,
-					inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
+			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
+			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
 			return;
 		}
 
