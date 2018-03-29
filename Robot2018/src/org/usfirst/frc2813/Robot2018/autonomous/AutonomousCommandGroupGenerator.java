@@ -517,6 +517,7 @@ public class AutonomousCommandGroupGenerator {
 		 * NB: DeliverCubeCommandSequence will always wait for Elevator to reach target
 		 * height, to avoid crashing
 		 */
+		Logger.debug(this + ": adding cube deliver sequence");
 		autoCmdList.cube.addDeliverSequenceSync();
 
 		/** time to switch to cube grabbing mode */

@@ -4,6 +4,7 @@ import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -13,7 +14,8 @@ public class IntakeSpin extends SubsystemCommand<Intake> {
 	private final Direction direction;
 
     public IntakeSpin(Intake intake, Direction direction, RunningInstructions duration, Lockout lockout) {
-    	super(intake, duration, lockout);
+		super(intake, duration, lockout);
+		Logger.debug(this + ": IntakeSpin (Direction: " + direction + ", Duration: " + duration + ", Lockout: "+ lockout + ")");
 		this.direction = direction;
 		addArg("direction", direction);
 		setName(toString());
