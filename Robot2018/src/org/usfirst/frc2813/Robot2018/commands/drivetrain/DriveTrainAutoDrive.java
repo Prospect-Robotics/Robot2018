@@ -330,9 +330,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * Added reporting of the error in the angle, so you can see how well PID is controlling angular 
 		 * drift from the angle at the start of the command.  Within +/- 1 degree seems to be adequate.
 		 */
-		long allocatedMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-		//long presumableFreeMemory = Runtime.getRuntime().maxMemory()-allocatedMemoty;
-		Logger.printFormat(LogType.ALWAYS,"Memory:",allocatedMemory);
 		Logger.printLabelled(LogType.INFO, "PID linear stepping",
 				"Timestamp", System.currentTimeMillis(),
 				"TargetDistance", distance * direction.getMultiplier(),
