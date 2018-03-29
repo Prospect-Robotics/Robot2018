@@ -186,15 +186,13 @@ public class Robot extends TimedRobot {
 		Logger.info("Autonomous Init");
 		driveTrain.setBrakeCoast(NeutralMode.Brake);
 		driveTrain.setGearShift(Direction.LOW_GEAR);
+		// Get the game setup data from the driver station
+		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
 		new POST(autonomousCommand).start();
-
-		// Get the game setup data from the driver station
-		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
-		
 	}
 
 	/**
