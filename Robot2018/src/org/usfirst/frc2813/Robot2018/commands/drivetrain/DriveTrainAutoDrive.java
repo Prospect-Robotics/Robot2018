@@ -76,6 +76,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private static final double DECELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
 	private static final double MIN_THROTTLE = 0.3;
 	private static final double MAX_THROTTLE = 1.0;
+	private static final double brakeFactor = 0.8; // scale throttle down 20% if going too fast
 
 	private final Gyro gyro;
 	private final Direction direction;
@@ -90,6 +91,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private boolean onCurve;
 	private double lastThrottle = 0; // Last throttle we sent to the drive train
 	private boolean complete = false; // Have we completed the operation
+	private double lastDistance, lastTime; // calculate real speed between calls
 
 	/**
 	 * Use PID to drive in a straight line for a given distance.
@@ -191,9 +193,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * Encoders will decrement when the roll backwards.  Therefore, if you want the robot to travel backwards during autonomous,
 		 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
 		 */
-		startPosition = subsystem.getDistance();
+		startPosition = lastDistance = subsystem.getDistance();
 		startAngle = gyro.getAngle();
-		startTime = System.currentTimeMillis();
+		startTime = lastTime = System.currentTimeMillis();
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive initialize",
 				"startTime", startTime,
 				"startPosition", startPosition,
@@ -228,9 +230,17 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		return rawDelta * direction.getMultiplierAsDouble();
 	}
 
-	/** Convert speed (0..1) to throttle +-[MIN_THROTTLE,MAX_THROTTLE] */
-	private double calcThrottle(double speed) {
-		return MIN_THROTTLE + (MAX_THROTTLE - MIN_THROTTLE) * speed;
+	/** Convert speed (0..1) to positive throttle [MIN_THROTTLE,MAX_THROTTLE] */
+	private double calcThrottle(double speed, double distanceTravelled) {
+		double desiredThrottle = MIN_THROTTLE + (MAX_THROTTLE - MIN_THROTTLE) * speed;
+// FIXME! Need to convert inches/millisecond to our speed in 0..1 and need to choose and define brakeFactor
+//		double newDistance = distanceTravelled - lastDistance;
+//		double newTime = System.currentTimeMillis() - lastTime;
+//		double newSpeed = (newDistance / newTime);  // FIXME! convert to standard space: 0..1
+//		if (newSpeed > speed) {
+//			return desiredThrottle * brakeFactor;
+//		}
+		return desiredThrottle;
 	}
 
 	/**
@@ -319,24 +329,18 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 */
 	private void usePIDOutput(double pidOutput) {
 		// If the command is complete, ignore any extra PID output callbacks while we are shutting PID down.
-		if(complete) {
-			return;
-		}
-		double distanceTravelled = distanceTravelled();
-		double newSpeed = calcSpeed(distanceTravelled);
-		double newThrottle = calcThrottle(newSpeed) * direction.getMultiplier();
+		if (complete) return;
 
-		/*
-		 * 3/22/2018 MT - 
-		 * Added reporting of the error in the angle, so you can see how well PID is controlling angular 
-		 * drift from the angle at the start of the command.  Within +/- 1 degree seems to be adequate.
-		 */
-		Logger.printLabelled(LogType.INFO, "PID linear stepping",
-				"Timestamp", System.currentTimeMillis(),
-				"TargetDistance", distance * direction.getMultiplier(),
+		double distanceTravelled = distanceTravelled();
+		double desiredSpeed = calcSpeed(distanceTravelled);
+		double newThrottle = calcThrottle(desiredSpeed, distanceTravelled) * direction.getMultiplier();
+
+		Logger.printLabelled(LogType.DEBUG, "PID linear stepping",
+				"TargetDistance", distance,
 				"distance travelled", distanceTravelled,
-				"AngleError[now]", gyro.getAngle() - startAngle,
-				"Speed", newSpeed,
+// uncomment next line to see our angular drift to see how PID is doing at keeping us on path
+//				"AngleError[now]", gyro.getAngle() - startAngle - calcAngle(distanceTravelled()),
+				"Desired speed", desiredSpeed,
 				"Throttle", newThrottle,
 				"PID Output", pidOutput);
 		subsystem.arcadeDrive(newThrottle, pidOutput);
