@@ -697,40 +697,48 @@ public abstract class AbstractMotorController implements IMotorController {
 		return null;
 	}
 
+	/**
+	* This isn't really an error, but with 4096 pulses/revolution a very small variation in detected pulses could
+	* result in false positives when checking for limits.
+	*/
 	private static final double MAX_PULSE_ERROR = 50;
+	private Length getLimitAdjustmentForMargin(Direction direction) {
+		return getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR).multiply(direction.getMultiplier());
+	}
+
 	@Override
 	public boolean isHardLimitExceeded(Direction direction) {
-		return getHasHardLimit(direction) && Length.isLimitExceeded(direction, getHardLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
+		return getHasHardLimit(direction) && Length.isLimitExceeded(direction, getHardLimit(direction).add(getLimitAdjustmentForMargin(direction)), getCurrentPosition()); // Extend the limit a little, detecting an error
 	}
 	@Override
 	public boolean isHardLimitReached(Direction direction) {
-		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
+		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction).subtract(getLimitAdjustmentForMargin(direction)), getCurrentPosition()); // Reduce the limit a little, checking for success
 	}
 	@Override
 	public boolean isHardLimitNeedingCalibration(Direction direction) {
-		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR)) 
-				&& !getCurrentHardLimitSwitchStatus(direction);
+		return getHasHardLimit(direction) && Length.isLimitReached(direction, getHardLimit(direction).add(getLimitAdjustmentForMargin(direction)), getCurrentPosition()) // Extend the limit a little, detecting an error 
+			&& !getCurrentHardLimitSwitchStatus(direction);
 	}
 	@Override
 	public boolean isSoftLimitExceeded(Direction direction) {
-		return getHasSoftLimit(direction) && Length.isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
+		return getHasSoftLimit(direction) && Length.isLimitExceeded(direction, getSoftLimit(direction).add(getLimitAdjustmentForMargin(direction)), getCurrentPosition()); // Extend the limit a little, detecting an error
 	}
 	@Override
 	public boolean isSoftLimitReached(Direction direction) {
-		return getHasSoftLimit(direction) && Length.isLimitReached(direction, getSoftLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
+		return getHasSoftLimit(direction) && Length.isLimitReached(direction, getSoftLimit(direction).subtract(getLimitAdjustmentForMargin(direction)), getCurrentPosition()); // Reduce the limit a little, checking for success
 	}
 	@Override
 	public boolean isPhysicalLimitExceeded(Direction direction) {
-		return Length.isLimitExceeded(direction, getPhysicalLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
+		return Length.isLimitExceeded(direction, getPhysicalLimit(direction).add(getLimitAdjustmentForMargin(direction)), getCurrentPosition());  // Extend the limit a little, detecting an error
 	}
 	@Override
 	public boolean isPhysicalLimitReached(Direction direction) {
-		return Length.isLimitReached(direction, getPhysicalLimit(direction), getCurrentPosition(), getConfiguration().getNativeSensorLengthUOM().create(MAX_PULSE_ERROR));
+		return Length.isLimitReached(direction, getPhysicalLimit(direction).subtract(getLimitAdjustmentForMargin(direction)), getCurrentPosition()); // Reduce the limit a little, checking for success
 	}
 	@Override
 	public boolean getCurrentSoftLimitSwitchStatus(Direction direction) {
 		if(getHasSoftLimit(direction)) {
-			return Length.isLimitExceeded(direction, getSoftLimit(direction), getCurrentPosition());
+			return Length.isLimitReached(direction, getSoftLimit(direction), getCurrentPosition()); // No adjustments
 		}
 		return false;
 	}
