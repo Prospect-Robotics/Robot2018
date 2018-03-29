@@ -351,7 +351,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Add a "shoot" cube sequence. */
 		public void addShootSequenceSync() {
-			Logger.debug(this + ": adding shoot sequence");
 			addIntakeOutAsync();
 			time.addDelayInSecondsSync(0.2);
 			addIntakeStopSync();
