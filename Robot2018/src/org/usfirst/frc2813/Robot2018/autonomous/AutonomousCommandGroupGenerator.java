@@ -303,7 +303,7 @@ public class AutonomousCommandGroupGenerator {
 		double robotWheelbaseWidth = 31;
 		double robotWheelbaseLength = 20;
 		double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
-		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2;
+		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2 + 2 * 1.125;
 		double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
 
 		/** absolute dimensions side to side */
