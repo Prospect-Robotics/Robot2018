@@ -3,6 +3,7 @@ package org.usfirst.frc2813.Robot2018.commands.motor;
 import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.Motor;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 
@@ -25,6 +26,12 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
 		addArg("direction", direction);
 		addArg("relativeDistance", relativeDistance);
 		addArg("allowableError", allowableError);
+		if(duration.isAsynchronous() && allowableError != null) {
+			throw new IllegalArgumentException(this + " must not specify an allowable error, if you aren't waiting for completion.");
+		}
+		if(!duration.isAsynchronous() && allowableError == null) {
+			throw new IllegalArgumentException(this + " must specify an allowable error for synchronous operation.");
+		}
     }
 	public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError, RunningInstructions duration) {
 		this(motor, direction, relativeDistance, allowableError, duration, Lockout.Disabled);

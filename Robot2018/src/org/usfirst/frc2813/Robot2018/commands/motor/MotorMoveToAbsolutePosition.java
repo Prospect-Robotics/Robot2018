@@ -24,7 +24,10 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 		addArg("position", position);
 		addArg("allowableError", allowableError);
 		if(duration.isAsynchronous() && allowableError != null) {
-			Logger.warning(this + " does not need to specify an allowable error, if you aren't waiting for completion.");
+			throw new IllegalArgumentException(this + " must not specify an allowable error, if you aren't waiting for completion.");
+		}
+		if(!duration.isAsynchronous() && allowableError == null) {
+			throw new IllegalArgumentException(this + " must specify an allowable error for synchronous operation.");
 		}
     }
 	public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, RunningInstructions duration) {
