@@ -53,7 +53,7 @@ public class OI {
 	 * MotorTesting - what I used for motor testing, 
 	 * Competition - and what Jesse wants for competition.
 	 */
-	private enum ButtonLayout { Standard, MotorTesting, Competition };
+	private enum ButtonLayout { Standard, MotorTesting, Competition }
 	private static ButtonLayout buttonLayout = ButtonLayout.Competition;
 	
 	/**

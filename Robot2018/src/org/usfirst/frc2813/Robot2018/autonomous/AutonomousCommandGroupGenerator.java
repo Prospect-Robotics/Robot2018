@@ -306,7 +306,17 @@ public class AutonomousCommandGroupGenerator {
 		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2;
 		double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
 
+		/** absolute dimensions side to side */
+		double backWallWidth = 264;
+		double fieldWidth = 323.38;
+		double switchWidth = 152.88;
+		double scalePlatformWidth = 132.88;
+		double scaleFullWidth = 150.55;
+		double scaleTargetWidth = 56;
+
 		/** field dimensions from back wall */
+		double fieldDepth = 648;
+		double scaleTargetDepth = 48.7;
 		double backWallToSwitch = 140;
 		double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; /** pyramid of cubes on near side of switch */
 		double backWallToFarSideOfSwitch = 196;
@@ -314,30 +324,19 @@ public class AutonomousCommandGroupGenerator {
 		double backWallToScalePlatform = 261.47;
 		double backWallToScaleTarget = 299.65;
 
+		/** field dimensions from side wall */
+		double sideWallToFirstRobotStartPosition = 29.69;
+		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
+		double sideWallToFirstRobotCenter = sideWallToFirstRobotStartPosition + robotBumperWidth / 2;
+		double sideWallToScaleTarget = 71.57;
+		double sideWallToScalePlatform = 95.25;
+		double sideWallToSwitch = 85.25;
+
 		/** relative depth dimensions */
 		double switchDepth = backWallToFarSideOfSwitch - backWallToSwitch;
 		double switchToScalePlatform = backWallToScalePlatform - backWallToFarSideOfSwitch;
 		double scaleAlleyWidth = switchToScalePlatform - cubeSize;
 		double scalePlatformToTarget = backWallToScaleTarget - backWallToScalePlatform;
-		double scaleAlleyToTarget = 71.57;
-		double scaleDepth = 48.7;
-		double scaleWidth = 56;
-
-		/** dimensions side to side */
-		double backWallWidth = 264;
-		double fieldWidth = 293.69;
-		double switchWidth = 152.88;
-		double scalePlatformWidth = 132.88;
-		double scaleFullWidth = 150.55;
-		double scaleTargetWidth = 56;
-
-		/** relative width dimensions */
-		double sideWallToFirstRobotStartPosition = (fieldWidth - backWallWidth) / 2;
-		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
-		double sideWallToFirstRobotCenter = sideWallToFirstRobotStartPosition + robotBumperWidth / 2;
-		double sideWallToScaleTarget = (fieldWidth - scaleFullWidth) / 2;
-		double sideWallToScalePlatform = (fieldWidth - scalePlatformWidth) / 2;
-		double sideWallToSwitch = (fieldWidth - switchWidth) / 2;
 
 		/**
 		 * Make a note that we are generating the sequence now, and capture the
@@ -399,7 +398,7 @@ public class AutonomousCommandGroupGenerator {
 			Logger.printFormat(LogType.INFO,"%s: Robot and Scale are both at the %s position.",this,robotStartingPosition);
 			/** This is the total side offset between us and the scale target */
 			double offsetRemaining = sideWallToScaleTarget - sideWallToFirstRobotCenter;
-			double totalDistanceAhead = backWallToScaleTarget + scaleDepth/2;
+			double totalDistanceAhead = backWallToScaleTarget + scaleTargetDepth/2;
 			if (useCurves) {
 				/**
 				 * We are backwards on the left side. Working backwards, we will approach the
