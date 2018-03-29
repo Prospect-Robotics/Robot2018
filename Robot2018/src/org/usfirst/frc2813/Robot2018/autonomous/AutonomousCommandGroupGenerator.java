@@ -28,10 +28,10 @@ import org.usfirst.frc2813.units.values.Length;
 public class AutonomousCommandGroupGenerator {
 	/**
 	 * Some note about speed.
-	 * 
+	 *
 	 * These speeds are scaled 0..1 The robot is capable of a range of throttle
 	 * settings. This is managed elsewhere. Here we use 0..1.
-	 * 
+	 *
 	 * Transitional speed vs max speed: The autonomous drive routine that call has a
 	 * fixed min (slowest throttle setting which affects the robot) and a
 	 * programmable max. When we pass speed into these routines it. is the speed to
@@ -95,11 +95,11 @@ public class AutonomousCommandGroupGenerator {
 	 * <li>LEFT any any unchanged
 	 *
 	 * <li>RIGHT any any reversed
-	 * 
+	 *
 	 * <li>NEUTRAL any LEFT unchanged
 	 * <li>NEUTRAL any RIGHT reversed
 	 * </ul>
-	 * 
+	 *
 	 * @see SCRIPT_BIAS
 	 * @param startingPosition
 	 *            The starting placement of the robot, LEFT/CENTER/RIGHT
@@ -123,7 +123,7 @@ public class AutonomousCommandGroupGenerator {
 	/**
 	 * This is a built-in unit test function for verifying that we get the correct
 	 * output from our expectations
-	 * 
+	 *
 	 * @param startingPosition
 	 *            The starting placement of the robot, LEFT/CENTER/RIGHT
 	 * @param nearSwitchPosition
@@ -212,7 +212,7 @@ public class AutonomousCommandGroupGenerator {
 	/**
 	 * Prepare to shoot a cube at the scale. This starts the elevator moving up all
 	 * the way! Be careful!!! We will not be very stable.
-	 * 
+	 *
 	 * @param direction
 	 *            - which direction is the robot facing?
 	 */
@@ -265,7 +265,7 @@ public class AutonomousCommandGroupGenerator {
 		 * middle and only with the scale otherwise. If we want to do both, we will have
 		 * to split off two directional biases. Us relative to switch and us relative to
 		 * scale.
-		 * 
+		 *
 		 * @see getBiasedDirection
 		 */
 		Direction left = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(),
@@ -380,8 +380,7 @@ public class AutonomousCommandGroupGenerator {
 		 * change it later.
 		 */
 		prepareForSwitchAsync(Direction.FORWARD);
-		
-		
+
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting
 		 * position and the configurations of switch and scale. We make these decisions
@@ -395,10 +394,14 @@ public class AutonomousCommandGroupGenerator {
 			 * The robot and the scale are on the same side. Drive forward and approach the
 			 * scale from the side.
 			 */
-			Logger.printFormat(LogType.INFO,"%s: Robot and Scale are both at the %s position.",this,robotStartingPosition);
-			/** This is the total side offset between us and the scale target */
-			double offsetRemaining = sideWallToScaleTarget - sideWallToFirstRobotCenter;
+			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
+			/** This is the total side offset between us and the scale target center */
+			double totalDistanceSide = sideWallToScaleTarget - sideWallToFirstRobotCenter;
 			double totalDistanceAhead = backWallToScaleTarget + scaleTargetDepth/2;
+			double distanceFromTargetEdge = (robotBumperLength/2 + finalDistanceToTarget);
+			double diagDistFromTargetProjected = distanceFromTargetEdge / Math.sqrt(2);
+			double radius = totalDistanceSide - diagDistFromTargetProjected;
+			double distanceToDriveStraight = backWallToScaleTarget - (radius + diagDistFromTargetProjected);
 			if (useCurves) {
 				/**
 				 * We are backwards on the left side. Working backwards, we will approach the
@@ -408,30 +411,16 @@ public class AutonomousCommandGroupGenerator {
 				 * offset from the forward distance. Travel that distance straight. Then raise
 				 * the elevator. Then follow our curve to the target.
 				 */
-				double radius = offsetRemaining - (robotBumperLength/2 + finalDistanceToTarget) / Math.sqrt(2);
-				
-//				Logger.printFormat(LogType.INFO,"%s: samde side use curves, calling AddDriveSync with dir: %s, dist %d, speed %s.",this, Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining).getValue(), SPEED_FULL);
-				Logger.info(this+": before call to addDriveSync");
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining), SPEED_FULL);
-//				Logger.printFormat(LogType.INFO,"%s: Calling prepareForScaleAsync.",this);
-				Logger.info(this+": after call to addDriveSync");
-//				prepareForScaleAsync(Direction.BACKWARD);
-				Logger.info(this+": after call to prepare for scale");
-//				Logger.printFormat(LogType.INFO,"%s: samde side use curves, calling AddCurveDegreesSync with dir: %s, angle: %f, radius %d, direction %s, speed %s.",this, Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
-				Logger.info(this+": before call to addCurveDriveSync");
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
+				prepareForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
 				Logger.info(this+": after call to addCurveDriveSync");
 //				Logger.printFormat(LogType.INFO,"%s: after call to AddCurveDegreesSync.",this);
-				
 			} else {
-				double diagonalTravel = offsetRemaining * Math.sqrt(2) - (robotBumperLength/2 + finalDistanceToTarget);
-				double straightTravel = totalDistanceAhead - offsetRemaining;
-
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead - offsetRemaining), SPEED_TURN);
-				autoCmdList.drive.addQuickTurnSync(left, 90); /** right but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(43), SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_TURN);
 				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addQuickTurnSync(right, 90); /** left but we're backwards */
+				autoCmdList.drive.addQuickTurnSync(left, 45); /** right but we're backwards */
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromTargetEdge), SPEED_TURN);
 			}
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/**
@@ -501,9 +490,9 @@ public class AutonomousCommandGroupGenerator {
 
 			if (useCurves) {
 				double firstRadius = scaleAlleyWidth;
-				
+
 				double secondRadius = (scaleAlleyWidth/2 - projectedDistToTarget) * Math.sqrt(2);
-				
+
 				double distanceFromCenterToSecondTurn = distanceFromCenter - projectedDistToTarget;
 
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
