@@ -10,7 +10,7 @@ import org.usfirst.frc2813.units.uom.UOM;
  * NB: This is a JUnit Test but junit classes aren't available on the target, causing the build to fail
  * So I removed the JUnit classes.  The function can still be called manually from somewhere as needed.
  */
-class TestUOM {
+class UOMTest {
 
 	@org.junit.jupiter.api.Test
 	void test() {

@@ -24,7 +24,7 @@ import org.usfirst.frc2813.units.values.Length;
  *     with the new object wizard in the package explorer and then deleting the generated class.  That
  *     will make sure JUnit is available in your classpath.
  */
-class Test  {
+class MotorTest  {
 	static final int PERIODIC_INTERVAL = 250;
 
 	@org.junit.jupiter.api.Test
