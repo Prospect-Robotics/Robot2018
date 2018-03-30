@@ -26,12 +26,12 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 * default for all command instances, but can be disabled object-by-object with
 	 * setTracingEnabled.
 	 */
-	private boolean enableTracing = true;
+	protected boolean enableTracing = false;
 	/**
 	 * This log level controls the logging of which of the main high level functions
 	 * being called on command, i.e. "in end', "in isfinished" etc...
 	 */
-	private static final LogType TRACING_LOG_LEVEL = LogType.DEBUG;
+	protected static final LogType TRACING_LOG_LEVEL = LogType.INFO;
 	/**
 	 * We will populate this array with the key/value pairs of arguments for
 	 * formatting into a nice pretty name.
