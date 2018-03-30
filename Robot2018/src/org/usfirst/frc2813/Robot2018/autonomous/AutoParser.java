@@ -74,8 +74,8 @@ public class AutoParser extends CommandGroup {
 					default:
 						throw new IllegalArgumentException("expected 'clockwise' or 'counterclockwise', got " + st);
 					}
-					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
-							endSpeedFactor, curve, clockwise));
+// FIXME! update to match changes					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
+//							endSpeedFactor, curve, clockwise));
 				} else
 					add(new DriveTrainAutoDrive(Robot.driveTrain, distance, direction, speed, startSpeedFactor,
 							endSpeedFactor));
