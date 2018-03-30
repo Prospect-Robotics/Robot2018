@@ -1,7 +1,6 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
 import org.usfirst.frc2813.Robot2018.Robot;
-import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoDrive;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainAutoStop;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainQuickTurn;
@@ -15,7 +14,6 @@ import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForHardLimitSwitch;
 import org.usfirst.frc2813.Robot2018.commands.motor.MotorWaitForTargetPosition;
 import org.usfirst.frc2813.Robot2018.commands.solenoid.SolenoidSet;
 import org.usfirst.frc2813.Robot2018.subsystems.motor.ArmConfiguration;
-import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -157,7 +155,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed - speed coming out this command
 		 */
 		public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
-			Logger.printLabelled(LogType.DEBUG, "AUTO ADD CURVE", "direction", direction, "distance", distance, "radius", radius, "rotation", rotation, "endSpeed", endSpeed);
+			Logger.debug("AUTO ADD CURVE [direction: %s, distance: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, distance, radius, rotation, endSpeed);
 			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 			trackSpeed(endSpeed);
@@ -169,9 +167,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param destinationAngle
 		 */
 		public void addGotoSync(Length horizontalOffset, Length forwardOffset, double destinationAngle) {
-			// hey could you do this impossible task for me?thanks
-			// --Mr. Grossman
-			
 			double hOff = horizontalOffset.convertTo(LengthUOM.Inches).getValue();
 			double fOff = forwardOffset.convertTo(LengthUOM.Inches).getValue();
 			
