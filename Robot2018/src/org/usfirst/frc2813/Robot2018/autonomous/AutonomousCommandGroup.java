@@ -213,7 +213,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Calibrate the elevator (move down), but don't wait for completion. */
 		private void addCalibrateAsync() {
 			if(!Robot.elevator.isDisconnected()) {
-				addParallel(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
+				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/**
@@ -240,7 +240,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 			 * go slower when we have a cube in the jaws!
 			 */
 			if(!Robot.elevator.isDisconnected()) {
-				addParallel(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0)));
+				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0), RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/** Wait for the Elevator to hit the hard reset limit*/
@@ -264,7 +264,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		private void addCalibrateAsync() {
 			if(!Robot.arm.isDisconnected()) {
-				addParallel(new MotorCalibrateSensor(Robot.arm, Direction.IN));
+				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
 		/**
@@ -288,7 +288,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addMoveToPositionAsync(Length armDegrees) {
 			if(!Robot.arm.isDisconnected())
-				addParallel(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5)));
+				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Wait for the Arm to hit the hard reset limit */
@@ -338,17 +338,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 			time.addDelayInSecondsSync(0.2);
 			addIntakeStopSync();
 			setHaveCube(true);
-			
 		}
 
 		/** Add a command to start the intake spinning inwards */
 		private void addIntakeInAsync() {
-			addParallel(new IntakeSpin(Robot.intake, Direction.IN));
+			addSequential(new IntakeSpin(Robot.intake, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Add a command to start the intake spinning outwards */
 		private void addIntakeOutAsync() {
-			addParallel(new IntakeSpin(Robot.intake, Direction.OUT));
+			addSequential(new IntakeSpin(Robot.intake, Direction.OUT, RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
 		/** Add a command to stop the intake spinning */

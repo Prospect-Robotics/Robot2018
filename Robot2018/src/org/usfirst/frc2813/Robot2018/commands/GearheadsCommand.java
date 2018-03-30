@@ -164,14 +164,8 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	}
 
 	/**
-	 * NB: We invoke the superclass after calling the subclass's
-	 * implementation.-*-********
-	 * 
-	 * 
-	 * 
-	 * 
-	 * super.interrupted() will call end(), so any user hooks for interrupted-only
-	 * can go in interruptedImpl and common stuff in endImpl.
+	 * NB: We invoke the superclass after calling the subclass's implementation.
+	 * super.interrupted() will call end(), so any user hooks for interrupted-only can go in interruptedImpl and common stuff in endImpl.
 	 */
 	@Override
 	protected final void end() {
@@ -219,11 +213,10 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 		} else if (!isFinished && runningInstructions.isForever()) {
 			trace("isFinished", "command is in running forever mode.");
 			isFinished = false;
-		} /*
-			 * else if(getRunningInstructions().isAsynchronous()) {
-			 * traceFormatted("isFinished",
-			 * "returning true.  Duration set to Asynchronous."); return true; }
-			 */ else if (!isFinished && runningInstructions.isTimeout() && isTimedOut()) {
+		} else if(getRunningInstructions().isAsynchronous()) {
+			traceFormatted("isFinished", "returning true.  Duration set to Asynchronous.");
+			return true;
+		} else if(!isFinished && runningInstructions.isTimeout() && isTimedOut()) {
 			trace("isFinished", "command failed with timeout error.");
 			isFinished = true;
 		} else if (!isFinished && runningInstructions.isTimer() && isTimedOut()) {

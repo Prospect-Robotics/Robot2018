@@ -13,6 +13,7 @@ public class RunningInstructions {
 
 	public static RunningInstructions RUN_NORMALLY = new RunningInstructions(RunMode.RunNormally, null);
 	public static RunningInstructions RUN_FOREVER = new RunningInstructions(RunMode.RunForever, null);
+	public static RunningInstructions RUN_ASYNCHRONOUSLY = new RunningInstructions(RunMode.RunAsynchronously, null);
 	
 	/**
 	 * Create a new command duration with a specific type an time (optional) 
@@ -29,6 +30,7 @@ public class RunningInstructions {
 		switch(type) {
 		case RunNormally:
 		case RunForever:
+		case RunAsynchronously:
 		default:
 			if(time != null) {
 				throw new IllegalArgumentException(Formatter.concat("Duration is ", type , ", so time parameter must be null."));
@@ -60,6 +62,7 @@ public class RunningInstructions {
 	}
 	
 	public boolean isForever() { return type.isRunForever(); }
+	public boolean isAsynchronous() { return type.isRunAsynchronously(); }
 	public boolean isTimer() { return type.isRunTimed(); }
 	public boolean isTimeout() { return type.isRunWithTimeout(); }
 	public boolean isDisabled() { return type.isRunNormally(); }

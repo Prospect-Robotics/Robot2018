@@ -22,11 +22,6 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 		setName(toString());
 		addArg("position", position);
 		addArg("allowableError", allowableError);
-		// XXX this check should be here, maybe I should just leave RunningInstructions.RUN_ASYNCHRONOUSLY in...
-		/*
-		if(duration.isAsynchronous() && allowableError != null) {
-			throw new IllegalArgumentException(this + " must not specify an allowable error, if you aren't waiting for completion.");
-		}*/
     }
 	public MotorMoveToAbsolutePosition(Motor motor, Length position, Length allowableError, RunningInstructions duration) {
 		this(motor, position, allowableError, duration, Lockout.Disabled);

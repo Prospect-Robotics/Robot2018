@@ -25,14 +25,12 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
 		addArg("direction", direction);
 		addArg("relativeDistance", relativeDistance);
 		addArg("allowableError", allowableError);
-		/*
 		if(duration.isAsynchronous() && allowableError != null) {
 			throw new IllegalArgumentException(this + " must not specify an allowable error, if you aren't waiting for completion.");
 		}
 		if(!duration.isAsynchronous() && allowableError == null) {
 			throw new IllegalArgumentException(this + " must specify an allowable error for synchronous operation.");
 		}
-		*/
     }
 	public MotorMoveToRelativePosition(Motor motor, Direction direction, Length relativeDistance, Length allowableError, RunningInstructions duration) {
 		this(motor, direction, relativeDistance, allowableError, duration, Lockout.Disabled);
@@ -52,7 +50,6 @@ public final class MotorMoveToRelativePosition extends MotorCommand {
 
 	@Override
 	public boolean ghscIsFinished() {
-		if(allowableError == null) return true;
      	// Handle completion for sync mode
     	if(subsystem.getCurrentPositionErrorWithin(allowableError)) {
     		traceFormatted("isFinished", "success waiting for %s to move %s by %s.", subsystem, direction, relativeDistance);
