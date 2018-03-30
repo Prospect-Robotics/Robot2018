@@ -128,7 +128,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [RELATIVE] Must adjust direction
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Direction newDirection = adjustPhase(direction);
-		log("moveInDirectionAtDefaultRate", String.format("converted % to %s", direction, newDirection));
+		log("moveInDirectionAtDefaultRate", String.format("converted %s to %s", direction, newDirection));
 		return getMotorController().moveInDirectionAtDefaultRate(newDirection);
 	}
 
@@ -136,7 +136,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	public boolean getCurrentHardLimitSwitchStatus(Direction direction) {
 		// [RELATIVE] Must adjust direction
 		Direction newDirection = adjustPhase(direction);
-		log("getCurrentHardLimitSwitchStatus", String.format("converted % to %s", direction, newDirection));
+		log("getCurrentHardLimitSwitchStatus", String.format("converted %s to %s", direction, newDirection));
 		return getMotorController().getCurrentHardLimitSwitchStatus(newDirection);
 	}
 
@@ -146,7 +146,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Rate rate = getMotorController().getCurrentRate();
 		Rate newRate = adjustPhase(toDisplayUnitsNoPhaseCorrection(rate));
-		log("getCurrentRate", String.format("converted % to %s", rate, newRate));
+		log("getCurrentRate", String.format("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 
@@ -155,7 +155,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		Length error = getMotorController().getCurrentPositionError();
 		Length newError = adjustPhase(toDisplayUnitsNoPhaseCorrection(error));
-		log("getCurrentPositionError", String.format("converted % to %s", error, newError));
+		log("getCurrentPositionError", String.format("converted %s to %s", error, newError));
 		return newError;
 	}
 
@@ -164,7 +164,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		Rate rate = getMotorController().getCurrentRateError();
 		Rate newRate = adjustPhase(toDisplayUnitsNoPhaseCorrection(rate));
-		log("getCurrentRateError", String.format("converted % to %s", rate, newRate));
+		log("getCurrentRateError", String.format("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 
@@ -175,7 +175,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		}
 		// [RELATIVE] Must adjust units, scale
 		Rate newMarginOfError = toSensorUnitsNoPhaseCorrection(marginOfError).getAbsoluteValue();
-		log("getCurrentRateErrorWithin", String.format("converted % to %s", marginOfError, newMarginOfError));
+		log("getCurrentRateErrorWithin", String.format("converted %s to %s", marginOfError, newMarginOfError));
 		return getMotorController().getCurrentRateErrorWithin(newMarginOfError);
 	}
 
@@ -186,7 +186,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		}
 		// [RELATIVE] Must adjust units, scale
 		Length newMarginOfError = toSensorUnitsNoPhaseCorrection(marginOfError).getAbsoluteValue();
-		log("getCurrentPositionErrorWithin", String.format("converted % to %s", marginOfError, newMarginOfError));
+		log("getCurrentPositionErrorWithin", String.format("converted %s to %s", marginOfError, newMarginOfError));
 		return getMotorController().getCurrentPositionErrorWithin(newMarginOfError);
 	}
 

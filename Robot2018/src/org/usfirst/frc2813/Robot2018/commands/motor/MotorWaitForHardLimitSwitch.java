@@ -35,7 +35,7 @@ public final class MotorWaitForHardLimitSwitch extends SubsystemCommand<Motor> {
 		if(!isFinished()) {
 			traceFormatted("initialize","waiting for %s to reach %s hard limit switch.",subsystem,direction);
 		} else {
-			traceFormatted("initialize","NOT waiting pointlessly for %s to reach the % hard limit switch, it's already doing that.", subsystem, direction);
+			traceFormatted("initialize","NOT waiting pointlessly for %s to reach the %s hard limit switch, it's already doing that.", subsystem, direction);
 		}
 	}
 
