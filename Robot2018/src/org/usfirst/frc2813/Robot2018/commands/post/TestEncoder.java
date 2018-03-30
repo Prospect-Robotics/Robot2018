@@ -45,7 +45,10 @@ public class TestEncoder extends Command {
 		if(isTimedOut()) {
 			if(callback != null)
 				callback.accept(false);
-			DriverStation.reportWarning("Warning.  "+encoder.getName()+" in "+encoder.getSubsystem()+" is nonfunctional.", false);
+			System.out.println("\n"
+					+ "WARNING WARNING WARNING\n"
+					+ "Encoder."+encoder.getName() + " in " + encoder.getSubsystem() + " is nonfunctional.\n"
+					+ "WARNING WARNING WARNING\n");
 			return true;
 		}
 		return false;
