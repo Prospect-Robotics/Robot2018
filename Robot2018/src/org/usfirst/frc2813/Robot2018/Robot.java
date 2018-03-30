@@ -1,8 +1,6 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
@@ -21,11 +19,10 @@ import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
+//import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -74,7 +71,7 @@ public class Robot extends TimedRobot {
 	public static Motor arm;
 	public static Intake intake;
 	public static Solenoid jaws;
-	public static UsbCamera camera;
+//	public static UsbCamera camera;
 	public static Solenoid gearShifter;
 	public static Solenoid ratchet;
 	public static Solenoid climbingBar;
@@ -129,41 +126,10 @@ public class Robot extends TimedRobot {
 		// Add commands to Autonomous Sendable Chooser
 
 		// initialize the camera
-		//camera = CameraServer.getInstance().startAutomaticCapture();
-		//camera.setResolution(640, 480);
-           new Thread(() -> {
-               UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-               camera.setResolution(640, 480);
-               
-               CvSink cvSink = CameraServer.getInstance().getVideo();
-               CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
-               
-               Mat source = new Mat();
-               Mat output = new Mat();
-               
-               while(!Thread.interrupted()) {
-                   cvSink.grabFrame(source);
-                   Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-                   outputStream.putFrame(output);
-                }
-            }).start();
-		/*new Thread(() -> {
-			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-			camera.setResolution(640, 480);
-			CvSink cvSink = CameraServer.getInstance().getVideo();
-			Mat source = new Mat();
-			Mat output = new Mat();
-			while(!Thread.interrupted()) {
-				cvSink.grabFrame(source);
-				Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-				//outputStream.putFrame(output);
-			}			
-			
-			
-			
-			
-			
-		}).start();*/
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		camera.setResolution(640, 480);
+		camera.setFPS(15);
+		// new DriveTrainPrintEncoderValues(Robot.driveTrain, 2000).start();
 	}
 
 	/**
@@ -192,6 +158,7 @@ public class Robot extends TimedRobot {
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 
+		
 		new POST(autonomousCommand).start();
 	}
 
