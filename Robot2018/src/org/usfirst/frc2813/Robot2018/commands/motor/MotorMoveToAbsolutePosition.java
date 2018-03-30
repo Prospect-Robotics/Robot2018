@@ -23,11 +23,14 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 		setName(toString());
 		addArg("position", position);
 		addArg("allowableError", allowableError);
+<<<<<<< HEAD
 		// XXX this check should be here, maybe I should just leave RunningInstructions.RUN_ASYNCHRONOUSLY in...
 		/*
 		if(duration.isAsynchronous() && allowableError != null) {
 			throw new IllegalArgumentException(this + " must not specify an allowable error, if you aren't waiting for completion.");
 		}
+=======
+>>>>>>> branch 'master' of https://www.github.com/Prospect-Robotics/Robot2018
 		if(!duration.isAsynchronous() && allowableError == null) {
 			throw new IllegalArgumentException(this + " must specify an allowable error for synchronous operation.");
 		}
