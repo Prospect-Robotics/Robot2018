@@ -1,10 +1,14 @@
 package org.usfirst.frc2813.util;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Helper functions for using arrays as tuples
+ * 
+ * @author Sean Worley
+ * @author Adrian Guerra
  */
 public final class Formatter {
 	/**
@@ -194,5 +198,27 @@ public final class Formatter {
 		for (Object o : objects)
 			sb.append(o.toString());
 		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * @param format
+	 * @param objects
+	 * @return
+	 *         <table border="1" style="border: 1px solid black;">
+	 *         <tr><th>input</th><th>return</th><th>other</th></tr>
+	 *         <tr><td>valid format string & args</td><td>formatted string</td></tr>
+	 *         <tr><td>invalid input</td><td>format string + args together as string</td><td>prints stack trace & error message</td></tr>
+	 *         </table>
+	 * @author Adrian Guerra
+	 */
+	public static String safeFormat(String format, Object... objects) {
+		try {
+			return String.format(format, objects);
+		} catch (java.util.IllegalFormatException e) {
+			System.err.println("Error in format string");
+			e.printStackTrace();
+			return concat(format, deepToString(objects));
+		}
 	}
 }
