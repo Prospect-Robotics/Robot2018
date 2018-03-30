@@ -472,6 +472,16 @@ public class MotorConfiguration implements IMotorConfiguration {
 	public final List<PIDConfiguration> getPIDConfigurations() {
 		return Collections.unmodifiableList(pidConfigurations);
 	}
+	double peakOutputForward = 1; 
+	double peakOutputReverse = -1;
+	@Override
+	public final double getPeakOutputForward() {
+		return peakOutputForward;
+	}
+	@Override
+	public final double getPeakOutputReverse() {
+		return peakOutputReverse;
+	}
 	/*
 	 * Get the native units for this axis
 	 */
@@ -507,7 +517,9 @@ public class MotorConfiguration implements IMotorConfiguration {
 			RemoteLimitSwitchSource remoteReverseHardLimitSwitchSource, // requireAll(Reverse|ReverseForwardHardLimitSwitch)
 			Integer remoteReverseHardLimitSwitchDeviceId, // requireAll(Reverse|ReverseForwardHardLimitSwitch)
 			ICommandFactory<Motor> defaultCommandFactory, // no requirements
-			List<PIDConfiguration> pidConfigurations
+			List<PIDConfiguration> pidConfigurations,
+			double peakOutputForward,
+			double peakOutputReverse
 			)
 	{
 		this.name = name;
@@ -541,6 +553,8 @@ public class MotorConfiguration implements IMotorConfiguration {
 		this.remoteForwardHardLimitSwitchDeviceId = remoteForwardHardLimitSwitchDeviceId;
 		this.remoteReverseHardLimitSwitchSource = remoteReverseHardLimitSwitchSource;
 		this.remoteReverseHardLimitSwitchDeviceId = remoteReverseHardLimitSwitchDeviceId;
+		this.peakOutputForward = peakOutputForward;
+		this.peakOutputReverse = peakOutputReverse;
 		if(pidConfigurations != null) {
 			this.pidConfigurations.addAll(pidConfigurations);
 		}
@@ -657,6 +671,8 @@ public class MotorConfiguration implements IMotorConfiguration {
 		checkParameter("remoteForwardHardLimitSwitchDeviceId", remoteForwardHardLimitSwitchDeviceId, 0, RemoteForwardHardLimitSwitch); // no requirements
 		checkParameter("remoteReverseHardLimitSwitchSource", remoteReverseHardLimitSwitchSource, 0, RemoteReverseHardLimitSwitch); // no requirements
 		checkParameter("remoteReverseHardLimitSwitchDeviceId", remoteReverseHardLimitSwitchDeviceId, 0, RemoteReverseHardLimitSwitch); // no requirements
+		checkParameter("peakOutputForward", peakOutputForward, 0, 0); // no requirements
+		checkParameter("peakOutputReverse", peakOutputReverse, 0, 0); // no requirements
 		if(hasAll(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue() && !hasAll(LocalForwardHardLimitSwitch)) {
 			throw new IllegalArgumentException(Formatter.concat("forwardSoftLimit ", forwardSoftLimit, " exceeds forwardLimit ", forwardLimit, ".  Soft limits must be within physical range of motion."));
 		}
@@ -731,6 +747,8 @@ public class MotorConfiguration implements IMotorConfiguration {
 		"\n", 
 		"forwardLimit..........................", describeValue(forwardLimit, nativeMotorLengthUOM), "\n", 
 		"reverseLimit..........................", describeValue(reverseLimit, nativeMotorLengthUOM), "\n", 
+		"peakOutputForward.....................", peakOutputForward*100 + "%\n", 
+		"peakOutputReverse.....................", peakOutputReverse*100 + "%\n", 
 		"\n", 
 		"Limits:\n", 
 		"\n", 

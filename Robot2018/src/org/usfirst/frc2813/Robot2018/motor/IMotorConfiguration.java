@@ -136,4 +136,6 @@ public interface IMotorConfiguration {
 
 	int getRemoteForwardHardLimitSwitchDeviceId();
 
+	double getPeakOutputForward();
+	double getPeakOutputReverse();
 }

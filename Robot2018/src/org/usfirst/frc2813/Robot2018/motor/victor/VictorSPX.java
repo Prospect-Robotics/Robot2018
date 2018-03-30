@@ -240,8 +240,8 @@ public class VictorSPX extends AbstractMotorController implements IMotor {
 		// set the peak and nominal outputs, 12V means full
 		mc.configNominalOutputForward(0, getTimeout());
 		mc.configNominalOutputReverse(0, getTimeout());
-		mc.configPeakOutputForward(1, getTimeout());
-		mc.configPeakOutputReverse(-1, getTimeout());
+		mc.configPeakOutputForward(configuration.getPeakOutputForward(), getTimeout());
+		mc.configPeakOutputReverse(configuration.getPeakOutputReverse(), getTimeout());
 		
 //		correctRelativeEncodersFromAbsolute();
 		

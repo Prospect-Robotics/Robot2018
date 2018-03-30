@@ -94,8 +94,8 @@ public class ArmConfiguration extends MotorConfiguration{
 	public static final RateUOM   ArmSRXEncoderRPS       = new RateUOM(ArmSRXEncoderRevolution, TimeUOM.Seconds, RateUOM.CanonicalRateUOMForMovement, "Arm-revs/second");
 
 	// Constants used for configuration
-	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(10); // TBD
-	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0);
+	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(6.5); // was 10
+	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(15); 
 	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(110);
 	private static final Rate   MINIMUM_RATE = ArmDegreesPerSecond.create(0);
 	private static final Rate   MAXIMUM_RATE = ArmDegreesPerSecond.create(90);
@@ -137,6 +137,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.ControlRate
 					|IMotorConfiguration.Forward
 					|IMotorConfiguration.ForwardSoftLimitSwitch
+					|IMotorConfiguration.ReverseSoftLimitSwitch // Added
 					|IMotorConfiguration.LimitPosition
 					|IMotorConfiguration.LimitRate
 					|IMotorConfiguration.SensorToDriveScale
@@ -169,7 +170,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			LimitSwitchNormal.NormallyOpen,     	// reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       	// reverseHardLimitSwitchResetsEncoder
 			MAXIMUM_POSITION_DEGREES,    			// forwardSoftLimit
-			null,                              		// reverseSoftLimit
+			MINIMUM_POSITION_DEGREES,          		// reverseSoftLimit
 			DEFAULT_SPEED_DEGREES_PER_SECOND, 		// defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ArmRateOnePercentOutputPerOneSecond,    // percentageRate
@@ -182,7 +183,9 @@ public class ArmConfiguration extends MotorConfiguration{
 					return new MotorHoldPosition(m); 
 				}
 			},
-			createPidConfigurations() // pidConfigurations
+			createPidConfigurations(), // pidConfigurations
+			0.75,
+			-0.75
 			);
 	}
 
