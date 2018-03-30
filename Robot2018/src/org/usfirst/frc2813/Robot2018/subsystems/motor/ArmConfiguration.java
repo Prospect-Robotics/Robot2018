@@ -11,6 +11,7 @@ import org.usfirst.frc2813.Robot2018.motor.MotorConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
 import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.subsystems.ICommandFactory;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.uom.RateUOM;
 import org.usfirst.frc2813.units.uom.TimeUOM;
@@ -137,6 +138,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.ControlRate
 					|IMotorConfiguration.Forward
 					|IMotorConfiguration.ForwardSoftLimitSwitch
+					|IMotorConfiguration.ReverseSoftLimitSwitch // Added
 					|IMotorConfiguration.LimitPosition
 					|IMotorConfiguration.LimitRate
 					|IMotorConfiguration.SensorToDriveScale
@@ -169,7 +171,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			LimitSwitchNormal.NormallyOpen,     	// reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       	// reverseHardLimitSwitchResetsEncoder
 			MAXIMUM_POSITION_DEGREES,    			// forwardSoftLimit
-			null,                              		// reverseSoftLimit
+			MINIMUM_POSITION_DEGREES,          		// reverseSoftLimit
 			DEFAULT_SPEED_DEGREES_PER_SECOND, 		// defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ArmRateOnePercentOutputPerOneSecond,    // percentageRate
@@ -182,50 +184,50 @@ public class ArmConfiguration extends MotorConfiguration{
 					return new MotorHoldPosition(m); 
 				}
 			},
-			createPidConfigurations() // pidConfigurations
+			createPidConfigurations()
 			);
 	}
 
 	public static void mathReport() {
-		System.out.println();
-		System.out.println("[Software Settings]");
-		System.out.println("Range.............................{" + MINIMUM_POSITION_DEGREES + ".." + MAXIMUM_POSITION_DEGREES + "}");
-		System.out.println("Default Speed....................." + DEFAULT_SPEED_DEGREES_PER_SECOND);
-		System.out.println("Default Speed (Native)............" + DEFAULT_SPEED_DEGREES_PER_SECOND.convertTo(ArmSRXMotorPulseRate));
-		System.out.println();
-		System.out.println("[Robot Measurements]");
-		System.out.println("ARM...............................d=" + LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2) + ", r=" + LENGTH_OF_DRIVE_AXIS_TO_ARM_END + ", c=" + LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI));
-		System.out.println();
-		System.out.println("[Units Of Measure]");
-		System.out.println("EncoderRevolution................." + ArmSRXEncoderRevolution.getValue() + " = " + ArmSRXEncoderRevolution.getValue().convertTo(LengthUOM.Inches));
-		System.out.println("Max Pulse/Decisecond.............." + ArmMaxDriveRPM.convertTo(ArmSRXMotorPulseRate).getValue() + " = " + ArmSRXMotorPulseRate.getCanonicalValue());
-		System.out.println("Max RPMs.........................." + ArmMaxDriveRPM + " = " + ArmMaxDriveRPM.convertTo(ArmSRXEncoderRPS) + " = " + ArmMaxDriveRPM.convertTo(ArmSRXEncoderRPS).getValue() * LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI).getValue());
-		System.out.println();
-		System.out.println("[Calculations]");
-		System.out.println("Pulses/encoder rev................" + PULSES_PER_ENCODER_REVOLUTION);
-		System.out.println("Pulses/drive rev.................." + PULSES_PER_DRIVE_REVOLUTION);
-		System.out.println("Inches/encoder rev................" + DRIVE_INCHES_PER_PULSE.multiply(PULSES_PER_ENCODER_REVOLUTION));
-		System.out.println("Pulses/drive degree..............." + PULSES_PER_ONE_DEGREE);
-		System.out.println("Inches/drive degree..............." + DRIVE_INCHES_PER_ONE_DEGREE);
-		System.out.println("Pulse Length (Inches)............." + DRIVE_INCHES_PER_PULSE);
-		System.out.println("Pulse Length (Canonical).........." + DRIVE_INCHES_PER_PULSE.convertToCanonicalUOM());
-		System.out.println("Distance in Second................" + ArmMaxDriveRPM.getLength(TimeUOM.Seconds.create(1)).convertTo(LengthUOM.Inches));
-		System.out.println("Distance in Minute................" + ArmMaxDriveRPM.getLength(TimeUOM.Minutes.create(1)).convertTo(LengthUOM.Inches));
- 		System.out.println("Arm 100% Rate....................." + ArmRateOnePercentOutputPerOneSecond.create(100) + " = " + ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(RateUOM.FeetPerSecond));
- 		System.out.println("Arm 100% Rate....................." + ArmRateOnePercentOutputPerOneSecond.create(100) + " = " + ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(ArmDegreesPerSecond));
- 		System.out.println("Arm % Rate Table..................");
+		//Logger.info("");
+		Logger.info("[Software Settings]");
+		Logger.info("Range.............................{", MINIMUM_POSITION_DEGREES, "..", MAXIMUM_POSITION_DEGREES, "}");
+		Logger.info("Default Speed.....................", DEFAULT_SPEED_DEGREES_PER_SECOND);
+		Logger.info("Default Speed (Native)............", DEFAULT_SPEED_DEGREES_PER_SECOND.convertTo(ArmSRXMotorPulseRate));
+		//Logger.info("");
+		Logger.info("[Robot Measurements]");
+		Logger.info("ARM...............................d=", LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2), ", r=", LENGTH_OF_DRIVE_AXIS_TO_ARM_END, ", c=", LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI));
+		Logger.info(" ");
+		Logger.info("[Units Of Measure]");
+		Logger.info("EncoderRevolution.................", ArmSRXEncoderRevolution.getValue(), " = ", ArmSRXEncoderRevolution.getValue().convertTo(LengthUOM.Inches));
+		Logger.info("Max Pulse/Decisecond..............", ArmMaxDriveRPM.convertTo(ArmSRXMotorPulseRate).getValue(), " = ", ArmSRXMotorPulseRate.getCanonicalValue());
+		Logger.info("Max RPMs..........................", ArmMaxDriveRPM, " = ", ArmMaxDriveRPM.convertTo(ArmSRXEncoderRPS), " = ", ArmMaxDriveRPM.convertTo(ArmSRXEncoderRPS).getValue() * LENGTH_OF_DRIVE_AXIS_TO_ARM_END.multiply(2).multiply(Math.PI).getValue());
+		//Logger.info("");
+		Logger.info("[Calculations]");
+		Logger.info("Pulses/encoder rev................", PULSES_PER_ENCODER_REVOLUTION);
+		Logger.info("Pulses/drive rev..................", PULSES_PER_DRIVE_REVOLUTION);
+		Logger.info("Inches/encoder rev................", DRIVE_INCHES_PER_PULSE.multiply(PULSES_PER_ENCODER_REVOLUTION));
+		Logger.info("Pulses/drive degree...............", PULSES_PER_ONE_DEGREE);
+		Logger.info("Inches/drive degree...............", DRIVE_INCHES_PER_ONE_DEGREE);
+		Logger.info("Pulse Length (Inches).............", DRIVE_INCHES_PER_PULSE);
+		Logger.info("Pulse Length (Canonical)..........", DRIVE_INCHES_PER_PULSE.convertToCanonicalUOM());
+		Logger.info("Distance in Second................", ArmMaxDriveRPM.getLength(TimeUOM.Seconds.create(1)).convertTo(LengthUOM.Inches));
+		Logger.info("Distance in Minute................", ArmMaxDriveRPM.getLength(TimeUOM.Minutes.create(1)).convertTo(LengthUOM.Inches));
+ 		Logger.info("Arm 100% Rate.....................", ArmRateOnePercentOutputPerOneSecond.create(100), " = ", ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(RateUOM.FeetPerSecond));
+ 		Logger.info("Arm 100% Rate.....................", ArmRateOnePercentOutputPerOneSecond.create(100), " = ", ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(ArmDegreesPerSecond));
+ 		Logger.info("Arm % Rate Table..................");
  		/*		for(int q = 0; q <= 100; q++) {
 		Rate pct = ArmRateOnePercentOutputPerOneSecond.create(q);
 		Rate pr = ArmSRXMotorPulseRate.create(pct.convertTo(ArmSRXMotorPulseRate).getValueAsInt());
 		Rate rpm = ArmSRXEncoderRPM.create(pct.convertTo(ArmSRXEncoderRPM).getValueAsInt());
 		Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
-		System.out.println("                                  " + pct + " = " + pr + " = " + rpm + " = " + ips);	
+		Logger.info("                                  ", pct" = "pr, " = ", rpm, " = ", ips);	
 	}
 */
  		for(int q = 0; q <= 360; q++) {
 		Length degrees = ArmDegrees.create(q);
 		Length pulses = degrees.convertTo(ArmSRXMotorPulses);
-		System.out.println("                                  " + degrees + " = " + pulses);	
+		Logger.info("                                  ", degrees, " = ", pulses);	
 	}
 
 	}

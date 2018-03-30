@@ -14,6 +14,7 @@ import org.usfirst.frc2813.units.uom.TimeUOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Time;
+import org.usfirst.frc2813.util.Formatter;
 
 /**
  * A wrapper class to handle an SRX Talon motor controller.  Assumes all units are already correct.  use MotorUnitConversionAdapter 
@@ -35,13 +36,13 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	private static LogType logLevel = LogType.DEBUG;
-	private static void debug(String message) {
+	private static void debug(Object... message) {
 		Logger.print(logLevel, message);
 	}
-	private static void warning(String message) {
+	private static void warning(Object... message) {
 		Logger.print(LogType.ERROR, message);
 	}	
-	private static void error(String message) {
+	private static void error(Object... message) {
 		Logger.print(LogType.ALWAYS, message);
 	}
 
@@ -70,7 +71,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 	}
 
 	private synchronized void setEncoderPosition(int pos) {
-		debug("Setting sensor position.  Was " + encoderValue + " Now " + pos);
+		debug("Setting sensor position.  Was ", encoderValue, " Now ", pos);
 		this.encoderValue = pos;
 	}
 
@@ -90,7 +91,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 			return;
 		}
 		updating = true;		
-		debug("Updating: " + this + " - " + getDiagnostics());
+		debug("Updating: ", this, " - ", getDiagnostics());
 		// Don't try to update encoder position before our first command
 		if(currentState == null) {
 			updating = false;
@@ -103,7 +104,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 		}
 		// Determine a rate
 		Rate rate = getCurrentRate();
-		debug("Current Rate: " + rate);
+		debug("Current Rate: ", rate);
 		// Determine starting position
 		Length start = getConfiguration().getNativeSensorLengthUOM().create(encoderValue);
 		// Determine the current time
@@ -113,7 +114,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 		}
 		// Determine an elapsed time
 		Time elapsedTime = TimeUOM.Milliseconds.create(now - lastEncoderPositionUpdate); // TimeUOM.Milliseconds.create(System.currentTimeMillis() - lastCommandTimestamp);
-		debug("Elapsed: " + elapsedTime);
+		debug("Elapsed: ", elapsedTime);
 		// Potential travel distance
 		Length distance = rate.getLength(elapsedTime);
 		// Determine where we should be based on command and elapsed time
@@ -130,7 +131,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 			// We are moving
 			break;
 		default:
-			throw new IllegalArgumentException(this + " unsupported operation: " + currentState.getOperation());
+			throw new IllegalArgumentException(Formatter.concat(this, " unsupported operation: ", currentState.getOperation()));
 		}
 		// No change to encoder position unless you are simulating instability
 		boolean resetEncoderFromHardLimit = false;
@@ -145,12 +146,12 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 		if(targetDirection == null) {
 			throw new IllegalStateException("Simulator error.  targetDirection is null!");
 		}
-		debug("RawDistance: " + distance);		
+		debug("RawDistance: ", distance);		
 		Length distanceWithSign = distance.multiply(targetDirection.getMultiplierAsDouble());
-		debug("distanceWithSign: " + distanceWithSign);		
+		debug("distanceWithSign: ", distanceWithSign);		
 		// Where would we end up if we were going in the same direction the entire time
 		Length projectedAbsolutePosition = start.add(distanceWithSign);
-		debug("projectedAbsolutePosition: " + projectedAbsolutePosition);		
+		debug("projectedAbsolutePosition: ", projectedAbsolutePosition);		
 		// OK, see where PID would have stopped us
 		Length targetAbsolutePosition = currentState.getTargetAbsolutePosition();
 		if(targetAbsolutePosition != null) {
@@ -160,19 +161,19 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 				lastCompletedCommand = currentState;
 			}
 		}
-		debug("projectedAbsolutePosition: " + projectedAbsolutePosition);		
-		debug("Start=" + start + " CommandDistance=" + distanceWithSign + " Projected=" + projectedAbsolutePosition + " Target=" + targetAbsolutePosition);
+		debug("projectedAbsolutePosition: ", projectedAbsolutePosition);		
+		debug("Start=", start, " CommandDistance=", distanceWithSign, " Projected=", projectedAbsolutePosition, " Target=", targetAbsolutePosition);
 		// Next, see if a soft limit would have stopped us.
 		Length softLimit = null;
 		if(getHasSoftLimit(targetDirection) && Length.isLimitReached(targetDirection, softLimit = getSoftLimit(targetDirection), projectedAbsolutePosition)) {
-			warning("Soft Limit Reached.  Clamping to " + softLimit + ".");
+			warning("Soft Limit Reached.  Clamping to ", softLimit, ".");
 			projectedAbsolutePosition = Length.clampToLimit(targetDirection, softLimit, projectedAbsolutePosition);
 			lastCompletedCommand = currentState;
 		}
 		// Next, see if a hard limit would have stopped us.
 		Length hardLimit = null;
 		if(getHasHardLimit(targetDirection) && Length.isLimitReached(targetDirection, hardLimit = getHardLimit(targetDirection), projectedAbsolutePosition)) {
-			warning("Hard Limit Reached.  Clamping to " + hardLimit + ".");
+			warning("Hard Limit Reached.  Clamping to ", hardLimit, ".");
 			projectedAbsolutePosition = Length.clampToLimit(targetDirection, hardLimit, projectedAbsolutePosition);
 			resetEncoderFromHardLimit = targetDirection.isPositive() ? configuration.getForwardHardLimitSwitchResetsEncoder() : configuration.getReverseHardLimitSwitchResetsEncoder();
 			lastCompletedCommand = currentState;
@@ -182,16 +183,16 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 		if(Length.isLimitExceeded(targetDirection, physicalLimit, projectedAbsolutePosition)) {
 			projectedAbsolutePosition = Length.clampToLimit(targetDirection, getPhysicalLimit(targetDirection), projectedAbsolutePosition);
 			lastCompletedCommand = currentState;
-			error(this + ": KABOOM!  You just broke the robot.  Moved " + targetDirection + " beyond " + physicalLimit + " and broke the hardware.  Projected=" + projectedAbsolutePosition);
+			error(this, ": KABOOM!  You just broke the robot.  Moved ", targetDirection, " beyond ", physicalLimit, " and broke the hardware.  Projected=", projectedAbsolutePosition);
 		}
 		// Now do the hardware-based encoder reset if necessary, which is always zero
 		if(resetEncoderFromHardLimit) {
-			warning("Resetting encoder due to " + targetDirection + " hard limit.");
+			warning("Resetting encoder due to ", targetDirection, " hard limit.");
 			projectedAbsolutePosition = projectedAbsolutePosition.getUOM().create(0);
 		}
 		// Now update the encoder value from our projection
 		int newEncoderValue = toSensorUnits(projectedAbsolutePosition).getValueAsInt();
-		debug("newEncoderValue: " + newEncoderValue);		
+		debug("newEncoderValue: ", newEncoderValue);		
 		if(this.encoderValue != newEncoderValue) {
 			setEncoderPosition(newEncoderValue);
 		}
@@ -207,15 +208,15 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 		case MOVING_IN_DIRECTION_AT_RATE:
 			Direction targetDirection = currentState.getTargetDirection();
 			if(currentState.getTargetRate() != null) {
-				debug("currentState.getTargetRate(): " + currentState.getTargetRate());
+				debug("currentState.getTargetRate(): ", currentState.getTargetRate());
 				rate = toSensorUnits(currentState.getTargetRate());
 			} else {
-				debug("configuration.getDefaultRate(): " + configuration.getDefaultRate());
+				debug("configuration.getDefaultRate(): ", configuration.getDefaultRate());
 				rate = toSensorUnits(configuration.getDefaultRate());
 			}
 			Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
 			Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
-			debug("VELOCITY RATE: " + rate);
+			debug("VELOCITY RATE: ", rate);
 			break;
 		case DISABLED:
 		case HOLDING_CURRENT_POSITION:
@@ -232,7 +233,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 					: getMaximumReverseRate();
 			break;
 		default:
-			throw new UnsupportedOperationException("Unsupported operation: " + getTargetState());
+			throw new UnsupportedOperationException(Formatter.concat("Unsupported operation: ", getTargetState()));
 		}
 		// TODO: Improve rate simulation, maybe add fake output for testing PID at some point.  
 		return rate;
@@ -260,9 +261,8 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 	 * ---------------------------------------------------------------------------------------------- */
 	
 	public String getDiagnotics() {
-		return super.getDiagnostics()
-				+ (configuration.hasAll(IMotorConfiguration.Disconnected) ? "" :
-				  " [...todo...]");
+		return Formatter.concat(super.getDiagnostics(), (configuration.hasAll(IMotorConfiguration.Disconnected) ? "" :
+				  " [...todo...]"));
 	}
 	
 	@Override
@@ -273,7 +273,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 
 	@Override
 	public String toString() {
-		return configuration.getName() + "." + this.getClass().getSimpleName();  
+		return Formatter.concat(configuration.getName(), ".", this.getClass().getSimpleName());  
 	}
 		
 	/**
