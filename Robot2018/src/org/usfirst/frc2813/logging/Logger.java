@@ -49,9 +49,9 @@ public class Logger {
 	 * @author Adrian Guerra
 	 */
 	public static void print(LogType severity, Object... objects) {
-		String finalPrint = "";
+		StringBuilder finalPrint = new StringBuilder();
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		finalPrint+=String.format("%02d:%02d.%03d] ",calendar.get(Calendar.MINUTE),calendar.get(Calendar.SECOND),calendar.get(Calendar.MILLISECOND) );
+		finalPrint.append(String.format("%02d:%02d.%03d] ",calendar.get(Calendar.MINUTE),calendar.get(Calendar.SECOND),calendar.get(Calendar.MILLISECOND)));
 		
 		if (loggingLevel.showTrace) {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
@@ -60,24 +60,23 @@ public class Logger {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			for (int i = trace.length - 1; i > 0; i--) {
 				if (knownClasses.contains(trace[i].getClassName())) {
-					finalPrint += trace[i].getClass().getSimpleName();
-					finalPrint += " ";
+					finalPrint.append(simplifyPackage(trace[i].getClassName()));
+					finalPrint.append(' ');
 				}
 			}
 		}
 		if (loggingLevel.isIncluded(severity)) {
 			if (objects.length == 0) {
-				finalPrint += "Nothing to log";
-			} else if (objects.length == 1) {
-				finalPrint += objects[0];
+				finalPrint.append("Nothing to log");
 			} else {
-				finalPrint += Arrays.deepToString(objects);
+				for(Object o : objects) finalPrint.append(o.toString());
 			}
             if (finalPrint.length() == 0) {
                 System.out.println("We got an empty trace string that we're about to print to the console. That's a bug.");
+                (new Throwable()).printStackTrace();
                 return;
             }
-            severity.level.print(finalPrint);
+            severity.level.print(finalPrint.toString());
 		}
 	}
 
@@ -114,6 +113,7 @@ public class Logger {
 		}
 		print(severity,finalPrint);
 	}
+	
 	
 	/**
 	 * <p>
