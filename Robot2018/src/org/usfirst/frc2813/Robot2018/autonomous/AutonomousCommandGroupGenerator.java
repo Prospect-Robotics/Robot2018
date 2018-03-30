@@ -406,31 +406,33 @@ public class AutonomousCommandGroupGenerator {
 			 * scale from the side.
 			 */
 			Logger.info(this, ": Robot and Scale are both at the ", robotStartingPosition, " position.");
-			/** This is the total side offset between us and the scale target center */
-			double totalDistanceSide = sideWallToScaleTarget - sideWallToFirstRobotCenter;
-			double totalDistanceAhead = backWallToScaleTarget + scaleTargetDepth/2;
-			double distanceFromTargetEdge = (robotBumperLength/2 + finalDistanceToTarget);
-			double diagDistFromTargetProjected = distanceFromTargetEdge / Math.sqrt(2);
-			double radius = totalDistanceSide - diagDistFromTargetProjected;
-			double distanceToDriveStraight = backWallToScaleTarget - (radius + diagDistFromTargetProjected);
-			if (useCurves) {
-				/**
-				 * We are backwards on the left side. Working backwards, we will approach the
-				 * target at a 45 degree angle to avoid the scale platform. The distance we need
-				 * to travel from left to right will be the sine of 45 degrees times the radius
-				 * of some circle. From this we find the radius. Now subtract the left->right
-				 * offset from the forward distance. Travel that distance straight. Then raise
-				 * the elevator. Then follow our curve to the target.
-				 */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
-			} else {
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_TURN);
-				prepareForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addQuickTurnSync(left, 45); /** right but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromTargetEdge), SPEED_TURN);
-			}
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
+			return;
+//			/** This is the total side offset between us and the scale target center */
+//			double totalDistanceSide = sideWallToScaleTarget - sideWallToFirstRobotCenter;
+//			double totalDistanceAhead = backWallToScaleTarget + scaleTargetDepth/2;
+//			double distanceFromTargetEdge = (robotBumperLength/2 + finalDistanceToTarget);
+//			double diagDistFromTargetProjected = distanceFromTargetEdge / Math.sqrt(2);
+//			double radius = totalDistanceSide - diagDistFromTargetProjected;
+//			double distanceToDriveStraight = backWallToScaleTarget - (radius + diagDistFromTargetProjected);
+//			if (useCurves) {
+//				/**
+//				 * We are backwards on the left side. Working backwards, we will approach the
+//				 * target at a 45 degree angle to avoid the scale platform. The distance we need
+//				 * to travel from left to right will be the sine of 45 degrees times the radius
+//				 * of some circle. From this we find the radius. Now subtract the left->right
+//				 * offset from the forward distance. Travel that distance straight. Then raise
+//				 * the elevator. Then follow our curve to the target.
+//				 */
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
+//				prepareForScaleAsync(Direction.BACKWARD);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
+//			} else {
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_TURN);
+//				prepareForScaleAsync(Direction.BACKWARD);
+//				autoCmdList.drive.addQuickTurnSync(left, 45); /** right but we're backwards */
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromTargetEdge), SPEED_TURN);
+//			}
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/**
 			 * If the robot is in the center, we're going to drop a cube into the switch on
@@ -438,76 +440,76 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			Logger.info(this, ": Robot is in the ", robotStartingPosition, " position, with the near switch at the "
 					+ nearSwitchPosition, " position.");
-			if (useCurves) {
-				/**
-				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves
-				 * us in the same orientation 2r up and 2r over The distance to the scale less
-				 * our length is how far we need to move forward. This S curve does that in 2
-				 * arcs, so set radius to half that. TODO: define field dimensions and our
-				 * dimensions in variables.
-				 */
-				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget - 120;
-				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
-						- 6; /** left bumper 6 inches right of left edge of switch */
-				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
-				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
-				double radius = 30; /** found by trial and error */
-				double degrees = 45.0;
-
-				//Set elevator and arm into position
-				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
-				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
-				//Drive to switch
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-						SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
-						SPEED_STOP);
-				//Shoot
+//			if (useCurves) {
+//				/**
+//				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves
+//				 * us in the same orientation 2r up and 2r over The distance to the scale less
+//				 * our length is how far we need to move forward. This S curve does that in 2
+//				 * arcs, so set radius to half that. TODO: define field dimensions and our
+//				 * dimensions in variables.
+//				 */
+//				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget - 120;
+//				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
+//						- 6; /** left bumper 6 inches right of left edge of switch */
+//				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
+//				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
+//				double radius = 30; /** found by trial and error */
+//				double degrees = 45.0;
+//
+//				//Set elevator and arm into position
+//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+//				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+//				//Drive to switch
+//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+//						SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+//						SPEED_STOP);
+//				//Shoot
+////				autoCmdList.arm.addWaitForTargetPositionSync();
+////				autoCmdList.elevator.addWaitForTargetPositionSync();
+//				autoCmdList.cube.addShootSequenceSync();
+//				
+//				//Drive to starting position
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+//						SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+//						SPEED_STOP);
+//				//lower elevator and grab cube #2
+//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
+//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
 //				autoCmdList.arm.addWaitForTargetPositionSync();
 //				autoCmdList.elevator.addWaitForTargetPositionSync();
-				autoCmdList.cube.addShootSequenceSync();
-				
-				//Drive to starting position
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
-						SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
-						SPEED_STOP);
-				//lower elevator and grab cube #2
-				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
-				autoCmdList.arm.addWaitForTargetPositionSync();
-				autoCmdList.elevator.addWaitForTargetPositionSync();
-				autoCmdList.cube.addGrabSequenceSync();
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
-				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
-				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-						SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
-						SPEED_STOP);
-				autoCmdList.arm.addWaitForTargetPositionSync();
-				autoCmdList.elevator.addWaitForTargetPositionSync();
-				autoCmdList.cube.addShootSequenceSync();
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
-						SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
-						SPEED_STOP);
-				autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
-				autoCmdList.arm.addWaitForTargetPositionSync();
-				autoCmdList.elevator.addWaitForTargetPositionSync();
-					autoCmdList.cube.addGrabSequenceSync();
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
-					autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
-					autoCmdList.arm.addMoveToPositionSync(ArmConfiguration.ArmDegrees.create(160));
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-						SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
-						SPEED_STOP);
-				autoCmdList.arm.addWaitForTargetPositionSync();
-				autoCmdList.elevator.addWaitForTargetPositionSync();
-				autoCmdList.cube.addShootSequenceSync();
-			} else {
+//				autoCmdList.cube.addGrabSequenceSync();
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
+//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+//				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+//						SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+//						SPEED_STOP);
+//				autoCmdList.arm.addWaitForTargetPositionSync();
+//				autoCmdList.elevator.addWaitForTargetPositionSync();
+//				autoCmdList.cube.addShootSequenceSync();
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+//						SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+//						SPEED_STOP);
+//				autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
+//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
+//				autoCmdList.arm.addWaitForTargetPositionSync();
+//				autoCmdList.elevator.addWaitForTargetPositionSync();
+//					autoCmdList.cube.addGrabSequenceSync();
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
+//					autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+//					autoCmdList.arm.addMoveToPositionSync(ArmConfiguration.ArmDegrees.create(160));
+//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+//						SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+//						SPEED_STOP);
+//				autoCmdList.arm.addWaitForTargetPositionSync();
+//				autoCmdList.elevator.addWaitForTargetPositionSync();
+//				autoCmdList.cube.addShootSequenceSync();
+//			} else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
 						- 6; /** left bumper 6 inches right of left edge of switch */
@@ -520,15 +522,8 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
 				autoCmdList.drive.addQuickTurnSync(right, 45);
-//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_STOP);
 				autoCmdList.cube.addShootSequenceSync();
-				autoCmdList.drive.addQuickTurnSync(left, 45);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), 1);
-				autoCmdList.drive.addQuickTurnSync(right, 45);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), 1);
-
-
-			}
+//			}
 		} else {
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
@@ -538,49 +533,51 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			Logger.info(this, ": Robot and Scale on opposite sides.  Robot is at the ", robotStartingPosition
 					+ " position and the Scale is at the ", scalePosition, " position.");
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
+			return;
 
-			/** distance from center of robot to center of scale alley */
-			double distanceToFirstTurn = backWallToScaleAlley + scaleAlleyWidth/2 - robotBumperLength/2;
-
-			/** distance from center of the robot from the center of the field */
-			double distanceToCenter = fieldWidth/2 - sideWallToFirstRobotCenter;
-
-			/** distance down scale alley from the center of the field to the target */
-			double distanceFromCenter = scaleFullWidth/2 - scaleTargetWidth/2;
-
-			/** project our desired distance to the target onto distance down scale alley */
-			double projectedDistToTarget = (finalDistanceToTarget + (robotBumperLength/2)) / Math.sqrt(2) + scaleTargetWidth/2;
-
-			/** make a right turn down scale alley */
-			double firstAngle = 90.0;
-
-			/** pass the target and double back. right turn + 45 degrees to avoid hitting scale platform */
-			double secondAngle = 135.0;
-
-			if (useCurves) {
-				double firstRadius = scaleAlleyWidth;
-
-				double secondRadius = (scaleAlleyWidth/2 - projectedDistToTarget) * Math.sqrt(2);
-
-				double distanceFromCenterToSecondTurn = distanceFromCenter - projectedDistToTarget;
-
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, firstAngle, inches(firstRadius), counterclockwise, SPEED_FULL);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter - firstRadius), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD); // half way down scale alley
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenterToSecondTurn), SPEED_FULL);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, secondAngle, inches(secondRadius), clockwise, SPEED_STOP);
-			} else {
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn), SPEED_TURN);
-				autoCmdList.drive.addQuickTurnSync(left, 90); /** right but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD); // half way down scale alley
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenter + projectedDistToTarget), SPEED_TURN);
-				autoCmdList.drive.addQuickTurnSync(right, 135); /** left but we're backwards */
-
-				double finalDistance = projectedDistToTarget * Math.sqrt(2) - finalDistanceToTarget - robotBumperLength/2;
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(finalDistance), SPEED_STOP);
-			}
+//			/** distance from center of robot to center of scale alley */
+//			double distanceToFirstTurn = backWallToScaleAlley + scaleAlleyWidth/2 - robotBumperLength/2;
+//
+//			/** distance from center of the robot from the center of the field */
+//			double distanceToCenter = fieldWidth/2 - sideWallToFirstRobotCenter;
+//
+//			/** distance down scale alley from the center of the field to the target */
+//			double distanceFromCenter = scaleFullWidth/2 - scaleTargetWidth/2;
+//
+//			/** project our desired distance to the target onto distance down scale alley */
+//			double projectedDistToTarget = (finalDistanceToTarget + (robotBumperLength/2)) / Math.sqrt(2) + scaleTargetWidth/2;
+//
+//			/** make a right turn down scale alley */
+//			double firstAngle = 90.0;
+//
+//			/** pass the target and double back. right turn + 45 degrees to avoid hitting scale platform */
+//			double secondAngle = 135.0;
+//
+//			if (useCurves) {
+//				double firstRadius = scaleAlleyWidth;
+//
+//				double secondRadius = (scaleAlleyWidth/2 - projectedDistToTarget) * Math.sqrt(2);
+//
+//				double distanceFromCenterToSecondTurn = distanceFromCenter - projectedDistToTarget;
+//
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, firstAngle, inches(firstRadius), counterclockwise, SPEED_FULL);
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter - firstRadius), SPEED_FULL);
+//				prepareForScaleAsync(Direction.BACKWARD); // half way down scale alley
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenterToSecondTurn), SPEED_FULL);
+//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, secondAngle, inches(secondRadius), clockwise, SPEED_STOP);
+//			} else {
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn), SPEED_TURN);
+//				autoCmdList.drive.addQuickTurnSync(left, 90); /** right but we're backwards */
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter), SPEED_FULL);
+//				prepareForScaleAsync(Direction.BACKWARD); // half way down scale alley
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenter + projectedDistToTarget), SPEED_TURN);
+//				autoCmdList.drive.addQuickTurnSync(right, 135); /** left but we're backwards */
+//
+//				double finalDistance = projectedDistToTarget * Math.sqrt(2) - finalDistanceToTarget - robotBumperLength/2;
+//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(finalDistance), SPEED_STOP);
+//			}
 		}
 // NOOOOOOoooooooooooooooooooooooo!
 //		/**
