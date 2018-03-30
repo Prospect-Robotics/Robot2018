@@ -315,14 +315,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 //			arm.addWaitForTargetPositionSync();
 //		}
 
-		/** Add a "grab" cube sequence */
-		private void addGrabSequenceSync() {
-			addIntakeInAsync();
-			addJawsCloseSync();
-			time.addDelayInSecondsSync(0.2);
-			addIntakeStopSync();
-		}
-
 		/** Add a command to start the intake spinning inwards */
 		private void addIntakeInAsync() {
 			addSequential(new IntakeSpin(Robot.intake, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
@@ -349,11 +341,20 @@ public class AutonomousCommandGroup extends CommandGroup {
 			addSequential(new SolenoidSet(Robot.jaws, Direction.OPEN));
 		}
 
+		/** Add a "grab" cube sequence */
+		public void addGrabSequenceSync() {
+			addIntakeInAsync();
+			addJawsCloseSync();
+			time.addDelayInSecondsSync(0.5);
+			addIntakeStopSync();
+		}
+
 		/** Add a "shoot" cube sequence. */
 		public void addShootSequenceSync() {
 			addIntakeOutAsync();
-			time.addDelayInSecondsSync(0.2);
+			time.addDelayInSecondsSync(0.5);
 			addIntakeStopSync();
+			addJawsOpenSync();
 		}
 
 		/**
