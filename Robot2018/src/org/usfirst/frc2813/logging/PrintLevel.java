@@ -15,16 +15,22 @@ enum PrintLevel {
 	DEFAULT {
 		@Override
 		void print(String content) {
-			System.out.println(content);
+			try {
+				System.out.println(content);
+			}
+			catch(Throwable e) {
+				// Don't do anything
+			}
 		}
 	},
 	WARNING {
 		@Override
 		void print(String content) {
 			try {
-				DriverStation.reportWarning(content,false);
-			} catch(Throwable t) {
 				System.out.println(content);
+			}
+			catch(Throwable e) {
+				// Don't do anything
 			}
 		}
 	},
@@ -32,9 +38,10 @@ enum PrintLevel {
 		@Override
 		void print(String content) {
 			try {
-				DriverStation.reportError(content,false);
-			} catch(Throwable t) {
 				System.out.println(content);
+			}
+			catch(Throwable e) {
+				// Don't do anything
 			}
 		}
 	};
