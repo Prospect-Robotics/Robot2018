@@ -194,6 +194,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		public void addSensorResetSequenceSync() {
 			addSequential(new DriveTrainResetEncoders(Robot.driveTrain));
 			addSequential(new DriveTrainResetGyro(Robot.driveTrain));
+			initState();
 		}
 
 		/**
