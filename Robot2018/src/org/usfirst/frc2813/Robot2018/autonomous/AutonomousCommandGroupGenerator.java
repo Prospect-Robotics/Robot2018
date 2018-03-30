@@ -361,6 +361,9 @@ public class AutonomousCommandGroupGenerator {
 		/** Initialize the robot */
 		autoCmdList.resetAndCalibrateSync();
 
+		/** Initialize the drive state */
+		autoCmdList.drive.initState();
+
 		/**
 		 * Keep track of whether we expect to be holding a cube at each step, so we can
 		 * choose our speed wisely.

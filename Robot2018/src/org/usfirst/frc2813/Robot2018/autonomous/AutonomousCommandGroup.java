@@ -20,6 +20,7 @@ import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
 
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 
@@ -77,10 +78,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public class Drive {
 
 		/**
-		 * This is the sticky setting for the last speed as we came out of a move.
-		 * TODO: This is not used.
+		 * These are the sticky settings for the last speed, and angle as we came out of a move.
 		 */
 		private double currentSpeed = 0.0;
+		private double currentAngle = 0.0;  // absolute from gyro. Update from gyro.
 		/**
 		 * This is the sticky setting to be used for all subsequent commands created for driving in an arc.
 		 */
@@ -96,11 +97,21 @@ public class AutonomousCommandGroup extends CommandGroup {
 		private double turnSpeed = 0.25;
 
 		/**
+		 * Initial angle. Call this first!
+         */
+        public void initState() {
+            currentSpeed = 0.0;
+            currentAngle = Robot.driveTrain.getGyro().getAngle();
+        }
+
+		/**
 		 * Track the current speed sent by use. If 0, we need to come to a complete stop before anything
 		 * else can happen.
 		 * @param speed
+		 * @param angle
 		 */
-		private void trackSpeed(double speed) {
+		private void trackState(double speed, double angle) {
+			currentAngle += angle;
 			currentSpeed = speed;
 			if (speed == 0.0) {
 				addSequential(new DriveTrainAutoStop(Robot.driveTrain));
@@ -144,23 +155,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed - speed coming out this command
 		 */
 		public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
-			addCurveSync(direction, radius.multiply(2*Math.PI*degrees/360), radius, rotation, endSpeed);
+			Logger.debug("AUTO ADD CURVE DEGREES [direction: %s, degrees: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, degrees, radius, rotation, endSpeed);
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, degrees, radius.convertTo(LengthUOM.Inches).getValue(), rotation==Direction.CLOCKWISE, direction, currentSpeed, endSpeed, currentAngle));
+			trackState(endSpeed, degrees);
 		}
 
-		/**
-		 * Add a command for driving on a circular path for a set distance, with a desired speed at the end of the movement.
-		 * @param direction - forward or backward
-		 * @param distance - along the curve.
-		 * @param radius - radius of circular path
-		 * @param rotation - clockwise or counterclockwise
-		 * @param endSpeed - speed coming out this command
-		 */
-		public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
-			Logger.debug("AUTO ADD CURVE [direction: %s, distance: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, distance, radius, rotation, endSpeed);
-			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
-					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
-			trackSpeed(endSpeed);
-		}
 		/**
 		 * 
 		 * @param horizontalOffset
@@ -188,7 +187,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
 			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
-			trackSpeed(endSpeed);
+			trackState(endSpeed, 0.0);
 		}
 
 		/** Add commands to reset the drive train encoders and gyros (typically called at the start of a match) */

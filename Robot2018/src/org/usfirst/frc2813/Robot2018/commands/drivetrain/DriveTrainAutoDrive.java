@@ -147,16 +147,16 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param driveTrain - the drivetrain subsystem
 	 * @param speed - the peak speed. We ramp up to this
 	 * @param direction - forward or backward?
-	 * @param distance - how far to travel
+	 * @param angle - degrees of curve to follow
 	 * @param startSpeedFactor - how fast are we going? 0..1
 	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
 	 * @param radius - the radius of the circle we are traveling
 	 * @param clockwise - the direction of the circle
 	 */
-	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
-		this(driveTrain, speed, direction, distance, startSpeedFactor, endSpeedFactor);
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double angle, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
+		this(driveTrain, speed, direction, computeDistance(angle, radius), startSpeedFactor, endSpeedFactor);
 		onCurve = true;
-		deltaAngle = (distance * 180.0) / (radius * Math.PI); // just an offset for now
+		deltaAngle = angle;
 		if (!clockwise) {
 			deltaAngle *= -1.0;
 		}
@@ -165,13 +165,18 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		}
 		addArg("speed",speed);
 		addArg("direction",direction);
-		addArg("distance",distance);
+		addArg("angle",angle);
 		addArg("startSpeedFactor",startSpeedFactor);
 		addArg("endSpeedFactor",endSpeedFactor);
 		addArg("radius",radius);
 		addArg("clockwise",clockwise);
 		setName(toString());
 	}
+
+    private static double computeDistance(double angle, double radius) {
+        // TODO Auto-generated method stub
+        return radius*(2*Math.PI*angle/360);
+    }
 
 	public static void scaleRamps(double scaleFactor) {
 		if (scaleFactor > 0 && scaleFactor <= 1.0) {
