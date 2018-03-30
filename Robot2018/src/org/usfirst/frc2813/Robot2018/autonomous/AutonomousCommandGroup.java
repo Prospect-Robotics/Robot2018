@@ -162,6 +162,27 @@ public class AutonomousCommandGroup extends CommandGroup {
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 			trackSpeed(endSpeed);
 		}
+		/**
+		 * 
+		 * @param horizontalOffset
+		 * @param forwardOffset
+		 * @param destinationAngle
+		 */
+		public void addGotoSync(Length horizontalOffset, Length forwardOffset, double destinationAngle) {
+			// hey could you do this impossible task for me?thanks
+			// --Mr. Grossman
+			
+			double hOff = horizontalOffset.convertTo(LengthUOM.Inches).getValue();
+			double fOff = forwardOffset.convertTo(LengthUOM.Inches).getValue();
+			
+			Direction leftOrRight = (hOff < 0) ? Direction.LEFT : (hOff == 0) ? Direction.CENTER : Direction.RIGHT;
+			
+			Direction forward = (fOff < 0) ? Direction.LEFT : (fOff == 0) ? Direction.CENTER : Direction.RIGHT;
+			
+			//addSeqquential(ne
+			//addDriveSync(forward, LengthUOM.Inches.create(Math.sqrt(hOff*hOff+fOff*fOff)), SPEED);
+			
+		}
 
 		/**
 		 * Add a command for driving forward for a set distance, with a desired speed at the end of the movement.
@@ -197,7 +218,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Calibrate the elevator (move down), but don't wait for completion. */
 		private void addCalibrateAsync() {
 			if(!Robot.elevator.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN, RunningInstructions.RUN_ASYNCHRONOUSLY));
+				addParallel(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
 			}
 		}
 		/**
@@ -224,7 +245,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 			 * go slower when we have a cube in the jaws!
 			 */
 			if(!Robot.elevator.isDisconnected()) {
-				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0), RunningInstructions.RUN_ASYNCHRONOUSLY));
+				addParallel(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0)));
 			}
 		}
 		/** Wait for the Elevator to hit the hard reset limit*/
@@ -248,7 +269,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		private void addCalibrateAsync() {
 			if(!Robot.arm.isDisconnected()) {
-				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
+				addParallel(new MotorCalibrateSensor(Robot.arm, Direction.IN));
 			}
 		}
 		/**
@@ -272,7 +293,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addMoveToPositionAsync(Length armDegrees) {
 			if(!Robot.arm.isDisconnected())
-				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), RunningInstructions.RUN_ASYNCHRONOUSLY));
+				addParallel(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5)));
 		}
 
 		/** Wait for the Arm to hit the hard reset limit */
@@ -321,16 +342,18 @@ public class AutonomousCommandGroup extends CommandGroup {
 			addJawsCloseSync();
 			time.addDelayInSecondsSync(0.2);
 			addIntakeStopSync();
+			setHaveCube(true);
+			
 		}
 
 		/** Add a command to start the intake spinning inwards */
 		private void addIntakeInAsync() {
-			addSequential(new IntakeSpin(Robot.intake, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
+			addParallel(new IntakeSpin(Robot.intake, Direction.IN));
 		}
 
 		/** Add a command to start the intake spinning outwards */
 		private void addIntakeOutAsync() {
-			addSequential(new IntakeSpin(Robot.intake, Direction.OUT, RunningInstructions.RUN_ASYNCHRONOUSLY));
+			addParallel(new IntakeSpin(Robot.intake, Direction.OUT));
 		}
 
 		/** Add a command to stop the intake spinning */
@@ -354,6 +377,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 			addIntakeOutAsync();
 			time.addDelayInSecondsSync(0.2);
 			addIntakeStopSync();
+			setHaveCube(false);
 		}
 
 		/**

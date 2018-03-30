@@ -31,10 +31,11 @@ public enum RunMode {
 	/**
 	 * This command is going to return immediately, ignoring the subclass's isFinished.
 	 */
-	RunAsynchronously;
+	//RunAsynchronously,
+	;
 	public boolean isRunForever() { return this == RunForever; }
 	public boolean isRunTimed() { return this == RunTimed; }
 	public boolean isRunWithTimeout() { return this == RunWithTimeout; }
 	public boolean isRunNormally() { return this == RunNormally; }
-	public boolean isRunAsynchronously() { return this == RunAsynchronously; }
+	//public boolean isRunAsynchronously() { return this == RunAsynchronously; }
 }
