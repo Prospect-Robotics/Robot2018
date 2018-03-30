@@ -12,6 +12,7 @@ import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Value;
+import org.usfirst.frc2813.util.Formatter;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -53,7 +54,7 @@ public class MotorConfiguration implements IMotorConfiguration {
         case RemoteReverseHardLimitSwitch : return "RemoteReverseHardLimitSwitch";
         case RemoteForwardHardLimitSwitch : return "RemoteForwardHardLimitSwitch";
         default:
-                return "Unknown Capability " + capability;
+                return Formatter.concat("Unknown Capability ", capability);
         }
 	}
 	
@@ -564,17 +565,17 @@ public class MotorConfiguration implements IMotorConfiguration {
 	private void checkParameter(String name, Object value, int requireAny, int requireAll) {
 		if (value != null) { 
 			if(requireAny != 0 && !hasAny(requireAny)) {
-				throw new IllegalArgumentException("Indicated capabilities do not require " + name + ".\nThe following capabilities use " + name + ":\n" + listCapabilitiesCSV(requireAny));
+				throw new IllegalArgumentException(Formatter.concat("Indicated capabilities do not require ", name, ".\nThe following capabilities use ", name, ":\n", listCapabilitiesCSV(requireAny)));
 			}
 			if(requireAll != 0 && !hasAll(requireAll)) {
-				throw new IllegalArgumentException("Indicated capabilities do not require " + name + ".\nThe " + name + " parameter is ONLY required if you have ALL of these capabilities:\n" + listCapabilitiesCSV(requireAll));
+				throw new IllegalArgumentException(Formatter.concat("Indicated capabilities do not require ", name, ".\nThe ", name, " parameter is ONLY required if you have ALL of these capabilities:\n", listCapabilitiesCSV(requireAll)));
 			}
 		} else {
 			if(requireAny != 0 && hasAny(requireAny)) {
-				throw new IllegalArgumentException("Indicated capabilities require " + name + ".\nThe following capabilities use " + name + ":\n" + listCapabilitiesCSV(requireAny));
+				throw new IllegalArgumentException(Formatter.concat("Indicated capabilities require ", name, ".\nThe following capabilities use ", name, ":\n", listCapabilitiesCSV(requireAny)));
 			}
 			if(requireAll != 0 && hasAll(requireAll)) {
-				throw new IllegalArgumentException("Indicated capabilities require " + name + ".\nThe parameter " + name + " is required if you have all the capabilities:\n" + listCapabilitiesCSV(requireAll));
+				throw new IllegalArgumentException(Formatter.concat("Indicated capabilities require ", name, ".\nThe parameter ", name, " is required if you have all the capabilities:\n", listCapabilitiesCSV(requireAll)));
 			}
 		}
 	}
@@ -585,20 +586,20 @@ public class MotorConfiguration implements IMotorConfiguration {
 			for(int i = 0; i <= MAX_CAPABILITY; i++) {
 				int c = (1 << i);
 				if((requireAll & c) != 0 && (capabilities & c) == 0) {
-					throw new IllegalArgumentException("The capability " + getCapabilityName(capability) + " depends on " + getCapabilityName(c));	
+					throw new IllegalArgumentException(Formatter.concat("The capability ", getCapabilityName(capability), " depends on ", getCapabilityName(c)));	
 				}
 			}
 		}
 		
 		if(hasAll(capability) && requireAny != 0 && !hasAny(requireAny)) {
-			throw new IllegalArgumentException("The " + getCapabilityName(capability) + " capability requires at least one of:\n" + listCapabilitiesCSV(requireAny));
+			throw new IllegalArgumentException(Formatter.concat("The ", getCapabilityName(capability), " capability requires at least one of:\n", listCapabilitiesCSV(requireAny)));
 		}
 	}
 
 	private void validateCapabilityDependency(int capability, int requireAny, int requireAll, int requireNone) {
 		validateCapabilityDependency(capability,requireAny,requireAll);
 		if(requireNone != 0 && hasAny(requireNone)) {
-			throw new IllegalArgumentException("The " + getCapabilityName(capability) + " capability is incompatible with:\n" + listCapabilitiesCSV(requireNone & capabilities));
+			throw new IllegalArgumentException(Formatter.concat("The ", getCapabilityName(capability), " capability is incompatible with:\n", listCapabilitiesCSV(requireNone & capabilities)));
 		}
 	}
 
@@ -657,10 +658,10 @@ public class MotorConfiguration implements IMotorConfiguration {
 		checkParameter("remoteReverseHardLimitSwitchSource", remoteReverseHardLimitSwitchSource, 0, RemoteReverseHardLimitSwitch); // no requirements
 		checkParameter("remoteReverseHardLimitSwitchDeviceId", remoteReverseHardLimitSwitchDeviceId, 0, RemoteReverseHardLimitSwitch); // no requirements
 		if(hasAll(ForwardSoftLimitSwitch) && forwardSoftLimit.getValue() > forwardLimit.getValue() && !hasAll(LocalForwardHardLimitSwitch)) {
-			throw new IllegalArgumentException("forwardSoftLimit " + forwardSoftLimit + " exceeds forwardLimit " + forwardLimit + ".  Soft limits must be within physical range of motion.");
+			throw new IllegalArgumentException(Formatter.concat("forwardSoftLimit ", forwardSoftLimit, " exceeds forwardLimit ", forwardLimit, ".  Soft limits must be within physical range of motion."));
 		}
 		if(hasAll(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()&& !hasAll(LocalReverseHardLimitSwitch)) {
-			throw new IllegalArgumentException("reverseSoftLimit " + reverseSoftLimit + " exceeds reverseLimit " + reverseLimit + ".  Soft limits must be within physical range of motion.");
+			throw new IllegalArgumentException(Formatter.concat("reverseSoftLimit ", reverseSoftLimit, " exceeds reverseLimit ", reverseLimit, ".  Soft limits must be within physical range of motion."));
 		}
 	}
 
@@ -682,73 +683,74 @@ public class MotorConfiguration implements IMotorConfiguration {
 
 	@SuppressWarnings("rawtypes")
 	private String describeUOM(UOM uom) {
-		return (uom != null ? (uom + " (" + uom.getCanonicalValue() + ")") : null);
+		if(uom != null) {
+			return Formatter.concat(uom, '(', uom.getCanonicalValue(), ')');
+		} else return null;
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private String describeValue(Value value, UOM alt) {
-		return (value != null ? (value + " (" + value.convertTo(alt) + ")") : null);
+		if(value != null) {
+			return Formatter.concat(value, " (", value.convertTo(alt), ')');
+		} else return null;
 	}
 	/* (non-Javadoc)
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getDescription()
 	 */
 	@Override
 	public String getDescription() {
-		StringBuffer buf = new StringBuffer();
-		buf
-		.append("----------------------------------------------------------------------------\n")
-		.append("                            Motor Configuration                             \n")
-		.append("----------------------------------------------------------------------------\n")
-		.append("Name.................................." + getName() + "\n")
-		.append("\n")
-		.append("Capabilities.........................." + listCapabilities(capabilities, "", "\n                                      ", "") + "\n")
-		.append("\n")
-		.append("Length Units:\n")
-		.append("\n")
-		.append("nativeDisplayLengthUOM................" + describeUOM(nativeDisplayLengthUOM) + "\n")
-		.append("nativeMotorLengthUOM.................." + describeUOM(nativeMotorLengthUOM) + "\n")
-		.append("nativeSensorLengthUOM................." + describeUOM(nativeSensorLengthUOM) + "\n")
-		.append("\n")
-		.append("Rate Units:\n")
-		.append("\n")
-		.append("nativeDisplayRateUOM.................." + describeUOM(nativeDisplayRateUOM) + "\n")
-		.append("nativeMotorRateUOM...................." + describeUOM(nativeMotorRateUOM) + "\n")
-		.append("nativeSensorRateUOM..................." + describeUOM(nativeSensorRateUOM) + "\n")
-		.append("percentageRateUOM....................." + describeUOM(percentageRateUOM) + "\n")
-		.append("\n")
-		.append("Rates:\n")
-		.append("\n")
-		.append("defaultRate..........................." + describeValue(defaultRate, nativeMotorRateUOM) + "\n")
-		.append("minimumForwardRate...................." + describeValue(minimumForwardRate, nativeMotorRateUOM) + "\n")
-		.append("maximumForwardRate...................." + describeValue(maximumForwardRate, nativeMotorRateUOM) + "\n")
-		.append("minimumReverseRate...................." + describeValue(minimumReverseRate, nativeMotorRateUOM) + "\n")
-		.append("maximumReverseRate...................." + describeValue(maximumReverseRate, nativeMotorRateUOM) + "\n")
-		.append("\n")
-		.append("Limits:\n")
-		.append("\n")
-		.append("forwardLimit.........................." + describeValue(forwardLimit, nativeMotorLengthUOM) + "\n")
-		.append("reverseLimit.........................." + describeValue(reverseLimit, nativeMotorLengthUOM) + "\n")
-		.append("\n")
-		.append("Limits:\n")
-		.append("\n")
-		.append("forwardSoftLimit......................" + describeValue(forwardSoftLimit, nativeMotorLengthUOM) + "\n")
-		.append("reverseSoftLimit......................" + describeValue(reverseSoftLimit, nativeMotorLengthUOM) + "\n")
-		.append("forwardHardLimitSwitchBehavior........" + forwardHardLimitSwitchNormal + "\n")
-		.append("forwardHardLimitSwitchResetsEncoder..." + forwardHardLimitSwitchResetsEncoder + "\n")
-		.append("reverseHardLimitSwitchBehavior........" + reverseHardLimitSwitchNormal + "\n")
-		.append("reverseHardLimitSwitchResetsEncoder..." + reverseHardLimitSwitchResetsEncoder + "\n")
-		.append("\n")
-		.append("Scaling:\n")
-		.append("\n")
-		.append("sensorPhaseIsReversed................." + sensorPhaseIsReversed + "\n")
-		.append("motorPhaseIsReversed.................." + motorPhaseIsReversed + "\n")
-		.append("sensorToDriveScalingMultiplier........" + sensorToDriveScalingMultiplier + "\n")
-		.append("\n")
-		.append("Miscellaneous:\n")
-		.append("\n")
-		.append("neutralMode..........................." + neutralMode + "\n")
-		.append("defaultCommandFactory................." + defaultCommandFactory + "\n")
-		.append("----------------------------------------------------------------------------\n")
-		;
-		return buf.toString();
+		return Formatter.concat(
+		"----------------------------------------------------------------------------\n",
+		"                            Motor Configuration                             \n",
+		"----------------------------------------------------------------------------\n",
+		"Name..................................", getName(), '\n',
+		"\n",
+		"Capabilities..........................",listCapabilities(capabilities, "", "\n                                      ", ""), '\n',
+		"\n",
+		"Length Units:\n", 
+		"\n", 
+		"nativeDisplayLengthUOM................", describeUOM(nativeDisplayLengthUOM) , '\n', 
+		"nativeMotorLengthUOM..................", describeUOM(nativeMotorLengthUOM), '\n', 
+		"nativeSensorLengthUOM.................", describeUOM(nativeSensorLengthUOM), "\n", 
+		"\n", 
+		"Rate Units:\n", 
+		"\n", 
+		"nativeDisplayRateUOM..................", describeUOM(nativeDisplayRateUOM), "\n", 
+		"nativeMotorRateUOM....................", describeUOM(nativeMotorRateUOM), "\n", 
+		"nativeSensorRateUOM...................", describeUOM(nativeSensorRateUOM), "\n", 
+		"percentageRateUOM.....................", describeUOM(percentageRateUOM), "\n", 
+		"\n", 
+		"Rates:\n", 
+		"\n", 
+		"defaultRate...........................", describeValue(defaultRate, nativeMotorRateUOM), "\n", 
+		"minimumForwardRate....................", describeValue(minimumForwardRate, nativeMotorRateUOM), "\n", 
+		"maximumForwardRate....................", describeValue(maximumForwardRate, nativeMotorRateUOM), "\n", 
+		"minimumReverseRate....................", describeValue(minimumReverseRate, nativeMotorRateUOM), "\n", 
+		"maximumReverseRate....................", describeValue(maximumReverseRate, nativeMotorRateUOM), "\n", 
+		"\n", 
+		"Limits:\n", 
+		"\n", 
+		"forwardLimit..........................", describeValue(forwardLimit, nativeMotorLengthUOM), "\n", 
+		"reverseLimit..........................", describeValue(reverseLimit, nativeMotorLengthUOM), "\n", 
+		"\n", 
+		"Limits:\n", 
+		"\n", 
+		"forwardSoftLimit......................", describeValue(forwardSoftLimit, nativeMotorLengthUOM), "\n", 
+		"reverseSoftLimit......................", describeValue(reverseSoftLimit, nativeMotorLengthUOM), "\n", 
+		"forwardHardLimitSwitchBehavior........", forwardHardLimitSwitchNormal, "\n", 
+		"forwardHardLimitSwitchResetsEncoder...", forwardHardLimitSwitchResetsEncoder, "\n", 
+		"reverseHardLimitSwitchBehavior........", reverseHardLimitSwitchNormal, "\n", 
+		"reverseHardLimitSwitchResetsEncoder...", reverseHardLimitSwitchResetsEncoder, "\n", 
+		"\n", 
+		"Scaling:\n", 
+		"\n", 
+		"sensorPhaseIsReversed.................", sensorPhaseIsReversed, "\n", 
+		"motorPhaseIsReversed..................", motorPhaseIsReversed, "\n", 
+		"sensorToDriveScalingMultiplier........", sensorToDriveScalingMultiplier, "\n", 
+		"\n", 
+		"Miscellaneous:\n", 
+		"\n", 
+		"neutralMode...........................", neutralMode, "\n", 
+		"defaultCommandFactory.................", defaultCommandFactory, "\n", 
+		"----------------------------------------------------------------------------\n");
 	}
 }

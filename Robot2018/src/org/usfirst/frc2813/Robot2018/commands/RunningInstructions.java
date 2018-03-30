@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.commands;
 
 import org.usfirst.frc2813.units.values.Time;
+import org.usfirst.frc2813.util.Formatter;
 
 /**
  * This object encapsulates how long a command should run, and an optional timer value.
@@ -32,13 +33,13 @@ public class RunningInstructions {
 		//case RunAsynchronously:
 		default:
 			if(time != null) {
-				throw new IllegalArgumentException("Duration is " + type + ", so time parameter must be null.");
+				throw new IllegalArgumentException(Formatter.concat("Duration is ", type , ", so time parameter must be null."));
 			}
 			break;
 		case RunTimed:
 		case RunWithTimeout:
 			if(time == null) {
-				throw new IllegalArgumentException("Duration is " + type + ", so time parameter must NOT be null.");
+				throw new IllegalArgumentException(Formatter.concat("Duration is ", type, ", so time parameter must NOT be null."));
 			}
 			break;
 		}
@@ -67,6 +68,13 @@ public class RunningInstructions {
 	public boolean isDisabled() { return type.isRunNormally(); }
 	
 	public String toString() {
-		return time != null ? (type + "(" + time + ")") : type.toString(); 
+		StringBuilder sb = new StringBuilder();
+		sb.append(type.toString());
+		if(time != null) {
+			sb.append('(');
+			sb.append(time.toString());
+			sb.append(')');
+		}
+		return sb.toString();
 	}
 }

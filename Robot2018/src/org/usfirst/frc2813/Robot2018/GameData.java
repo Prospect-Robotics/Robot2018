@@ -1,6 +1,9 @@
 package org.usfirst.frc2813.Robot2018;
 
+import org.usfirst.frc2813.logging.LogType;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.util.Formatter;
 
 /**
  * The game data from the driver station:
@@ -30,7 +33,7 @@ public class GameData {
 			this.nearSwitchPosition = Direction.OFF;
 			this.scalePosition = Direction.OFF;
 			this.farSwitchPosition = Direction.OFF;
-			System.out.println(this + " received invalid GameData: " + gd);
+			Logger.print(LogType.ERROR, this, " received invalid GameData: ", gd);
 		} 	
 	}
 
@@ -57,8 +60,8 @@ public class GameData {
 	
 	public String toString() {
 		if(isGameDataValid) {
-			return getClass().getSimpleName() + " [NearSwitch=" + getNearSwitchPosition() + ", Scale=" + getScalePosition() + ", " + getFarSwitchPosition() + "]";
+			return Formatter.concat(getClass().getSimpleName(), " [NearSwitch=", getNearSwitchPosition(), ", Scale=", getScalePosition(), ", ", getFarSwitchPosition(), "]");
 		}
-		return getClass().getSimpleName() + " [Invalid]"; 
+		return Formatter.concat(getClass().getSimpleName(), " [Invalid]"); 
 	}
 }

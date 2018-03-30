@@ -15,23 +15,27 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 
 /**
- * This command provides support for the different basic starting 
- * points for synchronous, asynchronous, timed, etc.
+ * This command provides support for the different basic starting points for
+ * synchronous, asynchronous, timed, etc.
  */
 public abstract class GearheadsCommand extends Command implements IInterlockable {
 	private final RunningInstructions runningInstructions;
 	/**
-	 * If TRACING_LOG_LEVEL is within our current log level for the system, we will trace out when all the core Command functions are executing.
-	 * This is on by default for all command instances, but can be disabled object-by-object with setTracingEnabled. 
+	 * If TRACING_LOG_LEVEL is within our current log level for the system, we will
+	 * trace out when all the core Command functions are executing. This is on by
+	 * default for all command instances, but can be disabled object-by-object with
+	 * setTracingEnabled.
 	 */
 	private boolean enableTracing = true;
 	/**
-	 * This log level controls the logging of which of the main 
-	 * high level functions being called on command, i.e. "in end', "in isfinished" etc... 
+	 * This log level controls the logging of which of the main high level functions
+	 * being called on command, i.e. "in end', "in isfinished" etc...
 	 */
 	private static final LogType TRACING_LOG_LEVEL = LogType.DEBUG;
 	/**
-	 * We will populate this array with the key/value pairs of arguments for formatting into a nice pretty name.
+	 * We will populate this array with the key/value pairs of arguments for
+	 * formatting into a nice pretty name.
+	 * 
 	 * @see addArg
 	 */
 	private final ArrayList<Object> args = new ArrayList<Object>();
@@ -39,126 +43,158 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 * This is the list of interlocks to check before performing the command
 	 */
 	private final List<IInterlock> interlocks = new ArrayList<IInterlock>();
+
 	/**
 	 * Create a new command with the specified type of duration and timer value
 	 */
 	protected GearheadsCommand(RunningInstructions duration) {
 		this.runningInstructions = duration != null ? duration : new RunningInstructions();
 		// Do not log implicit duration
-		if(duration != null) {
-			addArg("duration",duration);
+		if (duration != null) {
+			addArg("duration", duration);
 		}
-		if(this.runningInstructions.getTime() != null) {
+		if (this.runningInstructions.getTime() != null) {
 			setTimeout(this.runningInstructions.getTime());
 		}
 	}
+
 	/**
-	 * Add an interlock to the subsystem.  Will not add duplicates.  
-	 * Do not expect reference counting.
+	 * Add an interlock to the subsystem. Will not add duplicates. Do not expect
+	 * reference counting.
 	 */
 	public final void addInterlock(IInterlock interlock) {
-		if(!interlocks.contains(interlock)) {
+		if (!interlocks.contains(interlock)) {
 			interlocks.add(interlock);
 		}
 	}
+
 	/**
-	 * Remove the interlock from the subsystem.
-	 * Do not expect reference counting.
+	 * Remove the interlock from the subsystem. Do not expect reference counting.
 	 */
 	public final void removeInterlock(IInterlock interlock) {
 		interlocks.remove(interlock);
 	}
+
 	/**
 	 * Check the status of all interlocks to see if it's safe
 	 */
 	public final boolean isSafeToOperate() {
-		for(IInterlock interlock : interlocks) {
-			if(!interlock.isSafeToOperate())
+		for (IInterlock interlock : interlocks) {
+			if (!interlock.isSafeToOperate())
 				return false;
 		}
 		return true;
 	}
+
 	/**
 	 * Get the duration function of the command, if there's a rule about time
 	 */
 	public final RunningInstructions getRunningInstructions() {
 		return runningInstructions;
 	}
+
 	/**
-	 * Enable or disable tracking on a per-object basis.  
-	 * This is generally used inside subsystem's initDefaultCommand to prevent tracing on the default command
+	 * Enable or disable tracking on a per-object basis. This is generally used
+	 * inside subsystem's initDefaultCommand to prevent tracing on the default
+	 * command
+	 * 
 	 * @param isDefaultCommand
 	 */
 	public final void setTracingEnabled(boolean enableTracing) {
 		this.enableTracing = enableTracing;
 	}
+
 	/**
-	 * Is tracing enabled 
+	 * Is tracing enabled
+	 * 
 	 * @return true/false
 	 */
 	public final boolean isTracingEnabled() {
 		return enableTracing;
 	}
+
 	/*
 	 * Tracing messages go through here
 	 */
-	protected final void trace(String function, String message) {
-		if(isTracingEnabled()) {
-			Logger.print(TRACING_LOG_LEVEL, this, (function != null ? "." + function : ""), (message != null ? ": " + message : ""));
+	protected final void trace(String function, Object... message) {
+		if (isTracingEnabled()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(this);
+			if (function != null) {
+				sb.append('.');
+				sb.append(function);
+			}
+			if (message != null && message.length > 0) {
+				sb.append(':');
+				sb.append(' ');
+				for (Object o : message)
+					if (o != null)
+						sb.append(o.toString());
+			}
+			Logger.print(TRACING_LOG_LEVEL, sb);
 		}
 	}
+
 	/*
 	 * Tracing messages go through here
 	 */
-	protected final void traceFormatted(String function, String format, Object...parameters) {
+	protected final void traceFormatted(String function, String format, Object... parameters) {
 		trace(function, String.format(format, parameters));
 	}
+
 	/**
 	 * Generate tracing messages for started here
 	 */
 	protected void entered(String function) {
 		trace(function, "started");
 	}
+
 	/**
 	 * Generate tracing messages for return values here
 	 */
 	protected void returning(String function) {
 		trace(function, "returning");
 	}
+
 	/**
 	 * Generate tracing messages for return values here
 	 */
 	protected void returning(String function, Object result) {
-		trace(function, "returning " + result);
+		trace(function, "returning ", result);
 	}
+
 	/**
-	 * NB: We invoke the superclass after calling the subclass's implementation.-*-********
+	 * NB: We invoke the superclass after calling the subclass's
+	 * implementation.-*-********
 	 * 
 	 * 
 	 * 
 	 * 
-	 *  super.interrupted() will call end(), so any user hooks for interrupted-only can go in interruptedImpl and common stuff in endImpl.
+	 * super.interrupted() will call end(), so any user hooks for interrupted-only
+	 * can go in interruptedImpl and common stuff in endImpl.
 	 */
 	@Override
 	protected final void end() {
 		entered("end");
-		if(!isSafeToOperate()) {
-			Logger.error(this + ": INTERLOCK PREVENTED INTERRUPTED OPERATION.");
+		if (!isSafeToOperate()) {
+			Logger.error(this, ": INTERLOCK PREVENTED INTERRUPTED OPERATION.");
 		} else {
 			ghcEnd();
 		}
-		super.end(); // NB: This is safe. 
+		super.end(); // NB: This is safe.
 		returning("end");
 	}
+
 	/**
 	 * NB: We invoke the superclass after calling the subclass's implementation.
-	 * super.interrupted() will call end(), so any user hooks for interrupted-only can go in interruptedImpl and common stuff in endImpl.
+	 * super.interrupted() will call end(), so any user hooks for interrupted-only
+	 * can go in interruptedImpl and common stuff in endImpl.
 	 */
 	@Override
 	protected final void interrupted() {
 		entered("interrupted");
-		if(!isSafeToOperate()) {
-			Logger.error(this + ": INTERLOCK PREVENTED INTERRUPTED OPERATION.");
+		if (!isSafeToOperate()) {
+			Logger.error(this, ": INTERLOCK PREVENTED INTERRUPTED OPERATION.");
 		} else {
 			ghcInterrupted();
 		}
@@ -167,37 +203,40 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	}
 
 	/**
-	 * For timed execution mode, our default behavior is to return true if the timer has expired.
-	 * For asynchronous execution mode, our default behavior is to return true (execution in initialize like instant command)
-	 * For synchronous execution mode, our default behavior is to return false.
+	 * For timed execution mode, our default behavior is to return true if the timer
+	 * has expired. For asynchronous execution mode, our default behavior is to
+	 * return true (execution in initialize like instant command) For synchronous
+	 * execution mode, our default behavior is to return false.
 	 */
 	@Override
 	protected final boolean isFinished() {
 		boolean isFinished = false;
 		// Trace first
 		entered("isFinished");
-		if(!isSafeToOperate()) {
-			Logger.error(this + ": INTERLOCK PREVENTED ISFINISHED OPERATION. RETURN TRUE.");
+		if (!isSafeToOperate()) {
+			Logger.error(this, ": INTERLOCK PREVENTED ISFINISHED OPERATION. RETURN TRUE.");
 			isFinished = true;
-		} else if(!isFinished && runningInstructions.isForever()) {
+		} else if (!isFinished && runningInstructions.isForever()) {
 			trace("isFinished", "command is in running forever mode.");
 			isFinished = false;
-		}/* else if(getRunningInstructions().isAsynchronous()) {
-			traceFormatted("isFinished", "returning true.  Duration set to Asynchronous.");
-			return true;
-		}*/ else if(!isFinished && runningInstructions.isTimeout() && isTimedOut()) {
+		} /*
+			 * else if(getRunningInstructions().isAsynchronous()) {
+			 * traceFormatted("isFinished",
+			 * "returning true.  Duration set to Asynchronous."); return true; }
+			 */ else if (!isFinished && runningInstructions.isTimeout() && isTimedOut()) {
 			trace("isFinished", "command failed with timeout error.");
 			isFinished = true;
-		} else if(!isFinished && runningInstructions.isTimer() && isTimedOut()) {
-			trace("isFinished", "timed command completed, ran for " + runningInstructions.getTime() + ".");
+		} else if (!isFinished && runningInstructions.isTimer() && isTimedOut()) {
+			trace("isFinished", "timed command completed, ran for ", runningInstructions.getTime(), ".");
 			isFinished = true;
-		} else if(!isFinished && isTimedOut()) {
-			Logger.error(this + " WARNING: Someone is messing with timer.  If the timer is set, the duration should be either Timer or Timeout.");
+		} else if (!isFinished && isTimedOut()) {
+			Logger.error(this
+					+ " WARNING: Someone is messing with timer.  If the timer is set, the duration should be either Timer or Timeout.");
 			isFinished = true;
-		} else if(!isFinished && ghcIsFinished()) {
+		} else if (!isFinished && ghcIsFinished()) {
 			trace("isFinished", "subclass says it's finished.");
 			isFinished = true;
-		} else if(!isFinished && runningInstructions.isTimer()) {
+		} else if (!isFinished && runningInstructions.isTimer()) {
 			trace("isFinished", "timed command not finished yet.");
 			isFinished = false;
 		} else {
@@ -214,13 +253,14 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	// @Override
 	protected final void execute() {
 		entered("execute");
-		if(!isSafeToOperate()) {
-			Logger.error(this + ": INTERLOCK PREVENTED EXECUTE OPERATION.");
+		if (!isSafeToOperate()) {
+			Logger.error(this, ": INTERLOCK PREVENTED EXECUTE OPERATION.");
 		} else {
 			ghcExecute();
 		}
 		returning("execute");
 	}
+
 	/**
 	 * By default, we pass through to the superclass but we trace that we were here.
 	 */
@@ -228,65 +268,84 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	protected final void initialize() {
 		setName(toString());
 		entered("initialize");
-		if(!isSafeToOperate()) {
-			Logger.error(this + ": INTERLOCK PREVENTED INITIALIZE OPERATION.");
+		if (!isSafeToOperate()) {
+			Logger.error(this, ": INTERLOCK PREVENTED INITIALIZE OPERATION.");
 		} else {
 			ghcInitialize();
 		}
 		returning("initialize");
 	}
+
 	private String cachedLabel = null;
 	private int argsWhenLabelCached = 0;
+
 	/**
 	 * Build a formatted representation of the command, by calling getArgs().
 	 * Currently we don't have a way to automate the capture of command arguments
 	 * but we'll make one anyway.
 	 */
 	public String toString() {
-		if(cachedLabel == null || args.size() != argsWhenLabelCached) {
+		if (cachedLabel == null || args.size() != argsWhenLabelCached) {
 			cachedLabel = Formatter.formatConstructor(getClass(), args);
 			argsWhenLabelCached = args.size();
 		}
 		return cachedLabel;
 	}
+
 	/**
-	 * Add an arg to the list 
+	 * Add an arg to the list
 	 */
 	protected final void addArg(String name, Object value) {
 		args.add(name);
 		args.add(value);
 	}
+
 	/**
 	 * Concrete subclass may implement this method
+	 * 
 	 * @see initialize
 	 */
-	protected void ghcInitialize() { }
+	protected void ghcInitialize() {
+	}
+
 	/**
 	 * Concrete subclass may implement this method
+	 * 
 	 * @see execute
 	 */
-	protected void ghcExecute() { }
+	protected void ghcExecute() {
+	}
+
 	/**
 	 * Concrete subclass may implement this method
+	 * 
 	 * @see cancel
 	 */
-	protected void ghcEnd() { }
+	protected void ghcEnd() {
+	}
+
 	/**
 	 * Concrete subclass may implement this method
+	 * 
 	 * @see interrupted
 	 */
-	protected void ghcInterrupted() { }
+	protected void ghcInterrupted() {
+	}
+
 	/**
 	 * Concrete subclass must implement this method.
+	 * 
 	 * @see isFinished
 	 */
 	protected abstract boolean ghcIsFinished();
+
 	/**
 	 * If there is a timeout associated with the command, return it here.
+	 * 
 	 * @see TimedCommand
 	 */
 	protected void setTimeout(Time timeout) {
-		if(timeout == null) {
+		if (timeout == null) {
 			super.setTimeout(-1);
 		} else {
 			super.setTimeout(timeout.convertTo(TimeUOM.Seconds).getValue());

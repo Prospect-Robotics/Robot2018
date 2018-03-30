@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import org.usfirst.frc2813.util.Formatter;
+
 /**
  * 
  * @author Adrian Guerra
@@ -55,7 +57,7 @@ public class Logger {
 		
 		if (loggingLevel.showTrace) {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-			System.out.println(Arrays.toString(trace));// TODO remove getStackTrace() from trace
+			System.out.println(Formatter.concat((Object[]) trace));// TODO remove getStackTrace() from trace
 		} else {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			for (int i = trace.length - 1; i > 0; i--) {

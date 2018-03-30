@@ -7,6 +7,7 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
+import org.usfirst.frc2813.util.Formatter;
 
 /**
  * Generate a series of sequential commands to operate autonomously.
@@ -138,8 +139,8 @@ public class AutonomousCommandGroupGenerator {
 	private static void verify(Direction startingPosition, Direction goalPosition, Direction original,
 			Direction expected) {
 		if (getBiasedDirection(startingPosition, goalPosition, original) != expected) {
-			throw new IllegalArgumentException(
-					"In " + startingPosition + " position, biased " + original + " should have been " + expected + ".");
+			throw new IllegalArgumentException(Formatter.concat(
+					"In ", startingPosition, " position, biased ", original, " should have been ", expected, "."));
 		}
 	}
 
@@ -350,7 +351,7 @@ public class AutonomousCommandGroupGenerator {
 		 * This log message is a warning so you can catch that mistake instead of
 		 * pulling your hair out debugging a phantom bug.
 		 */
-		Logger.printLabelled(LogType.INFO, this + ": Generating Auto Sequence", "Robot", robotStartingPosition,
+		Logger.print(LogType.INFO, this, ": Generating Auto Sequence", "Robot", robotStartingPosition,
 				"NearSwitch", nearSwitchPosition, "Scale", scalePosition, "FarSwitch", farSwitchPosition,
 				"AdjustedLeft", left, "AdjustedRight", right);
 
@@ -377,7 +378,7 @@ public class AutonomousCommandGroupGenerator {
 		 * for normal use for no game data
 		 */
 		if (!Robot.gameData.isGameDataValid()) {
-			Logger.error(this + ": No game data.");
+			Logger.error(this, ": No game data.");
 			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
 			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
 		}
@@ -401,7 +402,7 @@ public class AutonomousCommandGroupGenerator {
 			 * The robot and the scale are on the same side. Drive forward and approach the
 			 * scale from the side.
 			 */
-			Logger.info(this + ": Robot and Scale are both at the " + robotStartingPosition + " position.");
+			Logger.info(this, ": Robot and Scale are both at the ", robotStartingPosition, " position.");
 			/** This is the total side offset between us and the scale target center */
 			double totalDistanceSide = sideWallToScaleTarget - sideWallToFirstRobotCenter;
 			double totalDistanceAhead = backWallToScaleTarget + scaleTargetDepth/2;
@@ -432,8 +433,8 @@ public class AutonomousCommandGroupGenerator {
 			 * If the robot is in the center, we're going to drop a cube into the switch on
 			 * the correct side.
 			 */
-			Logger.info(this + ": Robot is in the " + robotStartingPosition + " position, with the near switch at the "
-					+ nearSwitchPosition + " position.");
+			Logger.info(this, ": Robot is in the ", robotStartingPosition, " position, with the near switch at the "
+					+ nearSwitchPosition, " position.");
 			if (useCurves) {
 				/**
 				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves
@@ -472,8 +473,8 @@ public class AutonomousCommandGroupGenerator {
 			 * this by circling back to face the scale target at 45 degrees. The same as
 			 * when we are on the same side.
 			 */
-			Logger.info(this + ": Robot and Scale on opposite sides.  Robot is at the " + robotStartingPosition
-					+ " position and the Scale is at the " + scalePosition + " position.");
+			Logger.info(this, ": Robot and Scale on opposite sides.  Robot is at the ", robotStartingPosition
+					+ " position and the Scale is at the ", scalePosition, " position.");
 
 			/** distance from center of robot to center of scale alley */
 			double distanceToFirstTurn = backWallToScaleAlley + scaleAlleyWidth/2 - robotBumperLength/2;
