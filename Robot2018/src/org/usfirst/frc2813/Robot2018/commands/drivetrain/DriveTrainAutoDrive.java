@@ -74,7 +74,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 */
 	private static final double ACCELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
 	private static final double DECELERATION_RAMP = 60;// 60 inches to ramp from min speed to max speed
-	private static final double MIN_THROTTLE = 0.3;
+	private static final double MIN_THROTTLE = 0.5;
 	private static final double MAX_THROTTLE = 1.0;
 	private static final double brakeFactor = 0.8; // scale throttle down 20% if going too fast
 

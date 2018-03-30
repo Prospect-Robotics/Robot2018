@@ -26,7 +26,12 @@ public class GameData {
 			this.nearSwitchPosition = splitChar(gd.charAt(0));
 			this.scalePosition = splitChar(gd.charAt(1));
 			this.farSwitchPosition = splitChar(gd.charAt(2));
-			System.out.println(this);
+			System.err.println("-----------------------------------");
+			System.err.println("GAME CONFIGURATION:");
+			System.err.println("    Near Switch...." + getNearSwitchPosition());
+			System.err.println("    Scale.........." + getScalePosition());
+			System.err.println("    Far Switch....." + getFarSwitchPosition());
+			System.err.println("-----------------------------------");
 		}
 		else {
 			this.isGameDataValid = false;
@@ -34,7 +39,7 @@ public class GameData {
 			this.scalePosition = Direction.OFF;
 			this.farSwitchPosition = Direction.OFF;
 			Logger.print(LogType.ERROR, this, " received invalid GameData: ", gd);
-		} 	
+		}
 	}
 
 	/**

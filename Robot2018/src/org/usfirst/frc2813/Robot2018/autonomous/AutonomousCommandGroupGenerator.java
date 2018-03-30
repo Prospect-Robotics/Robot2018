@@ -57,7 +57,10 @@ public class AutonomousCommandGroupGenerator {
 	public static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
 
 	/** Elevator heights for picking up a cube on from the ground. */
-	public static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(6);
+	public static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(3);
+	
+	/** Elevator heights for picking up a cube on another cube. */
+	public static final Length ELEVATOR_HEIGHT_GRAB_SECOND_CUBE = LengthUOM.Inches.create(15);
 
 	/** Elevator height for placing cubes on the scale based on robot direction. */
 	public static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
@@ -369,10 +372,10 @@ public class AutonomousCommandGroupGenerator {
 		 * forward and stop. There is a two deep pile of cubes near the switch, stop a
 		 * foot short of them.
 		 */
-		if (true) { // bypass auto for now
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
-			return;
-		}
+//		if (true) { // bypass auto for now
+//			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
+//			return;
+//		}
 		/**
 		 * XXX This code has been modified for practice matches to only cross auto line. Lines commented out should be uncommented
 		 * for normal use for no game data
@@ -382,11 +385,11 @@ public class AutonomousCommandGroupGenerator {
 			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
 			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
 		}
-
-		/**
-		 * This initial state may not be exactly what we want, but it's safe. We can
-		 * change it later.
-		 */
+//
+//		/**
+//		 * This initial state may not be exactly what we want, but it's safe. We can
+//		 * change it later.
+//		 */
 		prepareForSwitchAsync(Direction.FORWARD);
 
 		/**
@@ -443,16 +446,67 @@ public class AutonomousCommandGroupGenerator {
 				 * arcs, so set radius to half that. TODO: define field dimensions and our
 				 * dimensions in variables.
 				 */
-				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
+				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget - 120;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
 						- 6; /** left bumper 6 inches right of left edge of switch */
-				double radius = 63.0; /** found by trial and error */
-				double degrees = 54.0;
+				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
+				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
+				double radius = 30; /** found by trial and error */
+				double degrees = 45.0;
 
+				//Set elevator and arm into position
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				//Drive to switch
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
 						SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
+				//Shoot
+//				autoCmdList.arm.addWaitForTargetPositionSync();
+//				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addShootSequenceSync();
+				
+				//Drive to starting position
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+						SPEED_STOP);
+				//lower elevator and grab cube #2
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addGrabSequenceSync();
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+						SPEED_STOP);
+				autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+					autoCmdList.cube.addGrabSequenceSync();
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
+					autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+					autoCmdList.arm.addMoveToPositionSync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addShootSequenceSync();
 			} else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
@@ -460,11 +514,20 @@ public class AutonomousCommandGroupGenerator {
 				double turnClearance = 8.0;
 
 				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(turnClearance),
-						SPEED_TURN); /** enough to turn */
-				autoCmdList.drive.addQuickTurnSync(left, 90);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget), SPEED_TURN);
-				autoCmdList.drive.addQuickTurnSync(right, 90);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToTarget - turnClearance), SPEED_STOP);
+						1); /** enough to turn */
+				autoCmdList.drive.addQuickTurnSync(left, 45);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), 1);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addQuickTurnSync(right, 45);
+//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_STOP);
+				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.drive.addQuickTurnSync(left, 45);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), 1);
+				autoCmdList.drive.addQuickTurnSync(right, 45);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), 1);
+
+
 			}
 		} else {
 			/**
@@ -519,14 +582,15 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(finalDistance), SPEED_STOP);
 			}
 		}
-		/**
-		 * NB: DeliverCubeCommandSequence will always wait for Elevator to reach target
-		 * height, to avoid crashing
-		 */
-		autoCmdList.cube.addDeliverSequenceSync();
-
-		/** time to switch to cube grabbing mode */
-		prepareForCubeGrabbingSync();
+// NOOOOOOoooooooooooooooooooooooo!
+//		/**
+//		 * NB: DeliverCubeCommandSequence will always wait for Elevator to reach target
+//		 * height, to avoid crashing
+//		 */
+//		autoCmdList.cube.addDeliverSequenceSync();
+//
+//		/** time to switch to cube grabbing mode */
+//		prepareForCubeGrabbingSync();
 
 		/** Remember we let go of our cube, we can really fly now... */
 		autoCmdList.cube.setHaveCube(false);

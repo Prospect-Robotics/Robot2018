@@ -20,8 +20,8 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	private double targetAngle;
 	
 	private static final double LERP_START=60;
-	private static final double LERP_STOP=40;
-	private static final double LERP_END=0.2;
+	private static final double LERP_STOP=25;
+	private static final double LERP_END=0.25;
 	private static final double MIN_DEG=0.5;
 
 	/*
@@ -77,16 +77,17 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	 * @return The correct throttle to use based on a ramp up/down interpolated from the calculations we made for the turn profile
 	 */
 	private static double calcThrottle(double errorMagnitudeInDegrees, double throttle) {
-		if (errorMagnitudeInDegrees < MIN_DEG) {//if at correct location, stop
-			return 0;
-		}
+//		if (errorMagnitudeInDegrees < MIN_DEG) {//if at correct location, stop
+//			return 0;
+//		}
 		if (errorMagnitudeInDegrees <= LERP_STOP) {//if through lerp period, min speed
 			return LERP_END;
 		}
 		if (errorMagnitudeInDegrees >= LERP_START) {//if not at lerp period, given speed
 			return throttle;
 		}
-		return (errorMagnitudeInDegrees - LERP_STOP) * (throttle - LERP_END) / (LERP_START-LERP_STOP) + LERP_END;//deceleration/linear interpolation code
+//		return (errorMagnitudeInDegrees - LERP_STOP) * (throttle - LERP_END) / (LERP_START-LERP_STOP) + LERP_END;//deceleration/linear interpolation code
+		return throttle;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
