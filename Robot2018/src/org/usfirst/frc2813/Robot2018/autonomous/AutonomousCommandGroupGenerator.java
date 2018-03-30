@@ -307,6 +307,7 @@ public class AutonomousCommandGroupGenerator {
 		double robotWheelbaseLength = 20;
 		double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
 		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2;
+		double intakeExtensionOverBumper = 3;
 		double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
 
 		/** absolute dimensions side to side */
@@ -441,8 +442,8 @@ public class AutonomousCommandGroupGenerator {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
 						- 6; /** left bumper 6 inches right of left edge of switch */
-				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
-				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
+				double inchesToFirstCube = backWallToCubePyramid - robotBumperLength - intakeExtensionOverBumper; /**Needs correct distance from back wall of intake to cube */
+				double inchesToSecondCube = inchesToFirstCube + cubeSize; /**Needs correct distance from back wall of intake to cube #2 */
 				double radius = 63.0; /** found by trial and error */
 				double degrees = 54.0;
 
