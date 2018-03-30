@@ -206,6 +206,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
 			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, direction, relativeAngle, 1));
+			trackState(0, relativeAngle);
 		}
 	}
 
