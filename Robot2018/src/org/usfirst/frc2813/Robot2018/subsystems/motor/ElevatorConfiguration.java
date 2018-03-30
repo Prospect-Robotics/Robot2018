@@ -188,7 +188,9 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					return new MotorHoldPosition(m); 
 				}
 			},
-			createPidConfigurations() // pidConfigurations
+			createPidConfigurations(), // pidConfigurations
+			1.0,
+			-1.0
 			);
 	}
 }

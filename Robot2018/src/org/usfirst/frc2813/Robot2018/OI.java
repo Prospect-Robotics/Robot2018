@@ -58,7 +58,8 @@ public class OI {
 
 	private static final Length ELEVATOR_HEIGHT_TOLERANCE  = LengthUOM.Inches.create(0.25);
 	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(4.0);
-	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(55);
+	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(80);
+	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(165);
 	private static final Length ARM_POSITION_TOLERANCE     = ArmConfiguration.ArmDegrees.create(5);
 
 	//// CREATING BUTTONS
@@ -132,7 +133,7 @@ public class OI {
 		return group;
 	}
 	public Command createArmToPickUpPosition() {
-		return new MotorMoveToAbsolutePosition(Robot.arm, AutonomousCommandGroupGenerator.ARM_POSITION_GRAB_CUBE, ArmConfiguration.ArmDegrees.create(5));
+		return new MotorMoveToAbsolutePosition(Robot.arm, ARM_POSITION_GRAB_CUBE, ArmConfiguration.ArmDegrees.create(5));
 	}
 
 	public Command createElevatorToPickUpHeight() {
@@ -350,7 +351,8 @@ public class OI {
 			break;
 		default:
 		case Competition:
-			new JoystickButton(buttonPanel, 1).whenPressed(createClimbSequence());
+			//new JoystickButton(buttonPanel, 1).whenPressed(createClimbSequence());
+			new JoystickButton(buttonPanel, 1).whenPressed(new DriveTrainOIDrive(Robot.driveTrain, joystick1, joystick2));
 			new JoystickButton(buttonPanel, 2).whenPressed(createClimbAbortSequence());
 			new JoystickButton(buttonPanel, 3).whileHeld(createArmIn());
 			new JoystickButton(buttonPanel, 4).whileHeld(createArmOut());

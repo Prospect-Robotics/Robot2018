@@ -10,7 +10,7 @@ import java.util.Calendar;
  *
  */
 public class Logger {
-	private static LogLevel loggingLevel = LogLevel.INFO;
+	private static LogLevel loggingLevel = LogLevel.ERROR;
 	private static ArrayList<String> knownClasses = new ArrayList<String>();
 	private static Calendar calendar = Calendar.getInstance();
 	public static void setLoggingLevel(LogLevel level) {
@@ -60,7 +60,7 @@ public class Logger {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			for (int i = trace.length - 1; i > 0; i--) {
 				if (knownClasses.contains(trace[i].getClassName())) {
-					finalPrint += simplifyPackage(trace[i].getClassName());
+					finalPrint += trace[i].getClass().getSimpleName();
 					finalPrint += " ";
 				}
 			}
@@ -75,7 +75,6 @@ public class Logger {
 			}
             if (finalPrint.length() == 0) {
                 System.out.println("We got an empty trace string that we're about to print to the console. That's a bug.");
-                (new Throwable()).printStackTrace();
                 return;
             }
             severity.level.print(finalPrint);
@@ -115,7 +114,6 @@ public class Logger {
 		}
 		print(severity,finalPrint);
 	}
-	
 	
 	/**
 	 * <p>

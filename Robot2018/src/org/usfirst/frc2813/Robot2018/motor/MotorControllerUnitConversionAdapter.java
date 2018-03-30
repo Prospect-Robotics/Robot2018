@@ -262,7 +262,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	private final void validateValueIsNotASensorValue(String title, Value value) {
 		UOM sensorUOM = (value instanceof org.usfirst.frc2813.units.values.Rate) ? configuration.getNativeSensorRateUOM() : configuration.getNativeSensorLengthUOM();
 		if(value.getUOM().equals(sensorUOM)) {
-			Logger.printLabelled(LogType.ERROR, title, "ERROR: We do not want " + value.getUOM() + "!");
+			Logger.printLabelled(LogType.DEBUG, title, "ERROR: We do not want " + value.getUOM() + "!");
 		}
 	}
 
@@ -275,7 +275,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	private final void validateValueIsASensorValue(String title, Value value) {
 		UOM sensorUOM = (value instanceof org.usfirst.frc2813.units.values.Rate) ? configuration.getNativeSensorRateUOM() : configuration.getNativeSensorLengthUOM();
 		if(!value.getUOM().equals(sensorUOM)) {
-			Logger.printLabelled(LogType.ERROR, title, "ERROR: Expected " + sensorUOM + " but got " + value.getUOM() + ".");
+			Logger.printLabelled(LogType.DEBUG, title, "ERROR: Expected " + sensorUOM + " but got " + value.getUOM() + ".");
 		}
 	}
 	/**

@@ -471,6 +471,16 @@ public class MotorConfiguration implements IMotorConfiguration {
 	public final List<PIDConfiguration> getPIDConfigurations() {
 		return Collections.unmodifiableList(pidConfigurations);
 	}
+	double peakOutputForward = 1; 
+	double peakOutputReverse = -1;
+	@Override
+	public final double getPeakOutputForward() {
+		return peakOutputForward;
+	}
+	@Override
+	public final double getPeakOutputReverse() {
+		return peakOutputReverse;
+	}
 	/*
 	 * Get the native units for this axis
 	 */
@@ -506,7 +516,9 @@ public class MotorConfiguration implements IMotorConfiguration {
 			RemoteLimitSwitchSource remoteReverseHardLimitSwitchSource, // requireAll(Reverse|ReverseForwardHardLimitSwitch)
 			Integer remoteReverseHardLimitSwitchDeviceId, // requireAll(Reverse|ReverseForwardHardLimitSwitch)
 			ICommandFactory<Motor> defaultCommandFactory, // no requirements
-			List<PIDConfiguration> pidConfigurations
+			List<PIDConfiguration> pidConfigurations,
+			double peakOutputForward,
+			double peakOutputReverse
 			)
 	{
 		this.name = name;
@@ -540,6 +552,8 @@ public class MotorConfiguration implements IMotorConfiguration {
 		this.remoteForwardHardLimitSwitchDeviceId = remoteForwardHardLimitSwitchDeviceId;
 		this.remoteReverseHardLimitSwitchSource = remoteReverseHardLimitSwitchSource;
 		this.remoteReverseHardLimitSwitchDeviceId = remoteReverseHardLimitSwitchDeviceId;
+		this.peakOutputForward = peakOutputForward;
+		this.peakOutputReverse = peakOutputReverse;
 		if(pidConfigurations != null) {
 			this.pidConfigurations.addAll(pidConfigurations);
 		}
