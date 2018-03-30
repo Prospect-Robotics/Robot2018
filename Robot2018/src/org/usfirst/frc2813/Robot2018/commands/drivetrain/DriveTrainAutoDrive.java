@@ -7,6 +7,7 @@ import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.util.Angles;
 
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSource;
@@ -100,7 +101,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param direction - forward or backward?
 	 * @param distance - how far to travel
 	 */
-	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startAngle) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
 		maxSpeed=speed;
@@ -109,6 +110,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		accelRamp = ACCELERATION_RAMP * rampScaleFactor;  // here we assume max ramp - ie: start and end at dead stop
 		decelRamp = DECELERATION_RAMP * rampScaleFactor;
 		onCurve = false;
+		this.startAngle = startAngle;
 		addArg("speed",speed);
 		addArg("direction",direction);
 		addArg("distance",distance);
@@ -127,8 +129,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param startSpeedFactor - how fast are we going? 0..1
 	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
 	 */
-	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startSpeedFactor, double endSpeedFactor) {
-		this(driveTrain, speed, direction, distance);
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance, double startAngle, double startSpeedFactor, double endSpeedFactor) {
+		this(driveTrain, speed, direction, distance, startAngle);
 		startSpeed = maxSpeed * startSpeedFactor;
 		accelRamp *= 1 - startSpeedFactor;
 
@@ -154,16 +156,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param clockwise - the direction of the circle
 	 */
 	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double angle, double startAngle, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
-		this(driveTrain, speed, direction, computeDistance(angle, radius), startSpeedFactor, endSpeedFactor);
+		this(driveTrain, speed, direction, computeDistance(angle, radius), startAngle, startSpeedFactor, endSpeedFactor);
 		onCurve = true;
-		deltaAngle = angle;
-		if (!clockwise) {
-			deltaAngle *= -1.0;
-		}
-		if (direction.isNegative()) {
-			deltaAngle *= -1.0;
-		}
-		this.startAngle = startAngle;
+		deltaAngle = Angles.getRelativeAngle(startAngle, direction, clockwise ? Direction.CLOCKWISE : Direction.COUNTERCLOCKWISE);
 		addArg("speed",speed);
 		addArg("direction",direction);
 		addArg("angle",angle);

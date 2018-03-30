@@ -372,11 +372,11 @@ public class AutonomousCommandGroupGenerator {
 		 * forward and stop. There is a two deep pile of cubes near the switch, stop a
 		 * foot short of them.
 		 */
-//		if (true) { // bypass auto for now
-//			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
+//		if (true) { // bypass auto for now inches(101.5), SPEED_STOP);
 //			return;
 //		}
 		/**
+//			autoCmdList.drive.addDriveSync(Direction.FORWARD,
 		 * XXX This code has been modified for practice matches to only cross auto line. Lines commented out should be uncommented
 		 * for normal use for no game data
 		 */
@@ -440,41 +440,41 @@ public class AutonomousCommandGroupGenerator {
 			 */
 			Logger.info(this, ": Robot is in the ", robotStartingPosition, " position, with the near switch at the "
 					+ nearSwitchPosition, " position.");
-//			if (useCurves) {
-//				/**
-//				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves
-//				 * us in the same orientation 2r up and 2r over The distance to the scale less
-//				 * our length is how far we need to move forward. This S curve does that in 2
-//				 * arcs, so set radius to half that. TODO: define field dimensions and our
-//				 * dimensions in variables.
-//				 */
-//				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget - 120;
-//				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
-//						- 6; /** left bumper 6 inches right of left edge of switch */
-//				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
-//				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
-//				double radius = 30; /** found by trial and error */
-//				double degrees = 45.0;
-//
-//				//Set elevator and arm into position
-//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
-//				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
-//				//Drive to switch
-//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-//						SPEED_FULL);
-//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
-//						SPEED_STOP);
-//				//Shoot
-////				autoCmdList.arm.addWaitForTargetPositionSync();
-////				autoCmdList.elevator.addWaitForTargetPositionSync();
-//				autoCmdList.cube.addShootSequenceSync();
-//				
-//				//Drive to starting position
-//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
-//						SPEED_FULL);
-//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
-//						SPEED_STOP);
-//				//lower elevator and grab cube #2
+			if (useCurves) {
+				/**
+				 * An S curve. counterclockwise 1/4 turn followed by clockwise 1/4 turn leaves
+				 * us in the same orientation 2r up and 2r over The distance to the scale less
+				 * our length is how far we need to move forward. This S curve does that in 2
+				 * arcs, so set radius to half that. TODO: define field dimensions and our
+				 * dimensions in variables.
+				 */
+				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget - 120;
+				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
+						- 6; /** left bumper 6 inches right of left edge of switch */
+				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
+				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
+				double radius = 30; /** found by trial and error */
+				double degrees = 45.0;
+
+				//Set elevator and arm into position
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				//Drive to switch
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				//Shoot
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addShootSequenceSync();
+				
+				//Drive to starting position
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+						SPEED_STOP);
+				//lower elevator and grab cube #2
 //				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
 //				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
 //				autoCmdList.arm.addWaitForTargetPositionSync();
@@ -509,7 +509,7 @@ public class AutonomousCommandGroupGenerator {
 //				autoCmdList.arm.addWaitForTargetPositionSync();
 //				autoCmdList.elevator.addWaitForTargetPositionSync();
 //				autoCmdList.cube.addShootSequenceSync();
-//			} else {
+			} else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
 						- 6; /** left bumper 6 inches right of left edge of switch */
@@ -523,7 +523,7 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
 				autoCmdList.drive.addQuickTurnSync(right, 45);
 				autoCmdList.cube.addShootSequenceSync();
-//			}
+			}
 		} else {
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
@@ -553,7 +553,7 @@ public class AutonomousCommandGroupGenerator {
 //
 //			/** pass the target and double back. right turn + 45 degrees to avoid hitting scale platform */
 //			double secondAngle = 135.0;
-//
+
 //			if (useCurves) {
 //				double firstRadius = scaleAlleyWidth;
 //

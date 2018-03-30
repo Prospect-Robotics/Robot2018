@@ -19,6 +19,7 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
+import org.usfirst.frc2813.util.Angles;
 
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -101,7 +102,8 @@ public class AutonomousCommandGroup extends CommandGroup {
          */
         public void initState() {
             currentSpeed = 0.0;
-            currentAngle = Robot.driveTrain.getGyro().getAngle();
+            //currentAngle = Robot.driveTrain.getGyro().getAngle();
+            currentAngle = 0.0;// We reset gyro at the start of autonomous
         }
 
 		/**
@@ -157,7 +159,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
 			Logger.debug("AUTO ADD CURVE DEGREES [direction: %s, degrees: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, degrees, radius, rotation, endSpeed);
 			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, degrees, currentAngle, currentSpeed, endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation==Direction.CLOCKWISE));
-			trackState(endSpeed, degrees);
+			trackState(endSpeed, Angles.getRelativeAngle(degrees, direction, rotation));
 		}
 
 		/**
@@ -186,7 +188,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
-			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed, endSpeed));
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentAngle, currentSpeed, endSpeed));
 			trackState(endSpeed, 0.0);
 		}
 
@@ -207,7 +209,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
 			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, direction, relativeAngle, 1));
-			trackState(0, relativeAngle);
+			trackState(0.0, Angles.getRelativeAngle(relativeAngle, Direction.FORWARD, direction.isPositive() ? Direction.CLOCKWISE : Direction.COUNTERCLOCKWISE));
 		}
 	}
 
