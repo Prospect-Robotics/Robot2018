@@ -446,25 +446,30 @@ public class AutonomousCommandGroupGenerator {
 				double radius = 63.0; /** found by trial and error */
 				double degrees = 54.0;
 
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-						SPEED_FULL);
+				//Set elevator and arm into position
 				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				//Drive to switch
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
+				//Shoot
 				autoCmdList.cube.addShootSequenceSync();
+				//Drive to starting position
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
 						SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
 						SPEED_STOP);
+				//lower elevator and grab cube #2
 				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
 				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
 				autoCmdList.cube.addGrabSequenceSync();
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-						SPEED_FULL);
 				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
 				autoCmdList.cube.addShootSequenceSync();
@@ -476,10 +481,10 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
 				autoCmdList.cube.addGrabSequenceSync();
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
-				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-						SPEED_FULL);
 				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
 				autoCmdList.cube.addShootSequenceSync();
