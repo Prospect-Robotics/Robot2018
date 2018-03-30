@@ -156,7 +156,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
 			Logger.debug("AUTO ADD CURVE DEGREES [direction: %s, degrees: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, degrees, radius, rotation, endSpeed);
-			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, degrees, radius.convertTo(LengthUOM.Inches).getValue(), rotation==Direction.CLOCKWISE, direction, currentSpeed, endSpeed, currentAngle));
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, degrees, currentAngle, currentSpeed, endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation==Direction.CLOCKWISE));
 			trackState(endSpeed, degrees);
 		}
 

@@ -153,7 +153,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param radius - the radius of the circle we are traveling
 	 * @param clockwise - the direction of the circle
 	 */
-	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double angle, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double angle, double startAngle, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
 		this(driveTrain, speed, direction, computeDistance(angle, radius), startSpeedFactor, endSpeedFactor);
 		onCurve = true;
 		deltaAngle = angle;
