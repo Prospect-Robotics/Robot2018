@@ -7,6 +7,8 @@ import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.logging.LogType;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
+import org.usfirst.frc2813.units.uom.LengthUOM;
+import org.usfirst.frc2813.units.values.Length;
 
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSource;
@@ -180,6 +182,29 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		if (scaleFactor > 0 && scaleFactor <= 1.0) {
 			rampScaleFactor = scaleFactor;
 		}
+	}
+	
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, double angle, double radius, boolean clockwise, Direction direction, double startSpeedFactor, double endSpeedFactor) {
+		this(driveTrain, speed, direction, computeDistance(angle, radius), startSpeedFactor, endSpeedFactor);
+		onCurve = true;
+		deltaAngle = angle;
+		addArg("speed",speed);
+		addArg("direction",direction);
+		addArg("angle",angle);
+		addArg("startSpeedFactor",startSpeedFactor);
+		addArg("endSpeedFactor",endSpeedFactor);
+		addArg("radius",radius);
+		addArg("clockwise",clockwise);
+		setName(toString());
+	}
+	
+	
+
+	
+
+	private static double computeDistance(double angle, double radius) {
+		// TODO Auto-generated method stub
+		return radius*(2*Math.PI*angle/360);
 	}
 
 	// Called just before this Command runs the first time

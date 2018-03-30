@@ -77,7 +77,55 @@ public class AutonomousCommandGroupGenerator {
 	 * This is the bias for invertible scripts that can run on left or right sides.
 	 */
 	private static Direction SCRIPT_BIAS = Direction.LEFT;
+	
+	
+	/**
+	 * cubes are placed along switches on the scale side and in pyramid on the other
+	 * switch side
+	 */
+	private static final double cubeSize = 14;
 
+	/** robot dimensions with and without bumpers */
+	private static final double bumperThickness = 3.25;
+	private static final double robotWheelbaseWidth = 31;
+	private static final double robotWheelbaseLength = 20;
+	private static final double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
+	private static final double robotBumperLength = robotWheelbaseLength + bumperThickness * 2 + 2 * 1.125;
+	private static final double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
+	
+	/** absolute dimensions side to side */
+	private static final double backWallWidth = 264;
+	private static final double fieldWidth = 323.38;
+	private static final double switchWidth = 152.88;
+	private static final double scalePlatformWidth = 132.88;
+	private static final double scaleFullWidth = 150.55;
+	private static final double scaleTargetWidth = 56;
+
+	/** field dimensions from back wall */
+	private static final double fieldDepth = 648;
+	private static final double scaleTargetDepth = 48.7;
+	private static final double backWallToSwitch = 140;
+	private static final double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; /** pyramid of cubes on near side of switch */
+	private static final double backWallToFarSideOfSwitch = 196;
+	private static final double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; /** row of cubes on far side of switch */
+	private static final double backWallToScalePlatform = 261.47;
+	private static final double backWallToScaleTarget = 299.65;
+
+	/** field dimensions from side wall */
+	private static final double sideWallToFirstRobotStartPosition = 29.69;
+	private static final double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
+	private static final double sideWallToFirstRobotCenter = sideWallToFirstRobotStartPosition + robotBumperWidth / 2;
+	private static final double sideWallToScaleTarget = 71.57;
+	private static final double sideWallToScalePlatform = 95.25;
+	private static final double sideWallToSwitch = 85.25;
+
+	/** relative depth dimensions */
+	private static final double switchDepth = backWallToFarSideOfSwitch - backWallToSwitch;
+	private static final double switchToScalePlatform = backWallToScalePlatform - backWallToFarSideOfSwitch;
+	private static final double scaleAlleyWidth = switchToScalePlatform - cubeSize;
+	private static final double scalePlatformToTarget = backWallToScaleTarget - backWallToScalePlatform;
+	
+	private static final Length turnClearance = inches(8.0);
 	/**
 	 * To re-use scripts, we write them as if we were on the left, going left, etc.
 	 * and then we invert the directions as necessary.
@@ -293,51 +341,7 @@ public class AutonomousCommandGroupGenerator {
 		 * math with groups of Length is TOO PAINFUL!
 		 */
 
-		/**
-		 * cubes are placed along switches on the scale side and in pyramid on the other
-		 * switch side
-		 */
-		double cubeSize = 14;
 
-		/** robot dimensions with and without bumpers */
-		double bumperThickness = 3.25;
-		double robotWheelbaseWidth = 31;
-		double robotWheelbaseLength = 20;
-		double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
-		double robotBumperLength = robotWheelbaseLength + bumperThickness * 2 + 2 * 1.125;
-		double finalDistanceToTarget = 20; /** how close to get before we shoot cube */
-
-		/** absolute dimensions side to side */
-		double backWallWidth = 264;
-		double fieldWidth = 323.38;
-		double switchWidth = 152.88;
-		double scalePlatformWidth = 132.88;
-		double scaleFullWidth = 150.55;
-		double scaleTargetWidth = 56;
-
-		/** field dimensions from back wall */
-		double fieldDepth = 648;
-		double scaleTargetDepth = 48.7;
-		double backWallToSwitch = 140;
-		double backWallToCubePyramid = backWallToSwitch - 3 * cubeSize; /** pyramid of cubes on near side of switch */
-		double backWallToFarSideOfSwitch = 196;
-		double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; /** row of cubes on far side of switch */
-		double backWallToScalePlatform = 261.47;
-		double backWallToScaleTarget = 299.65;
-
-		/** field dimensions from side wall */
-		double sideWallToFirstRobotStartPosition = 29.69;
-		double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
-		double sideWallToFirstRobotCenter = sideWallToFirstRobotStartPosition + robotBumperWidth / 2;
-		double sideWallToScaleTarget = 71.57;
-		double sideWallToScalePlatform = 95.25;
-		double sideWallToSwitch = 85.25;
-
-		/** relative depth dimensions */
-		double switchDepth = backWallToFarSideOfSwitch - backWallToSwitch;
-		double switchToScalePlatform = backWallToScalePlatform - backWallToFarSideOfSwitch;
-		double scaleAlleyWidth = switchToScalePlatform - cubeSize;
-		double scalePlatformToTarget = backWallToScaleTarget - backWallToScalePlatform;
 
 		/**
 		 * Make a note that we are generating the sequence now, and capture the

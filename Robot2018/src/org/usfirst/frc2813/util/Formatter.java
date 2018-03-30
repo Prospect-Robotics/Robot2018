@@ -41,6 +41,23 @@ public final class Formatter {
 	}
 
 	/**
+	 * Convert nested arrays into nested tuples (Original code from:
+	 * https://stackoverflow.com/a/6427453)
+	 */
+	public static String arrayToString(Object[] in) {
+		String ret = "{";
+		for (Object obj : in) {
+			if (obj.getClass().isArray())
+				ret += arrayToString(createArrayFromArrayObject(obj));
+			else
+				ret += obj.toString();
+			ret += ",";
+		}
+		ret = ret.substring(0, ret.length() - 2);
+		return ret + "}";
+	}
+
+	/**
 	 * Format a value - pretty print arrays
 	 * 
 	 * @param value
@@ -50,7 +67,7 @@ public final class Formatter {
 		if (value == null) {
 			return null;
 		} else if (value.getClass().isArray()) {
-			return deepToString(createArrayFromArrayObject(value));
+			return arrayToString(createArrayFromArrayObject(value));
 		} else {
 			return value.toString();
 		}
@@ -63,7 +80,7 @@ public final class Formatter {
 		if (returnNullForNullValues && value == null) {
 			return null;
 		} else {
-			return concat(key, "=", formatValue(value));
+			return key + "=" + formatValue(value);
 		}
 	}
 
@@ -122,7 +139,7 @@ public final class Formatter {
 	 * Format a description of an object from it's class name and arguments.
 	 */
 	public static String formatConstructor(String objectClass, Object[] arguments) {
-		return Formatter.concat(objectClass, '(', formatLabelledSkipNulls(arguments), ')');
+		return objectClass + "(" + formatLabelledSkipNulls(arguments) + ")";
 	}
 
 	/**
@@ -175,8 +192,8 @@ public final class Formatter {
 	private static void deepToString(StringBuilder sb, Object[] array) {
 		sb.append('[');
 		for (Object o : array) {
-			if (o.getClass().isArray())
-				deepToString(sb, createArrayFromArrayObject(o));
+			if (o instanceof Object[])
+				deepToString(sb, (Object[]) o);
 			else
 				sb.append(o.toString());
 			sb.append(',');

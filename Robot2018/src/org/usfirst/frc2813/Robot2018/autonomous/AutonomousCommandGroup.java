@@ -93,6 +93,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * This is the sticky setting to be used for all subsequent commands created for turning in place.
 		 */
 		private double turnSpeed = 0.25;
+		private double currentAngle;
 
 		/**
 		 * Track the current speed sent by use. If 0, we need to come to a complete stop before anything
@@ -143,7 +144,9 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed - speed coming out this command
 		 */
 		public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
-			addCurveSync(direction, radius.multiply(2*Math.PI*degrees/360), radius, rotation, endSpeed);
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, degrees, radius.convertTo(LengthUOM.Inches).getValue(), rotation==Direction.CLOCKWISE, direction, currentSpeed, endSpeed));
+			trackSpeed(endSpeed);
+			currentAngle += degrees;
 		}
 
 		/**
@@ -155,7 +158,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed - speed coming out this command
 		 */
 		public void addCurveSync(Direction direction, Length distance, Length radius, Direction rotation, double endSpeed) {
-			Logger.debug("AUTO ADD CURVE [direction: %s, distance: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, distance, radius, rotation, endSpeed);
+			Logger.debug(String.format("AUTO ADD CURVE [direction: %s, distance: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, distance, radius, rotation, endSpeed));
 			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentSpeed,
 					endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation == Direction.CLOCKWISE));
 			trackSpeed(endSpeed);
@@ -166,7 +169,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param forwardOffset
 		 * @param destinationAngle
 		 */
-		public void addGotoSync(Length horizontalOffset, Length forwardOffset, double destinationAngle) {
+		public void addGotoSync(Length horizontalOffset, Length forwardOffset, double approachAngle) {
 			double hOff = horizontalOffset.convertTo(LengthUOM.Inches).getValue();
 			double fOff = forwardOffset.convertTo(LengthUOM.Inches).getValue();
 			

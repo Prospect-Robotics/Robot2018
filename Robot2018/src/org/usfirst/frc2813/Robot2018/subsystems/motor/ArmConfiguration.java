@@ -184,7 +184,9 @@ public class ArmConfiguration extends MotorConfiguration{
 					return new MotorHoldPosition(m); 
 				}
 			},
-			createPidConfigurations()
+			createPidConfigurations(), // pidConfigurations
+			0.75,
+			-0.75
 			);
 	}
 
