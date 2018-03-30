@@ -57,7 +57,7 @@ public class OI {
 	private static ButtonLayout buttonLayout = ButtonLayout.Competition;
 
 	private static final Length ELEVATOR_HEIGHT_TOLERANCE  = LengthUOM.Inches.create(0.25);
-	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(4.0);
+	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(5.0);
 	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(80);
 	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(165);
 	private static final Length ARM_POSITION_TOLERANCE     = ArmConfiguration.ArmDegrees.create(5);
