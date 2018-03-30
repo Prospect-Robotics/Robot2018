@@ -201,10 +201,15 @@ public final class Formatter {
 		}
 		sb.append(']');
 	}
-	
-	private static String concat(Object...objects) {
+
+	/**
+	 * Convert objects to strings and concatenate them. This is supposed to be as
+	 * memory efficient as possible. 40M of free RAM ain't much.
+	 */
+	private static String concat(Object... objects) {
 		StringBuilder sb = new StringBuilder();
-		for(Object o : objects) sb.append(o.toString());
+		for (Object o : objects)
+			sb.append(o.toString());
 		return sb.toString();
 	}
 }
