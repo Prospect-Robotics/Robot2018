@@ -59,9 +59,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 		}
 		
 		public void pidWrite(double output) {
-			if(parent.isAutonomous()) {
-				parent.disablePID();
-			} else {
+			if(!parent.isAutonomous()) {
 				pidOut.pidWrite(output);
 			}
 		}
@@ -109,9 +107,20 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 			initialized = true;
 		}
 	}
+	
+	protected void teardownPIDControllers() {
+		if(initialized) {
+			for (PIDController pid : pidControllers) {
+				pid.reset();
+				pid.free();
+			}
+			speedControllers.clear();
+			pidControllers.clear();
+			initialized = false;
+		}
+	}
 
 	protected void disablePID() {
-		initializePIDControllers();
 		for (PIDController pid : pidControllers) {
 			pid.disable();
 		}
@@ -119,7 +128,6 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 	}
 
 	protected void enablePID() {
-		initializePIDControllers();
 		for (PIDController pid : pidControllers) {
 			pid.enable();
 		}
@@ -151,7 +159,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 	// Called once after isFinished returns true
 	protected void ghscEnd() {
 		// Disable all encoders
-		disablePID();
+		teardownPIDControllers();
 	}
 	
 	/**
