@@ -50,12 +50,12 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	}
 
 	public void error(String function, Object...objects) {
-		Logger.print(logLevel, String.format("%s.%s %s", getClass().getSimpleName(), function, objects));
+		Logger.printFormat(logLevel, "%s.%s %s", getClass().getSimpleName(), function, objects);
 		(new Throwable()).printStackTrace();
 	}
 
 	public void log(String function, Object...objects) {
-		Logger.print(logLevel, String.format("%s.%s %s", getClass().getSimpleName(), function, objects));
+		Logger.printFormat(logLevel, "%s.%s %s", getClass().getSimpleName(), function, objects);
 	}
 
 	@Override
@@ -262,7 +262,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	private final void validateValueIsNotASensorValue(String title, Value value) {
 		UOM sensorUOM = (value instanceof org.usfirst.frc2813.units.values.Rate) ? configuration.getNativeSensorRateUOM() : configuration.getNativeSensorLengthUOM();
 		if(value.getUOM().equals(sensorUOM)) {
-			Logger.printLabelled(LogType.ERROR, title, String.format("ERROR: We do not want %s!"));
+			Logger.error("ERROR: We do not want ", value);
 		}
 	}
 
