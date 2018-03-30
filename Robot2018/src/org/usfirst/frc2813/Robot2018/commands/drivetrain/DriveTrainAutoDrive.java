@@ -163,6 +163,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		if (direction.isNegative()) {
 			deltaAngle *= -1.0;
 		}
+		this.startAngle = startAngle;
 		addArg("speed",speed);
 		addArg("direction",direction);
 		addArg("angle",angle);
@@ -196,7 +197,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * you must set BOTH the speed and the distance to a negative value (multiply by "BACKWARDS"
 		 */
 		startPosition = lastDistance = subsystem.getDistance();
-		startAngle = gyro.getAngle();
 		startTime = lastTime = System.currentTimeMillis();
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive initialize",
 				"startTime", startTime,
