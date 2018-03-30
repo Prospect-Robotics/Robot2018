@@ -88,9 +88,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 *
 	 * 4.  IF the robot gets much worse than it is now, this can be increased but you could always fix the damage.
 	 */
-	
-	private final PIDController pidAngleController = new PIDController(0.07, 0.01, 0.15, pidSourceAngle, this::pidAngleOutputFunc);
-	private final PIDController pidSpeedController = new PIDController(0.07, 0.01, 0.15, pidSourceSpeed, this::pidSpeedOutputFunc);
+
+	private PIDController pidAngleController = null;
+	private PIDController pidSpeedController = null;
 
 	/**
 	 * These defaults give us values that won't slip. Ramps to speed up and slow down and a min speed which we can
@@ -127,9 +127,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double distance) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.gyro = driveTrain.getGyro();
-		pidAngleController.setInputRange(-360, 360);
-		pidAngleController.setContinuous();
-		pidAngleController.setOutputRange(-1.0, 1.0);
 		maxSpeed=speed;
 		this.direction = direction;
 		this.distance = distance;
@@ -228,7 +225,13 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 				"accelRamp", accelRamp,
 				"endSpeed", endSpeed,
 				"decelRamp", decelRamp);
+
+        pidAngleController = new PIDController(0.07, 0.01, 0.15, pidSourceAngle, this::pidAngleOutputFunc);
+		pidAngleController.setInputRange(-360, 360);
+		pidAngleController.setContinuous();
+		pidAngleController.setOutputRange(-1.0, 1.0);
 		pidAngleController.enable();
+        pidSpeedController = new PIDController(0.07, 0.01, 0.15, pidSourceSpeed, this::pidSpeedOutputFunc);
 	}
 
 	/**
@@ -333,11 +336,25 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		complete = (distanceTravelled() >= distance);
 		return complete;
 	}
-	// Called once after isFinished returns true or interrupted.
+
+	/**
+	 * CRITICAL: Interrupted calls end, but end doesn't call interrupted!
+	 * If you want to turn stuff off... do it in end.
+	 * Called once after isFinished returns true or interrupted.
+	 */
 	@Override
-	protected void ghscInterrupted() {
-		pidAngleController.disable();
-		pidAngleController.reset();
+	protected void ghscEnd() {
+		// NB: reset() calls disable().  reset() does pidwrite to zero.
+		if(pidAngleController != null) {
+			pidAngleController.reset();
+			pidAngleController.free();
+			pidAngleController = null;
+		}
+		if(pidSpeedController != null) {
+			pidSpeedController.reset();
+			pidSpeedController.free();
+			pidSpeedController = null;
+		}
 		/*
 		 * When we end, we are going to push the same throttle value that we calculated for the "end speed"
 		 * and ramped down to, but we're going to disable the turn.  The last PID output we sent to the
