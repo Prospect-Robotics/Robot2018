@@ -336,6 +336,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double desiredSpeed = calcSpeed(distanceTravelled);
 		double newThrottle = calcThrottle(desiredSpeed, distanceTravelled) * direction.getMultiplier();
 
+/*
 		Logger.printLabelled(LogType.DEBUG, "PID linear stepping",
 				"TargetDistance", distance,
 				"distance travelled", distanceTravelled,
@@ -344,6 +345,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 				"Desired speed", desiredSpeed,
 				"Throttle", newThrottle,
 				"PID Angle Output", pidAngleOutput);
+*/
 		subsystem.arcadeDrive(newThrottle, pidAngleOutput);
 		lastThrottle = newThrottle; // NB: When we stop, we'll go back to this throttle + no angle
 	}
