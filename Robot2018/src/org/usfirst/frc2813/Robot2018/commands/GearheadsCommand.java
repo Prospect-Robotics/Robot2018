@@ -104,7 +104,7 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 */
 	protected final void trace(String function, String message) {
 		if(isTracingEnabled()) {
-			Logger.print(TRACING_LOG_LEVEL, this + (function != null ? "." + function : "") + (message != null ? ": " + message : ""));
+			Logger.print(TRACING_LOG_LEVEL, this, (function != null ? "." + function : ""), (message != null ? ": " + message : ""));
 		}
 	}
 	/*
