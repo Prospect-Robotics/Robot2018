@@ -309,11 +309,16 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		complete = (distanceTravelled() >= distance);
 		return complete;
 	}
-	// Called once after isFinished returns true or interrupted.
+	/**
+	 * CRITICAL: Interrupted calls end, but end doesn't call interrupted!
+	 * If you want to turn stuff off... do it in end.
+	 * Called once after isFinished returns true or interrupted.
+	 */
 	@Override
-	protected void ghscInterrupted() {
-		pidAngleController.disable();
+	protected void ghscEnd() {
+		// NB: reset() calls disable().  reset() does pidwrite to zero.
 		pidAngleController.reset();
+		pidAngleController.free();
 		/*
 		 * When we end, we are going to push the same throttle value that we calculated for the "end speed"
 		 * and ramped down to, but we're going to disable the turn.  The last PID output we sent to the
