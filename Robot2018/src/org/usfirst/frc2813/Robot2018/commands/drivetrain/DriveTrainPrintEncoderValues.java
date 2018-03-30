@@ -13,16 +13,16 @@ import edu.wpi.first.wpilibj.Encoder;
  */
 public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTrain> {
 	private long last;
-	private double timeout;
 	private final Encoder starboardEncoder;
 	private final Encoder portEncoder;
+	private final int reportingInterval;
 
-	public DriveTrainPrintEncoderValues(DriveTrain driveTrain) {
+	public DriveTrainPrintEncoderValues(DriveTrain driveTrain, int reportingInterval) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.last = 0;
-		this.timeout = timeout;
 		this.portEncoder = driveTrain.getEncoderPort();
 		this.starboardEncoder = driveTrain.getEncoderStarboard();
+		this.reportingInterval = reportingInterval;
 		setName(toString());
 		setRunWhenDisabled(true);
 	}
@@ -32,15 +32,26 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	protected void ghscInitialize() {
 	}
 
+	public static String getEncoderStatus(String label, Encoder encoder) {
+		return String.format("Encoder.%s Get=%s Raw=%s Dist=%s DistInches=%s DistPerPulse=%s Dir=%s Stopped=%s]",
+			label,
+			encoder.get(), 
+			encoder.getRaw(),  
+			encoder.getDistance(),
+			encoder.getDistance()*DriveTrain.WHEEL_CIRCUMFERENCE_INCHES, 
+			encoder.getDistancePerPulse(),
+			encoder.getDirection(),
+			encoder.getStopped());
+	}
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void ghscExecute() {
-		if((System.currentTimeMillis() - last) >= 100) {
+		if((System.currentTimeMillis() - last) >= reportingInterval) {
 			System.out.println(
-					"starboardEncoder " + starboardEncoder.get() + " [" + starboardEncoder.getRaw() + "] " +starboardEncoder.getDistance()+" "+ starboardEncoder.getDistance()*DriveTrain.WHEEL_CIRCUMFERENCE_INCHES +" ["+starboardEncoder.getDistancePerPulse()+"] "+starboardEncoder.getDirection()+" ["+starboardEncoder.getStopped()+"]\n" +
-							"ENCODERPORT " + portEncoder.get() + " [" + portEncoder.getRaw() + "]" +portEncoder.getDistance()+" "+ portEncoder.getDistance()*DriveTrain.WHEEL_CIRCUMFERENCE_INCHES+" ["+portEncoder.getDistancePerPulse()+"] "+portEncoder.getDirection()+" ["+portEncoder.getStopped()+"]\n"+
-							"DRIVETRAIN" + Robot.driveTrain.getDistance() +"\n"
-					);
+				String.format("%s\n%s\nDriveTrain [Dist=%s]\n",
+					getEncoderStatus("Left", portEncoder),
+					getEncoderStatus("Right", starboardEncoder),
+					Robot.driveTrain.getDistance()));
 			this.last = System.currentTimeMillis();
 		}
 	}
