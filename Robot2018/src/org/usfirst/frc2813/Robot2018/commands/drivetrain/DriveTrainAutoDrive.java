@@ -14,10 +14,13 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
- * Class to use PID control of autonomous drive. Note that all units are inches
+ * Class to use PID control of autonomous drive.
+ * We use 2 soft PID controllers. One for angle and one for velocity.
+ * Curved paths are supported by calculating our expected end angle, interpolating
+ * our angle and subtracting expected angular offset from current angle before sending to PID.
  */
 public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
-	private final PIDSource m_source = new PIDSource() {
+	private final PIDSource pidSourceSpeed = new PIDSource() {
 
 		@Override
 		public void setPIDSourceType(PIDSourceType pidSource) {
@@ -29,7 +32,27 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		}
 
 		/**
-		 * This is the main pid reader routine. It provides the current angle relative to expected.
+		 * This is the main speed PID reader routine. It provides the current speed relative to expected.
+		 * This is a value shifted to be centered around 0.
+		 */
+		@Override
+		public double pidGet() {
+			return 3;
+		}
+	};
+	private final PIDSource pidSourceAngle = new PIDSource() {
+
+		@Override
+		public void setPIDSourceType(PIDSourceType pidSource) {
+		}
+
+		@Override
+		public PIDSourceType getPIDSourceType() {
+			return PIDSourceType.kDisplacement;
+		}
+
+		/**
+		 * This is the main angle PID reader routine. It provides the current angle relative to expected.
 		 * This is a value in degrees, centered around 0. Theoretically this could be shifted up by
 		 * 180 degrees so it could be taken modulo 360 and then shifted back down. This would give
 		 * us an absolute angle +- 180 degrees. However, if the PID is working at all, we never
@@ -66,7 +89,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * 4.  IF the robot gets much worse than it is now, this can be increased but you could always fix the damage.
 	 */
 	
-	private final PIDController pidAngleController = new PIDController(0.07, 0.01, 0.15, m_source, this::pidAngleOutputFunc);
+	private final PIDController pidAngleController = new PIDController(0.07, 0.01, 0.15, pidSourceAngle, this::pidAngleOutputFunc);
+	private final PIDController pidSpeedController = new PIDController(0.07, 0.01, 0.15, pidSourceSpeed, this::pidSpeedOutputFunc);
 
 	/**
 	 * These defaults give us values that won't slip. Ramps to speed up and slow down and a min speed which we can
@@ -326,7 +350,14 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 	/**
 	 * This is the Angle controlling PID callback. It provides angle adjustment.
-	 * @param pidAngleOutput This is the output of the PID computation based on the error in the relative angle of the robot (the pid source)
+	 * @param pidSpeedOutput This is the output of the PID computation based on the error in the relative speed of the robot
+	 */
+	private void pidSpeedOutputFunc(double pidSpeedOutput) {
+	}
+
+	/**
+	 * This is the Angle controlling PID callback. It provides angle adjustment.
+	 * @param pidAngleOutput This is the output of the PID computation based on the error in the relative angle of the robot.
 	 */
 	private void pidAngleOutputFunc(double pidAngleOutput) {
 		// If the command is complete, ignore any extra PID output callbacks while we are shutting PID down.
