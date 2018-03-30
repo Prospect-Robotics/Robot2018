@@ -60,8 +60,19 @@ public class GameData {
 	
 	public String toString() {
 		if(isGameDataValid) {
-			return Formatter.concat(getClass().getSimpleName(), " [NearSwitch=", getNearSwitchPosition(), ", Scale=", getScalePosition(), ", ", getFarSwitchPosition(), "]");
+			return Formatter.concat(
+					"-----------------------------------\n",
+					"GAME CONFIGURATION:\n",
+					"    Near Switch....", 
+					getNearSwitchPosition(), "\n",
+					"    Scale..........",
+					getScalePosition(), "\n",
+					"    Far Switch.....",
+					getFarSwitchPosition(), "\n",
+					"-----------------------------------\n"
+					);
 		}
-		return Formatter.concat(getClass().getSimpleName(), " [Invalid]"); 
+		return Formatter.concat(
+				"<<<< INVALID >>>><<<< INVALID >>>> GAME CONFIGURATION <<<< INVALID >>>><<<< INVALID >>>>\n");
 	}
 }
