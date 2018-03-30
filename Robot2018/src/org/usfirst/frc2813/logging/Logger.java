@@ -12,7 +12,7 @@ import org.usfirst.frc2813.util.Formatter;
  *
  */
 public class Logger {
-	private static LogLevel loggingLevel = LogLevel.ERROR;
+	private static LogLevel loggingLevel = LogLevel.INFO;
 	private static ArrayList<String> knownClasses = new ArrayList<String>();
 	private static Calendar calendar = Calendar.getInstance();
 	public static void setLoggingLevel(LogLevel level) {
