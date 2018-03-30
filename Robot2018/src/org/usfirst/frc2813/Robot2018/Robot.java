@@ -143,7 +143,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-		
 		Scheduler.getInstance().run();
 	}
 
@@ -157,8 +156,6 @@ public class Robot extends TimedRobot {
 
 		autonomousCommand = new AutonomousCommandGroup();
 		autoCmdGenerator = new AutonomousCommandGroupGenerator();
-
-		
 		new POST(autonomousCommand).start();
 	}
 
@@ -177,7 +174,9 @@ public class Robot extends TimedRobot {
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		if (autonomousCommand != null) autonomousCommand.cancel();
+		if (autonomousCommand != null) {
+			autonomousCommand.cancel();
+		}
 		driveTrain.setBrakeCoast(NeutralMode.Brake);
 		new POST().start();
 	}
