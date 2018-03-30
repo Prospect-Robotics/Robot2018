@@ -244,6 +244,20 @@ public class AutonomousCommandGroup extends CommandGroup {
 				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0), RunningInstructions.RUN_ASYNCHRONOUSLY));
 			}
 		}
+		/**
+		 * Move the elevator to the indicated position.  Does not wait for completion.
+		 * @param position The absolute position to move the elevator to, relative to the lower limit switch.
+		 */
+		public void addMoveToPositionSync(Length position) {
+			/**
+			 * TODO When Necessary:
+			 * Allow overriding maximum rate for PID move to position,
+			 * go slower when we have a cube in the jaws!
+			 */
+			if(!Robot.elevator.isDisconnected()) {
+				addSequential(new MotorMoveToAbsolutePosition(Robot.elevator, position, LengthUOM.Inches.create(1.0)));
+			}
+		}
 		/** Wait for the Elevator to hit the hard reset limit*/
 		public void addWaitForHardLimitSwitchSync() {
 			if(!Robot.elevator.isDisconnected())
@@ -292,6 +306,16 @@ public class AutonomousCommandGroup extends CommandGroup {
 				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5), RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 
+		/**
+		 * Move the arm to the indicated position.
+		 * @param armDegrees The number of ARM degrees.
+		 * @see ArmConfiguration#ArmDegrees
+		 */
+		public void addMoveToPositionSync(Length armDegrees) {
+			if(!Robot.arm.isDisconnected())
+				addSequential(new MotorMoveToAbsolutePosition(Robot.arm, armDegrees, ArmConfiguration.ArmDegrees.create(5)));
+		}
+
 		/** Wait for the Arm to hit the hard reset limit */
 		public void addWaitForHardLimitSwitchSync() {
 			if(!Robot.arm.isDisconnected())
@@ -333,10 +357,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 //		}
 
 		/** Add a "grab" cube sequence */
-		private void addGrabSequenceSync() {
+		public void addGrabSequenceSync() {
 			addIntakeInAsync();
 			addJawsCloseSync();
-			time.addDelayInSecondsSync(0.2);
+			time.addDelayInSecondsSync(1.5);
 			addIntakeStopSync();
 			setHaveCube(true);
 		}
@@ -370,9 +394,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Add a "shoot" cube sequence. */
 		public void addShootSequenceSync() {
 			addIntakeOutAsync();
-			time.addDelayInSecondsSync(0.2);
+			time.addDelayInSecondsSync(1.5);
 			addIntakeStopSync();
 			setHaveCube(false);
+			addJawsOpenSync();
 		}
 
 		/**
