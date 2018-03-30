@@ -363,6 +363,7 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		autoCmdList.cube.setHaveCube(true);
 
+		
 		/**
 		 * If we have failed to read the field setup. The only safe option is to drive
 		 * forward and stop. There is a two deep pile of cubes near the switch, stop a
@@ -372,15 +373,22 @@ public class AutonomousCommandGroupGenerator {
 		 * XXX This code has been modified for practice matches to only cross auto line. Lines commented out should be uncommented
 		 * for normal use for no game data
 		 */
-//		if (!Robot.gameData.isGameDataValid()) {
-//			Logger.error(this + ": No game data.");
-		if (true) {
-//			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
+		boolean autoJustDriveForwardDEBUG = true;
+		
+		if (autoJustDriveForwardDEBUG) {		// TODO:  Debugging remove
+			Logger.error(this + ": Just Drive Forward (DEBUG) - disable normal Auto mode.");
 			Direction direction = Direction.FORWARD;
-//			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
 			autoCmdList.drive.addDriveSync(direction, inches(101.5), SPEED_STOP);
 			return;
 		}
+
+		if (!Robot.gameData.isGameDataValid()) {
+			Logger.error(this + ": No game data.");
+			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
+			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
+			return;
+		}
+
 
 		/**
 		 * This initial state may not be exactly what we want, but it's safe. We can
