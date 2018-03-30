@@ -1,8 +1,6 @@
 package org.usfirst.frc2813.logging;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 
 import org.usfirst.frc2813.util.Formatter;
 
@@ -14,7 +12,6 @@ import org.usfirst.frc2813.util.Formatter;
 public class Logger {
 	private static LogLevel loggingLevel = LogLevel.INFO;
 	private static ArrayList<String> knownClasses = new ArrayList<String>();
-	private static Calendar calendar = Calendar.getInstance();
 	public static void setLoggingLevel(LogLevel level) {
 		loggingLevel = level;
 	}
@@ -51,10 +48,11 @@ public class Logger {
 	 * @author Adrian Guerra
 	 */
 	public static void print(LogType severity, Object... objects) {
+		if (!loggingLevel.isIncluded(severity)) {
+			return;
+		}//TODO make cleaner
 		StringBuilder finalPrint = new StringBuilder();
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		finalPrint.append(String.format("%02d:%02d.%03d] ",calendar.get(Calendar.MINUTE),calendar.get(Calendar.SECOND),calendar.get(Calendar.MILLISECOND)));
-		
+		finalPrint.append(readableTime(System.currentTimeMillis()));
 		if (loggingLevel.showTrace) {
 			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 			System.out.println(Formatter.concat((Object[]) trace));// TODO remove getStackTrace() from trace
@@ -98,19 +96,27 @@ public class Logger {
 	 * @see Logger#print(LogType, Object...)
 	 */
 	public static void printFormat(LogType severity, String format, Object... objects) {
-		String formatted = String.format(format, objects);
+		if (!loggingLevel.isIncluded(severity)) {
+			return;
+		}//TODO make cleaner
+		String formatted = Formatter.safeFormat(format, objects);
 		print(severity, formatted);
 	}
 
+	//TODO jaavdoc
 	public static void printLabelled(LogType severity,String title,Object...objects) {
-		String finalPrint = title+": ";
+		if (!loggingLevel.isIncluded(severity)) {
+			return;
+		}//TODO make cleaner
+		StringBuilder finalPrint = new StringBuilder();
+		finalPrint.append(title).append(": ");
 		for(int i=0;i<objects.length;i++) {
-			finalPrint+=objects[i];
-			if(i%2==0) {
-				finalPrint+=":";
+			finalPrint.append(objects[i]);
+			if(i%2==0) {//check if current object is label or value
+				finalPrint.append(":");//put colon between pair
 			}
 			else {
-				finalPrint+=i+1==objects.length?"":", ";
+				finalPrint.append(i+1==objects.length?"":", ");//put comma after pair if not on the last pair
 			}
 		}
 		print(severity,finalPrint);
@@ -125,7 +131,7 @@ public class Logger {
 	public static void addMe() {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (int i = 0; i < trace.length; i++) {
-			if (trace[i].getClassName() == Logger.class.getName()) {
+			if (trace[i].getClassName().equals(Logger.class.getName())) {
 				knownClasses.add(trace[i + 1].getClassName());// TODO double check this
 				break;
 			}
@@ -199,5 +205,18 @@ public class Logger {
 	 */
 	public static void error(Object... objects) {
 		print(LogType.ERROR, objects);
+	}
+	
+	/**
+	 * Converts {@link System#currentTimeMillis()} to easily readable format
+	 * 
+	 * @param ms - {@link System#currentTimeMillis()}
+	 * @return {@code [minutes:seconds:milliseconds]}
+	 */
+	public static String readableTime(long ms) {
+		short milliseconds = (short) (ms%1000);
+		short seconds = (short) ((ms/1000)%60);
+		short minutes = (short) ((ms/60000)%60);
+		return Formatter.safeFormat("[%02d:%02d:%03d]",minutes,seconds,milliseconds);
 	}
 }
