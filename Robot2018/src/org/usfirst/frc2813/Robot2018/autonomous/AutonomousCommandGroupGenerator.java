@@ -56,7 +56,10 @@ public class AutonomousCommandGroupGenerator {
 	public static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
 
 	/** Elevator heights for picking up a cube on from the ground. */
-	public static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(6);
+	public static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(3);
+	
+	/** Elevator heights for picking up a cube on another cube. */
+	public static final Length ELEVATOR_HEIGHT_GRAB_SECOND_CUBE = LengthUOM.Inches.create(15);
 
 	/** Elevator height for placing cubes on the scale based on robot direction. */
 	public static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
@@ -438,13 +441,48 @@ public class AutonomousCommandGroupGenerator {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
 						- 6; /** left bumper 6 inches right of left edge of switch */
+				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
+				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
 				double radius = 63.0; /** found by trial and error */
 				double degrees = 54.0;
 
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
 						SPEED_FULL);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
+				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+						SPEED_STOP);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
+				autoCmdList.cube.addGrabSequenceSync();
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+						SPEED_STOP);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
+				autoCmdList.cube.addGrabSequenceSync();
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				autoCmdList.cube.addShootSequenceSync();
 			} else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
