@@ -368,18 +368,18 @@ public class AutonomousCommandGroupGenerator {
 		 * forward and stop. There is a two deep pile of cubes near the switch, stop a
 		 * foot short of them.
 		 */
+		if (true) { // bypass auto for now
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
+			return;
+		}
 		/**
 		 * XXX This code has been modified for practice matches to only cross auto line. Lines commented out should be uncommented
 		 * for normal use for no game data
 		 */
-//		if (!Robot.gameData.isGameDataValid()) {
-//			Logger.error(this + ": No game data.");
-		if (true) {
-//			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
-			Direction direction = Direction.FORWARD;
-//			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
-			autoCmdList.drive.addDriveSync(direction, inches(101.5), SPEED_STOP);
-			return;
+		if (!Robot.gameData.isGameDataValid()) {
+			Logger.error(this + ": No game data.");
+			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
+			autoCmdList.drive.addDriveSync(direction, inches(backWallToSwitch - robotBumperLength - 2 * cubeSize - 12), SPEED_STOP);
 		}
 
 		/**
