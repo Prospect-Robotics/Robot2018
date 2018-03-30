@@ -373,7 +373,7 @@ public class AutonomousCommandGroupGenerator {
 		 * XXX This code has been modified for practice matches to only cross auto line. Lines commented out should be uncommented
 		 * for normal use for no game data
 		 */
-		boolean autoJustDriveForwardDEBUG = false;
+		boolean autoJustDriveForwardDEBUG = true;
 		
 		if (autoJustDriveForwardDEBUG) {		// TODO:  Debugging remove
 			Logger.error(this + ": Just Drive Forward (DEBUG) - disable normal Auto mode.");
