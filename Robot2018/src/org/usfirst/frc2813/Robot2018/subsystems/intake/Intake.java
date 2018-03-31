@@ -1,5 +1,6 @@
 package org.usfirst.frc2813.Robot2018.subsystems.intake;
 
+import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSlowBurn;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
@@ -21,6 +22,7 @@ public class Intake extends GearheadsSubsystem {
 	}
 
 	public void initDefaultCommand() {
+//		setDefaultCommand(new IntakeSlowBurn(this, direction));
 	}
 
 	public void setTargetSpeed(double speed) {
@@ -72,18 +74,21 @@ public class Intake extends GearheadsSubsystem {
 	}
 
 	public void spin(Direction targetDirection) {
-		Logger.info(this + " spin(" + targetDirection + ").");
+		this.spin(targetDirection, speed);
+	}
+
+	public void spin(Direction targetDirection, double rate) {
 		if (targetDirection.isNeutral()) {
-			Logger.info(this + " spin(" + targetDirection + ") - stopping.");
+//(new Throwable()).printStackTrace();
+			Logger.info(this + "stopping.");
 			if (!isEmulated()) {
 				spx.set(0); // NB: Just in case disable doesn't clear speed.  Couldn't find a isDisabled() function.
 				spx.disable();
 			}
 			this.direction = Direction.IDLE;
 		} else {
-			Logger.info(this + " intake spin.  Direction=" + targetDirection + " speed=" + speed);
 			if(!isEmulated()) {
-				spx.set(targetDirection.isPositive() ? -speed : speed);
+				spx.set(targetDirection.isPositive() ? -rate : rate);
 			}
 		}
 		this.direction = targetDirection;
