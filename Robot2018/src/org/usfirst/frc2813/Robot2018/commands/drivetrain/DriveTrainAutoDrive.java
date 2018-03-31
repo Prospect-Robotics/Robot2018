@@ -153,19 +153,19 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @param startSpeedFactor - how fast are we going? 0..1
 	 * @param endSpeedFactor - how fast should we be going when we're done? 0..1
 	 * @param radius - the radius of the circle we are traveling
-	 * @param clockwise - the direction of the circle
+	 * @param rotation - the direction of the circle
 	 */
-	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double angle, double startAngle, double startSpeedFactor, double endSpeedFactor, double radius, boolean clockwise) {
+	public DriveTrainAutoDrive(DriveTrain driveTrain, double speed, Direction direction, double angle, double startAngle, double startSpeedFactor, double endSpeedFactor, double radius, Direction rotation) {
 		this(driveTrain, speed, direction, computeDistance(angle, radius), startAngle, startSpeedFactor, endSpeedFactor);
 		onCurve = true;
-		deltaAngle = Angles.getRelativeAngle(startAngle, direction, clockwise ? Direction.CLOCKWISE : Direction.COUNTERCLOCKWISE);
+		deltaAngle = Angles.getRelativeAngle(angle, direction, rotation);
 		addArg("speed",speed);
 		addArg("direction",direction);
 		addArg("angle",angle);
 		addArg("startSpeedFactor",startSpeedFactor);
 		addArg("endSpeedFactor",endSpeedFactor);
 		addArg("radius",radius);
-		addArg("clockwise",clockwise);
+		addArg("clockwise",rotation);
 		setName(toString());
 	}
 

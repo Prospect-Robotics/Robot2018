@@ -453,21 +453,27 @@ public class AutonomousCommandGroupGenerator {
 						- 6; /** left bumper 6 inches right of left edge of switch */
 				double inchesToFirstCube = 60; /**Needs correct distance from back wall of intake to cube */
 				double inchesToSecondCube = 73; /**Needs correct distance from back wall of intake to cube #2 */
-				double radius = 30; /** found by trial and error */
-				double degrees = 45.0;
+				double radius = 63; /** found by trial and error */ // UPDATE 3/30 - was 30
+				double degrees = 54.0;//UPDATE 3/30 - was 45.0
 
+				
+				boolean debugging = true;
 				//Set elevator and arm into position
-				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
-				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+//				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
 				//Drive to switch
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
 						SPEED_FULL);
+				
 				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
 						SPEED_STOP);
+
+				
 				//Shoot
 				autoCmdList.arm.addWaitForTargetPositionSync();
 				autoCmdList.elevator.addWaitForTargetPositionSync();
 				autoCmdList.cube.addShootSequenceSync();
+				
 				
 				//Drive to starting position
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
@@ -475,40 +481,41 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
 						SPEED_STOP);
 				//lower elevator and grab cube #2
-//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
-//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
-//				autoCmdList.arm.addWaitForTargetPositionSync();
-//				autoCmdList.elevator.addWaitForTargetPositionSync();
-//				autoCmdList.cube.addGrabSequenceSync();
-//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
-//				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
-//				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
-//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-//						SPEED_FULL);
-//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
-//						SPEED_STOP);
-//				autoCmdList.arm.addWaitForTargetPositionSync();
-//				autoCmdList.elevator.addWaitForTargetPositionSync();
-//				autoCmdList.cube.addShootSequenceSync();
-//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
-//						SPEED_FULL);
-//				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
-//						SPEED_STOP);
-//				autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
-//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
-//				autoCmdList.arm.addWaitForTargetPositionSync();
-//				autoCmdList.elevator.addWaitForTargetPositionSync();
-//					autoCmdList.cube.addGrabSequenceSync();
-//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
-//					autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
-//					autoCmdList.arm.addMoveToPositionSync(ArmConfiguration.ArmDegrees.create(160));
-//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
-//						SPEED_FULL);
-//				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
-//						SPEED_STOP);
-//				autoCmdList.arm.addWaitForTargetPositionSync();
-//				autoCmdList.elevator.addWaitForTargetPositionSync();
-//				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_GRAB_CUBE);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToFirstCube), SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addGrabSequenceSync();
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToFirstCube), SPEED_STOP);
+//				if (debugging) return;
+				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, 
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, 
+						SPEED_STOP);
+				autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(inchesToSecondCube), SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+					autoCmdList.cube.addGrabSequenceSync();
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(inchesToSecondCube), SPEED_STOP);
+					autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+					autoCmdList.arm.addMoveToPositionSync(ArmConfiguration.ArmDegrees.create(160));
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise,
+						SPEED_FULL);
+				autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise,
+						SPEED_STOP);
+				autoCmdList.arm.addWaitForTargetPositionSync();
+				autoCmdList.elevator.addWaitForTargetPositionSync();
+				autoCmdList.cube.addShootSequenceSync();
 			} else {
 				double distanceToTarget = backWallToSwitch - robotBumperLength - finalDistanceToTarget;
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2
