@@ -118,7 +118,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 		System.out.println();
 		System.out.println("[Reference Tables]");
 		for(int j = 0; j < 24; j++) {
-			System.out.println(String.format("%3d in/sec........................~%s %s", 
+			System.out.println(Formatter.safeFormat("%3d in/sec........................~%s %s", 
 					j, 
 					Math.round(RateUOM.InchesPerSecond.create(j).convertTo(ElevatorSRXRPM).getValue()), ElevatorSRXRPM.getUnitNameAbbreviation())
 			);

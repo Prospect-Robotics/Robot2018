@@ -19,6 +19,7 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
+import org.usfirst.frc2813.util.Formatter;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMSpeedController;
@@ -248,7 +249,7 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	}
 	@Override
 	public String getDiagnostics() {
-		return String.format("%s - [%s @ %s] [%s]", this, getTargetState(), getCurrentPosition(), getMotorController().getDiagnostics());
+		return Formatter.safeFormat("%s - [%s @ %s] [%s]", this, getTargetState(), getCurrentPosition(), getMotorController().getDiagnostics());
 	}
 	/* ----------------------------------------------------------------------------------------------
 	 * Subsystem API
