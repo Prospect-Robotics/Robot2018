@@ -16,8 +16,9 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 /**
  * Class to use PID control of autonomous drive.
  * We use 2 soft PID controllers. One for angle and one for velocity.
- * Curved paths are supported by calculating our expected end angle, interpolating
- * our angle and subtracting expected angular offset from current angle before sending to PID.
+ * Curved paths are supported by calculating our expected end angle, interpolating and using PID to correct angle.
+ * we subtract expected angular offset for curves from current angle before sending to PID.
+ * NOTE that we must over-correct with PID as the average error angle seen by PID must be close to 0 if we are to stay on a curve.
  */
 public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private final PIDSource pidSourceSpeed = new PIDSource() {

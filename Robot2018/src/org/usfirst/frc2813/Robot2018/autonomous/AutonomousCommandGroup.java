@@ -77,6 +77,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	public class Drive {
 
+		private AutonomousDriveState state;
 		/**
 		 * This is the sticky setting for the last speed as we came out of a move.
 		 * TODO: This is not used.
