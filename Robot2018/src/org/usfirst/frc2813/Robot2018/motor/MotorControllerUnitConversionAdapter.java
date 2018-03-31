@@ -8,6 +8,7 @@ import org.usfirst.frc2813.units.uom.UOM;
 import org.usfirst.frc2813.units.values.Length;
 import org.usfirst.frc2813.units.values.Rate;
 import org.usfirst.frc2813.units.values.Value;
+import org.usfirst.frc2813.util.Formatter;
 
 /*
  * This guy handles scaling of position and rate values based on gearing rations,
@@ -63,7 +64,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Length newPosition = adjustPhase(toSensorUnitsNoPhaseCorrection(position));
-		log("moveToAbsolutePosition", String.format("converted %s to %s", position, newPosition));
+		log("moveToAbsolutePosition", Formatter.safeFormat("converted %s to %s", position, newPosition));
 		return getMotorController().moveToAbsolutePosition(newPosition);
 	}
 
@@ -72,14 +73,14 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Length newPosition = adjustPhase(toSensorUnitsNoPhaseCorrection(position));
-		log("resetEncoderSensorPosition", String.format("converted %s to %s", position, newPosition));
+		log("resetEncoderSensorPosition", Formatter.safeFormat("converted %s to %s", position, newPosition));
 		return getMotorController().resetEncoderSensorPosition(newPosition);
 	}
 	
 	@Override
 	public boolean calibrateSensorInDirection(Direction direction) {
 		Direction newDirection = adjustPhase(direction);
-		log("calibrateSensorInDirection", String.format("converted %s to %s", direction, newDirection));
+		log("calibrateSensorInDirection", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().calibrateSensorInDirection(newDirection);
 	}
 
@@ -89,7 +90,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Direction newDirection = adjustPhase(direction);
 		Length newRelativeDistance = toSensorUnitsNoPhaseCorrection(relativeDistance);
-		log("moveToRelativePosition", String.format("converted {%s, %s} to {%s, %s}", direction, relativeDistance, newDirection, newRelativeDistance));
+		log("moveToRelativePosition", Formatter.safeFormat("converted {%s, %s} to {%s, %s}", direction, relativeDistance, newDirection, newRelativeDistance));
 		return getMotorController().moveToRelativePosition(newDirection, newRelativeDistance);
 	}
 
@@ -99,7 +100,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Length position = getMotorController().getCurrentPosition();
 		Length newPosition = adjustPhase(toDisplayUnitsNoPhaseCorrection(position));
-		log("getCurrentPosition", String.format("converted %s to %s", position, newPosition));
+		log("getCurrentPosition", Formatter.safeFormat("converted %s to %s", position, newPosition));
 		return newPosition;
 	}
 
@@ -119,7 +120,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Direction newDirection = adjustPhase(direction);
 		Rate newRate = toSensorUnitsNoPhaseCorrection(rate);
-		log("moveInDirectionAtRate", String.format("converted {%s, %s} to {%s, %s}", direction, rate, newDirection, newRate));
+		log("moveInDirectionAtRate", Formatter.safeFormat("converted {%s, %s} to {%s, %s}", direction, rate, newDirection, newRate));
 		return getMotorController().moveInDirectionAtRate(newDirection, newRate);
 	}
 
@@ -128,7 +129,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [RELATIVE] Must adjust direction
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Direction newDirection = adjustPhase(direction);
-		log("moveInDirectionAtDefaultRate", String.format("converted %s to %s", direction, newDirection));
+		log("moveInDirectionAtDefaultRate", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().moveInDirectionAtDefaultRate(newDirection);
 	}
 
@@ -136,7 +137,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	public boolean getCurrentHardLimitSwitchStatus(Direction direction) {
 		// [RELATIVE] Must adjust direction
 		Direction newDirection = adjustPhase(direction);
-		log("getCurrentHardLimitSwitchStatus", String.format("converted %s to %s", direction, newDirection));
+		log("getCurrentHardLimitSwitchStatus", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().getCurrentHardLimitSwitchStatus(newDirection);
 	}
 
@@ -146,7 +147,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// Since this requires a sensor, units for motor and sensor can be assumed to be the same
 		Rate rate = getMotorController().getCurrentRate();
 		Rate newRate = adjustPhase(toDisplayUnitsNoPhaseCorrection(rate));
-		log("getCurrentRate", String.format("converted %s to %s", rate, newRate));
+		log("getCurrentRate", Formatter.safeFormat("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 
@@ -155,7 +156,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		Length error = getMotorController().getCurrentPositionError();
 		Length newError = adjustPhase(toDisplayUnitsNoPhaseCorrection(error));
-		log("getCurrentPositionError", String.format("converted %s to %s", error, newError));
+		log("getCurrentPositionError", Formatter.safeFormat("converted %s to %s", error, newError));
 		return newError;
 	}
 
@@ -164,7 +165,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		// [ABSOLUTE] Must adjust units, scale and phase
 		Rate rate = getMotorController().getCurrentRateError();
 		Rate newRate = adjustPhase(toDisplayUnitsNoPhaseCorrection(rate));
-		log("getCurrentRateError", String.format("converted %s to %s", rate, newRate));
+		log("getCurrentRateError", Formatter.safeFormat("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 
@@ -175,7 +176,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		}
 		// [RELATIVE] Must adjust units, scale
 		Rate newMarginOfError = toSensorUnitsNoPhaseCorrection(marginOfError).getAbsoluteValue();
-		log("getCurrentRateErrorWithin", String.format("converted %s to %s", marginOfError, newMarginOfError));
+		log("getCurrentRateErrorWithin", Formatter.safeFormat("converted %s to %s", marginOfError, newMarginOfError));
 		return getMotorController().getCurrentRateErrorWithin(newMarginOfError);
 	}
 
@@ -186,7 +187,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		}
 		// [RELATIVE] Must adjust units, scale
 		Length newMarginOfError = toSensorUnitsNoPhaseCorrection(marginOfError).getAbsoluteValue();
-		log("getCurrentPositionErrorWithin", String.format("converted %s to %s", marginOfError, newMarginOfError));
+		log("getCurrentPositionErrorWithin", Formatter.safeFormat("converted %s to %s", marginOfError, newMarginOfError));
 		return getMotorController().getCurrentPositionErrorWithin(newMarginOfError);
 	}
 
@@ -275,7 +276,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 	private final void validateValueIsASensorValue(String title, Value value) {
 		UOM sensorUOM = (value instanceof org.usfirst.frc2813.units.values.Rate) ? configuration.getNativeSensorRateUOM() : configuration.getNativeSensorLengthUOM();
 		if(!value.getUOM().equals(sensorUOM)) {
-			Logger.printLabelled(LogType.ERROR, title, String.format("ERROR: Expected %s but got %s", sensorUOM, value.getUOM()));
+			Logger.printLabelled(LogType.ERROR, title, Formatter.safeFormat("ERROR: Expected %s but got %s", sensorUOM, value.getUOM()));
 		}
 	}
 	/**
@@ -348,25 +349,25 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		Direction newDirection = adjustPhase(direction);
 		Length length = getMotorController().getPhysicalLimit(newDirection);
 		Length newLength = toDisplayUnitsNoPhaseCorrection(length);
-		log("getPhysicalLimit", String.format("converted %s to %s and %s to %s", direction, newDirection, length, newLength));
+		log("getPhysicalLimit", Formatter.safeFormat("converted %s to %s and %s to %s", direction, newDirection, length, newLength));
 		return newLength;
 	}
 	@Override
 	public boolean getHasHardLimit(Direction direction) {
 		Direction newDirection = adjustPhase(direction);
-		log("getHasHardLimit", String.format("converted %s to %s", direction, newDirection));
+		log("getHasHardLimit", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().getHasHardLimit(newDirection);
 	}
 	@Override
 	public boolean getHasSoftLimit(Direction direction) {
 		Direction newDirection = adjustPhase(direction);
-		log("getHasSoftLimit", String.format("converted %s to %s", direction, newDirection));
+		log("getHasSoftLimit", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().getHasSoftLimit(newDirection);
 	}
 	@Override
 	public boolean getHasHardOrSoftLimit(Direction direction) {
 		Direction newDirection = adjustPhase(direction);
-		log("getHasHardOrSoftLimit", String.format("converted %s to %s", direction, newDirection));
+		log("getHasHardOrSoftLimit", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().getHasHardOrSoftLimit(newDirection);
 	}
 	
@@ -375,35 +376,35 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		Direction newDirection = adjustPhase(direction);
 		Length length = getMotorController().getSoftLimit(newDirection);
 		Length newLength = toDisplayUnitsNoPhaseCorrection(length);
-		log("getSoftLimit", String.format("converted %s to %s and %s to %s", direction, newDirection, length, newLength));
+		log("getSoftLimit", Formatter.safeFormat("converted %s to %s and %s to %s", direction, newDirection, length, newLength));
 		return newLength;
 	}
 	@Override
 	public Rate getMinimumForwardRate() {
 		Rate rate = getMotorController().getMinimumForwardRate();
 		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMinimumForwardRate", String.format("converted %s to %s", rate, newRate));
+		log("getMinimumForwardRate", Formatter.safeFormat("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 	@Override
 	public Rate getMaximumForwardRate() {
 		Rate rate = getMotorController().getMaximumForwardRate();
 		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMaximumForwardRate", String.format("converted %s to %s", rate, newRate));
+		log("getMaximumForwardRate", Formatter.safeFormat("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 	@Override
 	public Rate getMaximumReverseRate() {
 		Rate rate = getMotorController().getMaximumReverseRate();
 		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMaximumReverseRate", String.format("converted %s to %s", rate, newRate));
+		log("getMaximumReverseRate", Formatter.safeFormat("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 	@Override
 	public Rate getMinimumReverseRate() {
 		Rate rate = getMotorController().getMinimumReverseRate();
 		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMinimumReverseRate", String.format("converted %s to %s", rate, newRate));
+		log("getMinimumReverseRate", Formatter.safeFormat("converted %s to %s", rate, newRate));
 		return newRate;
 	}
 	@Override
@@ -411,7 +412,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		Direction newDirection = adjustPhase(direction);
 		Rate rate = getMotorController().getMaximumRate(newDirection);
 		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMaximumRate", String.format("converted %s to %s and %s to %s", direction, newDirection, rate, newRate));
+		log("getMaximumRate", Formatter.safeFormat("converted %s to %s and %s to %s", direction, newDirection, rate, newRate));
 		return newRate;
 	}
 	@Override
@@ -419,7 +420,7 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		Direction newDirection = adjustPhase(direction);
 		Rate rate = getMotorController().getMinimumRate(newDirection);
 		Rate newRate = toDisplayUnitsNoPhaseCorrection(rate);
-		log("getMinimumRate", String.format("converted %s to %s and %s to %s", direction, newDirection, rate, newRate));
+		log("getMinimumRate", Formatter.safeFormat("converted %s to %s and %s to %s", direction, newDirection, rate, newRate));
 		return newRate;
 	}
 	@Override
@@ -427,50 +428,50 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		Direction newDirection = adjustPhase(direction);
 		Length length = getMotorController().getHardLimit(newDirection);
 		Length newLength = toDisplayUnitsNoPhaseCorrection(length);
-		log("getHardLimit", String.format("converted %s to %s and %s to %s", direction, newDirection, length, newLength));
+		log("getHardLimit", Formatter.safeFormat("converted %s to %s and %s to %s", direction, newDirection, length, newLength));
 		return newLength;
 	}
 	
 	@Override
 	public boolean isHardLimitExceeded(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isHardLimitExceeded", String.format("converted %s to %s", direction, newDirection));
+		log("isHardLimitExceeded", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isHardLimitExceeded(newDirection); 
 	}
 	@Override
 	public boolean isHardLimitReached(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isHardLimitReached", String.format("converted %s to %s", direction, newDirection));
+		log("isHardLimitReached", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isHardLimitReached(newDirection); 
 	}
 	@Override
 	public boolean isHardLimitNeedingCalibration(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isHardLimitNeedingCalibration", String.format("converted %s to %s", direction, newDirection));
+		log("isHardLimitNeedingCalibration", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isHardLimitNeedingCalibration(newDirection); 
 	}
 	@Override
 	public boolean isSoftLimitExceeded(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isSoftLimitExceeded", String.format("converted %s to %s", direction, newDirection));
+		log("isSoftLimitExceeded", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isSoftLimitExceeded(newDirection); 
 	}
 	@Override
 	public boolean isSoftLimitReached(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isSoftLimitReached", String.format("converted %s to %s", direction, newDirection));
+		log("isSoftLimitReached", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isSoftLimitReached(newDirection); 
 	}
 	@Override
 	public boolean isPhysicalLimitExceeded(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isPhysicalLimitExceeded", String.format("converted %s to %s", direction, newDirection));
+		log("isPhysicalLimitExceeded", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isPhysicalLimitExceeded(newDirection); 
 	}
 	@Override
 	public boolean isPhysicalLimitReached(Direction direction) { 
 		Direction newDirection = adjustPhase(direction);
-		log("isPhysicalLimitReached", String.format("converted %s to %s", direction, newDirection));
+		log("isPhysicalLimitReached", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isPhysicalLimitReached(newDirection); 
 	}
 }
