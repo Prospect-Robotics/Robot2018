@@ -19,9 +19,7 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
-import org.usfirst.frc2813.util.GeometryHelpers;
 
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 
@@ -72,7 +70,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * the auto script is a robot-safety critical feature.
 		 */
 		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
-		arm.addCalibrateSync();
+		arm.addCalibrateAsync();
 		elevator.addCalibrateSync();
 	}
 
@@ -289,9 +287,8 @@ public class AutonomousCommandGroup extends CommandGroup {
 			addShootSequenceSync();
 		}
 
-// We do not currently do any cube dropping
-//		/** Add a drop cube sequence. */
-//		private void addDropSequenceSync() {
+		/** Add a drop cube sequence. */
+//		public void addDropSequenceSync() {
 //			addJawsOpenSync();
 //			// NB: We expect to have a cube... but since the jaws were open I assume we're trying to shake it loose so go fast...
 //			arm.addMoveToLevelPositionAsync();
@@ -336,7 +333,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/** Add a "shoot" cube sequence. */
 		public void addShootSequenceSync() {
 			addIntakeOutAsync();
-			time.addDelayInSecondsSync(1.5);
+			time.addDelayInSecondsSync(0.5);
 			addIntakeStopSync();
 			setHaveCube(false);
 			addJawsOpenSync();
