@@ -118,8 +118,8 @@ public class AutonomousCommandGroupGenerator {
 	public static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
 	public static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(76);
 
-	/** Arm Position for Level extension. Use to grab cube. */
-	public static final Length ARM_POSITION_GRAB_CUBE = ArmConfiguration.ArmDegrees.create(133);
+	/** Arm Position for Level extension. Use to grab and drop cube. */
+	public static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(133);
 
 	/** Arm Position for shooting over head */
 	public static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
@@ -256,29 +256,24 @@ public class AutonomousCommandGroupGenerator {
 	 * Prepare to shoot a cube at the switch. This is used as a starting position as
 	 * well.
 	 */
-	private void prepareForSwitchAsync(Direction direction) {
-		if (direction == direction.FORWARD) {
+	private void prepareForSwitchAsync() {
+		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
+		autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+	}
+
+	/** Prepare arm for shooting */
+	protected void prepareArmForShootingAsync(Direction direction) {
+		if (direction == Direction.FORWARD) {
 			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_FORWARD_SHOOT);
 		} else {
 			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_BACKWARD_SHOOT);
 		}
-		autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
-		autoCmdList.drive.setDriveSpeed(.5);//XXX Only for the cafeteria floor
 	}
-
-	/**
-	 * Prepare to shoot a cube at the scale. This starts the elevator moving up all
-	 * the way! Be careful!!! We will not be very stable.
-	 *
-	 * @param direction
-	 *            - which direction is the robot facing?
-	 */
-	protected void prepareForScaleAsync(Direction direction) {
+	/** Prepare elevator for scale */
+	protected void prepareElevatorForScaleAsync(Direction direction) {
 		if (direction == Direction.FORWARD) {
-			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_FORWARD_SHOOT);
 			autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SCALE_FORWARD);
 		} else {
-			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_BACKWARD_SHOOT);
 			autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SCALE_BACKWARD);
 		}
 		autoCmdList.drive.setDriveSpeed(SPEED_ELEVATOR_UP);
@@ -290,7 +285,7 @@ public class AutonomousCommandGroupGenerator {
 	 */
 	private void prepareForCubeGrabbingSync(Length elevatorHeight) {
 		autoCmdList.elevator.addMoveToPositionAsync(elevatorHeight);
-		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_GRAB_CUBE);
+		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
 		autoCmdList.elevator.addWaitForTargetPositionSync();
 		autoCmdList.arm.addWaitForTargetPositionSync();
 		autoCmdList.drive.setDriveSpeed(SPEED_FULL);
@@ -316,7 +311,7 @@ public class AutonomousCommandGroupGenerator {
 
 	private void getCenterCube(double distance) {
 		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distance), SPEED_STOP);
-		prepareForSwitchAsync(Direction.FORWARD);
+		prepareForSwitchAsync();
 		autoCmdList.cube.addGrabSequenceSync();
 		autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distance), SPEED_STOP);
 	}
@@ -344,7 +339,7 @@ public class AutonomousCommandGroupGenerator {
 		Direction farSwitchPosition = Robot.gameData.getFarSwitchPosition();
 		Direction scalePosition = Robot.gameData.getScalePosition();
 
-		/** Read user choices about our strategy */
+		// Read user choices about our strategy
 		boolean useCurves = Robot.autonomousSelectorCurves.getSelected() == Direction.ON;
 
 		/**
@@ -362,7 +357,7 @@ public class AutonomousCommandGroupGenerator {
 		left = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.LEFT);
 		right = getBiasedDirection(robotStartingPosition, Robot.gameData.getNearSwitchPosition(), Direction.RIGHT);
 
-		/** We similarly have a biased rotation. */
+		// We similarly have a biased rotation.
 		if (left == Direction.LEFT) {
 			clockwise = Direction.CLOCKWISE;
 			counterclockwise = Direction.COUNTERCLOCKWISE;
@@ -398,7 +393,7 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		autoCmdList.cube.setHaveCube(true);
 
-		// FIXME! bypass autonomous for competition
+		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
 		if (false) {
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
 			return;
@@ -419,7 +414,7 @@ public class AutonomousCommandGroupGenerator {
 		 * This initial state may not be exactly what we want, but it's safe. We can
 		 * change it later.
 		 */
-		prepareForSwitchAsync(Direction.FORWARD);
+		prepareForSwitchAsync();
 
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting
@@ -430,6 +425,7 @@ public class AutonomousCommandGroupGenerator {
 		 * paths as if we are are moving to the left.
 		 */
 		if (robotStartingPosition.equals(scalePosition)) {
+			prepareArmForShootingAsync(Direction.BACKWARD);
 			/**
 			 * The robot and the scale are on the same side. Drive forward and approach the
 			 * scale from the side.
@@ -452,14 +448,15 @@ public class AutonomousCommandGroupGenerator {
 				 * the elevator. Then follow our curve to the target.
 				 */
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD);
+				prepareElevatorForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
 			} else {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_TURN);
-				prepareForScaleAsync(Direction.BACKWARD);
+				prepareElevatorForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addQuickTurnSync(left, 45); /** right but we're backwards */
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromTargetEdge), SPEED_TURN);
 			}
+			autoCmdList.cube.addShootSequenceSync();
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/**
 			 * If the robot is in the center, we're going to drop a cube into the switch on
@@ -485,15 +482,16 @@ public class AutonomousCommandGroupGenerator {
 				double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2 - 6; // left bumper 6 inches right of left edge of switch
 				double turnClearance = 8.0;
 
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(turnClearance), SPEED_FULL); /** enough to turn */
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(turnClearance), SPEED_FULL); // enough to turn
 				autoCmdList.drive.addQuickTurnSync(left, 45);
 				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_FULL);
 				autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(160));
 				autoCmdList.drive.addQuickTurnSync(right, 45);
-				autoCmdList.cube.addShootSequenceSync();
+				autoCmdList.cube.addDropSequenceSync();
 			}
 		} else {
+			prepareArmForShootingAsync(Direction.BACKWARD);
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
 			 * and switch. Note that we must avoid driving over the scale platform. We do
@@ -531,26 +529,22 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn - firstRadius), SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, firstAngle, inches(firstRadius), counterclockwise, SPEED_FULL);
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter - firstRadius), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD); // half way down scale alley
+				prepareElevatorForScaleAsync(Direction.BACKWARD); // half way down scale alley
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenterToSecondTurn), SPEED_FULL);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, secondAngle, inches(secondRadius), clockwise, SPEED_STOP);
 			} else {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToFirstTurn), SPEED_TURN);
 				autoCmdList.drive.addQuickTurnSync(left, 90); /** right but we're backwards */
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToCenter), SPEED_FULL);
-				prepareForScaleAsync(Direction.BACKWARD); // half way down scale alley
+				prepareElevatorForScaleAsync(Direction.BACKWARD); // half way down scale alley
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromCenter + projectedDistToTarget), SPEED_TURN);
 				autoCmdList.drive.addQuickTurnSync(right, 135); /** left but we're backwards */
 
 				double finalDistance = projectedDistToTarget * Math.sqrt(2) - finalDistanceToTarget - robotBumperLength/2;
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(finalDistance), SPEED_STOP);
 			}
+			autoCmdList.cube.addShootSequenceSync();
 		}
-		/**
-		 * NB: DeliverCubeCommandSequence will always wait for Elevator to reach target
-		 * height, to avoid crashing
-		 */
-		autoCmdList.cube.addDeliverSequenceSync();
 
 		/** time to switch to cube grabbing mode */
 		prepareForCubeGrabbingSync();

@@ -288,12 +288,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 		}
 
 		/** Add a drop cube sequence. */
-//		public void addDropSequenceSync() {
-//			addJawsOpenSync();
-//			// NB: We expect to have a cube... but since the jaws were open I assume we're trying to shake it loose so go fast...
-//			arm.addMoveToLevelPositionAsync();
-//			arm.addWaitForTargetPositionSync();
-//		}
+		public void addDropSequenceSync() {
+			addJawsOpenSync();
+			setHaveCube(false);
+		}
 
 		/** Add a "grab" cube sequence */
 		public void addGrabSequenceSync() {
@@ -332,11 +330,12 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Add a "shoot" cube sequence. */
 		public void addShootSequenceSync() {
+			elevator.addWaitForTargetPositionSync();
 			addIntakeOutAsync();
 			time.addDelayInSecondsSync(0.5);
 			addIntakeStopSync();
-			setHaveCube(false);
 			addJawsOpenSync();
+			setHaveCube(false);
 		}
 
 		/**
