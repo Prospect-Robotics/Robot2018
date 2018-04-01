@@ -19,7 +19,7 @@ import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
 import org.usfirst.frc2813.units.values.Length;
-import org.usfirst.frc2813.util.Angles;
+import org.usfirst.frc2813.util.GeometryHelpers;
 
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -79,73 +79,26 @@ public class AutonomousCommandGroup extends CommandGroup {
 	public class Drive {
 
 		/**
-		 * These are the sticky settings for the last speed, and angle as we came out of a move.
+		 * track drive state including max speed, current angle and current speed.
 		 */
-		private double currentSpeed = 0.0;
-		private double currentAngle = 0.0;  // absolute from gyro. Update from gyro.
-		/**
-		 * This is the sticky setting to be used for all subsequent commands created for driving in an arc.
-		 */
-		private double curveSpeed = 0.4;
+		AutonomousDriveState state = new AutonomousDriveState();
 
-		/**
-		 * This is the sticky setting to be used for all subsequent commands created for driving forwards.
-		 */
-		private double driveSpeed = 1;
-		/**
-		 * This is the sticky setting to be used for all subsequent commands created for turning in place.
-		 */
-		private double turnSpeed = 0.25;
-
-		/**
-		 * Initial angle. Call this first!
-         */
-        public void initState() {
-            currentSpeed = 0.0;
-            //currentAngle = Robot.driveTrain.getGyro().getAngle();
-            currentAngle = 0.0;// We reset gyro at the start of autonomous
-        }
-
-		/**
-		 * Track the current speed sent by use. If 0, we need to come to a complete stop before anything
-		 * else can happen.
-		 * @param speed
-		 * @param angle
-		 */
-		private void trackState(double speed, double angle) {
-			currentAngle += angle;
-			currentSpeed = speed;
-			if (speed == 0.0) {
-				addSequential(new DriveTrainAutoStop(Robot.driveTrain));
-			}
-		}
-		/**
-		 * Set the sticky setting for the speed for taking curves.  This value will be used for all subsequent commands created for curved movement.
-		 * @param curveSpeed Percentage of output power {-1.0..1.0}
-		 */
-		public void setCurveSpeed(double curveSpeed) {
-			this.curveSpeed = curveSpeed;
+		/** We have stopped. Run a PID lock on the drive to fully halt. */
+		private void halt() {
+			addSequential(new DriveTrainAutoStop(Robot.driveTrain));
 		}
 
 		/**
 		 * Set the sticky setting for the speed for drive speed.  This value will be used for all subsequent commands created for driving forwards.
 		 * @param driveSpeed Percentage of output power {-1.0..1.0}
 		 */
-		public void setDriveSpeed(double driveSpeed) {
-			this.driveSpeed = driveSpeed;
-		}
-
-		/**
-		 * Set the sticky setting for the speed for turning.  This value will be used for all subsequent commands created for turning.
-		 * @param turnSpeed Percentage of output power {-1.0..1.0}
-		 */
-		public void setTurnSpeed(double turnSpeed) {
-			this.turnSpeed = turnSpeed;
+		public void setDriveSpeed(double speed) {
+			state.maxSpeed = speed;
 		}
 
 		/** Scale the acceleration/deceleration in the auto drive system. THIS IS GLOBAL AND INSTANT! */
 		public void setRampSpeed(double rampSpeed) {
-			DriveTrainAutoDrive.scaleRamps(rampSpeed);
+			state.scaleRamps(rampSpeed);
 		}
 
 		/**
@@ -158,27 +111,11 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
 			Logger.debug("AUTO ADD CURVE DEGREES [direction: %s, degrees: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, degrees, radius, rotation, endSpeed);
-			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, degrees, currentAngle, currentSpeed, endSpeed, radius.convertTo(LengthUOM.Inches).getValue(), rotation));
-			trackState(endSpeed, Angles.getRelativeAngle(degrees, direction, rotation));
-		}
-
-		/**
-		 * 
-		 * @param horizontalOffset
-		 * @param forwardOffset
-		 * @param destinationAngle
-		 */
-		public void addGotoSync(Length horizontalOffset, Length forwardOffset, double destinationAngle) {
-			double hOff = horizontalOffset.convertTo(LengthUOM.Inches).getValue();
-			double fOff = forwardOffset.convertTo(LengthUOM.Inches).getValue();
-			
-			Direction leftOrRight = (hOff < 0) ? Direction.LEFT : (hOff == 0) ? Direction.CENTER : Direction.RIGHT;
-			
-			Direction forward = (fOff < 0) ? Direction.LEFT : (fOff == 0) ? Direction.CENTER : Direction.RIGHT;
-			
-			//addSeqquential(ne
-			//addDriveSync(forward, LengthUOM.Inches.create(Math.sqrt(hOff*hOff+fOff*fOff)), SPEED);
-			
+			boolean commandHalts = state.speed != 0 && endSpeed == 0;
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, state, direction, degrees, radius.convertTo(LengthUOM.Inches).getValue(), rotation, endSpeed));
+			if (commandHalts) {
+				halt();
+			}
 		}
 
 		/**
@@ -188,15 +125,17 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
-			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, driveSpeed, direction, distance.convertTo(LengthUOM.Inches).getValue(), currentAngle, currentSpeed, endSpeed));
-			trackState(endSpeed, 0.0);
+			boolean commandHalts = state.speed != 0 && endSpeed == 0;
+			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, state, direction, distance.convertTo(LengthUOM.Inches).getValue(), endSpeed));
+			if (commandHalts) {
+				halt();
+			}
 		}
 
 		/** Add commands to reset the drive train encoders and gyros (typically called at the start of a match) */
 		public void addSensorResetSequenceSync() {
 			addSequential(new DriveTrainResetEncoders(Robot.driveTrain));
 			addSequential(new DriveTrainResetGyro(Robot.driveTrain));
-			initState();
 		}
 
 		/**
@@ -209,7 +148,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
 			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, direction, relativeAngle, 1));
-			trackState(0.0, Angles.getRelativeAngle(relativeAngle, Direction.FORWARD, direction.isPositive() ? Direction.CLOCKWISE : Direction.COUNTERCLOCKWISE));
+			halt();
 		}
 	}
 
