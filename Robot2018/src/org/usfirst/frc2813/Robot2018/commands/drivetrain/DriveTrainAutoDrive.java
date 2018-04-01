@@ -106,9 +106,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double startPosition;
 	private double startTime;
 	private double accelRamp, decelRamp;
-	private double startAngle; // which may or may not be zero degrees.
-	private double endAngle; // for the turn version
-	private boolean onCurve;
+	private double startAngle;
+	private double deltaAngle = 0; // for the turn version
 	private double lastThrottle = 0; // Last throttle we sent to the drive train
 	private boolean complete = false; // Have we completed the operation
 	private double lastPosition, lastTime; // calculate real speed between calls
@@ -143,7 +142,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		this.decelRamp = state.decelRamp * (1 - endSpeed);
 		this.startAngle = state.angle;
 		state.speed = endSpeed; // update state to what it will be
-		onCurve = false;
 
 		addArg("state",state);
 		addArg("direction",direction);
@@ -166,8 +164,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 */
 	public DriveTrainAutoDrive(DriveTrain driveTrain, AutonomousDriveState state, Direction direction, double angle, double radius, Direction rotation, double endSpeed) {
 		this(driveTrain, state, direction, GeometryHelpers.computeArcLength(angle, radius), endSpeed);
-		endAngle = GeometryHelpers.computeRelativeAngle(angle, direction, rotation);
-		state.angle = angle + endAngle;
+		deltaAngle = GeometryHelpers.computeRelativeAngle(angle, direction, rotation);
+		state.angle += deltaAngle;
 
 		addArg("angle",angle);
 		addArg("radius",radius);
@@ -181,13 +179,16 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		startPosition = lastPosition = readPosition();
 		startTime = lastTime = readTime();
 		Logger.printLabelled(LogType.INFO, "PID AutoDrive initialize",
+				"End state", state,
 				"startTime", startTime,
 				"startPosition", startPosition,
+				"Direction", direction,
 				"startSpeed", startSpeed,
 				"startAngle", startAngle,
+				"deltaAngle", deltaAngle,
 				"accelRamp", accelRamp,
-				"endSpeed", endSpeed,
-				"decelRamp", decelRamp);
+				"decelRamp", decelRamp,
+				"endSpeed", endSpeed);
 		pidAngleController = new PIDController(0.07, 0.01, 0.15, pidSourceAngle, this::pidAngleOutputFunc);
 		pidAngleController.setInputRange(-360, 360);
 		pidAngleController.setContinuous();
@@ -204,7 +205,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	/** measure our error from the curve we are walking. This is the angle PID callback */
     public double measureAngularDrift() {
         angularDrift = subsystem.getGyro().getAngle() - startAngle;
-        if (onCurve) {
+        if (deltaAngle != 0) {
             // subtract the angle we expect to be facing from the current angle to get angular error
         		angularDrift -= calcAngle(distanceTravelled());
         }
@@ -302,9 +303,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 			return 0;
 		}
 		if (distanceTravelled > distance) {
-			return endAngle;
+			return deltaAngle;
 		}
-		return GeometryHelpers.interpolate(0, startAngle, distance, endAngle, distanceTravelled);
+		return GeometryHelpers.interpolate(0, startAngle, distance, deltaAngle, distanceTravelled);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
