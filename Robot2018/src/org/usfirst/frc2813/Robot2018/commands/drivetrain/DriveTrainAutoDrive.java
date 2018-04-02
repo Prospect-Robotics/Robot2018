@@ -114,6 +114,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double measuredSpeed = 0;
 	private double angularDrift; // input to angle PID
 	private double velocityDrift; // input to speed PID
+	private int cyclesWithoutProgress = 0; // monitor position progress and give up if we stop moving
+	private static final double progressDistanceThreshold = 1;
+	private static final double progressCycleThreshold = 4;
 	
 	/**
 	 * We combine 2 separate PIDs into one routine to control drive - velocity and angle.
@@ -364,6 +367,14 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		if (complete) return;
 
 		double distanceTravelled = distanceTravelled();
+		if (distanceTravelled < progressDistanceThreshold) {
+			if (++cyclesWithoutProgress > progressCycleThreshold) {
+				complete = true;
+			}
+			else {
+				cyclesWithoutProgress = 0;
+			}
+		}
 		double desiredSpeed = calcSpeed(distanceTravelled);
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
 
