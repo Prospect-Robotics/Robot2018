@@ -122,6 +122,9 @@ public class AutonomousCommandGroupGenerator {
 	/** Arm Position for Level extension. Use to grab and drop cube. */
 	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(133);
 
+	/** Arm Position below Level extension to avoid hitting hooks with elevator down. Use to grab and drop cube. */
+	private static final Length ARM_POSITION_LOW = ArmConfiguration.ArmDegrees.create(160);
+
 	/** Arm Position for shooting over head */
 	private static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
 	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(70);
@@ -286,7 +289,7 @@ public class AutonomousCommandGroupGenerator {
 	 */
 	private void prepareForCubeGrabbingSync(Length elevatorHeight) {
 		autoCmdList.elevator.addMoveToPositionAsync(elevatorHeight);
-		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
+		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LOW);
 		autoCmdList.elevator.addWaitForTargetPositionSync();
 		autoCmdList.arm.addWaitForTargetPositionSync();
 		autoCmdList.drive.setDriveSpeed(SPEED_FULL);
@@ -301,14 +304,15 @@ public class AutonomousCommandGroupGenerator {
 	/** Helper routine for center position. Deliver cube and return */
 	private void deliverCenterCube(Length nextCubeHeight) {
 		if (useCurves) {
-		double radius = 63; /** found by trial and error */
-		double degrees = 54.0;
-		autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise, SPEED_FULL);
-		autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise, SPEED_STOP);
-		autoCmdList.cube.addDeliverSequenceSync();
-		prepareForCubeGrabbingSync(nextCubeHeight);
-		autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, SPEED_FULL);
-		autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, SPEED_STOP);
+			double radius = 63; // found by trial and error
+			double degrees = 54.0;
+
+			autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), counterclockwise, SPEED_FULL);
+			autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise, SPEED_STOP);
+			autoCmdList.cube.addDeliverSequenceSync();
+			autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, SPEED_FULL);
+			prepareForCubeGrabbingSync(nextCubeHeight);
+			autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, SPEED_STOP);
 		}
 		else {
 			double distanceToTarget = backWallToSwitch - robotBumperLength;
@@ -321,8 +325,8 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.drive.addQuickTurnSync(right, 45);
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_STOP);
 			autoCmdList.cube.addDeliverSequenceSync();
-			prepareForCubeGrabbingSync(nextCubeHeight);
 			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_FULL);
+			prepareForCubeGrabbingSync(nextCubeHeight);
 			autoCmdList.drive.addQuickTurnSync(left, 45);
 			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_FULL);
 			autoCmdList.drive.addQuickTurnSync(right, 45);
