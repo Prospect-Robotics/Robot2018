@@ -319,7 +319,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * It's highly probable that assigning to boolean complete will be atomic, though it's not
 		 * guaranteed.  I didn't think it was worth adding a mutex here and in the PID callback.
 		 */
-		complete = (distanceTravelled() >= distance);
+		if (!complete) {
+			complete = (distanceTravelled() >= distance);
+		}
 		return complete;
 	}
 	/**
