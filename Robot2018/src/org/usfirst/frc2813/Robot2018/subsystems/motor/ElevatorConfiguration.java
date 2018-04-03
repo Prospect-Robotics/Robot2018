@@ -25,7 +25,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
 	
 	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0);
-	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(82);
+	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(72);
 	private static final Length SAFETY_MARGIN_INCHES = LengthUOM.Inches.create(4);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
@@ -118,7 +118,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 		System.out.println();
 		System.out.println("[Reference Tables]");
 		for(int j = 0; j < 24; j++) {
-			System.out.println(String.format("%3d in/sec........................~%s %s", 
+			System.out.println(Formatter.safeFormat("%3d in/sec........................~%s %s", 
 					j, 
 					Math.round(RateUOM.InchesPerSecond.create(j).convertTo(ElevatorSRXRPM).getValue()), ElevatorSRXRPM.getUnitNameAbbreviation())
 			);

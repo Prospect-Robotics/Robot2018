@@ -5,6 +5,7 @@ import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
+import org.usfirst.frc2813.util.Formatter;
 
 import edu.wpi.first.wpilibj.Encoder;
 
@@ -33,7 +34,7 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	}
 
 	public static String getEncoderStatus(String label, Encoder encoder) {
-		return String.format("Encoder.%s Get=%s Raw=%s Dist=%s DistInches=%s DistPerPulse=%s Dir=%s Stopped=%s]",
+		return Formatter.safeFormat("Encoder.%s Get=%s Raw=%s Dist=%s DistInches=%s DistPerPulse=%s Dir=%s Stopped=%s]",
 			label,
 			encoder.get(), 
 			encoder.getRaw(),  
@@ -48,7 +49,7 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	protected void ghscExecute() {
 		if((System.currentTimeMillis() - last) >= reportingInterval) {
 			System.out.println(
-				String.format("%s\n%s\nDriveTrain [Dist=%s]\n",
+				Formatter.safeFormat("%s\n%s\nDriveTrain [Dist=%s]\n",
 					getEncoderStatus("Left", portEncoder),
 					getEncoderStatus("Right", starboardEncoder),
 					Robot.driveTrain.getDistance()));

@@ -53,13 +53,13 @@ public class OI {
 	 * MotorTesting - what I used for motor testing, 
 	 * Competition - and what Jesse wants for competition.
 	 */
-	private enum ButtonLayout { Standard, MotorTesting, Competition }
+	private enum ButtonLayout { Standard, MotorTesting, Competition, SwitchBotMode }
 	private static ButtonLayout buttonLayout = ButtonLayout.Competition;
 
 	private static final Length ELEVATOR_HEIGHT_TOLERANCE  = LengthUOM.Inches.create(0.25);
 	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(5.0);
 	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(80);
-	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(165);
+	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(175);
 	private static final Length ARM_POSITION_TOLERANCE     = ArmConfiguration.ArmDegrees.create(5);
 
 	//// CREATING BUTTONS
@@ -128,7 +128,7 @@ public class OI {
 	}
 	public Command createPickUpPositionSequence() {
 		CommandGroup group = new CommandGroup();
-		group.addSequential(createElevatorToPickUpHeight());
+//		group.addSequential(createElevatorToPickUpHeight());
 		group.addSequential(createArmToPickUpPosition());
 		return group;
 	}
@@ -361,6 +361,20 @@ public class OI {
 			new JoystickButton(buttonPanel, 8).whileHeld(createElevatorDown());
 			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
 			new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence()); // NB: Jack asked to have arm go in first.
+			new JoystickButton(buttonPanel, 11).whenPressed(createShootingPositionSequence());
+			new JoystickButton(buttonPanel, 12).whenPressed(createPickUpPositionSequence());
+			break;
+		case SwitchBotMode:
+			new JoystickButton(buttonPanel, 1).whileHeld(createArmIn());
+			new JoystickButton(buttonPanel, 2).whileHeld(createArmOut());
+			new JoystickButton(buttonPanel, 3).whileHeld(createArmIn());
+			new JoystickButton(buttonPanel, 4).whileHeld(createArmOut());
+			new JoystickButton(buttonPanel, 5).whileHeld(createIntakeIn());
+			new JoystickButton(buttonPanel, 6).whileHeld(createIntakeOut());
+			new JoystickButton(buttonPanel, 7).whileHeld(createIntakeIn());
+			new JoystickButton(buttonPanel, 8).whileHeld(createIntakeOut());
+			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
+			new JoystickButton(buttonPanel, 10).whenPressed(createRobotJawsToggle());
 			new JoystickButton(buttonPanel, 11).whenPressed(createShootingPositionSequence());
 			new JoystickButton(buttonPanel, 12).whenPressed(createPickUpPositionSequence());
 			break;

@@ -139,7 +139,7 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 * Tracing messages go through here
 	 */
 	protected final void traceFormatted(String function, String format, Object... parameters) {
-		trace(function, String.format(format, parameters));
+		trace(function, Formatter.safeFormat(format, parameters));
 	}
 
 	/**

@@ -62,13 +62,6 @@ public class AutonomousCommandGroup extends CommandGroup {
 		/**  First, reset the gyro and the wheel encoders. */
 		drive.addSensorResetSequenceSync();
 
-		/**
-		 * Next, return the elevator and the arm to the home position.  In competition, we will start in this
-		 * position and the auto-reset logic will calibrate them automatically - making this step instant and
-		 * unnecessary.  However, if we are testing, we want to make sure that we home the arm and the
-		 * elevator and get those counters reset or we may damage the robot.  So keeping these commands in
-		 * the auto script is a robot-safety critical feature.
-		 */
 		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
 		arm.addCalibrateAsync();
 		elevator.addCalibrateSync();
