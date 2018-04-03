@@ -138,7 +138,7 @@ public class RobotMap {
 		 * Therefore, we don't need to setInverted on the far side motors, but need to be very careful to ensure
 		 * that the physical wiring is correct! 
 		 */
-		elevatorSpeedControllerPort = new VictorSPX(3);
+		elevatorSpeedControllerPort = new VictorSPX(5); // MC 3 fried.  Moved to 5.
 		elevatorSpeedControllerPort.follow(srxElevator);
 		elevatorSpeedControllerPort.setInverted(false);	// Motors on the Port side spin forward
 		elevatorSpeedControllerStarboard = new VictorSPX(9);
