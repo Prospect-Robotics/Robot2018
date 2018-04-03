@@ -12,45 +12,58 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  */
 public class Intake extends GearheadsSubsystem {
 	private WPI_VictorSPX spx;
-	double speed;
-	Direction direction;
+	double defaultSpeed;
+	double targetSpeed;
+	Direction targetDirection;
 
 	public Intake(WPI_VictorSPX victor) {
 		spx = victor;
-		direction = Direction.IDLE;
-		speed = 1.0;
+		targetDirection = Direction.IDLE;
+		defaultSpeed = 1.0;
+		targetSpeed = defaultSpeed;
 	}
 
 	public void initDefaultCommand() {
 //		setDefaultCommand(new IntakeSlowBurn(this, direction));
 	}
 
-	public void setTargetSpeed(double speed) {
-		if (speed < 0 || 1 < speed) {
+	public void setDefaultSpeed(double defaultSpeed) {
+		if (defaultSpeed < 0 || 1 < defaultSpeed) {
 			throw new UnsupportedOperationException("Speed must be in [0, 1]");
 		}
-		this.speed = speed;
+		this.defaultSpeed = defaultSpeed;
+	}
+
+	public void setTargetSpeed(double defaultSpeed) {
+		if (targetSpeed < 0 || 1 < targetSpeed) {
+			throw new UnsupportedOperationException("Speed must be in [0, 1]");
+		}
+		this.targetSpeed = targetSpeed;
+	}
+
+	public double getDefaultSpeed() {
+		return defaultSpeed;
 	}
 
 	public double getTargetSpeed() {
-		return speed;
+		return targetSpeed;
 	}
 	
 	public Direction getTargetDirection() {
-		return direction;
+		return targetDirection;
 	}
 	
 	public double getCurrentSpeed() {
 		if(isEmulated()) {
-			return speed;
+			return targetSpeed;
 		} else {
 			return spx.get();
 		}
 	}
-	
+
 	public Direction getCurrentDirection() {
 		if(isEmulated()) {
-			return direction;
+			return targetDirection;
 		} else if(getCurrentSpeed() == 0) {
 			return Direction.IDLE;
 		} else if(spx.get() == 0) {
@@ -67,20 +80,25 @@ public class Intake extends GearheadsSubsystem {
 
 	public boolean isEnabled() {
 		if(isEmulated()) {
-			return speed > 0;
+			return targetSpeed > 0;
 		} else {
 			return spx.get() > 0;
 		}
 	}
 
-	public void spin(Direction targetDirection) {
+	/**
+	 * Spin in the indicated direction at indicatd speed
+	 * @param targetDirection direction to spin
+	 * @param speed percentage of maximum power (range -1.0 to 1.0)
+	 */
+	public void spin(Direction targetDirection, double speed) {
 		if (targetDirection.isNeutral()) {
 			Logger.debug(this + " stopping.  Direction is NEUTRAL.");
 			if (!isEmulated()) {
 				spx.set(0); // NB: Just in case disable doesn't clear speed.  Couldn't find a isDisabled() function.
 				spx.disable();
 			}
-			this.direction = Direction.IDLE;
+			this.targetDirection = Direction.IDLE;
 		} else {
 			double rate = targetDirection.isPositive() ? -speed : speed;
 			Logger.debug(this + " spinning @" + Math.round(100 * rate) + "% power.");
@@ -88,7 +106,16 @@ public class Intake extends GearheadsSubsystem {
 				spx.set(rate);
 			}
 		}
-		this.direction = targetDirection;
+		this.targetSpeed = speed;
+		this.targetDirection = targetDirection;
+	}
+
+	/**
+	 * Spin in the indicated direction at default speed
+	 * @param targetDirection direction to spin
+	 */
+	public void spin(Direction targetDirection) {
+		spin(targetDirection, this.defaultSpeed);
 	}
 
 	public void stop() {
