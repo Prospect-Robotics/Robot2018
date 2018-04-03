@@ -25,7 +25,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
 	
 	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0);
-	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(82);
+	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(72);
 	private static final Length SAFETY_MARGIN_INCHES = LengthUOM.Inches.create(4);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
