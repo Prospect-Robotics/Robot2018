@@ -347,7 +347,7 @@ public class AutonomousCommandGroupGenerator {
 	}
 	/** Helper routine for center position. grab first cube in pyramid and return */
 	private void getCenterSecondCube() {
-		double backWallToSecondCube = backWallToCubePyramid - cubeSize - robotBumperLength + cubeIntakeOverlap;
+		double backWallToSecondCube = backWallToCubePyramid + cubeSize - robotBumperLength + cubeIntakeOverlap;
 		getCenterCube(backWallToSecondCube);
 	}
 	/**
