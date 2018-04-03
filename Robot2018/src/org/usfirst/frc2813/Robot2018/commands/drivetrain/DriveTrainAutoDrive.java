@@ -102,7 +102,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private final AutonomousDriveState state;
 	private final Direction direction;
 	private final double distance;
-	private double startSpeed, endSpeed;
+	private double startSpeed, endSpeed, maxSpeed;
 	private double startPosition;
 	private double startTime;
 	private double accelRamp, decelRamp;
@@ -137,6 +137,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	public DriveTrainAutoDrive(DriveTrain driveTrain, AutonomousDriveState state, Direction direction, double distance, double endSpeed) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.state = state;
+		this.maxSpeed = state.maxSpeed;
 		this.direction = direction;
 		this.distance = distance;
 		this.startSpeed = state.speed;
@@ -278,20 +279,20 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		}
 		
 		if (distanceTravelled < accelRamp) {
-			startLimit = GeometryHelpers.interpolate(0, startSpeed, accelRamp, state.maxSpeed, distanceTravelled);
+			startLimit = GeometryHelpers.interpolate(0, startSpeed, accelRamp, maxSpeed, distanceTravelled);
 		}
 		else {
-			startLimit = state.maxSpeed;
+			startLimit = maxSpeed;
 		}
 
 		if (distanceRemaining < 0) {
 			endLimit = endSpeed;
 		}
 		else if (distanceRemaining < decelRamp) {
-			endLimit = GeometryHelpers.interpolate(distance - decelRamp, state.maxSpeed, distance, endSpeed, distanceTravelled);
+			endLimit = GeometryHelpers.interpolate(distance - decelRamp, maxSpeed, distance, endSpeed, distanceTravelled);
 		}
 		else {
-			endLimit = state.maxSpeed;
+			endLimit = maxSpeed;
 		}
 
 		return Math.min(startLimit, endLimit);

@@ -145,7 +145,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param relativeAngle - how many degrees to turn
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
-			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, direction, relativeAngle, 1));
+			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, state, direction, relativeAngle, 1));
 			halt();
 		}
 	}

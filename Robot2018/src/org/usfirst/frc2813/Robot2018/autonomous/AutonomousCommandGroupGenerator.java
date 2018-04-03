@@ -104,7 +104,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final double SPEED_STOP = 0.0;
 
 	/** Speed zero for stopping after a move. */
-	private static final double SPEED_TURN = 0.2;
+	private static final double SPEED_TURN = 0.3;
 
 	/** Elevator heights for placing cubes on the switch. */
 	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
@@ -113,7 +113,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(3);
 
 	/** Elevator heights for picking up a cube on another cube. */
-	private static final Length ELEVATOR_HEIGHT_GRAB_SECOND_CUBE = LengthUOM.Inches.create(15);
+	private static final Length ELEVATOR_HEIGHT_GRAB_SECOND_CUBE = LengthUOM.Inches.create(14);
 
 	/** Elevator height for placing cubes on the scale based on robot direction. */
 	private static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
@@ -319,16 +319,16 @@ public class AutonomousCommandGroupGenerator {
 			double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2;
 			double straightEnds = (distanceToTarget - sideShiftToTarget) / 2;
 
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_FULL);
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_TURN);
 			autoCmdList.drive.addQuickTurnSync(left, 45);
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_FULL);
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
 			autoCmdList.drive.addQuickTurnSync(right, 45);
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_STOP);
 			autoCmdList.cube.addDeliverSequenceSync();
-			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_FULL);
+			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_TURN);
 			prepareForCubeGrabbingSync(nextCubeHeight);
 			autoCmdList.drive.addQuickTurnSync(left, 45);
-			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_FULL);
+			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
 			autoCmdList.drive.addQuickTurnSync(right, 45);
 			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_STOP);
 		}
