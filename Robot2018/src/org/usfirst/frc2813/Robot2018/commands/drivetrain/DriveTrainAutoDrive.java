@@ -244,13 +244,14 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double measureActualSpeed() {
 		double deltaTime = getDeltaTime();
 		double deltaPosition = getDeltaPosition();
+		Logger.printFormat(LogType.INFO, "XYZZYA>  time: %s, position: %s, timeMillis %s", deltaTime, deltaPosition, System.currentTimeMillis());
 		if (deltaTime == 0) return measuredSpeed; // guard against divide by zero.
 		return (deltaPosition / deltaTime) / MAX_ACTUAL_SPEED;
 	}
 
 	/** Measure our error from the desired speed. This is the speed PID callback. */
 	private double measureVelocityDrift() {
-		velocityDrift = measureActualSpeed() - calcSpeed(distanceTravelled());
+		velocityDrift = calcSpeed(distanceTravelled()) - measureActualSpeed();
 		return velocityDrift;
 	}
 
@@ -302,6 +303,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @return desired offset from startAngle
 	 */
 	private double calcAngle(double distanceTravelled) {
+		Logger.printLabelled(LogType.INFO, "XYZZY calcAngle", "distSoFar", distanceTravelled, "ttlDist", distance, "startAngle", startAngle, "deltaAngle", deltaAngle, "interp", GeometryHelpers.interpolate(0, startAngle, distance, deltaAngle, distanceTravelled));
 		if (distanceTravelled < 0) {
 			return 0;
 		}
@@ -368,6 +370,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		// If the command is complete, ignore any extra PID output call backs while we are shutting PID down.
 		if (complete) return;
 
+		Logger.printFormat(LogType.INFO, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
 		double distanceTravelled = distanceTravelled();
 		if (distanceTravelled < progressDistanceThreshold) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {

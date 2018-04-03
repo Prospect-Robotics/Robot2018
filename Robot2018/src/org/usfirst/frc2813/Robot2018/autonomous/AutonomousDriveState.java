@@ -1,5 +1,7 @@
 package org.usfirst.frc2813.Robot2018.autonomous;
 
+import org.usfirst.frc2813.util.Formatter;
+
 /**
  * This is a state object for Autonomous drive commands.
  * It contains information about how the drive system is to be controlled, 
@@ -62,5 +64,8 @@ public class AutonomousDriveState {
 		}
 		accelRamp = scaleFactor * DEFAULT_ACCELERATION_RAMP;
 		decelRamp = scaleFactor * DEFAULT_DECELERATION_RAMP;
+	}
+	public String toString() {
+		return Formatter.concat("AutoState: [", "speed: ", speed, "maxSpeed: ", maxSpeed, "angle: ", angle, "throttle: (", minThrottle, ", ", maxThrottle, ")]");
 	}
 }
