@@ -171,7 +171,7 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	static boolean sentEncoderWarnings = false;
 	/**
-	 * Return the distance the robot has traveled in feet since the last call to
+	 * Return the distance the robot has traveled in inches since the last call to
 	 * driveTrain.reset(), or robot program start, whichever
 	 * was later. If the robot drove backwards, the value returned will be negative.
 	 * If the robot spins in place, the value will not change.
