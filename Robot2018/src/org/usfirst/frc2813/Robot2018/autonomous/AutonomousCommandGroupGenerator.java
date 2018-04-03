@@ -45,7 +45,9 @@ public class AutonomousCommandGroupGenerator {
 	private static final double robotBumperWidth = robotWheelbaseWidth + bumperThickness * 2;
 	private static final double robotBumperLength = robotWheelbaseLength + bumperThickness * 2 + 2 * 1.125;
 	private static final double finalDistanceToTarget = 20; // how close to get before we shoot cube
-	private static final double cubeIntakeOverlap = 5; // allow cube this far past robot front end to grab
+	private static final double jawProtrusion = 10; // overhang of jaws in front of bot. FIXME! measure this!
+	private static final double cubeIntakeOverlap = 5; // aim jaws this far past edge of cube. FIXME! measure this!
+	private static final double robotLengthIncJaws = robotBumperLength + jawProtrusion;
 
 	/** absolute dimensions side to side */
 	private static final double backWallWidth = 264;
@@ -342,12 +344,12 @@ public class AutonomousCommandGroupGenerator {
 	}
 	/** Helper routine for center position. grab first cube in pyramid and return */
 	private void getCenterFirstCube() {
-		double backWallToFirstCube = backWallToCubePyramid - robotBumperLength - cubeIntakeOverlap;
+		double backWallToFirstCube = backWallToCubePyramid - robotLengthIncJaws - cubeIntakeOverlap;
 		getCenterCube(backWallToFirstCube);
 	}
 	/** Helper routine for center position. grab first cube in pyramid and return */
 	private void getCenterSecondCube() {
-		double backWallToSecondCube = backWallToCubePyramid + cubeSize - robotBumperLength - cubeIntakeOverlap;
+		double backWallToSecondCube = backWallToCubePyramid + cubeSize - robotLengthIncJaws - cubeIntakeOverlap;
 		getCenterCube(backWallToSecondCube);
 	}
 	/**
