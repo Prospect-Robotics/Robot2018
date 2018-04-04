@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class POST extends CommandGroup {
 
 	private static boolean POSTinitiated = false;
+	private static boolean POSTcompleted = false;
+	
 	private final Optional<Command> afterPOST;
 
 	public POST() {
@@ -57,6 +59,7 @@ public class POST extends CommandGroup {
 	public void end() {
 		super.end();
 		System.out.println("POST complete!");
+		POSTcompleted = true;
 		try {
 			Thread.sleep(125); // should be enough to let the robot come to a complete stop (I mean we did move
 								// the drive train)
@@ -64,21 +67,30 @@ public class POST extends CommandGroup {
 			// we aren't prepared to deal with interrupts.
 			Thread.currentThread().interrupt();
 		}
+		// Zero before we start a command
+		Robot.driveTrain.getEncoderLeft().reset();
+		Robot.driveTrain.getEncoderRight().reset();
 		afterPOST.ifPresent(Command::start);
 	}
 
 	@Override
 	public void start() {
 		// ensure POST only runs once per reboot!
-		if (POSTinitiated)
+		if (POSTinitiated) {
+			// Zero before we start a command
+			Robot.driveTrain.getEncoderLeft().reset();
+			Robot.driveTrain.getEncoderRight().reset();
 			// don't run POST at all, it already ran. Just start the command.
 			afterPOST.ifPresent(Command::start);
-		else {
+		} else {
 			POSTinitiated = true;
 			System.out.println("Starting POST.");
 			// afterPOST will be called after POST completion.
 			super.start();
 		}
-
+	}
+	
+	public static boolean isPostComplete() {
+		return POSTcompleted;
 	}
 }
