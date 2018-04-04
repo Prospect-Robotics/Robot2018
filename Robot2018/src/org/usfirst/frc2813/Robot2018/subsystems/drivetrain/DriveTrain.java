@@ -42,7 +42,7 @@ public class DriveTrain extends GearheadsSubsystem {
     public static final double ENCODER_TO_DRIVE_SCALE = 3;
     public static final double ENCODER_PULSES_PER_ENCODER_REVOLUTION = 256;
     public static final double ENCODER_PULSES_PER_WHEEL_REVOLUTION = ENCODER_PULSES_PER_ENCODER_REVOLUTION * ENCODER_TO_DRIVE_SCALE;
-    public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION * 2;
+    public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
     private final Gyro gyro;
     private final SpeedController speedControllerLeftMaster;
@@ -189,14 +189,15 @@ public class DriveTrain extends GearheadsSubsystem {
     	 *
     	 * NOTE: encoderPort should
     	 */
-		if (encoderPortFunctional && encoderStarboardFunctional)
-			return (encoderRight.getDistance() + (-1 * encoderLeft.getDistance()))/2;
+		if (encoderPortFunctional && encoderStarboardFunctional) {
+			return (encoderRight.getDistance() + encoderLeft.getDistance())/2;
+		} 
 		else if(encoderPortFunctional) {
 			if(!sentEncoderWarnings) {
 				Logger.info("WARNING: The right drive train encoder is non-functional.");
 				sentEncoderWarnings = true;
 			}
-			return -encoderLeft.getDistance();
+			return encoderLeft.getDistance();
 		}
 		else if(encoderStarboardFunctional) {
 			if(!sentEncoderWarnings) {
@@ -206,11 +207,11 @@ public class DriveTrain extends GearheadsSubsystem {
 			return encoderRight.getDistance();
 		}
 		else {
-			if(!sentEncoderWarnings) {
-				Logger.info("WARNING: Both drive train encoders are non-functional.");
-				sentEncoderWarnings = true;
-			}
-			return (encoderRight.getDistance() + (-1 * encoderLeft.getDistance()))/2;
+//			if(!sentEncoderWarnings) {
+				Logger.error("ERROR: Both drive train encoders are non-functional.  Returning zero.");
+//				sentEncoderWarnings = true;
+//			}
+			return 0;
 		}
 	}
 	
