@@ -370,9 +370,6 @@ public class AutonomousCommandGroupGenerator {
 
 		// Read user choices about our strategy
 		useCurves = Robot.autonomousSelectorCurves.getSelected() == Direction.ON;
-
-		// Initialize drive speed because it's used as a starting speed for first drive command
-		autoCmdList.drive.setDriveSpeed(SPEED_FULL);
 		/**
 		 * Determine our biased directions. Assume if you're on a side, it's left and if
 		 * you're in the center the switch will be to the left. This reduces the
