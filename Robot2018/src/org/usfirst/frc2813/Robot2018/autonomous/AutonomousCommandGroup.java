@@ -138,7 +138,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param relativeAngle - how many degrees to turn
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
-			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, state, direction, relativeAngle, 1));
+			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, state, direction, relativeAngle, 0.45));
 			halt();
 		}
 	}
@@ -296,7 +296,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		}
 
 		/** Add a command to start the intake spinning inwards */
-		private void addIntakeInAsync() {
+		public void addIntakeInAsync() {
 			addSequential(new IntakeSpin(Robot.intake, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));
 		}
 

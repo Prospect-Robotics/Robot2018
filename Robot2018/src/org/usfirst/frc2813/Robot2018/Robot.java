@@ -3,6 +3,8 @@ package org.usfirst.frc2813.Robot2018;
 
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainPrintEncoderValues;
+import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainPrintPowerLevels;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.Robot2018.subsystems.intake.Intake;
@@ -129,7 +131,8 @@ public class Robot extends TimedRobot {
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(640, 480);
 		camera.setFPS(15);
-		// new DriveTrainPrintEncoderValues(Robot.driveTrain, 2000).start();
+//		new DriveTrainPrintEncoderValues(Robot.driveTrain, 2000).start();
+//		new DriveTrainPrintPowerLevels(Robot.driveTrain, 2000).start();
 	}
 
 	/**

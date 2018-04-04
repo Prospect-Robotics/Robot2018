@@ -9,22 +9,19 @@ import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.util.Formatter;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 
 /**
  * Print out the drive train encoder values to the log.
  */
-public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTrain> {
+public final class DriveTrainPrintPowerLevels extends SubsystemCommand<DriveTrain> {
 	private long last;
-	private final Encoder rightEncoder;
-	private final Encoder leftEncoder;
 	private final int reportingInterval;
 
-	public DriveTrainPrintEncoderValues(DriveTrain driveTrain, int reportingInterval) {
+	public DriveTrainPrintPowerLevels(DriveTrain driveTrain, int reportingInterval) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.last = 0;
-		this.leftEncoder = driveTrain.getEncoderLeft();
-		this.rightEncoder = driveTrain.getEncoderRight();
 		this.reportingInterval = reportingInterval;
 		setName(toString());
 		setRunWhenDisabled(true);
@@ -35,23 +32,20 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	protected void ghscInitialize() {
 	}
 
-	public static String getEncoderStatus(String label, Encoder encoder) {
-		return Formatter.safeFormat("Encoder.%s Get=%s Raw=%s Dist=%s DistPerPulse=%s Stopped=%s]",
-			label,
-			encoder.get(), 
-			encoder.getRaw(),  
-			encoder.getDistance(),
-			encoder.getDistancePerPulse(),
-			encoder.getStopped());
-	}
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void ghscExecute() {
 		if((System.currentTimeMillis() - last) >= reportingInterval) {
-			Logger.info(Formatter.safeFormat("DriveTrain [Dist=%s]",
-						Robot.driveTrain.getDistance()));
-			Logger.info(Formatter.safeFormat("%s - %s", getEncoderStatus("Left", leftEncoder), Robot.driveTrain.encoderPortFunctional ? " [FUNCTIONAL]" : " <<<<BROKEN>>>>"));
-			Logger.info(Formatter.safeFormat("%s - %s", getEncoderStatus("Right", rightEncoder), Robot.driveTrain.encoderStarboardFunctional ? " [FUNCTIONAL]" : " <<<<BROKEN>>>>"));
+			Logger.info("CURRENT- LM=" 
+			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Left_Master)
+			+ " LF="
+			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Left_Follower)
+			+ " RM="
+			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Right_Master)
+			+ " RF="
+			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Right_Follower) 
+			+ " TOTAL=" + RobotMap.pdp.getTotalCurrent()
+			);
 			this.last = System.currentTimeMillis();
 		}
 	}
