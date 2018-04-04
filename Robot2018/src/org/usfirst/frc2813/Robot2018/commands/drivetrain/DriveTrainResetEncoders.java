@@ -23,8 +23,8 @@ public class DriveTrainResetEncoders extends SubsystemCommand<DriveTrain> {
     @Override
     protected void ghscInitialize() {
     	trace("initialize", "resetting drive train encoders.");
-    	subsystem.getEncoderStarboard().reset();
-    	subsystem.getEncoderPort().reset();
+    	subsystem.getEncoderRight().reset();
+    	subsystem.getEncoderLeft().reset();
     }
 
 	@Override

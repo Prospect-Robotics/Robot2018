@@ -104,9 +104,9 @@ public class Robot extends TimedRobot {
 
 		RobotMap.init();
 		driveTrain = new DriveTrain(gyro);
-		elevator = new Motor(new ElevatorConfiguration(), RobotMap.srxElevator);
-		arm = new Motor(new ArmConfiguration(), RobotMap.srxArm);
-		intake = new Intake(RobotMap.intakeSpeedController);
+		elevator = new Motor(new ElevatorConfiguration(), RobotMap.elevatorSpeedControllerRightMaster);
+		arm = new Motor(new ArmConfiguration(), RobotMap.armSpeedControllerMaster);
+		intake = new Intake(RobotMap.intakeSpeedControllerMaster);
 		jaws = new Solenoid(new JawsConfiguration(), RobotMap.jawsSolenoid);
 		ratchet = new Solenoid(new RatchetConfiguration(), RobotMap.ratchetSolenoid);
 		climbingBar = new Solenoid(new ClimbingBarConfiguration(), RobotMap.climbingBarSolenoid);

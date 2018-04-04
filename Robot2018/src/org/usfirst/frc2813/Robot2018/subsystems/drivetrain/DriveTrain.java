@@ -45,49 +45,49 @@ public class DriveTrain extends GearheadsSubsystem {
     public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
     private final Gyro gyro;
-    private final SpeedController speedControllerPort;
-	private final SpeedController speedControllerStarboard;
+    private final SpeedController speedControllerLeftMaster;
+	private final SpeedController speedControllerRightMaster;
 	private final VictorSPX speedControllerPortFollow;
 	private final VictorSPX speedControllerStarboardFollow;
 	private final DifferentialDrive robotDrive;
-	private final Encoder encoderStarboard;
-	private final Encoder encoderPort;
+	private final Encoder encoderRight;
+	private final Encoder encoderLeft;
 	private final Solenoid gearShift;
 
 	public boolean encoderPortFunctional, encoderStarboardFunctional; // set by POST.
 
 	public DriveTrain(Gyro gyro) {
 		this.gyro = gyro;
-		this.encoderStarboard = RobotMap.driveTrainQuadratureEncoderStarboard;
-		this.encoderPort = RobotMap.driveTrainQuadratureEncoderPort;
-		this.speedControllerPort = RobotMap.driveTrainSpeedControllerPort;
-		this.speedControllerStarboard = RobotMap.driveTrainSpeedControllerStarboard;
-		this.speedControllerPortFollow = RobotMap.driveTrainSpeedControllerPortFollow;
-		this.speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerStarFollow;
+		this.encoderRight = RobotMap.driveTrainRightEncoder;
+		this.encoderLeft = RobotMap.driveTrainLeftEncoder;
+		this.speedControllerLeftMaster = RobotMap.driveTrainSpeedControllerLeftMaster;
+		this.speedControllerRightMaster = RobotMap.driveTrainSpeedControllerRightMaster;
+		this.speedControllerPortFollow = RobotMap.driveTrainSpeedControllerLeftFollower;
+		this.speedControllerStarboardFollow = RobotMap.driveTrainSpeedControllerRightFollower;
 		this.robotDrive = RobotMap.driveTrainRobotDrive;
 		this.gearShift = new Solenoid(new GearShiftConfiguration(), RobotMap.gearShiftSolenoid);
 
 		addChild(robotDrive);
-		addChild((Sendable) speedControllerPort);
-		LiveWindow.add((Sendable) speedControllerPort);
-		addChild((Sendable) speedControllerStarboard);
-		LiveWindow.add((Sendable) speedControllerStarboard);
+		addChild((Sendable) speedControllerLeftMaster);
+		LiveWindow.add((Sendable) speedControllerLeftMaster);
+		addChild((Sendable) speedControllerRightMaster);
+		LiveWindow.add((Sendable) speedControllerRightMaster);
 
 		robotDrive.setSafetyEnabled(true);
 		robotDrive.setExpiration(0.1);
 		// robotDrive.setSensitivity(0.5);//TODO Why aren't we setting sensitivity?
 		robotDrive.setMaxOutput(1.0);
 
-		speedControllerPort.setInverted(false);
-		speedControllerStarboard.setInverted(false);
+		speedControllerLeftMaster.setInverted(false);
+		speedControllerRightMaster.setInverted(false);
 
-		encoderStarboard.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
-		encoderStarboard.setSamplesToAverage(1);
-		encoderStarboard.setPIDSourceType(PIDSourceType.kRate);
-		encoderPort.setReverseDirection(true);
-		encoderPort.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
-		encoderPort.setSamplesToAverage(1);
-		encoderPort.setPIDSourceType(PIDSourceType.kRate);
+		encoderRight.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
+		encoderRight.setSamplesToAverage(1);
+		encoderRight.setPIDSourceType(PIDSourceType.kRate);
+		encoderLeft.setReverseDirection(true);
+		encoderLeft.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
+		encoderLeft.setSamplesToAverage(1);
+		encoderLeft.setPIDSourceType(PIDSourceType.kRate);
 	}
 
 	public Gyro getGyro() {
@@ -98,20 +98,20 @@ public class DriveTrain extends GearheadsSubsystem {
 		return gearShift;
 	}
 	
-	public Encoder getEncoderStarboard() {
-		return encoderStarboard;
+	public Encoder getEncoderRight() {
+		return encoderRight;
 	}
 	
-	public Encoder getEncoderPort() {
-		return encoderPort;
+	public Encoder getEncoderLeft() {
+		return encoderLeft;
 	}
 	
-	public SpeedController getSpeedControllerStarboard() {
-		return speedControllerStarboard;
+	public SpeedController getSpeedControllerRightMaster() {
+		return speedControllerRightMaster;
 	}
 	
-	public SpeedController getSpeedControllerPort() {
-		return speedControllerPort;
+	public SpeedController getSpeedControllerLeftMaster() {
+		return speedControllerLeftMaster;
 	}
 	
 	// @Override
@@ -190,38 +190,38 @@ public class DriveTrain extends GearheadsSubsystem {
     	 * NOTE: encoderPort should
     	 */
 		if (encoderPortFunctional && encoderStarboardFunctional)
-			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
+			return (encoderRight.getDistance() + (-1 * encoderLeft.getDistance()))/2;
 		else if(encoderPortFunctional) {
 			if(!sentEncoderWarnings) {
 				Logger.info("WARNING: The right drive train encoder is non-functional.");
 				sentEncoderWarnings = true;
 			}
-			return -encoderPort.getDistance();
+			return -encoderLeft.getDistance();
 		}
 		else if(encoderStarboardFunctional) {
 			if(!sentEncoderWarnings) {
 				Logger.info("WARNING: The left drive train encoder is non-functional.");
 				sentEncoderWarnings = true;
 			}
-			return encoderStarboard.getDistance();
+			return encoderRight.getDistance();
 		}
 		else {
 			if(!sentEncoderWarnings) {
 				Logger.info("WARNING: Both drive train encoders are non-functional.");
 				sentEncoderWarnings = true;
 			}
-			return (encoderStarboard.getDistance() + (-1 * encoderPort.getDistance()))/2;
+			return (encoderRight.getDistance() + (-1 * encoderLeft.getDistance()))/2;
 		}
 	}
 	
 	public void stop() {
-		speedControllerPort.set(0);
-		speedControllerStarboard.set(0);
+		speedControllerLeftMaster.set(0);
+		speedControllerRightMaster.set(0);
 	}
 
 	public void setBrakeCoast(NeutralMode b) {
-		((VictorSPX) speedControllerPort).setNeutralMode(b);
-		((VictorSPX) speedControllerStarboard).setNeutralMode(b);
+		((VictorSPX) speedControllerLeftMaster).setNeutralMode(b);
+		((VictorSPX) speedControllerRightMaster).setNeutralMode(b);
 		speedControllerPortFollow.setNeutralMode(b);
 		speedControllerStarboardFollow.setNeutralMode(b);
 	}

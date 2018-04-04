@@ -81,19 +81,19 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 		if (!initialized) {
 			// Build a list of all the speed controllers, we can use when we need to drive
 			// them all
-			speedControllers.add(driveTrain.getSpeedControllerPort());
-			speedControllers.add(driveTrain.getSpeedControllerStarboard());
+			speedControllers.add(driveTrain.getSpeedControllerLeftMaster());
+			speedControllers.add(driveTrain.getSpeedControllerRightMaster());
 			// Initialize one PID for every working encoder.
 			if (driveTrain.encoderPortFunctional && driveTrain.encoderStarboardFunctional) {
-				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(),
-						new AutoOnlyPIDOutput(this, driveTrain.getSpeedControllerPort())));
-				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(),
-						new AutoOnlyPIDOutput(this, driveTrain.getSpeedControllerStarboard())));
+				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderLeft(),
+						new AutoOnlyPIDOutput(this, driveTrain.getSpeedControllerLeftMaster())));
+				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderRight(),
+						new AutoOnlyPIDOutput(this, driveTrain.getSpeedControllerRightMaster())));
 			} else if (driveTrain.encoderPortFunctional) {
-				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderPort(), 
+				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderLeft(), 
 						new AutoOnlyPIDOutput(this, new AllPIDControllers(this))));
 			} else if (driveTrain.encoderStarboardFunctional) {
-				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderStarboard(), 
+				pidControllers.add(new PIDController(Kp, Ki, Kd, driveTrain.getEncoderRight(), 
 						new AutoOnlyPIDOutput(this, new AllPIDControllers(this))));
 			} else {
 				DriverStation.reportWarning("Can't PIDStop, BOTH ENCODERS OFFLINE", true);

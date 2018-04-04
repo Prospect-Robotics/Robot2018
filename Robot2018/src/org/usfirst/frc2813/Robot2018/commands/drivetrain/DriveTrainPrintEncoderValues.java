@@ -21,8 +21,8 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	public DriveTrainPrintEncoderValues(DriveTrain driveTrain, int reportingInterval) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.last = 0;
-		this.portEncoder = driveTrain.getEncoderPort();
-		this.starboardEncoder = driveTrain.getEncoderStarboard();
+		this.portEncoder = driveTrain.getEncoderLeft();
+		this.starboardEncoder = driveTrain.getEncoderRight();
 		this.reportingInterval = reportingInterval;
 		setName(toString());
 		setRunWhenDisabled(true);
