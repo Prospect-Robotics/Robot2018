@@ -38,16 +38,6 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 	protected void ghscExecute() {
 		if(!DriverStation.getInstance().isAutonomous()) {
 			subsystem.arcadeDrive(joystick1, joystick2);
-			Logger.info("CURRENT- LM=" 
-			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Left_Master)
-			+ " LF="
-			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Left_Follower)
-			+ " RM="
-			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Right_Master)
-			+ " RF="
-			+ RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_DriveTrain_Right_Follower) 
-			+ " TOTAL=" + RobotMap.pdp.getTotalCurrent()
-			);
 		}
 	}
 
