@@ -28,7 +28,7 @@ public class TestEncoder extends Command {
 	// Called just before this Command runs the first time
 	protected void initialize() {
 		startingPosition = encoder.getRaw();
-		motor.set(0.15); // 0.1 will at least cause the encoder to move.
+		motor.set(0.25); // 0.1 will at least cause the encoder to move.
 	}
 
 	// Called repeatedly when this Command is scheduled to run
