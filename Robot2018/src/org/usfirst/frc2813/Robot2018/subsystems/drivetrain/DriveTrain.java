@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * TODO:  encoderPort.setReverseDirection is set to true, but we are still multiplying the distance value by -1.  This seems like a bug.
  */
 public class DriveTrain extends GearheadsSubsystem {
-    public static final double WHEEL_DIAMETER_INCHES = 4;
+    public static final double WHEEL_DIAMETER_INCHES = 3.95;
     public static final double WHEEL_CIRCUMFERENCE_INCHES = Math.PI * WHEEL_DIAMETER_INCHES;
     public static final double ENCODER_TO_DRIVE_SCALE = 3;
     public static final double ENCODER_PULSES_PER_ENCODER_REVOLUTION = 256;
@@ -84,7 +84,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		encoderRight.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderRight.setSamplesToAverage(1);
 		encoderRight.setPIDSourceType(PIDSourceType.kRate);
-		encoderLeft.setReverseDirection(true);
+// encoderLeft.setReverseDirection(true); done at construction, not sure that it works here
 		encoderLeft.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderLeft.setSamplesToAverage(1);
 		encoderLeft.setPIDSourceType(PIDSourceType.kRate);
