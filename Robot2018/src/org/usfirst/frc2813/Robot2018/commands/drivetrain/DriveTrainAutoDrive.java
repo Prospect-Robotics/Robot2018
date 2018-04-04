@@ -376,11 +376,11 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double distanceTravelled = distanceTravelled();
 		if ((distanceTravelled-lastDistanceTravelled) < progressDistanceThreshold) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
+				Logger.print(LogType.INFO, "COMPLETE - Delta=" + (distanceTravelled-lastDistanceTravelled));
 				complete = true;
 			}
-			else {
-				cyclesWithoutProgress = 0;
-			}
+		} else {
+			cyclesWithoutProgress = 0;
 		}
 		lastDistanceTravelled = distanceTravelled;
 		double desiredSpeed = calcSpeed(distanceTravelled);
