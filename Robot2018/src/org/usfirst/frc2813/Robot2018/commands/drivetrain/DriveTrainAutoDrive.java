@@ -117,6 +117,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private int cyclesWithoutProgress = 0; // monitor position progress and give up if we stop moving
 	private static final double progressDistanceThreshold = 1;
 	private static final double progressCycleThreshold = 4;
+	private double lastDistanceTravelled;
 	
 	/**
 	 * We combine 2 separate PIDs into one routine to control drive - velocity and angle.
@@ -377,14 +378,16 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 		Logger.printFormat(LogType.INFO, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
 		double distanceTravelled = distanceTravelled();
-		if (distanceTravelled < progressDistanceThreshold) {
+		if ((distanceTravelled-lastDistanceTravelled) < progressDistanceThreshold) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
+				action("pidAngleOutputFunc", "We hit a wall.  Stopping early.");
 				complete = true;
 			}
 		}
 		else {
 			cyclesWithoutProgress = 0;
 		}
+		lastDistanceTravelled = distanceTravelled;
 		double desiredSpeed = calcSpeed(distanceTravelled);
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
 

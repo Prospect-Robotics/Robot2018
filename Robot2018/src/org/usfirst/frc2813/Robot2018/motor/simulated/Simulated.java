@@ -213,8 +213,7 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 				debug("configuration.getDefaultRate(): " + configuration.getDefaultRate());
 				rate = toSensorUnits(configuration.getDefaultRate());
 			}
-			Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
-			Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
+			rate = Rate.clampToLimit(getMinimumRate(targetDirection), getMaximumRate(targetDirection), rate);
 			debug("VELOCITY RATE: " + rate);
 			break;
 		case DISABLED:

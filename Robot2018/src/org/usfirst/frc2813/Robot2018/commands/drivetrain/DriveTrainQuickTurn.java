@@ -47,6 +47,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 		addArg("relativeAngleInDegrees",relativeAngleInDegrees);
 		addArg("rate",rate);
 		setName(toString());
+		state.shared.angle = targetAngle;
 	}
 
 	// Called just before this Command runs the first time
