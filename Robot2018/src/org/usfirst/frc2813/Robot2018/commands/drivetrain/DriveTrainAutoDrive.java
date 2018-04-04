@@ -97,7 +97,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 *   b) can have meaningful speed ramps from and to stop, and
 	 *   c) can meaningfully limit our speed when needed, such as when the elevator is raised.
 	 */
-	private static final double MAX_ACTUAL_SPEED = 2;  // FIXME! need to find out time rate from our timer call before we can even guess
+	private static final double MAX_ACTUAL_SPEED = 40;  // FIXME! need to find out time rate from our timer call before we can even guess
 
 	private final AutonomousDriveState state;
 	private final Direction direction;
@@ -209,10 +209,13 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 	/** measure our error from the curve we are walking. This is the angle PID callback */
     public double measureAngularDrift() {
+   		double angleRightNow = subsystem.getGyro().getAngle();
         angularDrift = subsystem.getGyro().getAngle() - startAngle;
-        if (deltaAngle != 0) {
-            // subtract the angle we expect to be facing from the current angle to get angular error
-        		angularDrift -= calcAngle(distanceTravelled());
+        if (deltaAngle == 0) {
+        		angularDrift = angleRightNow - startAngle;
+        }
+        else {
+        		angularDrift = angleRightNow - calcAngle(distanceTravelled());
         }
         return angularDrift;
     }
@@ -376,10 +379,10 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double distanceTravelled = distanceTravelled();
 		if ((distanceTravelled-lastDistanceTravelled) < progressDistanceThreshold) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
-				Logger.print(LogType.INFO, "COMPLETE - Delta=" + (distanceTravelled-lastDistanceTravelled));
 				complete = true;
 			}
-		} else {
+		}
+		else {
 			cyclesWithoutProgress = 0;
 		}
 		lastDistanceTravelled = distanceTravelled;
