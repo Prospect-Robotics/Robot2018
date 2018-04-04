@@ -262,9 +262,9 @@ public class AutonomousCommandGroupGenerator {
 	 * Prepare to shoot a cube at the switch. This is used as a starting position as
 	 * well.
 	 */
-	private void prepareForSwitchAsync() {
-		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
-		autoCmdList.elevator.addMoveToPositionAsync(ELEVATOR_HEIGHT_SWITCH);
+	private void prepareForSwitchSync() {
+//		autoCmdList.arm.addMoveToPositionSync(ARM_POSITION_LEVEL);
+		autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
 	}
 
 	/** Prepare arm for shooting */
@@ -293,7 +293,7 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.elevator.addMoveToPositionAsync(elevatorHeight);
 		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LOW);
 		autoCmdList.elevator.addWaitForTargetPositionSync();
-		autoCmdList.arm.addWaitForTargetPositionSync();
+//		autoCmdList.arm.addWaitForTargetPositionSync();
 		autoCmdList.drive.setDriveSpeed(SPEED_FULL);
 	}
 	protected void prepareForCubeGrabbingSync() {
@@ -318,13 +318,14 @@ public class AutonomousCommandGroupGenerator {
 		}
 		else {
 			double distanceToTarget = backWallToSwitch - robotBumperLength;
-			double sideShiftToTarget = (switchWidth - robotBumperWidth) / 2;
-			double straightEnds = (distanceToTarget - sideShiftToTarget) / 2;
-
+			double sideShiftToTarget = (switchWidth - robotBumperWidth + 12) / 3;
+			double straightEnds = (distanceToTarget - sideShiftToTarget - 16) / 3;
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_TURN);
 			autoCmdList.drive.addQuickTurnSync(left, 45);
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
+			autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
 			autoCmdList.drive.addQuickTurnSync(right, 45);
+			autoCmdList.elevator.addWaitForTargetPositionSync();
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_STOP);
 			autoCmdList.cube.addDeliverSequenceSync();
 			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_TURN);
@@ -337,19 +338,20 @@ public class AutonomousCommandGroupGenerator {
 	}
 
 	private void getCenterCube(double distance) {
+		autoCmdList.cube.addIntakeInAsync();
 		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distance), SPEED_STOP);
-		prepareForSwitchAsync();
+//		prepareForSwitchAsync();
 		autoCmdList.cube.addGrabSequenceSync();
 		autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distance), SPEED_STOP);
 	}
 	/** Helper routine for center position. grab first cube in pyramid and return */
 	private void getCenterFirstCube() {
-		double backWallToFirstCube = backWallToCubePyramid - robotLengthIncJaws - cubeIntakeOverlap;
+		double backWallToFirstCube = backWallToCubePyramid - robotLengthIncJaws - cubeIntakeOverlap-4;
 		getCenterCube(backWallToFirstCube);
 	}
 	/** Helper routine for center position. grab first cube in pyramid and return */
 	private void getCenterSecondCube() {
-		double backWallToSecondCube = backWallToCubePyramid + cubeSize - robotLengthIncJaws - cubeIntakeOverlap;
+		double backWallToSecondCube = backWallToCubePyramid + cubeSize - robotLengthIncJaws - cubeIntakeOverlap-8;
 		getCenterCube(backWallToSecondCube);
 	}
 	/**
@@ -422,7 +424,7 @@ public class AutonomousCommandGroupGenerator {
 
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
 		if (false) {
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101.5), SPEED_STOP);
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(240), SPEED_STOP);
 			return;
 		}
 
@@ -441,7 +443,7 @@ public class AutonomousCommandGroupGenerator {
 		 * This initial state may not be exactly what we want, but it's safe. We can
 		 * change it later.
 		 */
-		prepareForSwitchAsync();
+		prepareForSwitchSync();
 
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting
