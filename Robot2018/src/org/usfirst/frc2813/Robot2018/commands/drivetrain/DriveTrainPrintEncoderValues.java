@@ -3,6 +3,7 @@ package org.usfirst.frc2813.Robot2018.commands.drivetrain;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.RobotMap;
 import org.usfirst.frc2813.Robot2018.commands.RunningInstructions;
+import org.usfirst.frc2813.Robot2018.commands.post.POST;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
@@ -48,10 +49,17 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	@Override
 	protected void ghscExecute() {
 		if((System.currentTimeMillis() - last) >= reportingInterval) {
-			Logger.info(Formatter.safeFormat("DriveTrain [Dist=%s]",
-						Robot.driveTrain.getDistance()));
-			Logger.info(Formatter.safeFormat("%s - %s", getEncoderStatus("Left", leftEncoder), Robot.driveTrain.encoderPortFunctional ? " [FUNCTIONAL]" : " <<<<BROKEN>>>>"));
-			Logger.info(Formatter.safeFormat("%s - %s", getEncoderStatus("Right", rightEncoder), Robot.driveTrain.encoderStarboardFunctional ? " [FUNCTIONAL]" : " <<<<BROKEN>>>>"));
+			if(POST.isPostComplete()) {
+				System.out.println(Formatter.safeFormat("DriveTrain %s%s[Dist=%s] %s / %s", 
+							Robot.driveTrain.encoderPortFunctional ? " [LEFT OK]" : " <<LEFT BROKEN>>",
+							Robot.driveTrain.encoderStarboardFunctional ? " [RIGHT OK]" : " <<RIGHT BROKEN>>",
+							Robot.driveTrain.getDistance(),
+							getEncoderStatus("Left", leftEncoder), 
+							getEncoderStatus("Right", rightEncoder)
+						));
+			} else {
+				System.out.println(Formatter.safeFormat("DriveTrainPrintEncoderValues: Waiting for POST."));
+			}
 			this.last = System.currentTimeMillis();
 		}
 	}
