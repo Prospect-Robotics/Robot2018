@@ -377,9 +377,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
 				complete = true;
 			}
-			else {
-				cyclesWithoutProgress = 0;
-			}
+		}
+		else {
+			cyclesWithoutProgress = 0;
 		}
 		double desiredSpeed = calcSpeed(distanceTravelled);
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
