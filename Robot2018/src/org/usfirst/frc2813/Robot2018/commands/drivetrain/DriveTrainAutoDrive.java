@@ -208,10 +208,14 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 	/** measure our error from the curve we are walking. This is the angle PID callback */
     public double measureAngularDrift() {
+    		double angleRightNow = subsystem.getGyro().getAngle();
+
         angularDrift = subsystem.getGyro().getAngle() - startAngle;
-        if (deltaAngle != 0) {
-            // subtract the angle we expect to be facing from the current angle to get angular error
-        		angularDrift -= calcAngle(distanceTravelled());
+        if (deltaAngle == 0) {
+        		angularDrift = angleRightNow - startAngle;
+        }
+        else {
+        		angularDrift = angleRightNow - calcAngle(distanceTravelled());
         }
         return angularDrift;
     }
