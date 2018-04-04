@@ -115,7 +115,10 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double angularDrift; // input to angle PID
 	private double velocityDrift; // input to speed PID
 	private int cyclesWithoutProgress = 0; // monitor position progress and give up if we stop moving
-	private static final double progressDistanceThreshold = 1;
+	/**
+	 * Our interrupt latency is around 45ms. Set our stuck threshold to 5 inches per second at full speed.
+	 */
+	private static final double progressDistanceThreshold = 0.045*5;
 	private static final double progressCycleThreshold = 6;
 	private double lastDistanceTravelled;
 	
@@ -377,7 +380,15 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 		Logger.printFormat(LogType.INFO, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
 		double distanceTravelled = distanceTravelled();
-		if ((distanceTravelled-lastDistanceTravelled) < progressDistanceThreshold) {
+		double desiredSpeed = calcSpeed(distanceTravelled);
+		
+		/*
+		 * Compare the distance since the last call to a threshold scaled by expected speed to ensure
+		 * we aren't stuck. This happens if we drifted and are actually pushing against something. In
+		 * this case we mark ourselves complete. This effectively resets our position as there is no
+		 * record of our leaving early and autonomous tracks as if we traveled the full distance.
+		 */
+		if ((distanceTravelled - lastDistanceTravelled) < progressDistanceThreshold * desiredSpeed) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
 				Logger.error("STALL DETECTED\n");
 //				complete = true;
@@ -387,7 +398,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 			cyclesWithoutProgress = 0;
 		}
 		lastDistanceTravelled = distanceTravelled;
-		double desiredSpeed = calcSpeed(distanceTravelled);
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
 
 		// WARNING! This will flood logs!
