@@ -116,7 +116,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double velocityDrift; // input to speed PID
 	private int cyclesWithoutProgress = 0; // monitor position progress and give up if we stop moving
 	private static final double progressDistanceThreshold = 1;
-	private static final double progressCycleThreshold = 4;
+	private static final double progressCycleThreshold = 6;
 	private double lastDistanceTravelled;
 	
 	/**
@@ -379,7 +379,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double distanceTravelled = distanceTravelled();
 		if ((distanceTravelled-lastDistanceTravelled) < progressDistanceThreshold) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
-				complete = true;
+				Logger.error("STALL DETECTED\n");
+//				complete = true;
 			}
 		}
 		else {
