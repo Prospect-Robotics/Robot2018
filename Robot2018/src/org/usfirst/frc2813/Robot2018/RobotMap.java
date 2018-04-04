@@ -163,7 +163,7 @@ public class RobotMap {
 		driveTrainRightEncoder = new Encoder(10, 11, true, EncodingType.k4X);// port 0 2*0+10=10, port 0 2*0+11=11
 		LiveWindow.addSensor("DriveTrain", "Right Encoder", driveTrainRightEncoder);
 		
-		driveTrainLeftEncoder = new Encoder(12, 13, true, EncodingType.k4X);
+		driveTrainLeftEncoder = new Encoder(12, 13, false, EncodingType.k4X);
 		LiveWindow.addSensor("DriveTrain", "Left Encoder", driveTrainLeftEncoder);
 
 		/*
