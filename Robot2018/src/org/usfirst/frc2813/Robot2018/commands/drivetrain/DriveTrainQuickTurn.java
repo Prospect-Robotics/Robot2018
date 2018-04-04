@@ -32,7 +32,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.direction = direction;
 		this.rate = rate;
-		startingAngle = state.angle;
+		startingAngle = state.shared.angle;
 		targetAngle   = startingAngle + (direction.getMultiplierAsDouble() * relativeAngleInDegrees);  
 		if(relativeAngleInDegrees < 0) {
 			throw new IllegalArgumentException("Do not specify reverse directions with negative angles.  Use direction instead.");

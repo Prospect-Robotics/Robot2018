@@ -18,19 +18,6 @@ public class AutonomousDriveState {
 	private static final double DEFAULT_MIN_THROTTLE = 0.2;
 	private static final double DEFAULT_MAX_THROTTLE = 1.0;
 
-	// FIXME! switch to Rate type
-	/**
-	 * current speed [0,1]
-	 */
-	public double speed = 0;
-	/**
-	 * top allowable speed [0,1]
-	 */
-	public double maxSpeed = 1;
-	/**
-	 * current angle in field relative degrees (ie: 0 is starting angle)
-	 */
-	public double angle = 0;
 	/**
 	 * distance to safely accelerate from 0 to top speed
 	 */
@@ -49,9 +36,29 @@ public class AutonomousDriveState {
 	public double maxThrottle = DEFAULT_MAX_THROTTLE;
 	
 	/**
-	 * construct a state object out of defaults. No accessors as everything is public for now.
+	 * nested class for state which is shared between autonomous actions. Read and write only
+	 * in constructors! This is required since all operations are constructed in one pass and
+	 * then run later.
 	 */
+	public class Shared {
+		// FIXME! switch to Rate type
+		/**
+		 * current speed [0,1]
+		 */
+		public double speed = 0;
+		/**
+		 * top allowable speed [0,1]
+		 */
+		public double maxSpeed = 1;
+		/**
+		 * current angle in field relative degrees (ie: 0 is starting angle)
+		 */
+		public double angle = 0;
+	}
+	public Shared shared;
+	
 	public AutonomousDriveState() {
+		shared = new Shared();
 	}
 	
 	/**
@@ -66,6 +73,6 @@ public class AutonomousDriveState {
 		decelRamp = scaleFactor * DEFAULT_DECELERATION_RAMP;
 	}
 	public String toString() {
-		return Formatter.concat("AutoState: [", "speed: ", speed, "maxSpeed: ", maxSpeed, "angle: ", angle, "throttle: (", minThrottle, ", ", maxThrottle, ")]");
+		return Formatter.concat("AutoState: [", "speed: ", shared.speed, "maxSpeed: ", shared.maxSpeed, "angle: ", shared.angle, "throttle: (", minThrottle, ", ", maxThrottle, ")]");
 	}
 }

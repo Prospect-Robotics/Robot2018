@@ -137,15 +137,15 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	public DriveTrainAutoDrive(DriveTrain driveTrain, AutonomousDriveState state, Direction direction, double distance, double endSpeed) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.state = state;
-		this.maxSpeed = state.maxSpeed;
+		this.maxSpeed = state.shared.maxSpeed;
 		this.direction = direction;
 		this.distance = distance;
-		this.startSpeed = state.speed;
+		this.startSpeed = state.shared.speed;
 		this.endSpeed = endSpeed;
 		this.accelRamp = state.accelRamp * (1 - startSpeed);
 		this.decelRamp = state.decelRamp * (1 - endSpeed);
-		this.startAngle = state.angle;
-		state.speed = endSpeed; // update state to what it will be
+		this.startAngle = state.shared.angle;
+		state.shared.speed = endSpeed; // update state to what it will be
 
 		addArg("state",state);
 		addArg("direction",direction);
@@ -169,7 +169,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	public DriveTrainAutoDrive(DriveTrain driveTrain, AutonomousDriveState state, Direction direction, double angle, double radius, Direction rotation, double endSpeed) {
 		this(driveTrain, state, direction, GeometryHelpers.computeArcLength(angle, radius), endSpeed);
 		deltaAngle = GeometryHelpers.computeRelativeAngle(angle, direction, rotation);
-		state.angle += deltaAngle;
+		state.shared.angle += deltaAngle;
 
 		addArg("angle",angle);
 		addArg("radius",radius);

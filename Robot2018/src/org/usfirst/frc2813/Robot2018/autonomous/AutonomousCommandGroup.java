@@ -81,10 +81,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/**
 		 * Set the sticky setting for the speed for drive speed.  This value will be used for all subsequent commands created for driving forwards.
-		 * @param driveSpeed Percentage of output power {-1.0..1.0}
+		 * @param driveSpeed Percentage of output power {-1.0..1.0}. Must occur during command creation
 		 */
 		public void setDriveSpeed(double speed) {
-			state.maxSpeed = speed;
+			state.shared.maxSpeed = speed;
 		}
 
 		/** Scale the acceleration/deceleration in the auto drive system. THIS IS GLOBAL AND INSTANT! */
@@ -102,7 +102,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addCurveDegreesSync(Direction direction, double degrees, Length radius, Direction rotation, double endSpeed) {
 			Logger.debug("AUTO ADD CURVE DEGREES [direction: %s, degrees: %s, radius: %s, rotation: %s, endSpeed: %s]", direction, degrees, radius, rotation, endSpeed);
-			boolean commandHalts = state.speed != 0 && endSpeed == 0;
+			boolean commandHalts = state.shared.speed != 0 && endSpeed == 0;
 			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, state, direction, degrees, radius.convertTo(LengthUOM.Inches).getValue(), rotation, endSpeed));
 			if (commandHalts) {
 				halt();
@@ -116,7 +116,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param endSpeed The end speed as a percentage of output.  Range is {-1.0..1.0}.
 		 */
 		public void addDriveSync(Direction direction, Length distance, double endSpeed) {
-			boolean commandHalts = state.speed != 0 && endSpeed == 0;
+			boolean commandHalts = state.shared.speed != 0 && endSpeed == 0;
 			addSequential(new DriveTrainAutoDrive(Robot.driveTrain, state, direction, distance.convertTo(LengthUOM.Inches).getValue(), endSpeed));
 			if (commandHalts) {
 				halt();
