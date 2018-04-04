@@ -36,14 +36,12 @@ public final class DriveTrainPrintEncoderValues extends SubsystemCommand<DriveTr
 	}
 
 	public static String getEncoderStatus(String label, Encoder encoder) {
-		return Formatter.safeFormat("Encoder.%s Get=%s Raw=%s Dist=%s DistInches=%s DistPerPulse=%s Dir=%s Stopped=%s]",
+		return Formatter.safeFormat("Encoder.%s Get=%s Raw=%s Dist=%s DistPerPulse=%s Stopped=%s]",
 			label,
 			encoder.get(), 
 			encoder.getRaw(),  
 			encoder.getDistance(),
-			encoder.getDistance()*DriveTrain.WHEEL_CIRCUMFERENCE_INCHES, 
 			encoder.getDistancePerPulse(),
-			encoder.getDirection(),
 			encoder.getStopped());
 	}
 	// Called repeatedly when this Command is scheduled to run
