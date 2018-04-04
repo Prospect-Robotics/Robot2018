@@ -34,7 +34,7 @@ public class Intake extends GearheadsSubsystem {
 		this.defaultSpeed = defaultSpeed;
 	}
 
-	public void setTargetSpeed(double defaultSpeed) {
+	public void setTargetSpeed(double targetSpeed) {
 		if (targetSpeed < 0 || 1 < targetSpeed) {
 			throw new UnsupportedOperationException("Speed must be in [0, 1]");
 		}
