@@ -15,7 +15,7 @@ public class AutonomousDriveState {
 	 */
 	private static final double DEFAULT_ACCELERATION_RAMP = 60; // inches to ramp from min speed to max speed
 	private static final double DEFAULT_DECELERATION_RAMP = 60; // inches to ramp from min speed to max speed
-	private static final double DEFAULT_MIN_THROTTLE = 0.2;
+	private static final double DEFAULT_MIN_THROTTLE = 0.3;
 	private static final double DEFAULT_MAX_THROTTLE = 1.0;
 
 	/**
