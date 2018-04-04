@@ -97,7 +97,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 *   b) can have meaningful speed ramps from and to stop, and
 	 *   c) can meaningfully limit our speed when needed, such as when the elevator is raised.
 	 */
-	private static final double MAX_ACTUAL_SPEED = 40;  // FIXME! need to find out time rate from our timer call before we can even guess
+	private static final double MAX_ACTUAL_SPEED = 2;  // FIXME! need to find out time rate from our timer call before we can even guess
 
 	private final AutonomousDriveState state;
 	private final Direction direction;
@@ -117,6 +117,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private int cyclesWithoutProgress = 0; // monitor position progress and give up if we stop moving
 	private static final double progressDistanceThreshold = 1;
 	private static final double progressCycleThreshold = 4;
+	private double lastDistanceTravelled;
 	
 	/**
 	 * We combine 2 separate PIDs into one routine to control drive - velocity and angle.
@@ -373,7 +374,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 
 		Logger.printFormat(LogType.INFO, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
 		double distanceTravelled = distanceTravelled();
-		if (distanceTravelled < progressDistanceThreshold) {
+		if ((distanceTravelled-lastDistanceTravelled) < progressDistanceThreshold) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
 				complete = true;
 			}
@@ -381,6 +382,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 				cyclesWithoutProgress = 0;
 			}
 		}
+		lastDistanceTravelled = distanceTravelled;
 		double desiredSpeed = calcSpeed(distanceTravelled);
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
 
