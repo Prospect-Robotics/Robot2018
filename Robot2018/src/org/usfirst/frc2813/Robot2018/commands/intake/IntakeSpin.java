@@ -36,9 +36,9 @@ public class IntakeSpin extends SubsystemCommand<Intake> {
 	@Override
 	protected void ghscInitialize() {
 		if(subsystem.getTargetDirection().equals(direction)) {
-			traceFormatted("initialize", "NOT telling %s to spin %s, but it already is.", subsystem, direction);
+			actionFormatted("initialize", "NOT telling %s to spin %s, but it already is.", subsystem, direction);
 		} else {
-			traceFormatted("initialize", "telling %s to spin %s.", subsystem, direction);
+			actionFormatted("initialize", "telling %s to spin %s.", subsystem, direction);
 			subsystem.spin(direction);
 		}
 	}
@@ -50,7 +50,7 @@ public class IntakeSpin extends SubsystemCommand<Intake> {
 
 	@Override
 	protected void ghscinterruptedWhileWaiting() {
-		traceFormatted("interrupted", "telling %s to stop.", subsystem);
+		actionFormatted("interrupted", "telling %s to stop.", subsystem);
 		subsystem.stop();
 	}
 }

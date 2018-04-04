@@ -35,9 +35,9 @@ public final class MotorCalibrateSensor extends MotorCommand {
 	@Override
 	protected void ghscInitialize() {
 		if(subsystem.getTargetState().getOperation() == MotorOperation.CALIBRATING_SENSOR_IN_DIRECTION && subsystem.getTargetState().getTargetDirection() == direction) {
-			traceFormatted("initialize", "NOT telling %s to calibrate the sensor in  to %s, it's already doing that.",subsystem,direction);
+			actionFormatted("initialize", "NOT telling %s to calibrate the sensor in  to %s, it's already doing that.",subsystem,direction);
 		} else {
-			traceFormatted("initialize", "telling %s to calibrate using hard limit switch in %s direction.",subsystem,direction);
+			actionFormatted("initialize", "telling %s to calibrate using hard limit switch in %s direction.",subsystem,direction);
 			subsystem.calibrateSensorInDirection(direction);
 		}
 	}
@@ -53,7 +53,7 @@ public final class MotorCalibrateSensor extends MotorCommand {
 	@Override
 	protected boolean ghscIsFinished() {
 		if(subsystem.getCurrentHardLimitSwitchStatus(direction)) {
-			traceFormatted("isFinished", "hard limit reached.  calibration completed.");
+			actionFormatted("isFinished", "hard limit reached.  calibration completed.");
 			return true;
 		}
 		traceFormatted("isFinished", "still waiting.");

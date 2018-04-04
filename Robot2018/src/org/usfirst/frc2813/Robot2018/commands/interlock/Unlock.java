@@ -22,7 +22,7 @@ public class Unlock extends GearheadsCommand {
 
 	@Override
 	protected void ghcInitialize() {
-		traceFormatted("initialize","unlocking %s.", target);
+		action("initialize","unlocking %s.", target);
 		target.removeInterlock(LOCKED.ALWAYS);
 	}
 

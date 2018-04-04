@@ -26,12 +26,17 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 * default for all command instances, but can be disabled object-by-object with
 	 * setTracingEnabled.
 	 */
-	protected boolean enableTracing = false;
+	protected boolean enableTracing = true;
 	/**
 	 * This log level controls the logging of which of the main high level functions
 	 * being called on command, i.e. "in end', "in isfinished" etc...
 	 */
-	protected static final LogType TRACING_LOG_LEVEL = LogType.INFO;
+	protected static final LogType TRACING_LOG_LEVEL = LogType.DEBUG;
+	/**
+	 * This log level controls the logging of which of the main high level functions
+	 * being called on command, i.e. "in end', "in isfinished" etc...
+	 */
+	protected static final LogType ACTION_LOG_LEVEL = LogType.INFO;
 	/**
 	 * We will populate this array with the key/value pairs of arguments for
 	 * formatting into a nice pretty name.
@@ -112,11 +117,10 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	public final boolean isTracingEnabled() {
 		return enableTracing;
 	}
-
 	/*
 	 * Tracing messages go through here
 	 */
-	protected final void trace(String function, Object... message) {
+	private final void log(LogType logType, String function, Object... message) {
 		if (isTracingEnabled()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(this);
@@ -131,8 +135,21 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 					if (o != null)
 						sb.append(o.toString());
 			}
-			Logger.print(TRACING_LOG_LEVEL, sb);
+			Logger.print(logType, sb);
 		}
+	}
+	/*
+	 * Tracing messages go through here
+	 */
+	protected final void action(String function, Object... message) {
+		log(ACTION_LOG_LEVEL, function, message);
+	}
+
+	/*
+	 * Tracing messages go through here
+	 */
+	protected final void trace(String function, Object... message) {
+		log(TRACING_LOG_LEVEL, function, message);
 	}
 
 	/*
@@ -140,6 +157,13 @@ public abstract class GearheadsCommand extends Command implements IInterlockable
 	 */
 	protected final void traceFormatted(String function, String format, Object... parameters) {
 		trace(function, Formatter.safeFormat(format, parameters));
+	}
+
+	/*
+	 * Tracing messages go through here
+	 */
+	protected final void actionFormatted(String function, String format, Object... parameters) {
+		action(function, Formatter.safeFormat(format, parameters));
 	}
 
 	/**

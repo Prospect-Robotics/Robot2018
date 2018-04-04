@@ -20,10 +20,10 @@ public class SubsystemSetDefaultCommand extends SubsystemCommand<GearheadsSubsys
 	@Override
 	protected void ghscInitialize() {
 		if(subsystem.getDefaultCommand() != defaultCommand) {
-			traceFormatted("initialize","setting default command for %s to %s.", subsystem, defaultCommand);
+			actionFormatted("initialize","setting default command for %s to %s.", subsystem, defaultCommand);
 			subsystem.setDefaultCommand(defaultCommand);
 		} else {
-			traceFormatted("initialize","doesn't need to set default command for %s, as it's already correct.", subsystem, defaultCommand);
+			actionFormatted("initialize","doesn't need to set default command for %s, as it's already correct.", subsystem, defaultCommand);
 		}
 	}
 

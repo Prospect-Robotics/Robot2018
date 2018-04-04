@@ -144,6 +144,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 
 	protected void ghscInitialize() {
 		// Enable all encoders
+		action("initialize", "starting PID.");
 		initializePIDControllers();
 		enablePID();
 	}
@@ -158,6 +159,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 
 	// Called once after isFinished returns true
 	protected void ghscEnd() {
+		action("end", "stopping.");
 		// Disable all encoders
 		teardownPIDControllers();
 	}

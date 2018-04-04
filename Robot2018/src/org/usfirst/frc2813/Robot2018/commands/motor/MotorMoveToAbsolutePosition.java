@@ -38,7 +38,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 		if(subsystem.getTargetState().getOperation() == MotorOperation.MOVING_TO_ABSOLUTE_POSITION && subsystem.getTargetState().getTargetAbsolutePosition() == position) {
 			traceFormatted("initialize","NOT telling %s to move to %s, it's already doing that.", subsystem, position);
 		} else {
-			traceFormatted("initialize","telling %s to move to %s.", subsystem, position);
+			actionFormatted("initialize","telling %s to move to %s.", subsystem, position);
 			subsystem.moveToAbsolutePosition(position);
 		}
 	}
@@ -48,7 +48,7 @@ public final class MotorMoveToAbsolutePosition extends MotorCommand {
 		if(allowableError == null) return true;
     	// Handle completion for sync mode
     	if(subsystem.getCurrentPositionErrorWithin(allowableError)) {
-    		traceFormatted("isFinished", "success waiting for %s to move to %s.",subsystem,position);
+    		actionFormatted("isFinished", "success waiting for %s to move to %s.",subsystem,position);
     		return true;
     	}    	
      	traceFormatted("isFinished","still waiting for %s to move to %s.",subsystem,position);

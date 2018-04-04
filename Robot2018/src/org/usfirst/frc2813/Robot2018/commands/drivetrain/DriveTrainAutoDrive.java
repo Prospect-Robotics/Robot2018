@@ -182,7 +182,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	protected void ghscInitialize() {
 		startPosition = lastPosition = readPosition();
 		startTime = lastTime = readTime();
-		Logger.printLabelled(LogType.INFO, "PID AutoDrive initialize",
+		actionFormatted("initialize", "PID AutoDrive initialize",
 				"End state", state,
 				"startTime", startTime,
 				"startPosition", startPosition,

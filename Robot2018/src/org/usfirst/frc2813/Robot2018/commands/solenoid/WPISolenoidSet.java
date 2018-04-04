@@ -28,7 +28,7 @@ public final class WPISolenoidSet extends TargetedCommand<edu.wpi.first.wpilibj.
 	
 	//@Override
 	protected void ghcInitialize() {
-        traceFormatted("intialize", "toggling %s to %b", target, position);
+        actionFormatted("initialize", "toggling %s to %b", target, position);
         target.set(position.isPositive());
 	}
 	

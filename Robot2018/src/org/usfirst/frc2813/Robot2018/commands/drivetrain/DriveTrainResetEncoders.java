@@ -22,7 +22,7 @@ public class DriveTrainResetEncoders extends SubsystemCommand<DriveTrain> {
     // Called once when the command executes
     @Override
     protected void ghscInitialize() {
-    	trace("initialize", "resetting drive train encoders.");
+    	action("initialize", "resetting drive train encoders.");
     	subsystem.getEncoderRight().reset();
     	subsystem.getEncoderLeft().reset();
     }

@@ -33,9 +33,9 @@ public final class SolenoidSet extends SubsystemCommand<Solenoid> {
 	//@Override
 	protected void ghscInitialize() {
 		if(subsystem.getCurrentPosition() == position) {
-			traceFormatted("initialize","NOT changing %s from %s to %s, it's already %s",subsystem,subsystem.getCurrentPosition(),position,position);
+			actionFormatted("initialize","NOT changing %s from %s to %s, it's already %s",subsystem,subsystem.getCurrentPosition(),position,position);
 		} else {
-			traceFormatted("initialize","changing %s from %s to %s",subsystem,subsystem.getCurrentPosition(),position);
+			actionFormatted("initialize","changing %s from %s to %s",subsystem,subsystem.getCurrentPosition(),position);
 			subsystem.setTargetPosition(position);
 		}
 	}

@@ -40,9 +40,9 @@ public final class MotorWaitForTargetPosition extends SubsystemCommand<Motor> {
 	protected void ghscInitialize() {
 		// NB: If the motor is moving to a position (relative or absolute)
 		if(!isFinished()) {
-			traceFormatted("initialize","waiting for %s to reach %s.",subsystem,subsystem.getTargetState().getTargetAbsolutePosition());
+			actionFormatted("initialize","waiting for %s to reach %s.",subsystem,subsystem.getTargetState().getTargetAbsolutePosition());
 		} else {
-			traceFormatted("initialize","NOT waiting pointlessly for %s to reach position, it's already done that.", subsystem);
+			actionFormatted("initialize","NOT waiting pointlessly for %s to reach position, it's already done that.", subsystem);
 		}
 	}
 

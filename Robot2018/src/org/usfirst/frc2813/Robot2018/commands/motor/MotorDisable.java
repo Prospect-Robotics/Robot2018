@@ -29,7 +29,7 @@ public final class MotorDisable extends MotorCommand {
 				traceFormatted("initialize", "NOT SETTING %s to disable (neutral state), it's already disabled.", subsystem);
 			}
 		} else {
-			traceFormatted("initialize", "setting %s to disable (neutral state).",subsystem);
+			actionFormatted("initialize", "setting %s to disable (neutral state).",subsystem);
 		}
 		subsystem.disable();
 	}

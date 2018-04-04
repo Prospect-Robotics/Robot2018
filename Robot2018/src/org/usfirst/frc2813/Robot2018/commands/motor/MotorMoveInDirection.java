@@ -48,7 +48,7 @@ public final class MotorMoveInDirection extends MotorCommand {
 		{
 			traceFormatted("initialize","NOT setting %s to move %s, it's already doing that.", subsystem, direction);
 		} else {
-			traceFormatted("initialize","setting %s to move in the %s direction", subsystem, direction);
+			actionFormatted("initialize","setting %s to move in the %s direction", subsystem, direction);
 			subsystem.moveInDirectionAtRate(direction, rate);
 		}
 	}

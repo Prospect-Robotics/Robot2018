@@ -26,7 +26,7 @@ public final class MotorHoldPosition extends MotorCommand {
 	@Override
 	protected void ghscInitialize() {
 		if(!subsystem.getTargetState().getOperation().equals(MotorOperation.HOLDING_CURRENT_POSITION)) {
-			traceFormatted("initialize","setting %s to hold position", subsystem);
+			actionFormatted("initialize","setting %s to hold position", subsystem);
 			subsystem.holdCurrentPosition();
 		} else {
 			traceFormatted("initialize","not setting %s to hold position, it's already doing that", subsystem);

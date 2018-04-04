@@ -52,6 +52,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	// Called just before this Command runs the first time
 	@Override
 	protected void ghscInitialize() {
+		actionFormatted("initialize", "starting quick turn to %s degrees (absolute) @ rate %s.", targetAngle, rate);
 	}
 
 	/**

@@ -19,13 +19,13 @@ public final class ToggleCompressor extends TargetedCommand<Compressor> {
     // Called once when the command executes
     protected void ghcInitialize() {
     	if(getTarget().enabled()) {
-    		System.out.println(this + " disabling the compressor.");
+    		action("initialize", "disabling the compressor.");
     		getTarget().stop();
     	} else {
-    		System.out.println(this + " enabling the compressor.");
+    		action("initialize", "enabling the compressor.");
     		getTarget().start();
     		if(getTarget().getPressureSwitchValue()) {
-    			System.out.println(this + " has enabled the compressor, but it will not start until tank pressure drops below 90PSI.");
+    			action("initialize", "has enabled the compressor, but it will not start until tank pressure drops below 90PSI.");
     		}
     	}
     }

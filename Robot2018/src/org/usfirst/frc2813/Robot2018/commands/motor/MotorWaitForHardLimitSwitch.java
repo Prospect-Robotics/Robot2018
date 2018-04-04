@@ -43,9 +43,9 @@ public final class MotorWaitForHardLimitSwitch extends SubsystemCommand<Motor> {
 	protected boolean ghscIsFinished() {
 		boolean finished = subsystem.getCurrentHardLimitSwitchStatus(direction);
 		if(!finished) {
-			traceFormatted("isFinished", "waiting for %s to reach %s hard limit switch.",subsystem,direction);
+			actionFormatted("isFinished", "waiting for %s to reach %s hard limit switch.",subsystem,direction);
 		} else {
-			traceFormatted("isFinished", "%s reached %s hard limit switch.",subsystem,direction);
+			actionFormatted("isFinished", "%s reached %s hard limit switch.",subsystem,direction);
 		}
 		return finished;
 	}

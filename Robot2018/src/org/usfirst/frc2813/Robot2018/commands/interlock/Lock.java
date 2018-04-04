@@ -22,7 +22,7 @@ public class Lock extends GearheadsCommand {
 
 	@Override
 	protected void ghcInitialize() {
-		traceFormatted("initialize","locking %s.", target);
+		action("initialize","locking %s.", target);
 		target.addInterlock(LOCKED.ALWAYS);
 	}
 

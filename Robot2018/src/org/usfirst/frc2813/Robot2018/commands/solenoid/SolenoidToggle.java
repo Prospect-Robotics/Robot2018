@@ -27,7 +27,7 @@ public class SolenoidToggle extends SubsystemCommand<Solenoid> {
 	protected void ghscInitialize() {
 		Direction oldPosition = subsystem.getCurrentPosition();
 		Direction newPosition = oldPosition.getInverse();
-		traceFormatted("intialize", "toggling %s from %s to %s", subsystem, oldPosition, newPosition);
+		actionFormatted("intialize", "toggling %s from %s to %s", subsystem, oldPosition, newPosition);
 		subsystem.setTargetPosition(newPosition);
 	}
 

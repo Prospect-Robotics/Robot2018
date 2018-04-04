@@ -49,11 +49,11 @@ public final class MotorPositionPIDTest extends MotorCommand {
 	protected void ghscExecute() {
 		if(subsystem.getCurrentPositionErrorWithin(allowableError)) {
 			targetDirection = targetDirection.getInverse();
-			trace("execute", "REVERSING.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentPositionError() + " Goal " + targetPosition);
+			action("execute", "REVERSING.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentPositionError() + " Goal " + targetPosition);
 			Length targetPosition = targetDirection.equals(Direction.FORWARD) ? minHeight : maxHeight;
 			subsystem.moveToAbsolutePosition(targetPosition);
 		} else {
-			trace("execute", "NOT THERE.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentPositionError() + " Goal " + targetPosition);
+			action("execute", "NOT THERE.  GOING " + targetDirection + " @ " + subsystem.getCurrentPosition() + " Error " + subsystem.getCurrentPositionError() + " Goal " + targetPosition);
 		}
 	}
 

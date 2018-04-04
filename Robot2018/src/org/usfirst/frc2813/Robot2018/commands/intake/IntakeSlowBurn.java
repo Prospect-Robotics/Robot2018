@@ -36,7 +36,7 @@ public class IntakeSlowBurn extends SubsystemCommand<Intake> {
 
 	@Override
 	protected void ghscInitialize() {
-		System.out.println("SLOW BURN START");
+		action("initialize", "starting slow spin");
 		subsystem.spin(direction, SLOW_BURN_SPEED);
 	}
 
@@ -46,7 +46,7 @@ public class IntakeSlowBurn extends SubsystemCommand<Intake> {
 	}
 
 	protected void ghscEnd() {
-		System.out.println("SLOW BURN END");
+		action("initialize", "stopping slow spin");
 		subsystem.stop();
 	}
 	@Override
