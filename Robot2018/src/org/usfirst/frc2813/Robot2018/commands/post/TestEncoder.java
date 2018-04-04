@@ -28,16 +28,21 @@ public class TestEncoder extends Command {
 	// Called just before this Command runs the first time
 	protected void initialize() {
 		startingPosition = encoder.getRaw();
+		motor.set(0.15); // 0.1 will at least cause the encoder to move.
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		motor.set(0.1); // 0.1 will at least cause the encoder to move.
+	}
+	
+	@Override
+	protected void end() {
+		motor.set(0);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		if(encoder.getRaw() != startingPosition) {
+		if(Math.abs(encoder.getRaw() - startingPosition) >= 3) {
 			if(callback != null)
 				callback.accept(true);
 			return true;
