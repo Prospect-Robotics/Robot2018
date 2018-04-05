@@ -118,8 +118,8 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length ELEVATOR_HEIGHT_GRAB_SECOND_CUBE = LengthUOM.Inches.create(14);
 
 	/** Elevator height for placing cubes on the scale based on robot direction. */
-	private static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(76);
-	private static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(76);
+	private static final Length ELEVATOR_HEIGHT_SCALE_FORWARD = LengthUOM.Inches.create(66);
+	private static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(66);
 
 	/** Arm Position for Level extension. Use to grab and drop cube. */
 	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(133);
@@ -462,7 +462,7 @@ public class AutonomousCommandGroupGenerator {
 
 			/** This is the total side offset between us and the scale target center */
 			double totalDistanceSide = sideWallToScaleTarget - sideWallToFirstRobotCenter;
-			double totalDistanceAhead = backWallToScaleTarget + scaleTargetDepth/2;
+			double totalDistanceAhead = (15*12);//backWallToScaleTarget + scaleTargetDepth/2;
 			double distanceFromTargetEdge = (robotBumperLength/2 + finalDistanceToTarget);
 			double diagDistFromTargetProjected = distanceFromTargetEdge / Math.sqrt(2);
 			double radius = totalDistanceSide - diagDistFromTargetProjected;
@@ -480,10 +480,11 @@ public class AutonomousCommandGroupGenerator {
 				prepareElevatorForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
 			} else {
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead), SPEED_TURN);
 				prepareElevatorForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addQuickTurnSync(left, 45); /** right but we're backwards */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceFromTargetEdge), SPEED_TURN);
+				autoCmdList.drive.addQuickTurnSync(right, 30);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(8), SPEED_TURN);
+				autoCmdList.drive.addQuickTurnSync(left, 30);
 			}
 			autoCmdList.cube.addShootSequenceSync();
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
