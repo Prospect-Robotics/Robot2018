@@ -6,6 +6,7 @@ import org.usfirst.frc2813.Robot2018.autonomous.AutonomousDriveState;
 import org.usfirst.frc2813.Robot2018.commands.Lockout;
 import org.usfirst.frc2813.Robot2018.commands.subsystem.SubsystemCommand;
 import org.usfirst.frc2813.Robot2018.subsystems.drivetrain.DriveTrain;
+import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
 /**
@@ -79,31 +80,56 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	 * @return The correct throttle to use based on a ramp up/down interpolated from the calculations we made for the turn profile
 	 */
 	private static double calcThrottle(double errorMagnitudeInDegrees, double throttle) {
-//		if (errorMagnitudeInDegrees < MIN_DEG) {//if at correct location, stop
-//			return 0;
-//		}
+		if (errorMagnitudeInDegrees < MIN_DEG) {//if at correct location, stop
+			return 0;
+		}
 		if (errorMagnitudeInDegrees <= LERP_STOP) {//if through lerp period, min speed
 			return LERP_END;
 		}
 		if (errorMagnitudeInDegrees >= LERP_START) {//if not at lerp period, given speed
 			return throttle;
 		}
-//		return (errorMagnitudeInDegrees - LERP_STOP) * (throttle - LERP_END) / (LERP_START-LERP_STOP) + LERP_END;//deceleration/linear interpolation code
-		return throttle;
+//		return throttle;
+		return (errorMagnitudeInDegrees - LERP_STOP) * (throttle - LERP_END) / (LERP_START-LERP_STOP) + LERP_END;//deceleration/linear interpolation code
 	}
 
 	// Called repeatedly when this Command is scheduled to run
+	@Override
 	protected void ghscExecute() {
-		int directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
-		subsystem.arcadeDrive(0, calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier);
+		double directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
+		double throttle = calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier;
+//		Logger.info(this + "throttle: " + throttle);
+		subsystem.arcadeDrive(0, throttle);
+	}
+	
+	@Override
+	protected void ghscEnd() {
+		// Make sure we stop moving
+		subsystem.arcadeDrive(0, 0);
 	}
 
+	public static final long SETTLING_TIME_MS = 75; 
+	public long whenDidWeDetectAngleWasCloseEnough = 0;
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean ghscIsFinished() {
-		return getErrorMagnitudeInDegrees() <= MIN_DEG;
+		long now = System.currentTimeMillis();
+		if(getErrorMagnitudeInDegrees() <= MIN_DEG) {
+			if(whenDidWeDetectAngleWasCloseEnough != 0) {
+				if((now - whenDidWeDetectAngleWasCloseEnough) >= SETTLING_TIME_MS) {
+					Logger.debug(this.getClass().getSimpleName() + " - stable at goal for " + (now - whenDidWeDetectAngleWasCloseEnough) + "ms.  FINISHED!");
+					return true;
+				}
+			} else {
+				whenDidWeDetectAngleWasCloseEnough = now;
+			}
+			Logger.debug(this.getClass().getSimpleName() + " - stable but only at goal for " + (now - whenDidWeDetectAngleWasCloseEnough) + "ms.  WAITING.");
+		} else {
+			whenDidWeDetectAngleWasCloseEnough = 0;
+		}
+		return false;
 	}
-    
+
 	@Override
 	public boolean ghscIsSubsystemRequired() {
 		return true;
