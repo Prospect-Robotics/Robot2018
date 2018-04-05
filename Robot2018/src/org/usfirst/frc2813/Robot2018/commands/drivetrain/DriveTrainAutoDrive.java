@@ -109,7 +109,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double startAngle;
 	private double deltaAngle = 0; // for the turn version
 	private double lastThrottle = 0; // Last throttle we sent to the drive train
-	private boolean complete = false; // Have we completed the operation
+	private boolean distanceReached = false; // Have we traveled far enough
+	// stop when we have gone far enough AND our angular error is less than 0.5 degrees
+	private static final double endAngleErrorThreshold = 0.5;
 	private double lastPosition, lastTime; // calculate real speed between calls
 	private double measuredSpeed = 0;
 	private double angularDrift; // input to angle PID
@@ -213,7 +215,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	/** measure our error from the curve we are walking. This is the angle PID callback */
     public double measureAngularDrift() {
         double angleRightNow = subsystem.getGyro().getAngle();
-        angularDrift = subsystem.getGyro().getAngle() - startAngle;
         if (deltaAngle == 0) {
         		angularDrift = angleRightNow - startAngle;
         }
@@ -326,13 +327,16 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	protected boolean ghscIsFinished() {
 		/*
 		 * Keep track of whether we have finished, and ignore any PID outputs on a best effort basis.
-		 * It's highly probable that assigning to boolean complete will be atomic, though it's not
+		 * It's highly probable that assigning to boolean distanceReached will be atomic, though it's not
 		 * guaranteed.  I didn't think it was worth adding a mutex here and in the PID callback.
 		 */
-		if (!complete) {
-			complete = (distanceTravelled() >= distance);
+		if (!distanceReached) {
+			distanceReached = (distanceTravelled() >= distance);
 		}
-		return complete;
+		if (distanceReached) {
+			return !needAngleLock();
+		}
+		return false;
 	}
 	/**
 	 * CRITICAL: Interrupted calls end, but end doesn't call interrupted!
@@ -369,14 +373,27 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
     private void pidSpeedOutputFunc(double pidSpeedOutput) {
     		pidSpeedAdjust = disableSpeedPID ? 0 : pidSpeedOutput;
     }
+    
+    private boolean needAngleLock() {
+    	if (endSpeed == 0 && subsystem.getGyro().getAngle() - deltaAngle > endAngleErrorThreshold) {
+    		lastThrottle = 0;
+    		return true;
+    	}
+    	return false;
+	}
 
 	/**
 	 * This is the Angle controlling PID callback. It provides angle adjustment.
 	 * @param pidAngleAdjust This is the output of the PID computation based on the error in the relative angle of the robot (the pid source)
 	 */
 	private void pidAngleOutputFunc(double pidAngleAdjust) {
-		// If the command is complete, ignore any extra PID output call backs while we are shutting PID down.
-		if (complete) return;
+		// If the command is distanceReached, ignore any extra PID output call backs while we are shutting PID down.
+		if (distanceReached) {
+			if (needAngleLock()) {
+				subsystem.arcadeDrive(lastThrottle, pidAngleAdjust);
+			}
+			return;
+		}
 
 		Logger.printFormat(LogType.INFO, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
 		double distanceTravelled = distanceTravelled();
@@ -385,13 +402,13 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		/*
 		 * Compare the distance since the last call to a threshold scaled by expected speed to ensure
 		 * we aren't stuck. This happens if we drifted and are actually pushing against something. In
-		 * this case we mark ourselves complete. This effectively resets our position as there is no
+		 * this case we mark ourselves distanceReached. This effectively resets our position as there is no
 		 * record of our leaving early and autonomous tracks as if we traveled the full distance.
 		 */
 		if ((distanceTravelled - lastDistanceTravelled) < progressDistanceThreshold * desiredSpeed) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
 				Logger.error("STALL DETECTED\n");
-//				complete = true;
+//				distanceReached = true;
 			}
 		}
 		else {
