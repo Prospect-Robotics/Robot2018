@@ -13,7 +13,7 @@ public class AutonomousDriveState {
 	 * These defaults give us values that won't slip. Ramps to speed up and slow down and a min speed which we can
 	 * safely transition to/from a dead stop at.
 	 */
-	private static final double DEFAULT_ACCELERATION_RAMP = 60; // inches to ramp from min speed to max speed
+	private static final double DEFAULT_ACCELERATION_RAMP = 12; // inches to ramp from min speed to max speed
 	private static final double DEFAULT_DECELERATION_RAMP = 60; // inches to ramp from min speed to max speed
 	private static final double DEFAULT_MIN_THROTTLE = 0.3;
 	private static final double DEFAULT_MAX_THROTTLE = 1.0;
