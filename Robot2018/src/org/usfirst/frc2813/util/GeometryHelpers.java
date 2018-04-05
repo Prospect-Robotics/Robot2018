@@ -29,10 +29,10 @@ public class GeometryHelpers {
 	 * Compute the distance traveled over an arc section given angle in degrees and radius
 	 * @param angle
 	 * @param radius
-	 * @return
+	 * @return circumference (2*pi*r) * circle fraction (angle/360)
 	 */
     public static double computeArcLength(double angle, double radius) {
-        return radius*(2*Math.PI*angle/360);
+        return 2*Math.PI*radius * angle/360;
     }
 
     /**
