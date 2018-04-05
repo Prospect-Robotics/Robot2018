@@ -193,7 +193,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			1.0,
 			-1.0,
 			40,
-			2000,
+			0, // was 2000,
 			30
 			);
 	}

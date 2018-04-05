@@ -188,7 +188,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			0.75,
 			-0.75,
 			40,
-			1000,
+			0, // was 1000,
 			30
 			);
 	}

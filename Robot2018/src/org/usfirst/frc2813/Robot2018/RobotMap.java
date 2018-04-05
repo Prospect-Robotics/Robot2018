@@ -5,6 +5,7 @@ package org.usfirst.frc2813.Robot2018;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.Compressor;
@@ -90,8 +91,8 @@ public class RobotMap {
 	/*
 	 *  Drive Train Subsystem
 	 */
-	public static WPI_VictorSPX driveTrainSpeedControllerLeftMaster;
-	public static WPI_VictorSPX driveTrainSpeedControllerRightMaster;
+	public static WPI_TalonSRX driveTrainSpeedControllerLeftMaster;
+	public static WPI_TalonSRX driveTrainSpeedControllerRightMaster;
 	public static VictorSPX driveTrainSpeedControllerLeftFollower;
 	public static VictorSPX driveTrainSpeedControllerRightFollower;
 	public static DifferentialDrive driveTrainRobotDrive;
@@ -142,20 +143,20 @@ public class RobotMap {
 		/*
 		 * Drive Train subsystem
 		 */
-		driveTrainSpeedControllerLeftMaster = new WPI_VictorSPX(CAN_ID_DriveTrain_Left_Master);
+		driveTrainSpeedControllerLeftMaster = new WPI_TalonSRX(CAN_ID_DriveTrain_Left_Master);
 		driveTrainSpeedControllerLeftMaster.setName("DriveTrain", "Left Motor");
 		driveTrainSpeedControllerLeftMaster.setInverted(false);
 		LiveWindow.add(driveTrainSpeedControllerLeftMaster);
-		driveTrainSpeedControllerRightMaster = new WPI_VictorSPX(CAN_ID_DriveTrain_Right_Master);
+		driveTrainSpeedControllerRightMaster = new WPI_TalonSRX(CAN_ID_DriveTrain_Right_Master);
 		driveTrainSpeedControllerRightMaster.setName("DriveTrain", "Right Motor");
 		driveTrainSpeedControllerRightMaster.setInverted(false);
 		LiveWindow.add(driveTrainSpeedControllerRightMaster);
 
 		driveTrainSpeedControllerLeftFollower = new VictorSPX(CAN_ID_DriveTrain_Left_Follower);
-		driveTrainSpeedControllerLeftFollower.set(ControlMode.Follower, driveTrainSpeedControllerLeftMaster.getDeviceID());
+		driveTrainSpeedControllerLeftFollower.follow(driveTrainSpeedControllerLeftMaster );
 		driveTrainSpeedControllerLeftFollower.setInverted(driveTrainSpeedControllerLeftMaster.getInverted());
 		driveTrainSpeedControllerRightFollower = new VictorSPX(CAN_ID_DriveTrain_Right_Follower);
-		driveTrainSpeedControllerRightFollower.set(ControlMode.Follower, driveTrainSpeedControllerRightMaster.getDeviceID());
+		driveTrainSpeedControllerRightFollower.follow(driveTrainSpeedControllerRightMaster);
 		driveTrainSpeedControllerRightFollower.setInverted(false);
 		driveTrainRobotDrive = new DifferentialDrive(driveTrainSpeedControllerLeftMaster, driveTrainSpeedControllerRightMaster);
 		LiveWindow.add(driveTrainRobotDrive);

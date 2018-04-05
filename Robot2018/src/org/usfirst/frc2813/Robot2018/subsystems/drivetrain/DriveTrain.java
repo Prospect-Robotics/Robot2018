@@ -14,6 +14,7 @@ import org.usfirst.frc2813.units.Direction;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
@@ -45,8 +46,8 @@ public class DriveTrain extends GearheadsSubsystem {
     public static final double INCHES_PER_ENCODER_PULSE = WHEEL_CIRCUMFERENCE_INCHES / ENCODER_PULSES_PER_WHEEL_REVOLUTION;
 
     private final Gyro gyro;
-    private final SpeedController speedControllerLeftMaster;
-	private final SpeedController speedControllerRightMaster;
+    private final WPI_TalonSRX speedControllerLeftMaster;
+	private final WPI_TalonSRX speedControllerRightMaster;
 	private final VictorSPX speedControllerPortFollow;
 	private final VictorSPX speedControllerStarboardFollow;
 	private final DifferentialDrive robotDrive;
@@ -55,6 +56,10 @@ public class DriveTrain extends GearheadsSubsystem {
 	private final Solenoid gearShift;
 
 	public boolean encoderPortFunctional, encoderStarboardFunctional; // set by POST.
+
+	public static final int PEAK_CURRENT_LIMIT       = 35;
+	public static final int PEAK_CURRENT_DURATION    = 0;
+	public static final int CONTINUOUS_CURRENT_LIMIT = 35;
 
 	public DriveTrain(Gyro gyro) {
 		this.gyro = gyro;
@@ -88,6 +93,17 @@ public class DriveTrain extends GearheadsSubsystem {
 		encoderLeft.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderLeft.setSamplesToAverage(1);
 		encoderLeft.setPIDSourceType(PIDSourceType.kRate);
+		
+		// Set static current limits
+		speedControllerLeftMaster.configContinuousCurrentLimit(CONTINUOUS_CURRENT_LIMIT, 10);
+		speedControllerLeftMaster.configPeakCurrentLimit(PEAK_CURRENT_LIMIT, 10);
+		speedControllerLeftMaster.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);
+		speedControllerLeftMaster.enableCurrentLimit(true);
+		
+		speedControllerRightMaster.configContinuousCurrentLimit(CONTINUOUS_CURRENT_LIMIT, 10);
+		speedControllerRightMaster.configPeakCurrentLimit(PEAK_CURRENT_LIMIT, 10);
+		speedControllerRightMaster.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);
+		speedControllerRightMaster.enableCurrentLimit(true);
 	}
 
 	public Gyro getGyro() {
@@ -221,8 +237,8 @@ public class DriveTrain extends GearheadsSubsystem {
 	}
 
 	public void setBrakeCoast(NeutralMode b) {
-		((VictorSPX) speedControllerLeftMaster).setNeutralMode(b);
-		((VictorSPX) speedControllerRightMaster).setNeutralMode(b);
+		speedControllerLeftMaster.setNeutralMode(b);
+		speedControllerRightMaster.setNeutralMode(b);
 		speedControllerPortFollow.setNeutralMode(b);
 		speedControllerStarboardFollow.setNeutralMode(b);
 	}
