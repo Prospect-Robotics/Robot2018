@@ -25,12 +25,11 @@ import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
  * the minimal amount of data specified.
  */
 public class MotorConfiguration implements IMotorConfiguration {
-	
 	// Common state
 	private final String name;
 	// Capabilities
 	private final int capabilities;
-	
+
 	public static String getCapabilityName(int capability) {
         switch(capability) {
         case ControlDirection       : return "ControlDirection";
@@ -53,6 +52,7 @@ public class MotorConfiguration implements IMotorConfiguration {
         case Disconnected           : return "Disconnected";
         case RemoteReverseHardLimitSwitch : return "RemoteReverseHardLimitSwitch";
         case RemoteForwardHardLimitSwitch : return "RemoteForwardHardLimitSwitch";
+        case StaticCurrentLimit 		  : return "StaticCurrentLimit";
         default:
                 return Formatter.concat("Unknown Capability ", capability);
         }
@@ -285,7 +285,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getSensorPhaseIsReversed()
 	 */
 	@Override
-	public final boolean getSensorPhaseIsReversed() {
+	public final Boolean getSensorPhaseIsReversed() {
 		// NB: do not require Reverse, motor could be reversed even when we don't use reverse
 		requireAny(ReadRate|ReadPosition);
 		return sensorPhaseIsReversed;
@@ -298,7 +298,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getMotorPhaseIsReversed()
 	 */
 	@Override
-	public final boolean getMotorPhaseIsReversed() {
+	public final Boolean getMotorPhaseIsReversed() {
 		// NB: do not require Reverse, motor could be reversed even when we don't use reverse
 		requireAny(ControlRate|ControlPosition|ControlDirection);
 		return motorPhaseIsReversed;
@@ -350,7 +350,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getForwardHardLimitSwitchResetsEncoder()
 	 */
 	@Override
-	public final boolean getForwardHardLimitSwitchResetsEncoder() {
+	public final Boolean getForwardHardLimitSwitchResetsEncoder() {
 		requireAll(Forward|LocalForwardHardLimitSwitch);
 		return forwardHardLimitSwitchResetsEncoder;
 	}
@@ -362,7 +362,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 	 * @see org.usfirst.frc2813.Robot2018.motor.IMotorConfiguration#getReverseHardLimitSwitchResetsEncoder()
 	 */
 	@Override
-	public final boolean getReverseHardLimitSwitchResetsEncoder() {
+	public final Boolean getReverseHardLimitSwitchResetsEncoder() {
 		requireAll(Reverse|LocalReverseHardLimitSwitch);
 		return reverseHardLimitSwitchResetsEncoder;
 	}
@@ -444,14 +444,14 @@ public class MotorConfiguration implements IMotorConfiguration {
 
 	Integer remoteForwardHardLimitSwitchDeviceId;
 	@Override
-	public int getRemoteForwardHardLimitSwitchDeviceId() {
+	public Integer getRemoteForwardHardLimitSwitchDeviceId() {
 		requireAll(Forward|RemoteForwardHardLimitSwitch);
 		return remoteForwardHardLimitSwitchDeviceId;
 	}
 
 	Integer remoteReverseHardLimitSwitchDeviceId;
 	@Override
-	public int getRemoteReverseHardLimitSwitchDeviceId() {
+	public Integer getRemoteReverseHardLimitSwitchDeviceId() {
 		requireAll(Reverse|RemoteReverseHardLimitSwitch);
 		return remoteForwardHardLimitSwitchDeviceId;
 	}
@@ -472,14 +472,14 @@ public class MotorConfiguration implements IMotorConfiguration {
 	public final List<PIDConfiguration> getPIDConfigurations() {
 		return Collections.unmodifiableList(pidConfigurations);
 	}
-	double peakOutputForward = 1; 
-	double peakOutputReverse = -1;
+	Double peakOutputForward = new Double(1); 
+	Double peakOutputReverse = new Double(-1);
 	@Override
-	public final double getPeakOutputForward() {
+	public final Double getPeakOutputForward() {
 		return peakOutputForward;
 	}
 	@Override
-	public final double getPeakOutputReverse() {
+	public final Double getPeakOutputReverse() {
 		return peakOutputReverse;
 	}
 	/*
@@ -518,8 +518,11 @@ public class MotorConfiguration implements IMotorConfiguration {
 			Integer remoteReverseHardLimitSwitchDeviceId, // requireAll(Reverse|ReverseForwardHardLimitSwitch)
 			ICommandFactory<Motor> defaultCommandFactory, // no requirements
 			List<PIDConfiguration> pidConfigurations,
-			double peakOutputForward,
-			double peakOutputReverse
+			Double peakOutputForward,
+			Double peakOutputReverse,
+			Integer peakCurrentLimit,
+			Integer peakCurrentDurationMs,
+			Integer continuousCurrentLimit
 			)
 	{
 		this.name = name;
@@ -555,6 +558,10 @@ public class MotorConfiguration implements IMotorConfiguration {
 		this.remoteReverseHardLimitSwitchDeviceId = remoteReverseHardLimitSwitchDeviceId;
 		this.peakOutputForward = peakOutputForward;
 		this.peakOutputReverse = peakOutputReverse;
+		this.peakCurrentLimit = peakCurrentLimit;
+		this.continuousCurrentLimit = continuousCurrentLimit;
+		this.peakCurrentDurationMs = peakCurrentDurationMs;
+		
 		if(pidConfigurations != null) {
 			this.pidConfigurations.addAll(pidConfigurations);
 		}
@@ -641,6 +648,7 @@ public class MotorConfiguration implements IMotorConfiguration {
 		validateCapabilityDependency(NeutralMode, ControlRate|ControlPosition, 0);
 		validateCapabilityDependency(RemoteForwardHardLimitSwitch, 0, Forward|ControlDirection, LocalForwardHardLimitSwitch);
 		validateCapabilityDependency(RemoteReverseHardLimitSwitch, 0, Reverse|ControlDirection, LocalForwardHardLimitSwitch);
+		validateCapabilityDependency(StaticCurrentLimit, 0, 0, 0);
 		// Now validate settings
 		checkParameter("nativeDisplayLengthUOM", nativeDisplayLengthUOM, 0, 0);
 		checkParameter("nativeMotorLengthUOM", nativeMotorLengthUOM, ControlPosition|ControlDirection, 0);  
@@ -679,6 +687,9 @@ public class MotorConfiguration implements IMotorConfiguration {
 		if(hasAll(ReverseSoftLimitSwitch) && reverseSoftLimit.getValue() < reverseLimit.getValue()&& !hasAll(LocalReverseHardLimitSwitch)) {
 			throw new IllegalArgumentException(Formatter.concat("reverseSoftLimit ", reverseSoftLimit, " exceeds reverseLimit ", reverseLimit, ".  Soft limits must be within physical range of motion."));
 		}
+		checkParameter("peakCurrentLimit", peakCurrentLimit, StaticCurrentLimit, 0); 
+		checkParameter("continuousCurrentLimit", continuousCurrentLimit, StaticCurrentLimit, 0);
+		checkParameter("peakCurrentDurationMs", peakCurrentDurationMs, StaticCurrentLimit, 0);
 	}
 
 	/* (non-Javadoc)
@@ -759,6 +770,12 @@ public class MotorConfiguration implements IMotorConfiguration {
 		"reverseHardLimitSwitchBehavior........", reverseHardLimitSwitchNormal, "\n", 
 		"reverseHardLimitSwitchResetsEncoder...", reverseHardLimitSwitchResetsEncoder, "\n", 
 		"\n", 
+		"Current Limits:\n", 
+		"\n", 
+		"peakCurrentLimit......................", peakCurrentLimit, "\n", 
+		"peakCurrentDurationMs.................", peakCurrentDurationMs, "\n", 
+		"continuousCurrentLimit................", continuousCurrentLimit, "\n", 
+		"\n", 
 		"Scaling:\n", 
 		"\n", 
 		"sensorPhaseIsReversed.................", sensorPhaseIsReversed, "\n", 
@@ -770,5 +787,26 @@ public class MotorConfiguration implements IMotorConfiguration {
 		"neutralMode...........................", neutralMode, "\n", 
 		"defaultCommandFactory.................", defaultCommandFactory, "\n", 
 		"----------------------------------------------------------------------------\n");
+	}
+
+	private Integer peakCurrentLimit;
+	@Override
+	public Integer getPeakCurrentLimit() {
+		requireAny(StaticCurrentLimit);
+		return peakCurrentLimit;
+	}
+
+	private Integer continuousCurrentLimit;
+	@Override
+	public Integer getContinuousCurrentLimit() {
+		requireAny(StaticCurrentLimit);
+		return continuousCurrentLimit;
+	}
+
+	private Integer peakCurrentDurationMs;
+	@Override
+	public Integer getPeakCurrentDurationMs() {
+		requireAny(StaticCurrentLimit);
+		return peakCurrentDurationMs;
 	}
 }

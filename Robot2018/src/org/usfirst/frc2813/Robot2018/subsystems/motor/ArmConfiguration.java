@@ -148,6 +148,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.LocalReverseHardLimitSwitch
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
+					|IMotorConfiguration.StaticCurrentLimit
 //					|MotorConfiguration.Disconnected // NB: WARNING: THIS TOTALLY DISABLES IT
 					),
 			ArmDegrees,                   	    	// nativeDisplayLengthUOM
@@ -185,7 +186,10 @@ public class ArmConfiguration extends MotorConfiguration{
 			},
 			createPidConfigurations(), // pidConfigurations
 			0.75,
-			-0.75
+			-0.75,
+			40,
+			1000,
+			30
 			);
 	}
 

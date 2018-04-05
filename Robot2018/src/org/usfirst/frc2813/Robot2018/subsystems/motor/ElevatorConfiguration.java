@@ -153,6 +153,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 					|IMotorConfiguration.Reverse
 					|IMotorConfiguration.DefaultRate
 					|IMotorConfiguration.NeutralMode
+					|IMotorConfiguration.StaticCurrentLimit
 //					|IMotorConfiguration.Disconnected // NB: WARNING !!
 					),
 			LengthUOM.Inches,                   // nativeDisplayLengthUOM
@@ -190,7 +191,10 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			},
 			createPidConfigurations(), // pidConfigurations
 			1.0,
-			-1.0
+			-1.0,
+			40,
+			2000,
+			30
 			);
 	}
 }

@@ -35,7 +35,8 @@ public interface IMotorConfiguration {
 	int NeutralMode = 1 << 16;
 	int RemoteForwardHardLimitSwitch = 1 << 17;
 	int RemoteReverseHardLimitSwitch = 1 << 18;
-	int Disconnected = 1 << 31;
+	int Disconnected = 1 << 19;
+	int StaticCurrentLimit = 1 << 20; 
 	int MAX_CAPABILITY = 31;
 
 	/*
@@ -92,9 +93,9 @@ public interface IMotorConfiguration {
 
 	Rate getDefaultRate();
 
-	boolean getSensorPhaseIsReversed();
+	Boolean getSensorPhaseIsReversed();
 
-	boolean getMotorPhaseIsReversed();
+	Boolean getMotorPhaseIsReversed();
 
 	LengthUOM getNativeDisplayLengthUOM();
 
@@ -102,9 +103,9 @@ public interface IMotorConfiguration {
 
 	Length getReverseLimit();
 
-	boolean getForwardHardLimitSwitchResetsEncoder();
+	Boolean getForwardHardLimitSwitchResetsEncoder();
 
-	boolean getReverseHardLimitSwitchResetsEncoder();
+	Boolean getReverseHardLimitSwitchResetsEncoder();
 
 	LimitSwitchNormal getForwardHardLimitSwitchNormal();
 
@@ -132,10 +133,14 @@ public interface IMotorConfiguration {
 
 	RemoteLimitSwitchSource getRemoteForwardHardLimitSwitchSource();
 
-	int getRemoteReverseHardLimitSwitchDeviceId();
+	Integer getRemoteReverseHardLimitSwitchDeviceId();
 
-	int getRemoteForwardHardLimitSwitchDeviceId();
+	Integer getRemoteForwardHardLimitSwitchDeviceId();
 
-	double getPeakOutputForward();
-	double getPeakOutputReverse();
+	Double getPeakOutputForward();
+	Double getPeakOutputReverse();
+
+	Integer getPeakCurrentLimit();
+	Integer getContinuousCurrentLimit();
+	Integer getPeakCurrentDurationMs();
 }

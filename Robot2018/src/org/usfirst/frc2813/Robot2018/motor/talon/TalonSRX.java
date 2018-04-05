@@ -364,6 +364,15 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		} else { 
 			mc.setNeutralMode(NeutralMode.EEPROMSetting); 
 		}
+		// Configure current limits
+		if(configuration.hasAny(IMotorConfiguration.StaticCurrentLimit)) {
+			mc.configPeakCurrentLimit(configuration.getPeakCurrentLimit(), getTimeout());
+			mc.configPeakCurrentDuration(configuration.getPeakCurrentDurationMs(), getTimeout());
+			mc.configContinuousCurrentLimit(configuration.getContinuousCurrentLimit(), getTimeout());
+			mc.enableCurrentLimit(true);		
+		} else {
+			mc.enableCurrentLimit(false);
+		}
 
 		// Configure the PID profiles
 		Iterator<PIDConfiguration> pidProfiles = configuration.getPIDConfigurations().iterator();
