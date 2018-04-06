@@ -54,13 +54,13 @@ public class RobotMap {
 	public final static int CAN_ID_DriveTrain_Left_Follower  = 2;
 	public final static int CAN_ID_Elevator_Left_Follower_1  = 3;
 	public final static int CAN_ID_Elevator_Left_Follower_2  = 4;
-	public final static int CAN_ID_Arm_Follower              = 5;
-	public final static int CAN_ID_Intake_Follower           = 6;
+	public final static int CAN_ID_Arm_Follower              = 9; // 5;
+	public final static int CAN_ID_Intake_Master             = 6;
 	public final static int CAN_ID_DriveTrain_Right_Master   = 7;
 	public final static int CAN_ID_DriveTrain_Right_Follower = 8;
-	public final static int CAN_ID_Elevator_Right_Follower   = 9;
+	public final static int CAN_ID_Elevator_Right_Follower   = 11; // 9;
 	public final static int CAN_ID_Elevator_Right_Master     = 10;
-	public final static int CAN_ID_Intake_Master             = 11;
+	public final static int CAN_ID_Intake_Follower           = 5;  //11;
 	public final static int CAN_ID_Arm_Master                = 12;
 	
 
@@ -113,7 +113,7 @@ public class RobotMap {
 															//  TODO:  document WHY the WPI_VictorSPX type and the VictorSPX type are different
 	public static VictorSPX elevatorSpeedControllerRightFollower;		//  Controller Right will follow controller Left; For followers, use the VictorSPX type rather than the WPI_VictorSPX type
 	public static VictorSPX elevatorSpeedControllerLeftFollower2;		//  Controller LeftFollow is the paired motor with controller Left; it will follow 1
-	
+
 	/*
 	 * Arm Subsystem. This subsystem includes the arm, intake and jaws
 	 */
@@ -171,28 +171,17 @@ public class RobotMap {
 		 * Elevator subsystem
 		 */
 		elevatorSpeedControllerRightMaster = new TalonSRX(CAN_ID_Elevator_Right_Master);		// CAN bus slot 10 (Talon is on the Right side)
-
-		// Note:  all of the VictorSPX controllers are under CAN bus control, so we use 1-based addressing, reserving
-		// port 0 on the CAN bus for new controllers / uninitialized controllers
-		/*
-		 * A note on Following:
-		 * The elevator is controlled by one TalonSRX motor controller with four VictorSPX motor controllers following.
-		 * Typically, when you have motors on opposite sides of the robot, the motor on the far side will need to spin
-		 * in the opposite direction of the motor on the close side.
-		 * We have had issues getting both following and setInverted to work.  Rather than trying to debug this, the
-		 * ROBOT HAS BEEN WIRED SO THAT THE MOTORS ON THE PORT SIDE ARE OPPOSITE OF THE MOTORS ON THE STARBOARD SIDE.
-		 * Therefore, we don't need to setInverted on the far side motors, but need to be very careful to ensure
-		 * that the physical wiring is correct! 
-		 */
-		elevatorSpeedControllerLeftFollower1 = new VictorSPX(CAN_ID_Elevator_Left_Follower_1);
-		elevatorSpeedControllerLeftFollower1.follow(elevatorSpeedControllerRightMaster);
-		elevatorSpeedControllerLeftFollower1.setInverted(false); // NB: Handled in wiring
-		elevatorSpeedControllerLeftFollower2 = new VictorSPX(CAN_ID_Elevator_Left_Follower_2);
-		elevatorSpeedControllerLeftFollower2.follow(elevatorSpeedControllerRightMaster);
-		elevatorSpeedControllerLeftFollower2.setInverted(false); // NB: Handled in wiring
+		elevatorSpeedControllerRightMaster.setInverted(true);
 		elevatorSpeedControllerRightFollower = new VictorSPX(CAN_ID_Elevator_Right_Follower);
 		elevatorSpeedControllerRightFollower.follow(elevatorSpeedControllerRightMaster);
-		elevatorSpeedControllerRightFollower.setInverted(false); // NB: Handled in wiring
+		// NB: When you are follower on the SAME SIDE do not invert again!  Output from master is already correct for it's side.  Invert only on the 'reverse' side.
+		
+		elevatorSpeedControllerLeftFollower1 = new VictorSPX(CAN_ID_Elevator_Left_Follower_1);
+		elevatorSpeedControllerLeftFollower1.follow(elevatorSpeedControllerRightMaster);
+		elevatorSpeedControllerLeftFollower1.setInverted(true); // NB: 
+		elevatorSpeedControllerLeftFollower2 = new VictorSPX(CAN_ID_Elevator_Left_Follower_2);
+		elevatorSpeedControllerLeftFollower2.follow(elevatorSpeedControllerRightMaster);
+		elevatorSpeedControllerLeftFollower2.setInverted(true); // NB: Wired incorrectly on practice bot
 		/*
 		 * Arm Subsystem
 		 */
@@ -212,7 +201,6 @@ public class RobotMap {
 		 * Compressor
 		 */
 		compressor = new Compressor();
-
 		/*
 		 * Solenoids
 		 */
