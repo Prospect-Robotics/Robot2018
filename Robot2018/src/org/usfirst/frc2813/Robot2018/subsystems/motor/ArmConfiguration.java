@@ -137,7 +137,7 @@ public class ArmConfiguration extends MotorConfiguration{
 					|IMotorConfiguration.ControlRate
 					|IMotorConfiguration.Forward
 					|IMotorConfiguration.ForwardSoftLimitSwitch
-					|IMotorConfiguration.ReverseSoftLimitSwitch // Added
+//					|IMotorConfiguration.ReverseSoftLimitSwitch // Added
 					|IMotorConfiguration.LimitPosition
 					|IMotorConfiguration.LimitRate
 					|IMotorConfiguration.SensorToDriveScale
@@ -171,7 +171,8 @@ public class ArmConfiguration extends MotorConfiguration{
 			LimitSwitchNormal.NormallyOpen,     	// reverseHardLimitSwitchNormal
 			Boolean.TRUE,                       	// reverseHardLimitSwitchResetsEncoder
 			MAXIMUM_POSITION_DEGREES,    			// forwardSoftLimit
-			MINIMUM_POSITION_DEGREES,          		// reverseSoftLimit
+//			MINIMUM_POSITION_DEGREES,          		// reverseSoftLimit
+			null,
 			DEFAULT_SPEED_DEGREES_PER_SECOND, 		// defaultRate
 			com.ctre.phoenix.motorcontrol.NeutralMode.Brake, // neutralMode
 			ArmRateOnePercentOutputPerOneSecond,    // percentageRate
