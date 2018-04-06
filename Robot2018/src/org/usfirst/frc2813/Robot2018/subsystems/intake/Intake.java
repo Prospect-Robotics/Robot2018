@@ -13,28 +13,26 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
  * minimal subsystem to manage Intake. It spins in/out with speed or stops
  */
 public class Intake extends GearheadsSubsystem {
-	private WPI_VictorSPX mc;
+	private WPI_TalonSRX mc;
 	double defaultSpeed;
 	double targetSpeed;
 	Direction targetDirection;
 	
-	public static final int PEAK_CURRENT_LIMIT = 60;
+	public static final int PEAK_CURRENT_LIMIT = 35;
 	public static final int CONTINUOUS_CURRENT_LIMIT = 35;
-	public static final int PEAK_CURRENT_DURATION = 500;
+	public static final int PEAK_CURRENT_DURATION = 0;
 
-	public Intake(WPI_VictorSPX mc) {
+	public Intake(WPI_TalonSRX mc) {
 		this.mc = mc;
 		targetDirection = Direction.IDLE;
 		defaultSpeed = 1.0;
 		targetSpeed = defaultSpeed;
 
-/*
  		// Set static current limits
  		mc.configContinuousCurrentLimit(CONTINUOUS_CURRENT_LIMIT, 10);
 		mc.configPeakCurrentLimit(PEAK_CURRENT_LIMIT, 10);
 		mc.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);
 		mc.enableCurrentLimit(true);
-*/
 	}
 
 	public void initDefaultCommand() {

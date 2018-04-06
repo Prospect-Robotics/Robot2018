@@ -187,7 +187,7 @@ public class ArmConfiguration extends MotorConfiguration{
 			createPidConfigurations(), // pidConfigurations
 			0.75,
 			-0.75,
-			40,
+			30,
 			0, // was 1000,
 			30
 			);

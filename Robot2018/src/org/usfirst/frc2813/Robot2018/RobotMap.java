@@ -119,7 +119,7 @@ public class RobotMap {
 	 */
 	public static TalonSRX armSpeedControllerMaster;                         // Arm motor controller
 	public static WPI_VictorSPX armSpeedControllerFollower;
-	public static WPI_VictorSPX intakeSpeedControllerMaster;
+	public static WPI_TalonSRX intakeSpeedControllerMaster;
 	public static VictorSPX intakeSpeedControllerFollower;
 
 	/**
@@ -203,10 +203,10 @@ public class RobotMap {
 		/*
 		 * Intake Subsystem
 		 */
-		intakeSpeedControllerMaster = new WPI_VictorSPX(CAN_ID_Intake_Master);
+		intakeSpeedControllerMaster = new WPI_TalonSRX(CAN_ID_Intake_Master);
 		intakeSpeedControllerMaster.setInverted(true);
 		intakeSpeedControllerFollower = new VictorSPX(CAN_ID_Intake_Follower);
-		intakeSpeedControllerFollower.set(ControlMode.Follower, intakeSpeedControllerMaster.getDeviceID());
+		intakeSpeedControllerFollower.follow(intakeSpeedControllerMaster);
 		intakeSpeedControllerFollower.setInverted(intakeSpeedControllerMaster.getInverted() ? false : true);
 		/*
 		 * Compressor

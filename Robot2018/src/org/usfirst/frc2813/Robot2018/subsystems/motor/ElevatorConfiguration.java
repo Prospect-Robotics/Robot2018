@@ -192,7 +192,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 			createPidConfigurations(), // pidConfigurations
 			1.0,
 			-1.0,
-			40,
+			30,
 			0, // was 2000,
 			30
 			);
