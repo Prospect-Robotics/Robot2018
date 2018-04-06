@@ -36,7 +36,7 @@ public class Intake extends GearheadsSubsystem {
 	}
 
 	public void initDefaultCommand() {
-//		setDefaultCommand(new IntakeSlowBurn(this, direction));
+//		setDefaultCommand(new IntakeSlowBurn(this, Direction.IN));
 	}
 
 	public void setDefaultSpeed(double defaultSpeed) {
