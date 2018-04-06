@@ -12,7 +12,7 @@ import org.usfirst.frc2813.units.Direction;
  */
 public class IntakeSlowBurn extends SubsystemCommand<Intake> {
 	private final Direction direction;
-	private static final double SLOW_BURN_SPEED = 0.6;
+	private static final double SLOW_BURN_SPEED = 0.2;
 	
     public IntakeSlowBurn(Intake intake, Direction direction, RunningInstructions duration, Lockout lockout) {
 		super(intake, duration, lockout);
