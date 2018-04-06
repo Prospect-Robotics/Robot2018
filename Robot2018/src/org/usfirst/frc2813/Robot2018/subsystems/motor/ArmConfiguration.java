@@ -23,7 +23,7 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	// Pulses per revolution
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096.0;
-	private static final double SENSOR_TO_DRIVE_DIVISOR = (36.0/30.0)*100.0; // 120:1
+	private static final double SENSOR_TO_DRIVE_DIVISOR = (36.0/30.0)*100.0*4.0; // 120:1 now 480:1
 
 	// Motor constants
 	private static final double    MAX_ENCODER_RPMS_UNLOADED             = 18700;
