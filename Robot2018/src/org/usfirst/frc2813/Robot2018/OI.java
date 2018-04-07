@@ -58,6 +58,7 @@ public class OI {
 
 	private static final Length ELEVATOR_HEIGHT_TOLERANCE  = LengthUOM.Inches.create(0.25);
 	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(5.0);
+	private static final Length ELEVATOR_HEIGHT_SWITCH 	   = LengthUOM.Inches.create(27);
 	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(120);
 	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(150);	
 	private static final Length ARM_POSITION_TOLERANCE     = ArmConfiguration.ArmDegrees.create(5);
@@ -138,6 +139,9 @@ public class OI {
 
 	public Command createElevatorToPickUpHeight() {
 		return new MotorMoveToAbsolutePosition(Robot.elevator, ELEVATOR_HEIGHT_GRAB_CUBE, ELEVATOR_HEIGHT_TOLERANCE);
+	}
+	public Command createElevatorToSwitchHeight() {
+		return new MotorMoveToAbsolutePosition(Robot.elevator, ELEVATOR_HEIGHT_SWITCH, ELEVATOR_HEIGHT_TOLERANCE);
 	}
 	public Command createArmToShootPosition() {
 		return new MotorMoveToAbsolutePosition(Robot.arm, ARM_POSITION_FORWARD_SHOOT, ARM_POSITION_TOLERANCE);
@@ -299,8 +303,8 @@ public class OI {
 		 *
 		 * COMPETITION LAYOUT:
 		 * 
-		 * (1)  START CLIMBING
-		 * (2)  ABORT CLIMBING
+		 * (1)  ELEVATOR TO SWITCH HEIGHT // START CLIMBING
+		 * (2)  ELEVATOR TO SWITCH HEIGHT // ABORT CLIMBING
 		 * (3)  ARM UP
 		 * (4)  ARM DOWN
 		 * (5)  INTAKE IN
@@ -352,6 +356,8 @@ public class OI {
 		default:
 		case Competition:
 //			new JoystickButton(buttonPanel, 1).whenPressed(createClimbSequence());
+			new JoystickButton(buttonPanel, 1).whenPressed(createElevatorToSwitchHeight());
+			new JoystickButton(buttonPanel, 2).whenPressed(createElevatorToSwitchHeight());
 //			new JoystickButton(buttonPanel, 2).whenPressed(createClimbAbortSequence());
 			new JoystickButton(buttonPanel, 3).whileHeld(createArmIn());
 			new JoystickButton(buttonPanel, 4).whileHeld(createArmOut());
