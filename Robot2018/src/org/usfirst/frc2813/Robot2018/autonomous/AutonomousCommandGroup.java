@@ -63,7 +63,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		drive.addSensorResetSequenceSync();
 
 		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
-		arm.addCalibrateAsync();
+		arm.addCalibrateSync();
 		elevator.addCalibrateSync();
 	}
 
@@ -317,7 +317,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 		/** Add a synchronous command to open the jaws */
 		@SuppressWarnings("unused")
-		private void addJawsOpenSync() {
+		public void addJawsOpenSync() {
 			addSequential(new SolenoidSet(Robot.jaws, Direction.OPEN));
 		}
 
@@ -342,7 +342,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 
 	public class Time {
 		/** Add a delay in seconds. */
-		private void addDelayInSecondsSync(double seconds) {
+		public void addDelayInSecondsSync(double seconds) {
 			addSequential(new TimedCommand(seconds));
 		}
 	}

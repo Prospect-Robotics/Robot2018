@@ -112,7 +112,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
 
 	/** Elevator heights for picking up a cube on from the ground. */
-	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(3);
+	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE = LengthUOM.Inches.create(2);
 
 	/** Elevator heights for picking up a cube on another cube. */
 	private static final Length ELEVATOR_HEIGHT_GRAB_SECOND_CUBE = LengthUOM.Inches.create(14);
@@ -125,7 +125,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(133);
 
 	/** Arm Position below Level extension to avoid hitting hooks with elevator down. Use to grab and drop cube. */
-	private static final Length ARM_POSITION_LOW = ArmConfiguration.ArmDegrees.create(160);
+	private static final Length ARM_POSITION_LOW = ArmConfiguration.ArmDegrees.create(130);
 
 	/** Arm Position for shooting over head */
 	private static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
@@ -263,8 +263,9 @@ public class AutonomousCommandGroupGenerator {
 	 * well.
 	 */
 	private void prepareForSwitchSync() {
-//		autoCmdList.arm.addMoveToPositionSync(ARM_POSITION_LEVEL);
 		autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
+
 	}
 
 	/** Prepare arm for shooting */
@@ -313,27 +314,29 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.drive.addCurveDegreesSync(Direction.FORWARD, degrees, inches(radius), clockwise, SPEED_STOP);
 			autoCmdList.cube.addDeliverSequenceSync();
 			autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), clockwise, SPEED_FULL);
-			prepareForCubeGrabbingSync(nextCubeHeight);
 			autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, degrees, inches(radius), counterclockwise, SPEED_STOP);
+			prepareForCubeGrabbingSync(nextCubeHeight);
 		}
 		else {
 			double distanceToTarget = backWallToSwitch - robotBumperLength;
-			double sideShiftToTarget = (switchWidth - robotBumperWidth + 12) / 3;
-			double straightEnds = (distanceToTarget - sideShiftToTarget - 16) / 3;
+			double sideShiftToTarget = (switchWidth - robotBumperWidth - 18) / 3;
+			double straightEnds = (distanceToTarget - sideShiftToTarget - 48) / 3;
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_TURN);
 			autoCmdList.drive.addQuickTurnSync(left, 45);
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
 			autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
 			autoCmdList.drive.addQuickTurnSync(right, 45);
 			autoCmdList.elevator.addWaitForTargetPositionSync();
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_STOP);
-			autoCmdList.cube.addDeliverSequenceSync();
-			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_TURN);
-			prepareForCubeGrabbingSync(nextCubeHeight);
-			autoCmdList.drive.addQuickTurnSync(left, 45);
-			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
-			autoCmdList.drive.addQuickTurnSync(right, 45);
-			autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_STOP);
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds+10), SPEED_STOP);
+			autoCmdList.cube.addShootSequenceSync();
+			
+			//autoCmdList.cube.addDeliverSequenceSync();
+			//autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_TURN);
+			//prepareForCubeGrabbingSync(nextCubeHeight);
+			//autoCmdList.drive.addQuickTurnSync(left, 45);
+			//autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
+			//autoCmdList.drive.addQuickTurnSync(right, 45);
+			//autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(straightEnds), SPEED_STOP);
 		}
 	}
 
@@ -462,7 +465,7 @@ public class AutonomousCommandGroupGenerator {
 
 			/** This is the total side offset between us and the scale target center */
 			double totalDistanceSide = sideWallToScaleTarget - sideWallToFirstRobotCenter;
-			double totalDistanceAhead = (15*12);//backWallToScaleTarget + scaleTargetDepth/2;
+			double totalDistanceAhead = (14*12);//backWallToScaleTarget + scaleTargetDepth/2;
 			double distanceFromTargetEdge = (robotBumperLength/2 + finalDistanceToTarget);
 			double diagDistFromTargetProjected = distanceFromTargetEdge / Math.sqrt(2);
 			double radius = totalDistanceSide - diagDistFromTargetProjected;
@@ -479,22 +482,32 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
 				prepareElevatorForScaleAsync(Direction.BACKWARD);
 				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
+				autoCmdList.cube.addShootSequenceSync();
 			} else {
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(totalDistanceAhead), SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(totalDistanceAhead), SPEED_TURN);
 				prepareElevatorForScaleAsync(Direction.BACKWARD);
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(60));
 				autoCmdList.drive.addQuickTurnSync(right, 30);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(8), SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(30), SPEED_TURN);
+				autoCmdList.cube.addJawsOpenSync();
+				autoCmdList.time.addDelayInSecondsSync(0.5);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(12), SPEED_TURN);
 				autoCmdList.drive.addQuickTurnSync(left, 30);
+				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), SPEED_TURN);
+				autoCmdList.resetAndCalibrateSync();
+				autoCmdList.drive.addQuickTurnSync(right, 150);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_TURN);
+
 			}
-			autoCmdList.cube.addShootSequenceSync();
+			
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/** If the robot is in the center, we're going to drop a cube into the switch on the correct side. */
 			Logger.printFormat(LogType.INFO, "%s: Robot is in the center position, with the near switch at the %s position.", this, nearSwitchPosition);
 				deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
-				getCenterFirstCube();
-				deliverCenterCube(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
-				getCenterSecondCube();
-				deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
+				//getCenterFirstCube();
+				//deliverCenterCube(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
+				//getCenterSecondCube();
+				//deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
 		} else {
 			prepareArmForShootingAsync(Direction.BACKWARD);
 			/**
@@ -557,7 +570,6 @@ public class AutonomousCommandGroupGenerator {
 		}
 
 		/** time to switch to cube grabbing mode */
-		prepareForCubeGrabbingSync();
 
 		/** Remember we let go of our cube, we can really fly now... */
 		autoCmdList.cube.setHaveCube(false);
