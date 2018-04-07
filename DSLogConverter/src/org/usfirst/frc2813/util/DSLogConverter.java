@@ -40,6 +40,7 @@ public class DSLogConverter {
 		// Read the whole file
 		int bytesRead = in.read(buffer);
 		if(bytesRead != file.length()) {
+			in.close();
 			throw new RuntimeException("Error reading the file: " + filename);
 		}
 		// Close the file
