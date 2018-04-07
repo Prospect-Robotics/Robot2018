@@ -418,7 +418,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
 
 		// WARNING! This will flood logs!
-		Logger.printLabelled(LogType.DEBUG, "PID linear stepping",
+		Logger.printLabelled(LogType.INFO, "PID linear stepping",
 				"TargetDistance", distance,
 				"distance traveled", distanceTravelled,
 				"Angular drift", angularDrift,
