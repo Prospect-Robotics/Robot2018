@@ -426,8 +426,8 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.cube.setHaveCube(true);
 
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
-		if (true) {
-//			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(240), SPEED_STOP);
+		if (false) {
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(100), SPEED_STOP);
 			return;
 		}
 
@@ -497,18 +497,18 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), SPEED_TURN);
 				autoCmdList.resetAndCalibrateSync();
 				autoCmdList.drive.addQuickTurnSync(right, 150);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_TURN);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_STOP); // was SPEED_TURN
 
 			}
 			
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/** If the robot is in the center, we're going to drop a cube into the switch on the correct side. */
 			Logger.printFormat(LogType.INFO, "%s: Robot is in the center position, with the near switch at the %s position.", this, nearSwitchPosition);
-				deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
-				//getCenterFirstCube();
-				//deliverCenterCube(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
-				//getCenterSecondCube();
-				//deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
+			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
+//			getCenterFirstCube();
+//			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
+//			getCenterSecondCube();
+//			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
 		} else {
 			prepareArmForShootingAsync(Direction.BACKWARD);
 			/**
