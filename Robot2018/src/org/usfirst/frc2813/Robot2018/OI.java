@@ -58,8 +58,8 @@ public class OI {
 
 	private static final Length ELEVATOR_HEIGHT_TOLERANCE  = LengthUOM.Inches.create(0.25);
 	private static final Length ELEVATOR_HEIGHT_GRAB_CUBE  = LengthUOM.Inches.create(5.0);
-	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(80);
-	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(175);
+	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(120);
+	private static final Length ARM_POSITION_GRAB_CUBE     = ArmConfiguration.ArmDegrees.create(150);	
 	private static final Length ARM_POSITION_TOLERANCE     = ArmConfiguration.ArmDegrees.create(5);
 
 	//// CREATING BUTTONS
@@ -351,8 +351,8 @@ public class OI {
 			break;
 		default:
 		case Competition:
-			new JoystickButton(buttonPanel, 1).whenPressed(createClimbSequence());
-			new JoystickButton(buttonPanel, 2).whenPressed(createClimbAbortSequence());
+//			new JoystickButton(buttonPanel, 1).whenPressed(createClimbSequence());
+//			new JoystickButton(buttonPanel, 2).whenPressed(createClimbAbortSequence());
 			new JoystickButton(buttonPanel, 3).whileHeld(createArmIn());
 			new JoystickButton(buttonPanel, 4).whileHeld(createArmOut());
 			new JoystickButton(buttonPanel, 5).whileHeld(createIntakeIn());

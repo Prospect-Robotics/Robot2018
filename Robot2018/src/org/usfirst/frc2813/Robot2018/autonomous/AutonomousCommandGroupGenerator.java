@@ -122,14 +122,14 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(66);
 
 	/** Arm Position for Level extension. Use to grab and drop cube. */
-	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(133);
+	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(150); // probably OK
 
 	/** Arm Position below Level extension to avoid hitting hooks with elevator down. Use to grab and drop cube. */
-	private static final Length ARM_POSITION_LOW = ArmConfiguration.ArmDegrees.create(130);
+	private static final Length ARM_POSITION_LOW = ArmConfiguration.ArmDegrees.create(150); // 150 on OI
 
 	/** Arm Position for shooting over head */
 	private static final Length ARM_POSITION_BACKWARD_SHOOT = ArmConfiguration.ArmDegrees.create(15);
-	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(70);
+	private static final Length ARM_POSITION_FORWARD_SHOOT = ArmConfiguration.ArmDegrees.create(120); // 120 on OI
 
 	/** This is the commandGroup we are populating with our autonomous routine */
 	private AutonomousCommandGroup autoCmdList = Robot.autonomousCommand;
@@ -325,6 +325,7 @@ public class AutonomousCommandGroupGenerator {
 			autoCmdList.drive.addQuickTurnSync(left, 45);
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
 			autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
 			autoCmdList.drive.addQuickTurnSync(right, 45);
 			autoCmdList.elevator.addWaitForTargetPositionSync();
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds+10), SPEED_STOP);
@@ -425,8 +426,8 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.cube.setHaveCube(true);
 
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
-		if (false) {
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(240), SPEED_STOP);
+		if (true) {
+//			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(240), SPEED_STOP);
 			return;
 		}
 

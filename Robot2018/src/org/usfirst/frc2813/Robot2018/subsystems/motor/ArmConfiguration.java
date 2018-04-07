@@ -23,7 +23,7 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	// Pulses per revolution
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096.0;
-	private static final double SENSOR_TO_DRIVE_DIVISOR = (36.0/30.0)*100.0*4.0; // 120:1 now 480:1
+	private static final double SENSOR_TO_DRIVE_DIVISOR = 480;// (36.0/30.0)*100.0*4.0; // 120:1 now 480:1
 
 	// Motor constants
 	private static final double    MAX_ENCODER_RPMS_UNLOADED             = 18700;
@@ -95,8 +95,8 @@ public class ArmConfiguration extends MotorConfiguration{
 
 	// Constants used for configuration
 	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(6.5); // was 10
-	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(15); 
-	private static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(110);
+	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0); 
+	public static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(152);
 	private static final Rate   MINIMUM_RATE = ArmDegreesPerSecond.create(0);
 	private static final Rate   MAXIMUM_RATE = ArmDegreesPerSecond.create(90);
 	
@@ -222,19 +222,16 @@ public class ArmConfiguration extends MotorConfiguration{
  		System.out.println("Arm 100% Rate....................." + ArmRateOnePercentOutputPerOneSecond.create(100) + " = " + ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(RateUOM.FeetPerSecond));
  		System.out.println("Arm 100% Rate....................." + ArmRateOnePercentOutputPerOneSecond.create(100) + " = " + ArmRateOnePercentOutputPerOneSecond.create(100).convertTo(ArmDegreesPerSecond));
  		System.out.println("Arm % Rate Table..................");
- 		/*		for(int q = 0; q <= 100; q++) {
-		Rate pct = ArmRateOnePercentOutputPerOneSecond.create(q);
-		Rate pr = ArmSRXMotorPulseRate.create(pct.convertTo(ArmSRXMotorPulseRate).getValueAsInt());
-		Rate rpm = ArmSRXEncoderRPM.create(pct.convertTo(ArmSRXEncoderRPM).getValueAsInt());
-		Rate ips = RateUOM.InchesPerSecond.create(pct.convertTo(RateUOM.InchesPerSecond).getValueAsInt());
-		System.out.println("                                  " + pct + " = " + pr + " = " + rpm + " = " + ips);	
+ 		for(int d = 0; d <= 180; d++) {
+ 			Length degrees = ArmDegrees.create(d);
+ 			System.out.println(degrees + " = " + degrees.convertTo(ArmSRXMotorPulses));
+ 		}
 	}
-*/
- 		for(int q = 0; q <= 360; q++) {
-		Length degrees = ArmDegrees.create(q);
-		Length pulses = degrees.convertTo(ArmSRXMotorPulses);
-		System.out.println("                                  " + degrees + " = " + pulses);	
-	}
-
-	}
+// 		for(int q = 0; q <= 360; q++) {
+//		Length degrees = ArmDegrees.create(q);
+//		Length pulses = degrees.convertTo(ArmSRXMotorPulses);
+//		System.out.println("                                  " + degrees + " = " + pulses);	
+//	}
+//
+//	}
 }
