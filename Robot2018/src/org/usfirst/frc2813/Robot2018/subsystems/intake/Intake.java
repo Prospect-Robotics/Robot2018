@@ -1,10 +1,13 @@
 package org.usfirst.frc2813.Robot2018.subsystems.intake;
 
 import org.usfirst.frc2813.Robot2018.commands.intake.IntakeSlowBurn;
+import org.usfirst.frc2813.Robot2018.motor.PIDConfiguration;
+import org.usfirst.frc2813.Robot2018.motor.PIDProfileSlot;
 import org.usfirst.frc2813.Robot2018.subsystems.GearheadsSubsystem;
 import org.usfirst.frc2813.logging.Logger;
 import org.usfirst.frc2813.units.Direction;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -16,11 +19,16 @@ public class Intake extends GearheadsSubsystem {
 	private WPI_TalonSRX mc;
 	double defaultSpeed;
 	double targetSpeed;
+	double targetOutputCurrentAmps; // NB: We will EITHER have targetSpeed OR targetOutputCurrentAmps 
+	
 	Direction targetDirection;
 	
 	public static final int PEAK_CURRENT_LIMIT = 35;
 	public static final int CONTINUOUS_CURRENT_LIMIT = 35;
 	public static final int PEAK_CURRENT_DURATION = 0;
+	
+	private static final double constantCurrentAmps = 5;
+	private static final PIDConfiguration constantCurrentPID = new PIDConfiguration(PIDProfileSlot.MaintainTargetOutputCurrent, 0.0, 0.0, 0.0, 0.0);
 
 	public Intake(WPI_TalonSRX mc) {
 		this.mc = mc;
@@ -31,12 +39,18 @@ public class Intake extends GearheadsSubsystem {
  		// Set static current limits
  		mc.configContinuousCurrentLimit(CONTINUOUS_CURRENT_LIMIT, 10);
 		mc.configPeakCurrentLimit(PEAK_CURRENT_LIMIT, 10);
-		mc.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);
+		mc.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);		
 		mc.enableCurrentLimit(true);
+		
+		mc.config_kF(constantCurrentPID.getPIDProfileSlot().getProfileSlotIndex(), constantCurrentPID.getF(), 10);
+		mc.config_kP(constantCurrentPID.getPIDProfileSlot().getProfileSlotIndex(), constantCurrentPID.getP(), 10);
+		mc.config_kI(constantCurrentPID.getPIDProfileSlot().getProfileSlotIndex(), constantCurrentPID.getI(), 10);
+		mc.config_kD(constantCurrentPID.getPIDProfileSlot().getProfileSlotIndex(), constantCurrentPID.getD(), 10);
 	}
 
 	public void initDefaultCommand() {
-//		setDefaultCommand(new IntakeSlowBurn(this, Direction.IN));
+		//  NOTE: You must also tune constantCurrentPID PID (see above). Right now it has ZERO output.
+//		setDefaultCommand(new IntakeSlowBurn(this, Direction.IN, constantCurrentAmps));
 	}
 
 	public void setDefaultSpeed(double defaultSpeed) {
@@ -98,6 +112,26 @@ public class Intake extends GearheadsSubsystem {
 		}
 	}
 
+	public void spinConstantCurrent(Direction targetDirection, double targetOutputCurrentAmps) {
+		if (targetDirection.isNeutral()) {
+			Logger.debug(this + " stopping.  Direction is NEUTRAL.");
+			if (!isEmulated()) {
+				mc.set(0); // NB: Just in case disable doesn't clear speed.  Couldn't find a isDisabled() function.
+				mc.disable();
+			}
+			this.targetDirection = Direction.IDLE;
+		} else {
+			double c = targetDirection.isPositive() ? -targetOutputCurrentAmps : targetOutputCurrentAmps;
+			Logger.debug(this + " spinning @ " + c + " amps.");
+			if(!isEmulated()) {
+				mc.set(ControlMode.Current, c);
+			}
+		}
+		this.targetOutputCurrentAmps = targetOutputCurrentAmps;
+		this.targetSpeed = 0;
+		this.targetDirection = targetDirection;
+	}
+
 	/**
 	 * Spin in the indicated direction at indicatd speed
 	 * @param targetDirection direction to spin
@@ -118,6 +152,7 @@ public class Intake extends GearheadsSubsystem {
 				mc.set(rate);
 			}
 		}
+		this.targetOutputCurrentAmps = 0;
 		this.targetSpeed = speed;
 		this.targetDirection = targetDirection;
 	}

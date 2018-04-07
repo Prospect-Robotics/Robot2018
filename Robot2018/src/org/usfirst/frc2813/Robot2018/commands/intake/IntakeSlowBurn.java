@@ -12,21 +12,23 @@ import org.usfirst.frc2813.units.Direction;
  */
 public class IntakeSlowBurn extends SubsystemCommand<Intake> {
 	private final Direction direction;
-	private static final double SLOW_BURN_SPEED = 0.2;
+	private final double targetOutputCurrentAmps;
 	
-    public IntakeSlowBurn(Intake intake, Direction direction, RunningInstructions duration, Lockout lockout) {
+    public IntakeSlowBurn(Intake intake, Direction direction, double targetOutputCurrentAmps, RunningInstructions duration, Lockout lockout) {
 		super(intake, duration, lockout);
 		this.direction = direction;
+		this.targetOutputCurrentAmps = targetOutputCurrentAmps;
 		addArg("direction", direction);
+		addArg("targetOutputCurrentAmps", targetOutputCurrentAmps);
 		setName(toString());
     }
 
-    public IntakeSlowBurn(Intake intake, Direction direction, RunningInstructions duration) {
-    	this(intake, direction, duration, Lockout.Disabled);
+    public IntakeSlowBurn(Intake intake, Direction direction, double targetOutputCurrentAmps, RunningInstructions duration) {
+    	this(intake, direction, targetOutputCurrentAmps, duration, Lockout.Disabled);
     }
 
-    public IntakeSlowBurn(Intake intake, Direction direction) {
-    	this(intake, direction, RunningInstructions.RUN_NORMALLY);
+    public IntakeSlowBurn(Intake intake, Direction direction, double targetOutputCurrentAmps) {
+    	this(intake, direction, targetOutputCurrentAmps, RunningInstructions.RUN_NORMALLY);
     }
 
 	@Override
@@ -36,8 +38,8 @@ public class IntakeSlowBurn extends SubsystemCommand<Intake> {
 
 	@Override
 	protected void ghscInitialize() {
-		action("initialize", "starting slow spin");
-		subsystem.spin(direction, SLOW_BURN_SPEED);
+		action("initialize", "starting slow " + direction + " spin @ " + targetOutputCurrentAmps + " amps.");
+		subsystem.spinConstantCurrent(direction, targetOutputCurrentAmps);
 	}
 
 	@Override

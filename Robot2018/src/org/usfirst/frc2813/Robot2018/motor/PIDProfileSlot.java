@@ -11,10 +11,11 @@ public enum PIDProfileSlot {
 	ProfileSlot1(1), 
 	ProfileSlot2(2), 
 	ProfileSlot3(3),
-	NoOpPosition(ProfileSlot3), 
+	NoOpPosition(ProfileSlot3), // NB: shared with MaintainTargetOutputCurrent.  Be careful here.
 	HoldingPosition(ProfileSlot2), 
 	MovingToPosition(ProfileSlot1),
-	MovingAtVelocity(ProfileSlot0);
+	MovingAtVelocity(ProfileSlot0),
+	MaintainTargetOutputCurrent(ProfileSlot3);
 
 	public final int profileSlotIndex;
 	public final PIDProfileSlot canonicalProfileSlot;
