@@ -147,8 +147,8 @@ public class OI {
 	}
 	protected CommandGroup createCalibrationSequence() {
 		CommandGroup calibration = new CommandGroup();
-		calibration.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
-		calibration.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
+		calibration.addParallel(new MotorCalibrateSensor(Robot.arm, Direction.REVERSE));
+		calibration.addParallel(new MotorCalibrateSensor(Robot.elevator, Direction.REVERSE));
 		return calibration;
 	}
 	/**
