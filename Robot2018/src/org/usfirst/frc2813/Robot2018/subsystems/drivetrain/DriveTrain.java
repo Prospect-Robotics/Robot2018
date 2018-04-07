@@ -89,17 +89,16 @@ public class DriveTrain extends GearheadsSubsystem {
 		encoderRight.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderRight.setSamplesToAverage(1);
 		encoderRight.setPIDSourceType(PIDSourceType.kRate);
-// encoderLeft.setReverseDirection(true); done at construction, not sure that it works here
 		encoderLeft.setDistancePerPulse(INCHES_PER_ENCODER_PULSE);
 		encoderLeft.setSamplesToAverage(1);
 		encoderLeft.setPIDSourceType(PIDSourceType.kRate);
-		
+
 		// Set static current limits
 		speedControllerLeftMaster.configContinuousCurrentLimit(CONTINUOUS_CURRENT_LIMIT, 10);
 		speedControllerLeftMaster.configPeakCurrentLimit(PEAK_CURRENT_LIMIT, 10);
 		speedControllerLeftMaster.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);
 		speedControllerLeftMaster.enableCurrentLimit(true);
-		
+
 		speedControllerRightMaster.configContinuousCurrentLimit(CONTINUOUS_CURRENT_LIMIT, 10);
 		speedControllerRightMaster.configPeakCurrentLimit(PEAK_CURRENT_LIMIT, 10);
 		speedControllerRightMaster.configPeakCurrentDuration(PEAK_CURRENT_DURATION, 10);
@@ -143,10 +142,22 @@ public class DriveTrain extends GearheadsSubsystem {
 
 	@Override
 	public void periodic() {
-		// Put code here to be run every loop
-
+		// If our voltage is getting low and ANYTHING else is running, stop the drive train
+		if(shouldSuspendToPreventBrownout()) {
+			stop();
+		}
 	}
-	//TODO Clean up driveTrain.arcadeDrive below
+	
+	/**
+	 * If voltage is getting low and arm/elevator/intake is running, stop driving... 
+	 */
+	public boolean shouldSuspendToPreventBrownout() {
+//		return RobotMap.pdp.getVoltage() <= 8 && 
+//				(  (RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_Arm_Master) > 0)
+//				|| (RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_Elevator_Right_Master) > 0)
+//				|| (RobotMap.pdp.getCurrent(RobotMap.PDP_PORT_Intake_Master) > 0));
+		return false;
+	}
 
 	/**
 	 * arcadeDrive for use in OI

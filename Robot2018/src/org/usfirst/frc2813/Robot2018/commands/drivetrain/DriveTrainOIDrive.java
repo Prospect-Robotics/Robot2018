@@ -37,7 +37,11 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 	@Override
 	protected void ghscExecute() {
 		if(!DriverStation.getInstance().isAutonomous()) {
-			subsystem.arcadeDrive(joystick1, joystick2);
+			if(subsystem.shouldSuspendToPreventBrownout()) {
+				Logger.error("DriveTrain is disabling itself to prevent brownout.");
+			} else {
+				subsystem.arcadeDrive(joystick1, joystick2);
+			}
 		}
 	}
 
