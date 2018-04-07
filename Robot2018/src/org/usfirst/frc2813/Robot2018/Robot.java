@@ -129,9 +129,9 @@ public class Robot extends TimedRobot {
 
 		// initialize the camera
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(640, 480);
+		camera.setResolution(320,240);
 		camera.setFPS(15);
-		new DriveTrainPrintEncoderValues(Robot.driveTrain, 2000).start();
+//		new DriveTrainPrintEncoderValues(Robot.driveTrain, 2000).start();
 //		new DriveTrainPrintPowerLevels(Robot.driveTrain, 2000).start();
 	}
 
