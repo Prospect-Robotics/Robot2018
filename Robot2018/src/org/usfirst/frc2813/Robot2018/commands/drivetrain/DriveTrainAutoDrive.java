@@ -253,7 +253,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	private double measureActualSpeed() {
 		double deltaTime = getDeltaTime();
 		double deltaPosition = getDeltaPosition();
-		Logger.printFormat(LogType.INFO, "XYZZYA>  time: %s, position: %s, timeMillis %s", deltaTime, deltaPosition, System.currentTimeMillis());
+		Logger.printFormat(LogType.DEBUG, "XYZZYA>  time: %s, position: %s, timeMillis %s", deltaTime, deltaPosition, System.currentTimeMillis());
 		if (deltaTime == 0) return measuredSpeed; // guard against divide by zero.
 		return (deltaPosition / deltaTime) / MAX_ACTUAL_SPEED;
 	}
@@ -312,7 +312,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * @return desired offset from startAngle
 	 */
 	private double calcAngle(double distanceTravelled) {
-		Logger.printLabelled(LogType.INFO, "XYZZY calcAngle", "distSoFar", distanceTravelled, "ttlDist", distance, "startAngle", startAngle, "deltaAngle", deltaAngle, "interp", GeometryHelpers.interpolate(0, startAngle, distance, deltaAngle, distanceTravelled));
+		Logger.printLabelled(LogType.DEBUG, "XYZZY calcAngle", "distSoFar", distanceTravelled, "ttlDist", distance, "startAngle", startAngle, "deltaAngle", deltaAngle, "interp", GeometryHelpers.interpolate(0, startAngle, distance, deltaAngle, distanceTravelled));
 		if (distanceTravelled < 0) {
 			return 0;
 		}
@@ -361,7 +361,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * pidAngleController before we reached our goal for curves will almost certainly have a non-zero rotation rate
 		 * and would have one if we were correcting for an error when driving straight.
 		 */
-		Logger.info("Stopping... leaving lastThrottle=", lastThrottle);
+		Logger.debug("Stopping... leaving lastThrottle=", lastThrottle);
 		subsystem.arcadeDrive(lastThrottle, 0.0);
 	}
 
@@ -395,7 +395,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 			return;
 		}
 
-		Logger.printFormat(LogType.INFO, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
+		Logger.printFormat(LogType.DEBUG, "XYZZYB>  timeMillis %s", System.currentTimeMillis());
 		double distanceTravelled = distanceTravelled();
 		double desiredSpeed = calcSpeed(distanceTravelled);
 		
@@ -418,7 +418,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		double newThrottle = speedToThrottle(desiredSpeed + pidSpeedAdjust);
 
 		// WARNING! This will flood logs!
-		Logger.printLabelled(LogType.INFO, "PID linear stepping",
+		Logger.printLabelled(LogType.DEBUG, "PID linear stepping",
 				"TargetDistance", distance,
 				"distance traveled", distanceTravelled,
 				"Angular drift", angularDrift,
