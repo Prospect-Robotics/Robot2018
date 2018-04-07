@@ -11,11 +11,16 @@ public enum PIDProfileSlot {
 	ProfileSlot1(1), 
 	ProfileSlot2(2), 
 	ProfileSlot3(3),
-	NoOpPosition(ProfileSlot3), 
 	HoldingPosition(ProfileSlot2), 
 	MovingToPosition(ProfileSlot1),
-	MovingAtVelocity(ProfileSlot0);
+	MovingAtVelocity(ProfileSlot0),
+	MaintainingTargetOutputCurrent(ProfileSlot3),
+	NoOpSlot(ProfileSlot3) // NB: Shared with current PID slot
+	;
 
+	public static final int MIN_SLOT_INDEX = 0;
+	public static final int MAX_SLOT_INDEX = 3;
+	public static final int NUM_SLOT_INDEXES = 4;
 	public final int profileSlotIndex;
 	public final PIDProfileSlot canonicalProfileSlot;
 	

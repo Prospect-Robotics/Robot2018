@@ -25,6 +25,11 @@ public interface IMotorState extends IMotorOperation {
 	 */
 	Rate getTargetRate();
 	/**
+	 * Get the current
+	 * @return the value, or null if it's not relevant to the operation
+	 */
+	Double getTargetOutputCurrent();
+	/**
 	 * Get the absolute position of the operation
 	 * @return the value, or null if it's not relevant to the operation
 	 */
@@ -119,6 +124,11 @@ public interface IMotorState extends IMotorOperation {
 	 * @return True if we recorded our position when we created the state, a "before" snapshot of the position.
 	 */
 	boolean getHasStartingAbsolutePosition();
+	/**
+	 * Is there a target current
+	 * @return True if the operation uses a target current parameter
+	 */
+	boolean getHasTargetOutputCurrent();
 	/**
 	 * Convert units
 	 * @param lengthUOM The unit to use for length (distance or angle)

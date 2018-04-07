@@ -19,4 +19,7 @@ public interface IMotorOperation {
 	boolean isMovingInDirectionAtRate();
 
 	boolean isCalibratingSensorInDirection();
+
+	boolean isMaintainingTargetOutputCurrent();
+	
 }

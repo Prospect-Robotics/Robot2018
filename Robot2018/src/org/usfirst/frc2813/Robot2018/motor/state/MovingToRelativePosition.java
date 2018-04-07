@@ -15,7 +15,8 @@ public class MovingToRelativePosition extends MotorState {
 				null,
 				null,
 				targetRelativeDistance,
-				motor.getCurrentPosition()
+				motor.getCurrentPosition(),
+				null
 				);
 	}
 }

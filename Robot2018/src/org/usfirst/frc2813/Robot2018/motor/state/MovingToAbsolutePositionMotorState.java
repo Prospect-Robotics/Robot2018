@@ -13,7 +13,8 @@ public class MovingToAbsolutePositionMotorState extends MotorState {
 				null, 
 				targetAbsolutePosition,
 				null,
-				motor.getCurrentPosition()
+				motor.getCurrentPosition(),
+				null
 				);
 	}
 }

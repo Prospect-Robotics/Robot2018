@@ -16,7 +16,9 @@ public enum MotorOperation implements IMotorOperation {
 	// Moving a relative distance in a direction
 	MOVING_TO_RELATIVE_POSITION,
 	// Calibrating sensor in a direction
-	CALIBRATING_SENSOR_IN_DIRECTION
+	CALIBRATING_SENSOR_IN_DIRECTION,
+	// Using PID to hold a current
+	MAINTAINING_TARGET_OUTPUT_CURRENT
 	;
 	@Override
 	public boolean isDisabled() {
@@ -66,5 +68,10 @@ public enum MotorOperation implements IMotorOperation {
 	@Override
 	public boolean isCalibratingSensorInDirection() {
 		return this == CALIBRATING_SENSOR_IN_DIRECTION;
+	}
+
+	@Override
+	public boolean isMaintainingTargetOutputCurrent() {
+		return this == MAINTAINING_TARGET_OUTPUT_CURRENT;
 	}
 }

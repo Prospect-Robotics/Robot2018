@@ -51,6 +51,8 @@ public final class TalonSRX extends AbstractMotorController {
 	public static final int RUNNING_CONFIGURATION_COMMAND_TIMEOUT_MS = 0;
 	// We will always use the same PID index
 	public static final PID currentPID = PID.Primary;
+	// Keep an indexed copy of the PIDConfigurations
+	private final PIDConfiguration[] pidConfigurations = new PIDConfiguration[PIDProfileSlot.NUM_SLOT_INDEXES]; 
 	
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
@@ -135,6 +137,10 @@ public final class TalonSRX extends AbstractMotorController {
 			newControlMode = ControlMode.Velocity;
 			newControlModeValue = toSensorUnits(proposedState.getTargetRate()).getValue() * proposedState.getTargetDirection().getMultiplierAsDouble();
 			break;
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			newControlMode = ControlMode.Current;
+			newControlModeValue = proposedState.getTargetOutputCurrent() * proposedState.getTargetDirection().getMultiplierAsDouble();
+			break;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			newControlMode = ControlMode.Velocity;
 			if(!getCurrentHardLimitSwitchStatus(proposedState.getTargetDirection())) {
@@ -215,10 +221,10 @@ public final class TalonSRX extends AbstractMotorController {
 		Logger.debug(this + " setting selected sensor " + pid.getPIDIndex() + " to " + rawValue + " (Requested " + sensorPosition + ").");
 		mc.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, pid.getPIDIndex(), getTimeout());
 		if(true) {
-			// NB: Clear no-op profile slot just to be sure		
-			configurePID(PIDProfileSlot.NoOpPosition, 0, 0, 0, 0);
+			// NB: Clear a profile slot		
+			configurePID(PIDProfileSlot.NoOpSlot, 0, 0, 0, 0);
 			// Set that as the slot
-			mc.selectProfileSlot(PIDProfileSlot.NoOpPosition.getProfileSlotIndex(), currentPID.getPIDIndex());
+			mc.selectProfileSlot(PIDProfileSlot.NoOpSlot.getProfileSlotIndex(), currentPID.getPIDIndex());
 			// Configure disabled, then position, then disabled, then velocity, then disabled... no matter what mode we were in - we should change modes at least once...
 			mc.set(ControlMode.Disabled, 0.0);
 			// Change modes, hoping to shake loose old PID state
@@ -231,6 +237,10 @@ public final class TalonSRX extends AbstractMotorController {
 			}
 			//Go back to disabled
 			mc.set(ControlMode.Disabled, 0.0);
+			// Restore the profile slot we overwrote, if it was being used
+			if(pidConfigurations[PIDProfileSlot.NoOpSlot.getProfileSlotIndex()] != null) {
+				configurePID(pidConfigurations[PIDProfileSlot.NoOpSlot.getProfileSlotIndex()]);
+			}			
 		}
 		// Restore correct slot & set sensor position
 		mc.selectProfileSlot(lastSlot.getProfileSlotIndex(), currentPID.getPIDIndex());
@@ -262,7 +272,14 @@ public final class TalonSRX extends AbstractMotorController {
 	private void configurePID(PIDProfileSlot profileSlot, double p, double i, double d) {
 		configurePID(profileSlot, p, i, d, 0);
 	}
-	
+	private void configurePID(PIDConfiguration pidConfiguration) {
+		configurePID(
+			pidConfiguration.getPIDProfileSlot(),
+			pidConfiguration.getP(),
+			pidConfiguration.getI(),
+			pidConfiguration.getD(),
+			pidConfiguration.getF());
+	}	
 	/*
 	 * Configure PID values
 	 */
@@ -378,13 +395,9 @@ setHardLimitSwitchClearsPositionAutomatically(Direction.REVERSE, false);
 		Iterator<PIDConfiguration> pidProfiles = configuration.getPIDConfigurations().iterator();
 		while(pidProfiles.hasNext()) {
 			PIDConfiguration pidConfiguration = pidProfiles.next();
-	 	    configurePID(
-	 	    		pidConfiguration.getPIDProfileSlot(),
-	 	    		pidConfiguration.getP(),
-	 	    		pidConfiguration.getI(),
-	 	    		pidConfiguration.getD(),
-	 	    		pidConfiguration.getF());
-	 	    Logger.info(this + " loaded : " + pidConfiguration);
+	 	    configurePID(pidConfiguration);
+	 	   pidConfigurations[pidConfiguration.getPIDProfileSlot().getProfileSlotIndex()] = pidConfiguration;
+	 	   Logger.info(this + " loaded : " + pidConfiguration);
 		}
 	}
 

@@ -29,12 +29,11 @@ public abstract class AbstractMotorController implements IMotorController {
 	 * Constants
 	 * ---------------------------------------------------------------------------------------------- */
 	
-	// We will use separate profiles for holding, moving to position, and moving at a rate
+	// We will use separate profiles for holding, moving to position, and moving at a rate, moving at current, etc.
 	public static final PIDProfileSlot PROFILE_SLOT_FOR_HOLD_POSITION     = PIDProfileSlot.HoldingPosition;
-	// We will use separate profiles for holding, moving to position, and moving at a rate
 	public static final PIDProfileSlot PROFILE_SLOT_FOR_MOVE_TO_POSITION  = PIDProfileSlot.MovingToPosition;
-	// We will use separate profiles for holding, moving to position, and moving at a rate
 	public static final PIDProfileSlot PROFILE_SLOT_FOR_MOVE_AT_VELOCITY  = PIDProfileSlot.MovingAtVelocity;
+	public static final PIDProfileSlot PROFILE_SLOT_FOR_MAINTAIN_TARGET_OUTPUT_CURRENT  = PIDProfileSlot.MaintainingTargetOutputCurrent;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * State
@@ -535,6 +534,8 @@ public abstract class AbstractMotorController implements IMotorController {
 		case MOVING_IN_DIRECTION_AT_RATE:
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			return PROFILE_SLOT_FOR_MOVE_AT_VELOCITY;
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			return PROFILE_SLOT_FOR_MAINTAIN_TARGET_OUTPUT_CURRENT;
 		default:
 			throw new IllegalStateException(Formatter.concat("Unsupported operation: ", state.getOperation()));
 		}
@@ -759,6 +760,20 @@ public abstract class AbstractMotorController implements IMotorController {
 	@Override
 	public boolean getHasHardOrSoftLimit(Direction direction) {
 		return getHasHardLimit(direction) || getHasSoftLimit(direction);
+	}
+	
+	@Override
+	public boolean maintainTargetOutputCurrent(Direction targetDirection, Double targetOutputCurrent) {		
+		if(targetOutputCurrent == null || targetOutputCurrent == 0) {
+			Logger.info(" was told to hold constant current of zero.  Holding position instead.");
+			return holdCurrentPosition();
+		} if(targetOutputCurrent < 0) {
+			disable();
+			throw new IllegalArgumentException("was told to hold negative constant current.  Use targetDirection instead.  Disabling the motor.");
+		}
+		else {
+			return changeState(MotorStateFactory.createMaintainTargetOutputCurrent(this, targetDirection, targetOutputCurrent));
+		}
 	}
 	
 }

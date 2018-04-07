@@ -124,7 +124,7 @@ public class ArmConfiguration extends MotorConfiguration{
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.HoldingPosition, 0.015, 0.0, 0.01, 0.0));
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingToPosition, 0.02, 0.0, 0.01, 0.0));
 		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MovingAtVelocity, 0.03, 0.0, 0.02, 1.0));
-		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.NoOpPosition, 0.0, 0.0, 0.0, 0.0));
+		pidConfigurations.add(new PIDConfiguration(PIDProfileSlot.MaintainingTargetOutputCurrent, 0.0, 0.0, 0.0, 0.0)); // TODO: Set some output parameters here based on testing.
 		return Collections.unmodifiableList(pidConfigurations);
 	}
 

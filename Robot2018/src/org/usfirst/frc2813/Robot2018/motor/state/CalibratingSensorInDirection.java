@@ -13,7 +13,8 @@ public class CalibratingSensorInDirection extends MotorState {
 				null,
 				null,
 				null,
-				motor.getCurrentPosition()
+				motor.getCurrentPosition(),
+				null
 				);
 	}
 }

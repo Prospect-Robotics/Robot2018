@@ -319,6 +319,11 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 	}
 
 	@Override
+	public boolean maintainTargetOutputCurrent(Direction targetDirection, Double targetOutputCurrent) {
+		return changeState(MotorStateFactory.createMaintainTargetOutputCurrent(this, targetDirection, targetOutputCurrent));
+	}
+
+	@Override
 	public final Length getCurrentPosition() {
 		return getMotorController().getCurrentPosition();
 	}
@@ -362,27 +367,22 @@ public final class Motor extends GearheadsSubsystem implements IMotor {
 		Logger.info(this + " entering " + proposedState);
 		switch(proposedState.getOperation()) {
 		case DISABLED:
-			getMotorController().disable();
-			break;
+			return getMotorController().disable();
 		case HOLDING_CURRENT_POSITION:
-			getMotorController().holdCurrentPosition();
-			break;
+			return getMotorController().holdCurrentPosition();
 		case MOVING_IN_DIRECTION_AT_RATE:
-			getMotorController().moveInDirectionAtRate(proposedState.getTargetDirection(), proposedState.getTargetRate());
-			break;
+			return getMotorController().moveInDirectionAtRate(proposedState.getTargetDirection(), proposedState.getTargetRate());
 		case MOVING_TO_ABSOLUTE_POSITION:
-			getMotorController().moveToAbsolutePosition(proposedState.getTargetAbsolutePosition());
-			break;
+			return getMotorController().moveToAbsolutePosition(proposedState.getTargetAbsolutePosition());
 		case MOVING_TO_RELATIVE_POSITION:
-			getMotorController().moveToRelativePosition(proposedState.getTargetDirection(), proposedState.getTargetRelativeDistance());
-			break;
+			return getMotorController().moveToRelativePosition(proposedState.getTargetDirection(), proposedState.getTargetRelativeDistance());
 		case CALIBRATING_SENSOR_IN_DIRECTION:
-			getMotorController().calibrateSensorInDirection(proposedState.getTargetDirection());
-			break;
+			return getMotorController().calibrateSensorInDirection(proposedState.getTargetDirection());
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			return getMotorController().maintainTargetOutputCurrent(proposedState.getTargetDirection(), proposedState.getTargetOutputCurrent());
 		default:
-			break;
+			return false;
 		}
-		return true;
 	}
 	/**
 	 * All device change come through here first.  This is a very high level sanity check

@@ -50,6 +50,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 	 * If not, it will disable the command's PID controllers
 	 */
 	private static class AutoOnlyPIDOutput implements PIDOutput {
+		@SuppressWarnings("unused")
 		private final DriveTrainAutoStop parent;
 		private final PIDOutput pidOut;
 		
@@ -59,7 +60,7 @@ public class DriveTrainAutoStop extends SubsystemCommand<DriveTrain> {
 		}
 		
 		public void pidWrite(double output) {
-			if(!parent.isAutonomous()) {
+			if(!DriveTrainAutoStop.isAutonomous()) {
 				pidOut.pidWrite(output);
 			}
 		}

@@ -474,4 +474,8 @@ public class MotorControllerUnitConversionAdapter implements IMotorController {
 		log("isPhysicalLimitReached", Formatter.safeFormat("converted %s to %s", direction, newDirection));
 		return getMotorController().isPhysicalLimitReached(newDirection); 
 	}
+	@Override
+	public boolean maintainTargetOutputCurrent(Direction direction, Double targetOutputCurrent) {
+		return getMotorController().maintainTargetOutputCurrent(direction, targetOutputCurrent);
+	}
 }

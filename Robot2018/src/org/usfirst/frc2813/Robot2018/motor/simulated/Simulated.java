@@ -127,7 +127,10 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 		case MOVING_IN_DIRECTION_AT_RATE:
 		case MOVING_TO_ABSOLUTE_POSITION:
 		case MOVING_TO_RELATIVE_POSITION:
-			// We are moving
+			// We are moving...
+			break;
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			// We are moving...
 			break;
 		default:
 			throw new IllegalArgumentException(this + " unsupported operation: " + currentState.getOperation());
@@ -229,6 +232,9 @@ public final class Simulated extends AbstractMotorController implements IMotorCo
 			rate = encoderValue < currentState.getTargetAbsolutePosition().getValue() 
 					? getMaximumForwardRate() 
 					: getMaximumReverseRate();
+			break;
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			// TODO
 			break;
 		default:
 			throw new UnsupportedOperationException("Unsupported operation: " + getTargetState());

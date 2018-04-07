@@ -125,6 +125,8 @@ public class PWMWithEncoder extends AbstractMotorController implements IMotor {
 //			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			throw new UnsupportedOperationException("PID loop has not yet been implemented for PWM + Encoder.");
 		default:
 			break;
 		}

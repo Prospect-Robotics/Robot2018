@@ -210,6 +210,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * Calibrate the arm (move down), but don't wait for completion.
 		 * To check it you would have to wait for a limit switch.
 		 */
+		@SuppressWarnings("unused")
 		private void addCalibrateAsync() {
 			if(!Robot.arm.isDisconnected()) {
 				addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN, RunningInstructions.RUN_ASYNCHRONOUSLY));

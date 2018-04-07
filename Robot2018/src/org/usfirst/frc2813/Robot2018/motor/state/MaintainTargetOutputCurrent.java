@@ -5,17 +5,17 @@ import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.values.Rate;
 
-public class MovingInDirectionAtRateMotorState extends MotorState {
-	public MovingInDirectionAtRateMotorState(IMotor motor, Direction targetDirection, Rate targetRate) {
+public class MaintainTargetOutputCurrent extends MotorState {
+	public MaintainTargetOutputCurrent(IMotor motor, Direction targetDirection, Double targetOutputCurrent) {
 		super(
 				motor, 
-				MotorOperation.MOVING_IN_DIRECTION_AT_RATE,
+				MotorOperation.MAINTAINING_TARGET_OUTPUT_CURRENT,
 				targetDirection,
-				targetRate,
 				null,
 				null,
-				motor.getCurrentPosition(),
-				null
+				null,
+				null,
+				targetOutputCurrent
 				);
 	}
 }

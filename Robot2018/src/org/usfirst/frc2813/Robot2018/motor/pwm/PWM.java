@@ -101,6 +101,10 @@ public class PWM extends AbstractMotorController implements IMotor {
 			break;
 		case CALIBRATING_SENSOR_IN_DIRECTION:
 			throw new UnsupportedOperationException("PWM controllers do not support calibrating sensors.  There are no sensors.");
+		case MAINTAINING_TARGET_OUTPUT_CURRENT:
+			throw new UnsupportedOperationException("PWM controllers do not support maintaining target output current.  There are no sensors.");
+		default:
+			break;
 		}
 		if(newSetting < -1 || newSetting > 1) {
 			// return false;

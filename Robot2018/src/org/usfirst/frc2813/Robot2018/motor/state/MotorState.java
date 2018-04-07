@@ -1,6 +1,7 @@
 package org.usfirst.frc2813.Robot2018.motor.state;
 
 import org.usfirst.frc2813.Robot2018.motor.IMotor;
+import org.usfirst.frc2813.Robot2018.motor.operation.IMotorOperation;
 import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 import org.usfirst.frc2813.units.Direction;
 import org.usfirst.frc2813.units.uom.LengthUOM;
@@ -21,6 +22,7 @@ public class MotorState implements IMotorState {
 	private final Length targetAbsolutePosition;
 	private final Length targetRelativeDistance;
 	private final Length startingAbsolutePosition;
+	private final Double targetOutputCurrent;
 
 	/* ----------------------------------------------------------------------------------------------
 	 * Constructors
@@ -33,7 +35,8 @@ public class MotorState implements IMotorState {
 			Rate rate, 
 			Length absolutePosition, 
 			Length relativeDistance,
-			Length startingAbsolutePosition
+			Length startingAbsolutePosition,
+			Double targetOutputCurrent
 			) 
 	{
 		this.motor = motor;
@@ -43,6 +46,7 @@ public class MotorState implements IMotorState {
 		this.targetAbsolutePosition = absolutePosition;
 		this.targetRelativeDistance = relativeDistance;
 		this.startingAbsolutePosition = startingAbsolutePosition;
+		this.targetOutputCurrent = targetOutputCurrent;
 	}
 
 	/* ----------------------------------------------------------------------------------------------
@@ -101,6 +105,7 @@ public class MotorState implements IMotorState {
 		return "MotorState[Op=" + operation 
 				+ (targetDirection != null ? " TgtDir=" + targetDirection : "")
 				+ (targetRate != null ? " TgtRate=" + targetRate : "")
+				+ (targetOutputCurrent != null ? " TgtCurrent=" + targetOutputCurrent : "")
 				+ (targetAbsolutePosition != null ? " TgtAbsPos=" + targetAbsolutePosition : "")
 				+ (targetRelativeDistance != null ? " TgtRelDist=" + targetRelativeDistance : "")
 				+ (targetRate != null ? " TgtRateErr=" + getCurrentRateError() : "")
@@ -136,7 +141,9 @@ public class MotorState implements IMotorState {
 				&& nullSafeEquals(other.targetDirection, targetDirection)
 				&& nullSafeEquals(other.targetAbsolutePosition, targetAbsolutePosition)
 				&& nullSafeEquals(other.targetRelativeDistance, targetRelativeDistance)
-				&& nullSafeEquals(other.targetRate, targetRate);
+				&& nullSafeEquals(other.targetRate, targetRate)
+				&& nullSafeEquals(other.targetOutputCurrent, targetOutputCurrent)
+				;
 	}
 
 	/**
@@ -281,7 +288,8 @@ public class MotorState implements IMotorState {
 				targetRate == null ? null : targetRate.convertTo(rateUOM),
 				targetAbsolutePosition == null ? null : targetAbsolutePosition.convertTo(lengthUOM),
 				targetRelativeDistance == null ? null : targetRelativeDistance.convertTo(lengthUOM),
-				startingAbsolutePosition == null ? startingAbsolutePosition :startingAbsolutePosition.convertTo(lengthUOM) 
+				startingAbsolutePosition == null ? startingAbsolutePosition :startingAbsolutePosition.convertTo(lengthUOM),
+				targetOutputCurrent
 				);
 	}
 
@@ -293,5 +301,20 @@ public class MotorState implements IMotorState {
 	@Override
 	public boolean getHasStartingAbsolutePosition() {
 		return true; // NB: Could do this only for relative moves, but why not
+	}
+
+	@Override
+	public Double getTargetOutputCurrent() {
+		return this.targetOutputCurrent;
+	}
+
+	@Override
+	public boolean getHasTargetOutputCurrent() {
+		return this.operation.equals(MotorOperation.MAINTAINING_TARGET_OUTPUT_CURRENT);
+	}
+
+	@Override
+	public boolean isMaintainingTargetOutputCurrent() {
+		return getOperation().isMaintainingTargetOutputCurrent();
 	}
 }

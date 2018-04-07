@@ -142,6 +142,14 @@ public interface IMotor {
 	 * @see IMotor#getTargetState()
 	 **/
 	public boolean moveToRelativePosition(Direction direction, Length relativeDistance);
+	
+	/**
+	 * Set the target to maintain a specified output current
+	 * @param direction The direction to move
+	 * @param targetOutputCurrent The target current to consume
+	 * @return true/false 
+	 */
+	public boolean maintainTargetOutputCurrent(Direction direction, Double targetOutputCurrent);
 	/**
 	 * Set the target for the motor to disabled/neutral.  Motor will be in OFF mode (either braking or neutral)
 	 * @return true if the command is supported and accepted

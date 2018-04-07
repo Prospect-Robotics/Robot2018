@@ -6,6 +6,6 @@ import org.usfirst.frc2813.Robot2018.motor.operation.MotorOperation;
 public class HoldingPositionMotorState extends MotorState {
 
 	public HoldingPositionMotorState(IMotor motor) {
-		super(motor, MotorOperation.HOLDING_CURRENT_POSITION, null, null, null, null, motor.getCurrentPosition());
+		super(motor, MotorOperation.HOLDING_CURRENT_POSITION, null, null, null, null, motor.getCurrentPosition(), null);
 	}
 }
