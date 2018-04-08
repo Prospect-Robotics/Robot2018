@@ -141,6 +141,17 @@ public class AutonomousCommandGroupGenerator {
 	private static Direction SCRIPT_BIAS = Direction.LEFT;
 
 	private Direction left, right, clockwise, counterclockwise;
+
+	/*
+	 * We tried having the robot start on the sides facing backwards so it could throw the cube on to the switch
+	 * over its shoulder and more quickly grab and place another cube.  When the Elevator binds, it can block the
+	 * over-the-shoulder throw.  For now, revert to everything forwards at start.  Post season, fix over-the-shoulder
+	 * because it is cool.
+	 */
+//	private Direction robotOnSideStartsFacing = Direction.BACKWARD;
+	private Direction robotStartFacingDirectionOnSide = Direction.FORWARD;
+	private Direction robotStartFacingDirectionInCenter = Direction.FORWARD;
+
 	/**
 	 * To re-use scripts, we write them as if we were on the left, going left, etc.
 	 * and then we invert the directions as necessary.
@@ -441,7 +452,8 @@ public class AutonomousCommandGroupGenerator {
 			Direction direction;
 			Logger.error(this, ": No game data.");
 //			direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;	// for when L and R go backwards
-			direction = Direction.FORWARD;
+//			direction = Direction.FORWARD;
+			direction = robotStartingPosition.equals(Direction.CENTER) ? robotStartFacingDirectionInCenter : robotStartFacingDirectionOnSide;	// for when L and R go backwards
 //			autoCmdList.drive.addDriveSync(direction, inches(backWallToCubePyramid), SPEED_STOP);
 			autoCmdList.drive.addDriveSync(direction, inches(distanceToCrossLine), SPEED_STOP);
 		}
@@ -461,7 +473,7 @@ public class AutonomousCommandGroupGenerator {
 		 * paths as if we are are moving to the left.
 		 */
 		if (robotStartingPosition.equals(scalePosition)) {
-			prepareArmForShootingAsync(Direction.BACKWARD);
+			prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
 			/**
 			 * The robot and the scale are on the same side. Drive forward and approach the
 			 * scale from the side.
@@ -484,25 +496,28 @@ public class AutonomousCommandGroupGenerator {
 				 * offset from the forward distance. Travel that distance straight. Then raise
 				 * the elevator. Then follow our curve to the target.
 				 */
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(distanceToDriveStraight), SPEED_FULL);
-				prepareElevatorForScaleAsync(Direction.BACKWARD);
-				autoCmdList.drive.addCurveDegreesSync(Direction.BACKWARD, 45.0, inches(radius), counterclockwise, SPEED_STOP);
+				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(distanceToDriveStraight), SPEED_FULL);
+				prepareElevatorForScaleAsync(robotStartFacingDirectionOnSide);
+				autoCmdList.drive.addCurveDegreesSync(robotStartFacingDirectionOnSide, 45.0, inches(radius), counterclockwise, SPEED_STOP);	// direction of turn is counterclockwise whether we are traveling forwards or backwards
 				autoCmdList.cube.addShootSequenceSync();
 			} else {
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(totalDistanceAhead), SPEED_TURN);
-				prepareElevatorForScaleAsync(Direction.BACKWARD);
+				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(totalDistanceAhead), SPEED_TURN);
+				prepareElevatorForScaleAsync(robotStartFacingDirectionOnSide);
 				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(60));
 				autoCmdList.drive.addQuickTurnSync(right, 30);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(30), SPEED_TURN);
-				autoCmdList.cube.addJawsOpenSync();
-				autoCmdList.time.addDelayInSecondsSync(0.5);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(12), SPEED_TURN);
-				autoCmdList.drive.addQuickTurnSync(left, 30);
-				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), SPEED_TURN);
-				autoCmdList.resetAndCalibrateSync();
-				autoCmdList.drive.addQuickTurnSync(right, 150);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_STOP); // was SPEED_TURN
-
+				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(30), SPEED_TURN);
+				boolean disableSecondCubeGrab;		// TODO:  Fix autonomous and then nail down the code
+				if (disableSecondCubeGrab = true) {
+					autoCmdList.cube.addShootSequenceSync();
+				} else { autoCmdList.cube.addJawsOpenSync();
+					autoCmdList.time.addDelayInSecondsSync(0.5);
+					autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(12), SPEED_TURN);
+					autoCmdList.drive.addQuickTurnSync(left, 30);
+					autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), SPEED_TURN);
+					autoCmdList.resetAndCalibrateSync();
+					autoCmdList.drive.addQuickTurnSync(right, 150);
+					autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_STOP); // was SPEED_TURN
+				}
 			}
 			
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
@@ -514,21 +529,35 @@ public class AutonomousCommandGroupGenerator {
 //			getCenterSecondCube();
 //			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
 		} else {
-			prepareArmForShootingAsync(Direction.BACKWARD);
+			prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
+			/**
+			 * Robot and scale are on opposite side. 
+			 * Driving down the alley is not working.
+			 * Instead, drive forward to the swtich and stop.
+			 * If we are on our side of the swtich, place a block
+			 */
+			Logger.printFormat(LogType.INFO, "%s: Robot is in the %s position. Opposite the scale in the %s position.", this, robotStartingPosition, scalePosition);
+
+//			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(101), SPEED_STOP);
+//			if(robotStartingPosition.equals(nearSwitchPosition)) {
+//				autoCmdList.drive.addQuickTurnSync(right, 90);
+//				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(12), SPEED_STOP);
+//				autoCmdList.cube.addShootSequenceSync();
+//			}
+			
+//			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(101), SPEED_STOP);
+//			if(robotStartingPosition.equals(nearSwitchPosition)) {
+//				autoCmdList.drive.addQuickTurnSync(right, 90);
+//				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(12), SPEED_STOP);
+//				autoCmdList.cube.addShootSequenceSync();
+//			}
+
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
 			 * and switch. Note that we must avoid driving over the scale platform. We do
 			 * this by circling back to face the scale target at 45 degrees. The same as
 			 * when we are on the same side.
 			 */
-			Logger.printFormat(LogType.INFO, "%s: Robot is in the %s position. Opposite the scale in the %s position.", this, robotStartingPosition, scalePosition);
-
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(101), SPEED_STOP);
-			if(robotStartingPosition.equals(nearSwitchPosition)) {
-				autoCmdList.drive.addQuickTurnSync(right, 90);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_STOP);
-				autoCmdList.cube.addShootSequenceSync();
-			}
 //			/** distance from center of robot to center of scale alley */
 //			double distanceToFirstTurn = backWallToScaleAlley + scaleAlleyWidth/2 - robotBumperLength/2;
 //
