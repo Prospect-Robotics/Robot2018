@@ -438,8 +438,9 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		autoCmdList.cube.setHaveCube(true);
 
+		boolean autoDriveForwardOnly;
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
-		if (true) {
+		if (autoDriveForwardOnly=false) {
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToCrossLine), SPEED_STOP);
 			return;
 		}
