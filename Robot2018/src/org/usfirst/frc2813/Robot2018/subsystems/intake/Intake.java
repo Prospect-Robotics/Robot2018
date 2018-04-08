@@ -23,10 +23,10 @@ public class Intake extends GearheadsSubsystem {
 	
 	Direction targetDirection;
 	
-	public static final int PEAK_CURRENT_LIMIT = 35;
-	public static final int CONTINUOUS_CURRENT_LIMIT = 35;
+	public static final int PEAK_CURRENT_LIMIT = 40;
+	public static final int CONTINUOUS_CURRENT_LIMIT = 40;
 	public static final int PEAK_CURRENT_DURATION = 0;
-	
+
 	private static final double constantCurrentAmps = 5;
 	private static final PIDConfiguration constantCurrentPID = new PIDConfiguration(PIDProfileSlot.MaintainTargetOutputCurrent, 0.0, 0.0, 0.0, 0.0);
 

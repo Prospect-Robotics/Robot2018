@@ -63,8 +63,14 @@ public class AutonomousCommandGroup extends CommandGroup {
 		drive.addSensorResetSequenceSync();
 
 		/** WARNING! MUST CALIBRATE ARM BEFORE ELEVATOR */
-		arm.addCalibrateSync();
-		elevator.addCalibrateSync();
+		CommandGroup calibrate = new CommandGroup();
+		if(!Robot.arm.isDisconnected()) {
+			calibrate.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN));
+		}
+		if(!Robot.elevator.isDisconnected()) {
+			calibrate.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
+		}
+		addParallel(calibrate);
 	}
 
 	public class Drive {
@@ -138,7 +144,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 * @param relativeAngle - how many degrees to turn
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
-			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, state, direction, relativeAngle, 0.45));
+			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, state, direction, relativeAngle, 0.6));
 			halt();
 		}
 	}
