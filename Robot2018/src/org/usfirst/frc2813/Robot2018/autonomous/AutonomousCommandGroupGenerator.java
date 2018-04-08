@@ -66,7 +66,8 @@ public class AutonomousCommandGroupGenerator {
 	private static final double backWallToScaleAlley = backWallToFarSideOfSwitch + cubeSize; // row of cubes on far side of switch
 	private static final double backWallToScalePlatform = 261.47;
 	private static final double backWallToScaleTarget = 299.65;
-
+	private static final double distanceToCrossLine = 130;		// latest value per Jack - not calculated
+	
 	/** field dimensions from side wall */
 	private static final double sideWallToFirstRobotStartPosition = 29.69;
 	private static final double sideWallToFirstRobotEndPosition = sideWallToFirstRobotStartPosition + robotBumperWidth;
@@ -427,7 +428,7 @@ public class AutonomousCommandGroupGenerator {
 
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
 		if (false) {
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(100), SPEED_STOP);
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToCrossLine), SPEED_STOP);
 			return;
 		}
 
@@ -437,9 +438,12 @@ public class AutonomousCommandGroupGenerator {
 		 * foot short of them.
 		 */
 		if (!Robot.gameData.isGameDataValid()) {
+			Direction direction;
 			Logger.error(this, ": No game data.");
-			Direction direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;
-			autoCmdList.drive.addDriveSync(direction, inches(backWallToCubePyramid), SPEED_STOP);
+//			direction = robotStartingPosition.equals(Direction.CENTER) ? Direction.FORWARD : Direction.BACKWARD;	// for when L and R go backwards
+			direction = Direction.FORWARD;
+//			autoCmdList.drive.addDriveSync(direction, inches(backWallToCubePyramid), SPEED_STOP);
+			autoCmdList.drive.addDriveSync(direction, inches(distanceToCrossLine), SPEED_STOP);
 		}
 
 		/**

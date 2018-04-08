@@ -167,7 +167,7 @@ public class RobotMap {
 		driveTrainLeftEncoder = new Encoder(12, 13, false, EncodingType.k4X);
 		LiveWindow.addSensor("DriveTrain", "Left Encoder", driveTrainLeftEncoder);
 
-		/*
+		/*-
 		 * Elevator subsystem
 		 */
 		elevatorSpeedControllerRightMaster = new TalonSRX(CAN_ID_Elevator_Right_Master);		// CAN bus slot 10 (Talon is on the Right side)

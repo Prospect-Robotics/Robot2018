@@ -23,7 +23,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	
 	private static final double LERP_START=60;
 	private static final double LERP_STOP=25;
-	private static final double LERP_END=0.25;
+	private static final double LERP_END=0.4;
 	private static final double MIN_DEG=0.5;
 
 	/*
