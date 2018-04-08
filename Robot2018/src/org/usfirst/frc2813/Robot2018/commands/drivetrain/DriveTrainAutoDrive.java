@@ -121,7 +121,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 	 * Our interrupt latency is around 45ms. Set our stuck threshold to 5 inches per second at full speed.
 	 */
 	private static final double progressDistanceThreshold = 0.045*5;
-	private static final double progressCycleThreshold = 6;
+//	private static final double progressCycleThreshold = 6;
+	private static final double progressCycleThreshold = 60;		// TODO:  Review:  allow to stall longer in case we get stuck on carpet, but do stop eventually in case we are hitting the switch
 	private double lastDistanceTravelled;
 	
 	/**
@@ -408,7 +409,9 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		if ((distanceTravelled - lastDistanceTravelled) < progressDistanceThreshold * desiredSpeed) {
 			if (++cyclesWithoutProgress > progressCycleThreshold) {
 				Logger.error("STALL DETECTED\n");
-//				distanceReached = true;
+//				distanceReached = true;		// TODO:  FLAG:  Is this right?  I think this was taken out because the bot gets stuck on carpet
+											// I think we still need it for when we hit the switch.  Putting back in, but upping progressCycleThreshold
+				distanceReached = true;
 			}
 		}
 		else {

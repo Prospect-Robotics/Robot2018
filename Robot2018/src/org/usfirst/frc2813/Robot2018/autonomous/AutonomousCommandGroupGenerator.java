@@ -318,6 +318,9 @@ public class AutonomousCommandGroupGenerator {
 
 	/** Helper routine for center position. Deliver cube and return */
 	private void deliverCenterCube(Length nextCubeHeight) {
+
+		useCurves = true;		// TODO:  testing curves FOR CENTER ONLY, overriding the sendable chooser in the drive station for now - FIX
+		
 		if (useCurves) {
 			double radius = 63; // found by trial and error
 			double degrees = 54.0;
@@ -501,16 +504,24 @@ public class AutonomousCommandGroupGenerator {
 				autoCmdList.drive.addCurveDegreesSync(robotStartFacingDirectionOnSide, 45.0, inches(radius), counterclockwise, SPEED_STOP);	// direction of turn is counterclockwise whether we are traveling forwards or backwards
 				autoCmdList.cube.addShootSequenceSync();
 			} else {
-<<<<<<< HEAD
 				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(totalDistanceAhead), SPEED_TURN);
 				prepareElevatorForScaleAsync(robotStartFacingDirectionOnSide);
-				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(60));
-				autoCmdList.drive.addQuickTurnSync(right, 30);
-				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(30), SPEED_TURN);
-				boolean disableSecondCubeGrab;		// TODO:  Fix autonomous and then nail down the code
-				if (disableSecondCubeGrab = true) {
-					autoCmdList.cube.addShootSequenceSync();
-				} else { autoCmdList.cube.addJawsOpenSync();
+				
+				// Values from practice bot in our lab
+//				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(60));
+//				autoCmdList.drive.addQuickTurnSync(right, 30);
+//				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(30), SPEED_TURN);
+				
+				// Values tuned by Jack at CVR
+				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(120));
+				autoCmdList.drive.addQuickTurnSync(right, 40);
+				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(36), SPEED_TURN);
+				
+//				autoCmdList.cube.addJawsOpenSync();			// Just dropping it hasn't worked well in practice - throw it instead
+				autoCmdList.cube.addShootSequenceSync();
+
+				boolean enableSecondCubeGrab;		// TODO:  Fix autonomous and then nail down the code
+				if (enableSecondCubeGrab = false) { 
 					autoCmdList.time.addDelayInSecondsSync(0.5);
 					autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(12), SPEED_TURN);
 					autoCmdList.drive.addQuickTurnSync(left, 30);
@@ -519,28 +530,12 @@ public class AutonomousCommandGroupGenerator {
 					autoCmdList.drive.addQuickTurnSync(right, 150);
 					autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_STOP); // was SPEED_TURN
 				}
-=======
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(totalDistanceAhead), SPEED_TURN);
-				prepareElevatorForScaleAsync(Direction.BACKWARD);
-				autoCmdList.arm.addMoveToPositionAsync(ArmConfiguration.ArmDegrees.create(120));
-				autoCmdList.drive.addQuickTurnSync(right, 40);
-				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(36), SPEED_TURN);
-				autoCmdList.cube.addShootSequenceSync();
-//				autoCmdList.cube.addJawsOpenSync();
-//				autoCmdList.time.addDelayInSecondsSync(0.5);
-//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(12), SPEED_TURN);
-//				autoCmdList.drive.addQuickTurnSync(left, 30);
-//				autoCmdList.drive.addDriveSync(Direction.BACKWARD, inches(24), SPEED_TURN);
-//				autoCmdList.resetAndCalibrateSync();
-//				autoCmdList.drive.addQuickTurnSync(right, 150);
-//				autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(24), SPEED_STOP); // was SPEED_TURN
-
->>>>>>> Jack's last stand.
 			}
 			
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
 			/** If the robot is in the center, we're going to drop a cube into the switch on the correct side. */
 			Logger.printFormat(LogType.INFO, "%s: Robot is in the center position, with the near switch at the %s position.", this, nearSwitchPosition);
+			
 			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
 //			getCenterFirstCube();
 //			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_SECOND_CUBE);
@@ -552,11 +547,13 @@ public class AutonomousCommandGroupGenerator {
 			/**
 			 * Robot and scale are on opposite side. 
 			 * Driving down the alley is not working.
-			 * Instead, drive forward to the swtich and stop.
-			 * If we are on our side of the swtich, place a block
+			 * Instead, drive forward to the switch and stop.
+			 * If we are on our side of the switch, place a block
 			 */
 			Logger.printFormat(LogType.INFO, "%s: Robot is in the %s position. Opposite the scale in the %s position.", this, robotStartingPosition, scalePosition);
 
+			//  This code assumes that we can rotate 90.  We can't do that with the competition bot on carpet.
+			//  Try just going forward to the switch straight and deliver a cube if it is on the correct side.
 //			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(101), SPEED_STOP);
 //			if(robotStartingPosition.equals(nearSwitchPosition)) {
 //				autoCmdList.drive.addQuickTurnSync(right, 90);
@@ -564,12 +561,12 @@ public class AutonomousCommandGroupGenerator {
 //				autoCmdList.cube.addShootSequenceSync();
 //			}
 			
-//			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(101), SPEED_STOP);
-//			if(robotStartingPosition.equals(nearSwitchPosition)) {
-//				autoCmdList.drive.addQuickTurnSync(right, 90);
-//				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(12), SPEED_STOP);
-//				autoCmdList.cube.addShootSequenceSync();
-//			}
+			 
+			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(backWallToSwitch - robotBumperLength), SPEED_STOP);
+			if(robotStartingPosition.equals(nearSwitchPosition)) {
+				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(4), SPEED_STOP);	// make sure we are touching the switch, but slowly - will stop if stalled
+				autoCmdList.cube.addShootSequenceSync();
+			}
 
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
