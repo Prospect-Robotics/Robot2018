@@ -107,7 +107,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final double SPEED_STOP = 0.0;
 
 	/** Speed zero for stopping after a move. */
-	private static final double SPEED_TURN = 0.3;
+	private static final double SPEED_TURN = 0.35;
 
 	/** Elevator heights for placing cubes on the switch. */
 	private static final Length ELEVATOR_HEIGHT_SWITCH = LengthUOM.Inches.create(27);
@@ -318,8 +318,6 @@ public class AutonomousCommandGroupGenerator {
 
 	/** Helper routine for center position. Deliver cube and return */
 	private void deliverCenterCube(Length nextCubeHeight) {
-
-		useCurves = true;		// TODO:  testing curves FOR CENTER ONLY, overriding the sendable chooser in the drive station for now - FIX
 		
 		if (useCurves) {
 			double radius = 63; // found by trial and error
@@ -338,7 +336,7 @@ public class AutonomousCommandGroupGenerator {
 			double straightEnds = (distanceToTarget - sideShiftToTarget - 12) / 3;
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(straightEnds), SPEED_TURN);
 			autoCmdList.drive.addQuickTurnSync(left, 55);
-			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
+			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12 + sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
 			autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
 			autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
 			autoCmdList.drive.addQuickTurnSync(right, 55);

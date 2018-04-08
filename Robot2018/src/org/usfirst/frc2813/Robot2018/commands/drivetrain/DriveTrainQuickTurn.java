@@ -98,7 +98,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	@Override
 	protected void ghscExecute() {
 		double directionMultiplier = getErrorInDegrees() < 0 ? -1 : 1;
-		double throttle = calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier;
+		double throttle = rate;//calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier;
 //		Logger.info(this + "throttle: " + throttle);
 		subsystem.arcadeDrive(0, throttle);
 	}
