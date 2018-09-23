@@ -186,9 +186,6 @@ public class RobotMap {
 		 * Arm Subsystem
 		 */
 		armSpeedControllerMaster = new TalonSRX(CAN_ID_Arm_Master);
-		armSpeedControllerFollower = new WPI_VictorSPX(CAN_ID_Arm_Follower);
-		armSpeedControllerFollower.setInverted(false); // NB: Handled in wiring
-		armSpeedControllerFollower.follow(armSpeedControllerMaster);
 		/*
 		 * Intake Subsystem
 		 */
