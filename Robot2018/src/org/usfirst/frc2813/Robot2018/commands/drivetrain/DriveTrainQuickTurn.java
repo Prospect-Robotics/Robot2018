@@ -101,6 +101,7 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 		double throttle = rate;//calcThrottle(getErrorMagnitudeInDegrees(), rate) * directionMultiplier;
 //		Logger.info(this + "throttle: " + throttle);
 		subsystem.arcadeDrive(0, throttle);
+		System.out.println(Robot.gyro.getAngle());
 	}
 	
 	@Override
@@ -115,16 +116,18 @@ public final class DriveTrainQuickTurn extends SubsystemCommand<DriveTrain> {
 	@Override
 	protected boolean ghscIsFinished() {
 		long now = System.currentTimeMillis();
-		if(getErrorMagnitudeInDegrees() <= MIN_DEG) {
-			if(whenDidWeDetectAngleWasCloseEnough != 0) {
-				if((now - whenDidWeDetectAngleWasCloseEnough) >= SETTLING_TIME_MS) {
-					Logger.debug(this.getClass().getSimpleName() + " - stable at goal for " + (now - whenDidWeDetectAngleWasCloseEnough) + "ms.  FINISHED!");
-					return true;
-				}
-			} else {
-				whenDidWeDetectAngleWasCloseEnough = now;
-			}
-			Logger.debug(this.getClass().getSimpleName() + " - stable but only at goal for " + (now - whenDidWeDetectAngleWasCloseEnough) + "ms.  WAITING.");
+		if(getErrorInDegrees() < 0 /*getErrorMagnitudeInDegrees() <= 10/* MIN_DEG*/) {
+			System.out.println("Finished");
+			return true;
+//			if(whenDidWeDetectAngleWasCloseEnough != 0) {
+//				if((now - whenDidWeDetectAngleWasCloseEnough) >= SETTLING_TIME_MS) {
+//					Logger.debug(this.getClass().getSimpleName() + " - stable at goal for " + (now - whenDidWeDetectAngleWasCloseEnough) + "ms.  FINISHED!");
+//					return true;
+//				}
+//			} else {
+//				whenDidWeDetectAngleWasCloseEnough = now;
+//			}
+//			Logger.debug(this.getClass().getSimpleName() + " - stable but only at goal for " + (now - whenDidWeDetectAngleWasCloseEnough) + "ms.  WAITING.");
 		} else {
 			whenDidWeDetectAngleWasCloseEnough = 0;
 		}
