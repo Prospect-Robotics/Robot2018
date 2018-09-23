@@ -1,6 +1,7 @@
 // RobotBuilder Version: 2.0
 package org.usfirst.frc2813.Robot2018;
 
+import org.usfirst.frc2813.Robot2018.autonomous.AutoThread;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroup;
 import org.usfirst.frc2813.Robot2018.autonomous.AutonomousCommandGroupGenerator;
 import org.usfirst.frc2813.Robot2018.commands.drivetrain.DriveTrainPrintEncoderValues;
@@ -162,17 +163,11 @@ public class Robot extends TimedRobot {
 		// Get the game setup data from the driver station
 		gameData = new GameData(DriverStation.getInstance().getGameSpecificMessage());
 
-		autonomousCommand = new AutonomousCommandGroup();
-		autoCmdGenerator = new AutonomousCommandGroupGenerator();
-		new POST(autonomousCommand).start();
-	}
-
-	/**
-	 * This function is called periodically during autonomous
-	 */
-	//@Override
-	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
+//		autonomousCommand = new AutonomousCommandGroup();
+//		autoCmdGenerator = new AutonomousCommandGroupGenerator();
+//		new POST(autonomousCommand).start();
+		Thread autoThread = new Thread(new AutoThread());
+		autoThread.start();
 	}
 
 	//@Override
