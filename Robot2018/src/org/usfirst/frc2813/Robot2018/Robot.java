@@ -78,6 +78,7 @@ public class Robot extends TimedRobot {
 	public static Solenoid gearShifter;
 	public static Solenoid ratchet;
 	public static Solenoid climbingBar;
+	public static Thread autoThread;
 
 	/**
 	 * Officially documenting our logical model for the robot.  LEFT is negative.
@@ -142,6 +143,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit(){
+		AutoThread.stop();
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 			autonomousCommand = null;
@@ -166,13 +168,14 @@ public class Robot extends TimedRobot {
 //		autonomousCommand = new AutonomousCommandGroup();
 //		autoCmdGenerator = new AutonomousCommandGroupGenerator();
 //		new POST(autonomousCommand).start();
-		Thread autoThread = new Thread(new AutoThread());
+		autoThread = new Thread(new AutoThread());
 		autoThread.start();
 	}
 
 	//@Override
 	public void teleopInit() {
 		Logger.info("teleopInit STARTED");
+		AutoThread.stop();
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
