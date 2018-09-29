@@ -169,6 +169,10 @@ public class Robot extends TimedRobot {
 		Thread autoThread = new Thread(new AutoThread());
 		autoThread.start();
 	}
+	
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
 	//@Override
 	public void teleopInit() {
