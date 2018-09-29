@@ -561,7 +561,7 @@ public class AutonomousCommandGroupGenerator {
 //			}
 			
 			 
-			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(backWallToSwitch - robotBumperLength), SPEED_STOP);
+			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(backWallToSwitch - robotBumperLength-15), SPEED_STOP);
 			if(robotStartingPosition.equals(nearSwitchPosition)) {
 				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(4), SPEED_STOP);	// make sure we are touching the switch, but slowly - will stop if stalled
 				autoCmdList.cube.addShootSequenceSync();

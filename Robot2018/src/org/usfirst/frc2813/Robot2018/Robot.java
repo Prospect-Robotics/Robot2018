@@ -196,6 +196,9 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 	}
 
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 	public void robotPeriodic() {
 		// Complain no more!
 	}

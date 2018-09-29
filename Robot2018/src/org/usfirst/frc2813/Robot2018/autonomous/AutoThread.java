@@ -11,15 +11,16 @@ public class AutoThread implements Runnable {
 
 	@Override
 	public void run() {
+		autonomousPeriodic();
 		while (is_active) {
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
+				autonomousPeriodic();
 				e.printStackTrace();
 			}	
 		}
-		autonomousPeriodic();
 	}
 	
 	public void autonomousPeriodic() {
