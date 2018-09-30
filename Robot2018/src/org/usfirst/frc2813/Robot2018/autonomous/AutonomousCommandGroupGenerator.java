@@ -439,8 +439,9 @@ public class AutonomousCommandGroupGenerator {
 		autoCmdList.cube.setHaveCube(true);
 
 		boolean autoDriveForwardOnly = false;
+		boolean useScale = false;
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
-		if (autoDriveForwardOnly==false) {
+		if (autoDriveForwardOnly==true) {
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToCrossLine), SPEED_STOP);
 			return;
 		}
@@ -464,7 +465,7 @@ public class AutonomousCommandGroupGenerator {
 		 * This initial state may not be exactly what we want, but it's safe. We can
 		 * change it later.
 		 */
-		prepareForSwitchSync();
+		
 
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting
@@ -474,7 +475,8 @@ public class AutonomousCommandGroupGenerator {
 		 * write all paths as if we are on the left. If we are in the center, we write
 		 * paths as if we are are moving to the left.
 		 */
-		if (robotStartingPosition.equals(scalePosition)) {
+		if (robotStartingPosition.equals(scalePosition) && useScale == true) {
+			prepareForSwitchSync();
 			prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
 			/**
 			 * The robot and the scale are on the same side. Drive forward and approach the
@@ -532,6 +534,7 @@ public class AutonomousCommandGroupGenerator {
 			}
 			
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
+			prepareForSwitchSync();
 			/** If the robot is in the center, we're going to drop a cube into the switch on the correct side. */
 			Logger.printFormat(LogType.INFO, "%s: Robot is in the center position, with the near switch at the %s position.", this, nearSwitchPosition);
 			
@@ -542,7 +545,9 @@ public class AutonomousCommandGroupGenerator {
 //			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
 			
 		} else {
-			prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
+			if (robotStartingPosition.equals(nearSwitchPosition)) {
+				prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
+			}
 			/**
 			 * Robot and scale are on opposite side. 
 			 * Driving down the alley is not working.

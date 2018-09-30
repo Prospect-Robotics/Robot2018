@@ -3,31 +3,33 @@ package org.usfirst.frc2813.Robot2018.autonomous;
 import org.usfirst.frc2813.Robot2018.Robot;
 import org.usfirst.frc2813.Robot2018.commands.post.POST;
 
+import edu.wpi.first.wpilibj.command.Scheduler;
+
 public class AutoThread implements Runnable {
 	private static boolean is_active = false;
+	private static double mUpdateRate = 1.0 / 50.0;
 	public AutoThread() {
-		// TODO Auto-generated constructor stub
+		Robot.autonomousCommand = new AutonomousCommandGroup();
+		Robot.autoCmdGenerator = new AutonomousCommandGroupGenerator();
 	}
 
 	@Override
 	public void run() {
-		autonomousPeriodic();
+		is_active = true;
+		new POST(Robot.autonomousCommand).start();
 		while (is_active) {
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				autonomousPeriodic();
+				long waitTime = (long) (mUpdateRate * 1000.0);
+			try {
+				Thread.sleep(waitTime);
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}	
 		}
 	}
 	
 	public void autonomousPeriodic() {
-		Robot.autonomousCommand = new AutonomousCommandGroup();
-		Robot.autoCmdGenerator = new AutonomousCommandGroupGenerator();
-		new POST(Robot.autonomousCommand).start();
-		is_active = true;
+		Scheduler.getInstance().run();
 	}
 
 	public static void stop() {

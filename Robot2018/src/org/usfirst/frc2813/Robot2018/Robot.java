@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 //import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the build.properties file in
  * the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends IterativeRobot {
 	/**
 	 *  This is the FIRST interface to read the state of the field pieces.
 	 */
@@ -102,7 +102,7 @@ public class Robot extends TimedRobot {
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
-	//@Override
+	@Override
 	public void robotInit() {
 		Logger.info("In robotInit");
 
@@ -157,7 +157,7 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 	}
 
-	//@Override
+	@Override
 	public void autonomousInit() {
 		Logger.info("Autonomous Init");
 		driveTrain.setBrakeCoast(NeutralMode.Brake);
@@ -172,7 +172,7 @@ public class Robot extends TimedRobot {
 		autoThread.start();
 	}
 
-	//@Override
+	@Override
 	public void teleopInit() {
 		Logger.info("teleopInit STARTED");
 		AutoThread.stop();
@@ -191,14 +191,11 @@ public class Robot extends TimedRobot {
 	/**
 	 * This function is called periodically during operator control
 	 */
-	//@Override
+	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 	}
 
-	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
-	}
 	public void robotPeriodic() {
 		// Complain no more!
 	}
