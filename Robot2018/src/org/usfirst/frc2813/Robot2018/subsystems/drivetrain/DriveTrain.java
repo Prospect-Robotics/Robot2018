@@ -172,7 +172,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		 *  Pushing the joystick left and right changes the joystick's X parameter.
 		 *  Even though the arcadeDrive calls this field "zRotation", it comes from the X axis of the joystick.
 		 */
-		robotDrive.arcadeDrive(joystick1.getY(), -joystick1.getX() * Math.abs(joystick1.getX()), false);
+		robotDrive.arcadeDrive(joystick1.getY(), (-joystick1.getX() * Math.abs(joystick1.getX()) + (-joystick1.getTwist() * Math.abs(joystick1.getTwist()))), false);
 
 	}
 
