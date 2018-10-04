@@ -354,6 +354,22 @@ public class AutonomousCommandGroupGenerator {
 		}
 	}
 
+	private void deliverSideCubeToSwitch() {
+		double distanceToTarget = backWallToSwitch - robotBumperLength;
+		double sideShiftToTarget = (switchWidth - robotBumperWidth) / 3;
+		double straightEnds = (distanceToTarget - sideShiftToTarget - 12) / 3;
+		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_TURN);
+		autoCmdList.drive.addQuickTurnSync(right, 25);
+//		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12 + sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
+		autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
+		autoCmdList.elevator.addWaitForTargetPositionSync();
+		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToTarget-65), SPEED_TURN);
+		autoCmdList.drive.addQuickTurnSync(left, 20);
+		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(18), SPEED_STOP);
+		autoCmdList.cube.addShootSequenceSync();
+	}
+	
 	private void getCenterCube(double distance) {
 		autoCmdList.cube.addIntakeInAsync();
 		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distance), SPEED_STOP);
@@ -438,7 +454,9 @@ public class AutonomousCommandGroupGenerator {
 		 */
 		autoCmdList.cube.setHaveCube(true);
 
-		boolean autoDriveForwardOnly = false;
+		boolean useScale = false;
+		
+		boolean autoDriveForwardOnly = true;
 		// FIXME! bypass autonomous for competition - make this a smart dashboard flag
 		if (autoDriveForwardOnly==false) {
 			autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToCrossLine), SPEED_STOP);
@@ -464,7 +482,7 @@ public class AutonomousCommandGroupGenerator {
 		 * This initial state may not be exactly what we want, but it's safe. We can
 		 * change it later.
 		 */
-		prepareForSwitchSync();
+		
 
 		/**
 		 * Here begins the autonomous decision tree in which we consider our starting
@@ -474,7 +492,8 @@ public class AutonomousCommandGroupGenerator {
 		 * write all paths as if we are on the left. If we are in the center, we write
 		 * paths as if we are are moving to the left.
 		 */
-		if (robotStartingPosition.equals(scalePosition)) {
+		if (robotStartingPosition.equals(scalePosition) && useScale == true) {
+			prepareForSwitchSync();
 			prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
 			/**
 			 * The robot and the scale are on the same side. Drive forward and approach the
@@ -532,6 +551,7 @@ public class AutonomousCommandGroupGenerator {
 			}
 			
 		} else if (robotStartingPosition.equals(Direction.CENTER)) {
+			prepareForSwitchSync();
 			/** If the robot is in the center, we're going to drop a cube into the switch on the correct side. */
 			Logger.printFormat(LogType.INFO, "%s: Robot is in the center position, with the near switch at the %s position.", this, nearSwitchPosition);
 			
@@ -542,7 +562,6 @@ public class AutonomousCommandGroupGenerator {
 //			deliverCenterCube(ELEVATOR_HEIGHT_GRAB_CUBE);
 			
 		} else {
-			prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
 			/**
 			 * Robot and scale are on opposite side. 
 			 * Driving down the alley is not working.
@@ -559,13 +578,25 @@ public class AutonomousCommandGroupGenerator {
 //				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(12), SPEED_STOP);
 //				autoCmdList.cube.addShootSequenceSync();
 //			}
-			
-			 
-			autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(backWallToSwitch - robotBumperLength-15), SPEED_STOP);
+//			
 			if(robotStartingPosition.equals(nearSwitchPosition)) {
-				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(4), SPEED_STOP);	// make sure we are touching the switch, but slowly - will stop if stalled
-				autoCmdList.cube.addShootSequenceSync();
+				prepareForSwitchSync();
+//				prepareArmForShootingAsync(robotStartFacingDirectionOnSide);
+				deliverSideCubeToSwitch();
+//				autoCmdList.drive.addQuickTurnSync(right, 10);
+			} else {
+				autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(backWallToSwitch - robotBumperLength-15), SPEED_STOP);
 			}
+//			Logger.info(robotStartingPosition.equals(nearSwitchPosition));
+			
+			
+//			Logger.info("Shoot Sequence");
+//			Logger.info(robotStartingPosition.equals(nearSwitchPosition));
+//			if(robotStartingPosition.equals(nearSwitchPosition)) {
+//				Logger.info("AddShootSequence");
+//				//autoCmdList.drive.addDriveSync(robotStartFacingDirectionOnSide, inches(4), SPEED_STOP);	// make sure we are touching the switch, but slowly - will stop if stalled
+//				autoCmdList.cube.addShootSequenceSync();
+//			}
 
 			/**
 			 * Robot and scale are on opposite side. Drive across the field between scale
