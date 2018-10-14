@@ -91,7 +91,6 @@ public class OI {
 	// button.whenReleased(new ExampleCommand());
 
 	public final Joystick joystick1;
-	public final Joystick joystick2;
 	public final Joystick buttonPanel;
 	public final SendableChooser<BiConsumer<Joystick, Joystick>> driveStyleChooser;
 	
@@ -319,7 +318,6 @@ public class OI {
 		 */
 		buttonPanel = new Joystick(0);
 		joystick1 = new Joystick(1);
-		joystick2 = new Joystick(2);
 
 		/*
 		 * Load the desired button layout
@@ -386,9 +384,8 @@ public class OI {
 			break;
 		}
 		
-		// Add the stick shifter
-		new JoystickPastMidpoint(joystick2, Direction.FORWARD).whenActive(createHighGear());
-		new JoystickPastMidpoint(joystick2, Direction.REVERSE).whenActive(createLowGear());
+		// Add gear shifter on trigger
+		new JoystickButton(joystick1, 1).whenPressed(createGearShiftToggle());
 
 		// Add compressor to live window
 		LiveWindow.add(RobotMap.compressor);
@@ -397,17 +394,14 @@ public class OI {
 		new RoboRIOUserButton().whenPressed(new ToggleCompressor(RobotMap.compressor));
 
 		// SmartDashboard Buttons
-		SmartDashboard.putData("OIDrive", new DriveTrainOIDrive(Robot.driveTrain, joystick1, joystick2));
+		SmartDashboard.putData("OIDrive", new DriveTrainOIDrive(Robot.driveTrain, joystick1));
 		driveStyleChooser = new SendableChooser<>();
-		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);
+//		driveStyleChooser.addDefault("Arcade drive", Robot.driveTrain::arcadeDrive);
 		driveStyleChooser.addObject("Tank drive", Robot.driveTrain::tankDrive);
 	}
 
 	public Joystick getJoystick1() {
 		return joystick1;
-	}
-	public Joystick getJoystick2() {
-		return joystick2;
 	}
 	public Joystick getbuttonPanel() {
 		return buttonPanel;

@@ -136,7 +136,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		 because DriveTrain has to be created before OI creates the joysticks.  Plus they are asking for
 		 a default command inside a subsystem, which is mixing the UI with the implementation and
 		 is poor design, but nothing we can do. */
-		setDefaultCommand(new DriveTrainOIDrive(this, Robot.oi.getJoystick1(), Robot.oi.getJoystick2()));
+		setDefaultCommand(new DriveTrainOIDrive(this, Robot.oi.getJoystick1()));
 //		setDefaultCommand(new DriveTrainOIDriveWithPIDStop(this, Robot.oi.getJoystick1(), Robot.oi.getJoystick2()));
 	}
 
@@ -164,7 +164,7 @@ public class DriveTrain extends GearheadsSubsystem {
 	 * @param joystick1 The joystick to use for linear throttle and angular throttle
 	 * @param joystickIgnored We don't use this one in arcadeDrive
 	 */
-	public void arcadeDrive(Joystick joystick1, Joystick joystickIgnored) {// defines arcadeDrive for OI
+	public void arcadeDrive(Joystick joystick1) {// defines arcadeDrive for OI
 		/*
 		 *  The arcadeDrive call parameters are (signed) speed and (signed) turn value [-1, 1]
 		 *  Pushing the joystick forward to drive forward decreases the joystick's Y parameter.
@@ -183,6 +183,7 @@ public class DriveTrain extends GearheadsSubsystem {
 		 */
 		robotDrive.arcadeDrive(- forwardSpeed, - turnSpeed, false); // false here means do not square the inputs (if
 																// omitted, the argument defaults to true)
+//		Logger.info(" " + forwardSpeed + " " + turnSpeed);
 	}
 
 	// Put methods for controlling this subsystem

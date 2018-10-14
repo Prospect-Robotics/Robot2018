@@ -52,8 +52,8 @@ public class Robot extends IterativeRobot {
 	public static final SendableChooser<Direction> positionSelector = new SendableChooser<>();
 	static {
 		Logger.info("Autonomous Position Selector Creation");
-		positionSelector.addDefault("LEFT", Direction.LEFT);
-		positionSelector.addObject("CENTER", Direction.CENTER);
+		positionSelector.addObject("LEFT", Direction.LEFT);
+		positionSelector.addDefault("CENTER", Direction.CENTER);
 		positionSelector.addObject("RIGHT", Direction.RIGHT);
 	}
 	public static final SendableChooser<Direction> autonomousSelectorCurves = new SendableChooser<>();

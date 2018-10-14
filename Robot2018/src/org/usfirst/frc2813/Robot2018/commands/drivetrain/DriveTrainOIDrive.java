@@ -18,13 +18,11 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 	
 	private final Joystick joystick1; 
-	private final Joystick joystick2;
 	private final long startTime;
 	
-	public DriveTrainOIDrive(DriveTrain driveTrain, Joystick joystick1, Joystick joystick2) {
+	public DriveTrainOIDrive(DriveTrain driveTrain, Joystick joystick1) {
 		super(driveTrain, RunningInstructions.RUN_NORMALLY, Lockout.Disabled);
 		this.joystick1 = joystick1;
-		this.joystick2 = joystick2;
 		this.startTime = System.currentTimeMillis();
 //		addArg("joystick1", joystick1);
 //		addArg("joystick2", joystick2);
@@ -40,7 +38,7 @@ public final class DriveTrainOIDrive extends SubsystemCommand<DriveTrain> {
 			if(subsystem.shouldSuspendToPreventBrownout()) {
 				Logger.error("DriveTrain is disabling itself to prevent brownout.");
 			} else {
-				subsystem.arcadeDrive(joystick1, joystick2);
+				subsystem.arcadeDrive(joystick1);
 			}
 		}
 	}
