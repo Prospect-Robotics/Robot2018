@@ -46,7 +46,7 @@ public class DriveTrainOIDriveWithPIDStop extends DriveTrainAutoStop {
 			if(isPIDEnabled()) {
 				disablePID();
 			}
-			subsystem.arcadeDrive(joystick1);
+			subsystem.arcadeDrive(joystick1, joystick2);
 		}
 		
 		if(pidStop && !isPIDEnabled()) {
