@@ -67,9 +67,10 @@ public class AutonomousCommandGroup extends CommandGroup {
 		if(!Robot.arm.isDisconnected()) {
 			calibrate.addSequential(new MotorCalibrateSensor(Robot.arm, Direction.IN));
 		}
-		if(!Robot.elevator.isDisconnected()) {
-			calibrate.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
-		}
+		//FIXME elevator check deactivated due to no limit switch - 10/06/18 at CalGames
+//		if(!Robot.elevator.isDisconnected()) {
+//			calibrate.addSequential(new MotorCalibrateSensor(Robot.elevator, Direction.DOWN));
+//		}
 		addParallel(calibrate);
 	}
 
@@ -145,7 +146,7 @@ public class AutonomousCommandGroup extends CommandGroup {
 		 */
 		public void addQuickTurnSync(Direction direction, double relativeAngle) {
 			addSequential(new DriveTrainQuickTurn(Robot.driveTrain, state, direction, relativeAngle, 0.6));
-			halt();
+//			halt(); XXX need to look further into this, but leave commented out for now
 		}
 	}
 
