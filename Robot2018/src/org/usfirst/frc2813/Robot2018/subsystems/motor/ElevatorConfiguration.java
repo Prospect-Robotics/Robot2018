@@ -25,7 +25,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double PULSES_PER_ENCODER_REVOLUTION = 4096;
 	
 	private static final Length MINIMUM_POSITION_INCHES = LengthUOM.Inches.create(0);
-	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(72);
+	private static final Length MAXIMUM_POSITION_INCHES = LengthUOM.Inches.create(80/*This used to be 2 until 10/23/18*/);
 	private static final Length SAFETY_MARGIN_INCHES = LengthUOM.Inches.create(4);
 	// Gearing constants
 	private static final double SENSOR_TO_DRIVE = 1.0;
@@ -36,7 +36,7 @@ public class ElevatorConfiguration extends MotorConfiguration {
 	private static final double    MAX_RPMS_UNLOADED_GEARED_DOWN = MAX_RPMS_UNLOADED	* MOTOR_TO_DRIVE;
 
 	// Software Settings
-	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(24); // TBD
+	private static final Rate   DEFAULT_SPEED_INCHES_PER_SECOND = RateUOM.InchesPerSecond.create(22/*This was 24 until 10/23/18*/); // TBD
 
 	// Hardware Inputs
 	private static final Length SHAFT_DIAMETER                = LengthUOM.Inches.create(1.25);
