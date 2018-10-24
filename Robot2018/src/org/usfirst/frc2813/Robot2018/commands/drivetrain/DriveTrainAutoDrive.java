@@ -331,12 +331,11 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * It's highly probable that assigning to boolean distanceReached will be atomic, though it's not
 		 * guaranteed.  I didn't think it was worth adding a mutex here and in the PID callback.
 		 */
-		//Logger.info(distanceTravelled() + "/" + distance);
 		if (!distanceReached) {
 			distanceReached = (distanceTravelled() >= distance);
 		}
 		if (distanceReached) {
-			return true;// (XXX need to look further into this) !needAngleLock();
+			return !needAngleLock();
 		}
 		return false;
 	}
@@ -363,13 +362,8 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 		 * pidAngleController before we reached our goal for curves will almost certainly have a non-zero rotation rate
 		 * and would have one if we were correcting for an error when driving straight.
 		 */
-		Logger.info("Stopping... leaving lastThrottle=", lastThrottle);
-		if (endSpeed == 0) {
-			subsystem.arcadeDrive(0.0, 0.0);
-		} else {
-			subsystem.arcadeDrive(lastThrottle, 0.0);
-		}
-//		subsystem.arcadeDrive(lastThrottle, 0.0);
+		Logger.debug("Stopping... leaving lastThrottle=", lastThrottle);
+		subsystem.arcadeDrive(lastThrottle, 0.0);
 	}
 
     /**
@@ -383,7 +377,6 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
     
     private boolean needAngleLock() {
     	if (endSpeed == 0 && subsystem.getGyro().getAngle() - deltaAngle > endAngleErrorThreshold) {
-    		Logger.info("needAngleLock: "+ endSpeed + " " + subsystem.getGyro().getAngle() + " " + deltaAngle);
     		lastThrottle = 0;
     		return true;
     	}
