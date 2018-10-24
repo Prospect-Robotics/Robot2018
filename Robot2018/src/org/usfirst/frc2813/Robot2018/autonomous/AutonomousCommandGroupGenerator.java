@@ -358,15 +358,20 @@ public class AutonomousCommandGroupGenerator {
 		double distanceToTarget = backWallToSwitch - robotBumperLength;
 		double sideShiftToTarget = (switchWidth - robotBumperWidth) / 3;
 		double straightEnds = (distanceToTarget - sideShiftToTarget - 12) / 3;
-		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_TURN);
-		autoCmdList.drive.addQuickTurnSync(right, 25);
+		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToTarget+10), 0/*FIXME SPEED_TURN*/);
+		Logger.info("deliverSideCubeToSwitch");
+		autoCmdList.drive.addQuickTurnSync(right, 80);
+		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_STOP);
+//		autoCmdList.drive.addQuickTurnSync(right, 80);
+//		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(20), 0.0);
+		Logger.info("deliverSideCubeToSwitch2");
 //		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12 + sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
 		autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
 		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
 		autoCmdList.elevator.addWaitForTargetPositionSync();
-		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToTarget-65), SPEED_TURN);
-		autoCmdList.drive.addQuickTurnSync(left, 20);
-		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(18), SPEED_STOP);
+//		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToTarget-65), SPEED_TURN);
+//		autoCmdList.drive.addQuickTurnSync(left, 20);
+//		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(18), SPEED_STOP);
 		autoCmdList.cube.addShootSequenceSync();
 	}
 	
