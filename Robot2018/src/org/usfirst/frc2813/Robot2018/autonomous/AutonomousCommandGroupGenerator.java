@@ -123,7 +123,7 @@ public class AutonomousCommandGroupGenerator {
 	private static final Length ELEVATOR_HEIGHT_SCALE_BACKWARD = LengthUOM.Inches.create(66);
 
 	/** Arm Position for Level extension. Use to grab and drop cube. */
-	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(150); // probably OK
+	private static final Length ARM_POSITION_LEVEL = ArmConfiguration.ArmDegrees.create(130); // probably OK
 
 	/** Arm Position below Level extension to avoid hitting hooks with elevator down. Use to grab and drop cube. */
 	private static final Length ARM_POSITION_LOW = ArmConfiguration.ArmDegrees.create(150); // 150 on OI
@@ -362,11 +362,11 @@ public class AutonomousCommandGroupGenerator {
 		Logger.info("deliverSideCubeToSwitch");
 		autoCmdList.drive.addQuickTurnSync(right, 80);
 		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12), SPEED_STOP);
-//		autoCmdList.drive.addQuickTurnSync(right, 80);
+//		autoCmdList.drive.addQuickTurnSync(left, 10);
 //		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(20), 0.0);
 		Logger.info("deliverSideCubeToSwitch2");
 //		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(12 + sideShiftToTarget * Math.sqrt(2)), SPEED_TURN);
-		autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
+		//TODO uncomment: autoCmdList.elevator.addMoveToPositionSync(ELEVATOR_HEIGHT_SWITCH);
 		autoCmdList.arm.addMoveToPositionAsync(ARM_POSITION_LEVEL);
 		autoCmdList.elevator.addWaitForTargetPositionSync();
 //		autoCmdList.drive.addDriveSync(Direction.FORWARD, inches(distanceToTarget-65), SPEED_TURN);

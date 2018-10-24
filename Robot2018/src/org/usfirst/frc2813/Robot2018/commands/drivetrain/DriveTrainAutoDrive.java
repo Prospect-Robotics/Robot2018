@@ -335,7 +335,7 @@ public class DriveTrainAutoDrive extends SubsystemCommand<DriveTrain> {
 			distanceReached = (distanceTravelled() >= distance);
 		}
 		if (distanceReached) {
-			return !needAngleLock();
+			return true;//!needAngleLock();
 		}
 		return false;
 	}
