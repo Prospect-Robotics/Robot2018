@@ -353,14 +353,14 @@ public class OI {
 			break;
 		default:
 		case Competition:
-			new JoystickButton(buttonPanel, 1).whileHeld(createElevatorUp());
-			new JoystickButton(buttonPanel, 2).whileHeld(createElevatorDown());
+			new JoystickButton(buttonPanel, 7).whileHeld(createElevatorUp());
+			new JoystickButton(buttonPanel, 8).whileHeld(createElevatorDown());
 			new JoystickButton(buttonPanel, 3).whileHeld(createArmIn());
 			new JoystickButton(buttonPanel, 4).whileHeld(createArmOut());
 			new JoystickButton(buttonPanel, 5).whileHeld(createIntakeIn());
 			new JoystickButton(buttonPanel, 6).whileHeld(createIntakeOut());
-			new JoystickButton(buttonPanel, 8).whenPressed(createRobotJawsToggle());
-			new JoystickButton(buttonPanel, 9).whenPressed(createElevatorToSwitchHeight());
+			new JoystickButton(buttonPanel, 9).whenPressed(createRobotJawsToggle());
+			new JoystickButton(buttonPanel, 1).whenPressed(createElevatorToSwitchHeight());
 			new JoystickButton(buttonPanel, 10).whenPressed(createCalibrationSequence());
 			new JoystickButton(buttonPanel, 11).whenPressed(createShootingPositionSequence());
 			new JoystickButton(buttonPanel, 12).whenPressed(createPickUpPositionSequence());
