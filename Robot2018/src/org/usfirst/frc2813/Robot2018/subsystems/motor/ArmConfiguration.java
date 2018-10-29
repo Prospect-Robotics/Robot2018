@@ -96,7 +96,7 @@ public class ArmConfiguration extends MotorConfiguration{
 	// Constants used for configuration
 	private static final Rate   DEFAULT_SPEED_DEGREES_PER_SECOND = ArmDegreesPerSecond.create(6.5); // was 10
 	private static final Length MINIMUM_POSITION_DEGREES = ArmDegrees.create(0); 
-	public static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(140/*This used to be 152 until 10/23/18*/);
+	public static final Length MAXIMUM_POSITION_DEGREES = ArmDegrees.create(150/*XXX This used to be 152 until 10/23/18*/);
 	private static final Rate   MINIMUM_RATE = ArmDegreesPerSecond.create(0);
 	private static final Rate   MAXIMUM_RATE = ArmDegreesPerSecond.create(90);
 	
