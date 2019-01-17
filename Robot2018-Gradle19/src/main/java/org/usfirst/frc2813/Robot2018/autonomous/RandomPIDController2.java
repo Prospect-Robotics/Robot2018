@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.util.BoundaryException;
+//import edu.wpi.first.wpilibj.util.BoundaryException;
 
 public class RandomPIDController2 extends SendableBase implements PIDInterface {
 	// EVERYTHING FROM HERE DOWN IS (more or less) COPY PASTED
@@ -545,7 +545,7 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 		m_thisMutex.lock();
 		try {
 			if (minimumInput > maximumInput) {
-				throw new BoundaryException("Lower bound is greater than upper bound");
+//				throw new BoundaryException("Lower bound is greater than upper bound");
 			}
 			m_minimumInput = minimumInput;
 			m_maximumInput = maximumInput;
@@ -569,7 +569,7 @@ public class RandomPIDController2 extends SendableBase implements PIDInterface {
 		m_thisMutex.lock();
 		try {
 			if (minimumOutput > maximumOutput) {
-				throw new BoundaryException("Lower bound is greater than upper bound");
+//				throw new BoundaryException("Lower bound is greater than upper bound");
 			}
 			m_minimumOutput = minimumOutput;
 			m_maximumOutput = maximumOutput;
