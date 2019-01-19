@@ -1,3 +1,3 @@
-cd %USERPROFILE%/git/Robot2019/Robot2019
+cd %USERPROFILE%/git/Robot2018/Robot2018-Gradle19
 call gradlew deploy
 pause
